@@ -43,8 +43,8 @@ Project Organization
     │   └── visualization  <- Scripts to create exploratory and results oriented visualizations
     │       └── visualize.py
     │
-    │── pyproject.toml    <- Human-readable project dependencies managed with Poetry
-    │── poetry.lock       <- File used by Poetry to install dependencies
+    ├── pyproject.toml    <- Human-readable project dependencies managed with Poetry
+    ├── poetry.lock       <- File used by Poetry to install dependencies
     └── .pre-commit-config.yaml <- pre-commit Git hooks
 
 
