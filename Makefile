@@ -29,8 +29,17 @@ requirements: test_environment
 ###
 
 ## Make Dataset
-download_data:
+download_all_data:
 	$(PYTHON_INTERPRETER) src/data/download_data.py
+
+download_land_mask:
+	$(PYTHON_INTERPRETER) src/data/download_data.py "external_datasets.to_download=[land_mask]"
+
+download_worldclim:
+	$(PYTHON_INTERPRETER) src/data/download_data.py "external_datasets.to_download=[worldclim]"
+
+download_all_vodca:
+	$(PYTHON_INTERPRETER) src/data/download_data.py "external_datasets.to_download=[vodca_c, vodca_ku, vodca_x]"
 
 ## Delete all compiled Python files
 clean:
