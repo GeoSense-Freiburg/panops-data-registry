@@ -1,0 +1,10 @@
+md5: eb3b05d24d5cb9fedeae78b369e0774b
+frozen: true
+deps:
+- checksum: '"26bf34209-5a0ca4b6aaadf"'
+  size: 10401038857
+  hash: md5
+  path: https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/wc2.1_30s_bio.zip
+outs:
+- hash: md5
+  path: wc2.1_30s_bio.zip

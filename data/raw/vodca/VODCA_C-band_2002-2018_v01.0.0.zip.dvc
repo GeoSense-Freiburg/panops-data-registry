@@ -1,0 +1,10 @@
+md5: 8935583545a09be9b076ba9cd7951243
+frozen: true
+deps:
+- checksum: '101460976387507749463389083403977342723'
+  size: 4604943249
+  hash: md5
+  path: https://zenodo.org/records/2575599/files/VODCA_C-band_2002-2018_v01.0.0.zip
+outs:
+- hash: md5
+  path: VODCA_C-band_2002-2018_v01.0.0.zip

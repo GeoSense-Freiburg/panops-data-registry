@@ -1,0 +1,10 @@
+md5: ec878a6fb5be5534f8edeae6e1436a26
+frozen: true
+deps:
+- checksum: '333898050269115523699183009783123494726'
+  size: 10696595619
+  hash: md5
+  path: https://zenodo.org/records/2575599/files/VODCA_Ku-band_1987-2017_v01.0.0.zip
+outs:
+- hash: md5
+  path: VODCA_Ku-band_1987-2017_v01.0.0.zip
