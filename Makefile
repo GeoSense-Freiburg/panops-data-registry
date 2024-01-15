@@ -32,9 +32,6 @@ requirements: test_environment
 download_data:
 	$(PYTHON_INTERPRETER) src/data/download_data.py
 
-data: download_data
-	$(PYTHON_INTERPRETER) src/data/make_dataset.py data/raw data/processed
-
 ## Delete all compiled Python files
 clean:
 	find . -type f -name "*.py[co]" -delete
