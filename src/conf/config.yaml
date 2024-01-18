@@ -24,3 +24,6 @@ external_datasets:
   vodca_x:
     url: ${external_datasets.vodca_base_url}/VODCA_X-band_1997-2018_v01.0.0.zip
     odir: ${paths.raw_data}/vodca
+
+gee:
+  land_mask_project: esa-land-cover

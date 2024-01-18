@@ -3,7 +3,7 @@ from pathlib import Path
 
 import requests
 
-from src.data.download_data import (
+from src.data.setup_raw.download_data import (
     download_file,
     download_files,
     get_datasets_download_info,
