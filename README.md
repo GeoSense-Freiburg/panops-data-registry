@@ -7,7 +7,6 @@ Project Organization
 ------------
 
     ├── LICENSE
-    ├── Makefile           <- Makefile with commands like `make data` or `make train`
     ├── README.md          <- The top-level README for developers using this project.
     ├── data               <- Data available for use with DVC
     │
@@ -53,9 +52,25 @@ Project Organization
 <p><small>Project based on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. #cookiecutterdatascience</small></p>
 
 ## Usage
-Coming soon!
+### Downloading data
+Downloading data from this registry is simple—that's the point!
 
-## Development setup
+To see what data is available, use `dvc list`, for example:
+```bash
+dvc list -R --dvc-only path/to/eo-data data
+```
+The above command lists all files available in the `data` directory of the `eo-data` registry (located in this case at `path/to/eo-data`). The `-R` flag tells DVC to list all directory contents recursively, and `--dvc-only` only shows the actual data, excluding system files like `__pycache__` and `.gitignore`.
+
+Download the data you want with `dvc get` or `dvc import`. Use `dvc get` if you don't want to automatically track your local copy of the data in your own DVC project. Using `dvc import` checks the files into DVC versioning.
+```bash
+dvc import path/to/eo-data data/raw/gbif/all_tracheophyta.zip myproject/data/raw/gbif
+```
+
+> [!NOTE]
+> DVC supports remote storage, just like Git. In this case, you would **not** want to set this registry as a DVC remote for your project, since it should be considered *read-only*. Configure a DVC remote for your project only if you want to push your data (and its intermediate transformations and features) to a project-specific remote.
+
+## Development
+### Setup
 
 ### 1. Clone the project repository
 
@@ -79,17 +94,14 @@ pipx install dvc
 ### 3. Create a virtual environment
 
 ```bash
-mamba create -n eo-data -c conda-forge python=3.10
-mamba activate eo-data
+conda create -n eo-data -c conda-forge python=3.10
+conda activate eo-data
 ```
 
-> [!NOTE]
-> `mamba` is simply a faster implementation of `conda`. If you don't have `mamba` installed, `conda` will also work.
-
 ### 4. Install dependencies
-This checks to confirm python and conda environment setup. If on Windows, or if you'd simply prefer not to use `make`, you can use `poetry install` instead.
+Install dependencies with Poetry.
 ```bash
-make requirements
+poetry install
 ```
 
 ### 5. Install pre-commit Git hooks (optional)
@@ -104,3 +116,31 @@ pre-commit install
 > poetry remove pre-commit
 > ```
 > If you've already installed the hooks with `pre-commit install`, you'll need to run `pre-commit uninstall`.
+
+### Running pipelines
+> [!WARNING]
+> This section is for **reproducing core data registry pipelines**. In other words, reproducing pipeline stages may result in modifcations or even removal of data, which could result in breaking changes for other parties who are simply pulling data for their own projects. Only run pipelines (e.g. `dvc repro` or `dvc exp run`) if you are sure you need to! If you only want to download data, see the above section on [Downloading data](#downloading-data).
+
+The entire data creation and transformation process can be reproduced using DVC pipelines. You can reproduce the entire pipeline with
+```bash
+dvc repro
+```
+but (more common) you may want to simply run a single stage, with
+```bash
+dvc repro my_stage
+```
+
+#### `download_gbif` DVC pipeline stage
+To reproduce the GBIF download of all non-cultivated plant occurrences in Tracheophyta, first check to see if any of the data files (outs) have changed.
+```bash
+dvc status download_gbif
+```
+If there have been changes, or if you simply want to get the most up-to-date query from GBIF, take the following steps:
+
+1. Create (or reuse) a JSON query in `references/gbif`
+2. View `dvc.yaml` to familiarize yourself with what the stage does.
+3. Update `params.yaml` accordingly (e.g. you will most likely at least want to update `gbif.query_date` for clear versioning).
+4. Run the pipeline stage:
+```bash
+dvc repro download_gbif
+```
