@@ -1,0 +1,22 @@
+stages:
+  download_gbif:
+    cmd: >-
+      python src/data/download_gbif.py
+      -q ${gbif.query}
+      -n ${gbif.query_name}_${gbif.query_date}
+      -o ${gbif.output}
+      -k 0061702-231120084113126
+    outs:
+      - ${gbif.output}/${gbif.query_name}_${gbif.query_date}.zip:
+          persist: true
+      - ${gbif.output}/${gbif.query_name}_${gbif.query_date}.json:
+          persist: true
+    desc: >
+      "This stage takes a query in the form of a JSON file (see references/gbif) and
+      initializes a download job based on it. The default behavior is to read a `query_date`
+      parameter in `params.yaml` and append it to the `query_name`. This is useful if you
+      want to timestamp a query as future queries with the same predicates may be different, 
+      but the date is not updated automatically so REMEMBER TO UPDATE `gbif.query_date`
+      before running this stage!\n\n
+      After the download job is initialized, it will check to see if the download is ready
+      every minute, and once it is, it will start downloading it."
