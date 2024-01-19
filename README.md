@@ -67,7 +67,7 @@ The above command lists all files available in the `data` directory of the `eo-d
 
 Download the data you want with `dvc get` or `dvc import`. Use `dvc get` if you don't want to automatically track your local copy of the data in your own DVC project. Using `dvc import` checks the files into DVC versioning.
 ```bash
-dvc import path/to/eo-data data/raw/gbif/all_tracheophyta.zip myproject/data/raw/gbif
+dvc import path/to/eo-data data/raw/gbif/all_tracheophyta.zip -o myproject/data/raw/gbif
 ```
 
 > [!NOTE]
@@ -76,14 +76,14 @@ dvc import path/to/eo-data data/raw/gbif/all_tracheophyta.zip myproject/data/raw
 ## Development
 ### Setup
 
-### 1. Clone the project repository
+#### 1. Clone the project repository
 
 ```bash
 git clone https://github.com/dluks/eo-data
 cd eo-data
 ```
 
-### 2. Install poetry and DVC.
+#### 2. Install poetry and DVC.
 
 ```bash
 pipx install poetry==~1.7
@@ -95,20 +95,20 @@ pipx install dvc
 > pip install --user condax
 > ```
 
-### 3. Create a virtual environment
+#### 3. Create a virtual environment
 
 ```bash
 conda create -n eo-data -c conda-forge python=3.10
 conda activate eo-data
 ```
 
-### 4. Install dependencies
+#### 4. Install dependencies
 Install dependencies with Poetry.
 ```bash
 poetry install
 ```
 
-### 5. Install pre-commit Git hooks (optional)
+#### 5. Install pre-commit Git hooks (optional)
 
 ```bash
 pre-commit install
