@@ -22,9 +22,9 @@ class GbifDownloadFailure(Exception):
 
 def init_gbif_download(query: dict) -> str:
     """
-    Initiate a GBIF download job and return the job key.
+    Initiate a GBIF download job in the Apache Parquet format and return the job key.
     """
-    download_key = occ.download(query)  # type: ignore
+    download_key = occ.download(query, format="SIMPLE_PARQUET")  # type: ignore
     return download_key[0]
 
 
@@ -99,7 +99,7 @@ def check_download_job_and_download_file(
     "--query",
     "query_file",
     type=click.Path(path_type=Path),
-    default=Path("references/gbif/all_tracheophyta.json"),
+    default=Path("references/gbif/query_all_tracheophyta.json"),
     show_default=True,
 )
 @click.option(
