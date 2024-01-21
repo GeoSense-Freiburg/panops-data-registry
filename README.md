@@ -134,17 +134,8 @@ but (more common) you may want to simply run a single stage, with
 dvc repro my_stage
 ```
 
-#### `download_gbif` DVC pipeline stage
-To reproduce the GBIF download of all non-cultivated plant occurrences in Tracheophyta, first check to see if any of the data files (outs) have changed.
+#### Data setup
+While it is likely not necessary, if you want to reproduce the GBIF download of all non-cultivated plant occurrences in Tracheophyta, simply run download_gbif.py:
 ```bash
-dvc status download_gbif
-```
-If there have been changes, or if you simply want to get the most up-to-date query from GBIF, take the following steps:
-
-1. Create (or reuse) a JSON query in `references/gbif`
-2. View `dvc.yaml` to familiarize yourself with what the stage does.
-3. Update `params.yaml` accordingly (e.g. you will most likely at least want to update `gbif.query_date` for clear versioning).
-4. Run the pipeline stage:
-```bash
-dvc repro download_gbif
+python src/data/download_gbif.py -n all_tracheophyta_[today's date] -o data/raw/gbif
 ```
