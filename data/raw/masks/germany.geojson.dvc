@@ -1,0 +1,6 @@
+outs:
+- md5: 23f2104c43848f9ba54a1c51c8d78998
+  size: 11028863
+  isexec: true
+  hash: md5
+  path: germany.geojson
