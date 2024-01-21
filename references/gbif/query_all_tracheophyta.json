@@ -13,6 +13,16 @@
         "key": "DEGREE_OF_ESTABLISHMENT",
         "values": ["cultivated"]
       }
+    },
+    {
+      "type": "equals",
+      "key": "HAS_GEOSPATIAL_ISSUE",
+      "value": "FALSE"
+    },
+    {
+      "type": "equals",
+      "key": "HAS_COORDINATE",
+      "value": "TRUE"
     }
   ]
 }
