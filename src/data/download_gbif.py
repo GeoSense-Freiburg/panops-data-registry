@@ -2,6 +2,7 @@
 import json
 import logging
 import time
+import zipfile
 from pathlib import Path
 from typing import Optional
 
@@ -36,9 +37,19 @@ def check_download_status(key: str) -> str:
 
 def download_request_to_disk(
     key: str, output_path: Path, name: Optional[str] = None
-) -> None:
-    """Download a completed GBIF download job's zipfile and metadata."""
+) -> Path:
+    """
+    Download a completed GBIF download job's zipfile and metadata.
 
+    Args:
+        key (str): The key of the completed GBIF download job.
+        output_path (Path): The path where the downloaded files will be saved.
+        name (Optional[str], optional): The name to be used for the downloaded files. If
+            None, then the default name will be used (the GBIF download key).
+
+    Returns:
+        Path: The full path of the downloaded zipfile.
+    """
     occ.download_get(key, str(output_path))
 
     # This is how it is downloaded by default
@@ -57,17 +68,20 @@ def download_request_to_disk(
     ) as f:
         json.dump(occ.download_meta(key), f)
 
+    return output_full_path
+
 
 def check_download_job_and_download_file(
     key: str, output_path: Path, name: Optional[str] = None, max_hours: int | float = 6
-) -> None:
+) -> Path:
     """
     Checks a pending GBIF download for a given amount of time, downloads the file once
     it is ready.
 
     Args:
-        output_path (Path): The path where the downloaded file will be saved.
         key (str): The key of the GBIF download job to check.
+        output_path (Path): The path where the downloaded file will be saved.
+        name (Optional[str], optional): The name of the downloaded file. Defaults to None.
         max_hours (int | float, optional): The maximum number of hours to wait for the download
             to complete. Defaults to 6.
 
@@ -79,7 +93,9 @@ def check_download_job_and_download_file(
     while True:
         status = check_download_status(key)
         if status == "SUCCEEDED":
-            download_request_to_disk(key=key, output_path=output_path, name=name)
+            output_file = download_request_to_disk(
+                key=key, output_path=output_path, name=name
+            )
             break
 
         if status == "FAILED":
@@ -91,6 +107,21 @@ def check_download_job_and_download_file(
                 f"Download job {key} did not complete within" f"{max_hours}. Aborting"
             )
         time.sleep(60)
+
+    return output_file
+
+
+def unzip_and_rename(file_path: Path):
+    """Unzip a file and rename the unzipped directory to the original name."""
+    with zipfile.ZipFile(file_path, "r") as zip_ref:
+        # Extract all the contents of zip file in current directory
+        zip_ref.extractall(path=file_path.parent)
+
+        # Get the name of the directory that was extracted (most likely
+        # "occurrences.parquet", but that may change in the future)
+        extracted_dir = Path(zip_ref.namelist()[0]).parent
+
+        extracted_dir.rename(file_path.with_suffix(".parquet"))
 
 
 @click.command()
@@ -143,10 +174,14 @@ def main(query_file: Path, name: str, key: str, output_path: Path):
     else:
         log.info("Re-checking download using key: %s", key)
         download_key = key
+
     log.info("Checking if download job is ready...")
-    check_download_job_and_download_file(
+    output_file = check_download_job_and_download_file(
         key=download_key, output_path=output_path, name=name
     )
+
+    log.info("Unzipping and renaming downloaded occurrences...")
+    unzip_and_rename(output_file)
 
 
 if __name__ == "__main__":
