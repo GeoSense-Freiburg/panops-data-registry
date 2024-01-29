@@ -43,7 +43,7 @@ Project Organization
     │       └── visualize.py
     │
     ├── tests              <- Pytest test scripts
-    ├── .dvc               <- Contains DVC data cache and config
+    ├── .dvc               <- Contains DVC tmp files (IMPORTANT! The DVC cache lives elsewhere in the filesystem)
     ├── dvc.yaml           <- Defines DVC pipeline stages
     ├── params.yaml        <- Define parameters used in DVC pipeline stages
     ├── pyproject.toml     <- Human-readable project dependencies managed with Poetry
@@ -56,6 +56,9 @@ Project Organization
 <p><small>Project based on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. #cookiecutterdatascience</small></p>
 
 ## Usage
+### Important!
+This project is still in active development, so before using it, please contact daniel.lusk@geosense.uni-freiburg.de.
+
 ### Downloading data
 Downloading data from this registry is simple—that's the point!
 
