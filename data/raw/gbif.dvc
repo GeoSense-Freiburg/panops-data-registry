@@ -1,0 +1,6 @@
+outs:
+- md5: 01471ac6d68db1a8c9c6bd4688a465b0.dir
+  size: 28197370173
+  nfiles: 1483
+  hash: md5
+  path: gbif
