@@ -12,6 +12,7 @@ python = "~3.10"
 requests = "^2.31.0"
 python-dotenv = "^1.0.0"
 pygbif = {path = "../pygbif/dist/pygbif-0.6.3-py2.py3-none-any.whl"}
+ipykernel = "^6.29.0"
 
 
 [tool.poetry.group.dev.dependencies]
