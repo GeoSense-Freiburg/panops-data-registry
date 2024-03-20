@@ -1,4 +1,4 @@
 [cache]
-    dir = /mnt/FS_data/geosense_data_registry/dvc-cache
+    dir = /mnt/FS_data/panops-data/dvc-cache
     shared = group
-    type = symlink
+    type = "hardlink,symlink"
