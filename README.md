@@ -1,7 +1,8 @@
-Geosense EO Data Registry
+PANOPS Data Registry
 ==============================
 
-A data registry of Earth observation data commonly used by the Geosense group at the University of Freiburg.
+A data registry of data commonly used in the PANOPS project of the Geosense group at the
+University of Freiburg.
 
 Project Organization
 ------------
@@ -12,35 +13,14 @@ Project Organization
     │
     ├── models             <- Trained and serialized models, model predictions, or model summaries
     │
-    ├── notebooks          <- Jupyter notebooks. Naming convention is a number (for ordering),
-    │                         the creator's initials, and a short `-` delimited description, e.g.
-    │                         `1.0-jqp-initial-data-exploration`.
-    │
     ├── references         <- Data dictionaries, manuals, and all other explanatory materials.
-    │
-    ├── reports            <- Generated analysis as HTML, PDF, LaTeX, etc.
-    │   └── figures        <- Generated graphics and figures to be used in reporting
-    │
-    ├── requirements.txt   <- The requirements file for reproducing the analysis environment, e.g.
-    │                         generated with `pip freeze > requirements.txt`
     │
     ├── setup.py           <- makes project pip installable (pip install -e .) so src can be imported
     ├── src                <- Source code for use in this project.
     │   ├── __init__.py    <- Makes src a Python module
     │   │
-    │   ├── data           <- Scripts to download or generate data
-    │   │   └── download_gbif.py
-    │   │
-    │   ├── features       <- Scripts to turn raw data into features for modeling (placeholder for now)
-    │   │   └── build_features.py
-    │   │
-    │   ├── models         <- Scripts to train models and then use trained models to make
-    │   │   │                 predictions (placeholders for now)
-    │   │   ├── predict_model.py
-    │   │   └── train_model.py
-    │   │
-    │   └── visualization  <- Scripts to create exploratory and results oriented visualizations
-    │       └── visualize.py
+    │   └── gbif           <- Downloads GBIF data according to a query object in references
+    │       └── download_gbif.py
     │
     ├── tests              <- Pytest test scripts
     ├── .dvc               <- Contains DVC tmp files (IMPORTANT! The DVC cache lives elsewhere in the filesystem)
@@ -59,7 +39,7 @@ Project Organization
 ### Important!
 This project is still in active development, so before using it, please contact daniel.lusk@geosense.uni-freiburg.de.
 
-### Downloading data
+### Downloading data (TODO: Update with correct instructions)
 Downloading data from this registry is simple—that's the point!
 
 To see what data is available, use `dvc list`, for example:
