@@ -1,4 +1,5 @@
 """Initiate a GBIF download and save it to disk once it is ready."""
+
 import json
 import logging
 import time
@@ -8,7 +9,7 @@ from typing import Optional
 
 import click
 from dotenv import find_dotenv, load_dotenv
-from pygbif import occurrences as occ
+from pygbif import occurrences as occ  # pylint: disable=import-error
 
 log = logging.getLogger(__name__)
 
