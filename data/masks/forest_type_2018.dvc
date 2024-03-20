@@ -1,0 +1,6 @@
+outs:
+- md5: 9acb20252e90342fd59f1ae6646051fa.dir
+  size: 8774525251
+  nfiles: 180
+  hash: md5
+  path: forest_type_2018
