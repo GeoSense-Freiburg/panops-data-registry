@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 from pygbif import occurrences as occ
 
-from src.data.download_gbif import (
+from src.gbif.download_gbif import (
     GbifDownloadFailure,
     check_download_job_and_download_file,
     check_download_status,
@@ -14,7 +14,7 @@ from src.data.download_gbif import (
 )
 
 # Define the module name to be used for mocking
-TESTED_MODULE = "src.data.download_gbif"
+TESTED_MODULE = "src.gbif.download_gbif"
 
 
 @pytest.fixture(name="gbif_query")

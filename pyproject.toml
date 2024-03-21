@@ -1,18 +1,19 @@
 [tool.poetry]
-name = "eo-data"
+name = "panops-data-registry"
 version = "0.1.0"
-description = "A registry of Earth observation datasets used in the Geosense lab."
+description = "A registry of Earth observation datasets used in the PANOPS project of the Geosense lab at the University of Freiburg."
 authors = ["Daniel Lusk"]
 license = "MIT"
 readme = "README.md"
 packages = [{include = "src"}]
 
 [tool.poetry.dependencies]
-python = "~3.10"
+python = "~3.12"
 requests = "^2.31.0"
 python-dotenv = "^1.0.0"
-pygbif = {path = "../custom-packages/pygbif/dist/pygbif-0.6.3-py2.py3-none-any.whl"}
+# pygbif = {path = "/mnt/FS_data/custom-packages/pygbif/dist/pygbif-0.6.3-py2.py3-none-any.whl"}
 ipykernel = "^6.29.0"
+pygbif = "^0.6.4"
 
 
 [tool.poetry.group.dev.dependencies]
