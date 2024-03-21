@@ -1,0 +1,15 @@
+modis:
+  date_start: "2001-01-01"
+  # date_end: "2024-01-01"
+  date_end: "2003-02-01"
+  product: "MODIS/061/MOD09GA"
+  bands:
+    - "sur_refl_b01" # red
+    - "sur_refl_b02" # NIR (841-876nm)
+    - "sur_refl_b03" # blue
+    - "sur_refl_b04" # green
+    - "sur_refl_b05" # NIR (1230-1250nm)
+  qa_band: "state_1km"
+  crs: "EPSG:4326"
+  scale: 2
+  output_path: "data/modis/test.zarr"
