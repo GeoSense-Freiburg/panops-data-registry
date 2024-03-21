@@ -1,5 +1,5 @@
-"""Test src.data.download_gbif"""
-import time
+"""Tests for the download_gbif module."""
+
 from pathlib import Path
 
 import pytest
