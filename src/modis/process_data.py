@@ -1,17 +1,8 @@
 """Generate global multiyear monthly averages of MODIS Terra surface reflectance data from
     2000-2023 at 1 km resolution.
-
-This script processes MODIS Terra surface reflectance data and calculates monthly averages using xarray.
-The processed data is saved in Zarr format.
-
-Usage:
-    python process_data.py [--no-dask] [--verbose]
-
-Options:
-    --no-dask, -d       Use Dask for parallel processing.
-    --verbose, -v       Enable verbose mode for logging.
-
 """
+
+# pylint: disable=no-member
 
 import argparse
 import logging
@@ -25,7 +16,7 @@ import zarr
 from dotenv import find_dotenv, load_dotenv
 
 from src.conf.parse_params import config
-from src.utils.gee import get_ic, mask_clouds
+from src.utils.gee import aggregate_ic_monthly, get_ic, mask_clouds
 from src.utils.log_utils import setup_logger
 
 setup_logger()
@@ -66,11 +57,11 @@ def get_modis_ic(
     )
 
     modis = mask_clouds(modis, modis_cfg["qa_band"]).select(modis_cfg["bands"])
-    # modis = add_ndvi(modis)
+    modis = add_ndvi(modis)
     return modis
 
 
-def process_modis_ic(ic: ee.ImageCollection, modis_cfg: dict) -> xr.Dataset:
+def process_modis_ic_xee(ic: ee.ImageCollection, modis_cfg: dict) -> xr.Dataset:
     """Process MODIS Terra surface reflectance ImageCollection by computing monthly averages
     using xarray."""
 
@@ -82,6 +73,47 @@ def process_modis_ic(ic: ee.ImageCollection, modis_cfg: dict) -> xr.Dataset:
     )
     ds = ds.groupby("time.month").mean()
     return ds
+
+
+def process_modis_ic_ee(ic: ee.ImageCollection, modis_cfg: dict) -> None:
+    """Process MODIS Terra surface reflectance ImageCollection by computing monthly averages"""
+
+    ic = aggregate_ic_monthly(ic)
+
+    months = range(1, 13)
+
+    # # Get the first image in the collection to retrieve band names
+    first_image = ee.Image(ic.first())
+    # bands = first_image.bandNames().getInfo()
+
+    # for month in months:
+    #     for band in bands:
+    #         mean_image = (
+    #             ic.filter(ee.Filter.calendarRange(month, month, "month"))
+    #             .select(band)
+    #             .mean()
+    #         )
+
+    #         year_start = modis_cfg["date_start"].split("-")[0]
+    #         year_end = modis_cfg["date_end"].split("-")[0]
+    #         res_in_km = modis_cfg["scale"] / 1000
+
+    #         export_params = {
+    #             "image": mean_image,
+    #             "description": f"modis_{band}_mean_{month}_{year_start}-{year_end}_"
+    #             f"{res_in_km:.2g}km",
+    #             "bucket": modis_cfg["bucket"],
+    #             "fileNamePrefix": f"modis_{band}_mean_{month}_{year_start}-{year_end}_"
+    #             f"{res_in_km:.2g}km",
+    #             "scale": modis_cfg["scale"],
+    #             "fileFormat": "GeoTIFF",
+    #             "formatOptions": {"cloudOptimized": True},
+    #             "maxPixels": 1e13,
+    #         }
+
+    #         # Export the Image to Google Cloud Storage
+    #         task = ee.batch.Export.image.toCloudStorage(**export_params)
+    #         task.start()
 
 
 def save_to_zarr(ds: xr.Dataset, output_path: str | os.PathLike):
@@ -102,6 +134,15 @@ def main(cfg: dict = config):
     )
     parser.add_argument("--no-dask", "-d", action="store_true", help="Use Dask")
     parser.add_argument("--verbose", "-v", action="store_true", help="Verbose mode")
+    parser.add_argument(
+        "--method",
+        "-m",
+        default="ee",
+        choices=["ee", "xee"],
+        help="Processing method. Note that xee method is experimental and only works for"
+        "datasets < 32 MB.",
+    )
+
     args = parser.parse_args()
 
     if args.verbose:
@@ -117,11 +158,15 @@ def main(cfg: dict = config):
     log.info("Getting MODIS Terra surface reflectance data")
     modis_ic = get_modis_ic(modis_cfg)
 
-    log.info("Processing MODIS Terra surface reflectance data")
-    ds = process_modis_ic(modis_ic, modis_cfg)
+    if args.method == "xee":
+        log.info(
+            "Processing into monthly avgs and saving the xarray Dataset to Zarr format"
+        )
+        ds = process_modis_ic_xee(modis_ic, modis_cfg)
+        save_to_zarr(ds, project_dir / modis_cfg["output_path"])
 
-    log.info("Saving the xarray Dataset to Zarr format")
-    save_to_zarr(ds, project_dir / modis_cfg["output_path"])
+    log.info("Processing into monthly avgs and exporting to Google Cloud Storage...")
+    process_modis_ic_ee(modis_ic, modis_cfg)
 
 
 if __name__ == "__main__":

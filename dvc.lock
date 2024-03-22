@@ -1,0 +1,13 @@
+schema: '2.0'
+stages:
+  modis_monthly_avgs:
+    cmd: python src/modis/process_data.py -v --no-dask
+    deps:
+    - path: src/modis/process_data.py
+      hash: md5
+      md5: efb5f8266b7ffdc5914b57ccdad1308d
+      size: 5209
+    - path: src/utils/gee.py
+      hash: md5
+      md5: 4febf32aae0df8376b931d206c4d1565
+      size: 2172

@@ -1,0 +1,6 @@
+stages:
+  modis_monthly_avgs:
+    cmd: python src/modis/process_data.py -v --no-dask
+    deps:
+      - src/modis/process_data.py
+      - src/utils/gee.py

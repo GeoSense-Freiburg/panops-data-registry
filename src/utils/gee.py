@@ -1,5 +1,7 @@
 """Google Earth Engine utility functions."""
 
+# pylint: disable=no-member
+
 from typing import Optional
 
 import ee
@@ -71,3 +73,23 @@ def mask_clouds(
         return image_masked
 
     return ic.map(_mask_clouds)
+
+
+def aggregate_ic_monthly(ic: ee.ImageCollection) -> ee.ImageCollection:
+    """Aggregates an ImageCollection of monthly averages to calendar month means"""
+
+    def _reduce_months(month):
+        bn = (
+            ee.String(ic.first().bandNames().get(0))
+            .cat("_mean_m")
+            .cat(ee.Number(month).toInt8().format())
+        )
+
+        return (
+            ic.filter(ee.Filter.calendarRange(month, month, "month"))
+            .reduce(ee.Reducer.mean())
+            .set("system:index", ee.Number(month).toInt8().format())
+            .rename(bn)
+        )
+
+    return ee.ImageCollection.fromImages(ee.List.sequence(1, 12).map(_reduce_months))
