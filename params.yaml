@@ -10,5 +10,7 @@ modis:
     - "sur_refl_b05" # NIR (1230-1250nm)
   qa_band: "state_1km"
   crs: "EPSG:4326"
-  scale: 0.008983
-  output_path: "data/modis/modis_monthly_avg_2000-2024_1km.zarr"
+  scale: 1000 # In meters for GEE export
+  target: "gcs"
+  bucket: "modis_monthly_avgs_1km"
+  output_path: data/modis/modis_monthly_avg_2000-2024_1km.zarr

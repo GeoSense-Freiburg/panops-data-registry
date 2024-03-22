@@ -16,17 +16,23 @@ import zarr
 from dotenv import find_dotenv, load_dotenv
 
 from src.conf.parse_params import config
-from src.utils.gee import aggregate_ic_monthly, get_ic, mask_clouds
+from src.utils.gee import (
+    ExportParams,
+    calculate_monthly_averages,
+    export_collection,
+    get_ic,
+    mask_clouds,
+)
 from src.utils.log_utils import setup_logger
 
 setup_logger()
 log = logging.getLogger(__name__)
 
 
-def setup(no_dask: bool = False):
+def setup(use_dask: bool = False):
     """Set up the Earth Engine API and Dask client."""
     ee.Initialize()
-    if no_dask:
+    if not use_dask:
         return None
     log.info("Setting up Dask client")
     client = dask.distributed.Client()
@@ -47,73 +53,56 @@ def add_ndvi(ic: ee.ImageCollection) -> ee.ImageCollection:
 
 
 def get_modis_ic(
-    modis_cfg: dict,
+    cfg: dict,
 ) -> ee.ImageCollection:
     """Get MODIS Terra surface reflectance data from 2000-2023."""
     modis = get_ic(
-        modis_cfg["product"],
-        modis_cfg["date_start"],
-        modis_cfg["date_end"],
+        cfg["product"],
+        cfg["date_start"],
+        cfg["date_end"],
     )
 
-    modis = mask_clouds(modis, modis_cfg["qa_band"]).select(modis_cfg["bands"])
-    modis = add_ndvi(modis)
+    modis = mask_clouds(modis, cfg["qa_band"]).select(cfg["bands"])
+
     return modis
 
 
-def process_modis_ic_xee(ic: ee.ImageCollection, modis_cfg: dict) -> xr.Dataset:
+def process_modis_ic_xee(ic: ee.ImageCollection, cfg: dict) -> xr.Dataset:
     """Process MODIS Terra surface reflectance ImageCollection by computing monthly averages
     using xarray."""
 
     ds = xr.open_dataset(
         ic,  # pyright: ignore[reportArgumentType]
         engine="ee",
-        crs=modis_cfg["crs"],
-        scale=modis_cfg["scale"],
+        crs=cfg["crs"],
+        scale=cfg["scale"],
     )
     ds = ds.groupby("time.month").mean()
     return ds
 
 
-def process_modis_ic_ee(ic: ee.ImageCollection, modis_cfg: dict) -> None:
+def mask_and_cast_int16(ic: ee.ImageCollection) -> ee.ImageCollection:
+    """Mask clouds and cast the ImageCollection to int16."""
+    return ic.map(lambda image: image.unmask(-32768)).map(lambda image: image.toInt16())
+
+
+def process_modis_ic_ee(ic: ee.ImageCollection, cfg: dict) -> ee.ImageCollection:
     """Process MODIS Terra surface reflectance ImageCollection by computing monthly averages"""
+    year_start = cfg["date_start"].split("-")[0]
+    year_end = cfg["date_end"].split("-")[0]
+    ic = calculate_monthly_averages(ic, year_start, year_end)
+    return mask_and_cast_int16(ic)
 
-    ic = aggregate_ic_monthly(ic)
 
-    months = range(1, 13)
-
-    # # Get the first image in the collection to retrieve band names
-    first_image = ee.Image(ic.first())
-    # bands = first_image.bandNames().getInfo()
-
-    # for month in months:
-    #     for band in bands:
-    #         mean_image = (
-    #             ic.filter(ee.Filter.calendarRange(month, month, "month"))
-    #             .select(band)
-    #             .mean()
-    #         )
-
-    #         year_start = modis_cfg["date_start"].split("-")[0]
-    #         year_end = modis_cfg["date_end"].split("-")[0]
-    #         res_in_km = modis_cfg["scale"] / 1000
-
-    #         export_params = {
-    #             "image": mean_image,
-    #             "description": f"modis_{band}_mean_{month}_{year_start}-{year_end}_"
-    #             f"{res_in_km:.2g}km",
-    #             "bucket": modis_cfg["bucket"],
-    #             "fileNamePrefix": f"modis_{band}_mean_{month}_{year_start}-{year_end}_"
-    #             f"{res_in_km:.2g}km",
-    #             "scale": modis_cfg["scale"],
-    #             "fileFormat": "GeoTIFF",
-    #             "formatOptions": {"cloudOptimized": True},
-    #             "maxPixels": 1e13,
-    #         }
-
-    #         # Export the Image to Google Cloud Storage
-    #         task = ee.batch.Export.image.toCloudStorage(**export_params)
-    #         task.start()
+def export_modis_ic(ic: ee.ImageCollection, cfg: dict):
+    """Export the ImageCollection."""
+    export_params = ExportParams(
+        crs=cfg["crs"],
+        scale=cfg["scale"],
+        target=cfg["target"],
+        folder=cfg["bucket"],
+    )
+    export_collection(ic, export_params, test=cfg["test"])
 
 
 def save_to_zarr(ds: xr.Dataset, output_path: str | os.PathLike):
@@ -125,14 +114,13 @@ def save_to_zarr(ds: xr.Dataset, output_path: str | os.PathLike):
     )
 
 
-def main(cfg: dict = config):
-    """Generate global multiyear monthly averages of MODIS Terra surface reflectance data from
-    2000-2023 at 1 km resolution."""
+def cli() -> argparse.Namespace:
+    """Command line interface."""
     parser = argparse.ArgumentParser(
         description="Generate global multiyear monthly averages of MODIS Terra surface"
         "reflectance data from 2000-2023 at 1 km resolution."
     )
-    parser.add_argument("--no-dask", "-d", action="store_true", help="Use Dask")
+    parser.add_argument("--dask", "-d", action="store_true", help="Use Dask")
     parser.add_argument("--verbose", "-v", action="store_true", help="Verbose mode")
     parser.add_argument(
         "--method",
@@ -142,32 +130,50 @@ def main(cfg: dict = config):
         help="Processing method. Note that xee method is experimental and only works for"
         "datasets < 32 MB.",
     )
+    parser.add_argument("--test", "-t", action="store_true", help="Test mode")
 
-    args = parser.parse_args()
+    return parser.parse_args()
+
+
+def main(cfg: dict = config["modis"]) -> None:
+    """Generate global multiyear monthly averages of MODIS Terra surface reflectance data from
+    2000-2023 at 1 km resolution."""
+    load_dotenv(find_dotenv())
+    project_dir = Path(os.environ["PROJECT_ROOT"])
+
+    args = cli()
 
     if args.verbose:
         log.setLevel(logging.INFO)
 
-    load_dotenv(find_dotenv())
-    project_dir = Path(os.environ["PROJECT_ROOT"])
-    modis_cfg = cfg["modis"]
+    cfg["test"] = args.test
+
+    if args.test:
+        log.info("Running in test mode")
+        cfg["date_start"] = "2021-01-01"
+        cfg["date_end"] = "2022-01-31"
+        cfg["scale"] = 112000
 
     log.info("Initializing the Earth Engine API")
-    setup(no_dask=args.no_dask)
+    setup(use_dask=args.dask)
 
     log.info("Getting MODIS Terra surface reflectance data")
-    modis_ic = get_modis_ic(modis_cfg)
+    modis_ic = get_modis_ic(cfg)
 
     if args.method == "xee":
         log.info(
             "Processing into monthly avgs and saving the xarray Dataset to Zarr format"
         )
-        ds = process_modis_ic_xee(modis_ic, modis_cfg)
-        save_to_zarr(ds, project_dir / modis_cfg["output_path"])
+        ds = process_modis_ic_xee(modis_ic, cfg)
+        save_to_zarr(ds, project_dir / cfg["output_path"])
 
-    log.info("Processing into monthly avgs and exporting to Google Cloud Storage...")
-    process_modis_ic_ee(modis_ic, modis_cfg)
+    if args.method == "ee":
+        log.info(
+            "Processing into monthly avgs and exporting to Google Cloud Storage..."
+        )
+        modis_ic = process_modis_ic_ee(modis_ic, cfg)
+        export_modis_ic(modis_ic, cfg)
 
 
 if __name__ == "__main__":
-    main()
+    main(config["modis"])

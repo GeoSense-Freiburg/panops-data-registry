@@ -2,27 +2,37 @@
 
 # pylint: disable=no-member
 
+from dataclasses import dataclass
 from typing import Optional
 
 import ee
 
 
 def get_ic(
-    product: str, date_start: str, date_end: str, bands: Optional[list] = None
+    product: str,
+    date_start: str,
+    date_end: str,
+    bands: Optional[list] = None,
+    bounds: Optional[ee.Geometry] = None,
 ) -> ee.ImageCollection:
     """
     Get an ee.ImageCollection.
 
     Args:
         product (str): The name of the product.
-        bands (list): A list of band names.
         date_start (str): The start date in 'YYYY-MM-DD' format.
         date_end (str): The end date in 'YYYY-MM-DD' format.
+        bands (list, optional): A list of band names to select. Defaults to None.
+        bounds (ee.Geometry, optional): The bounds to filter the image collection. Defaults to None.
 
     Returns:
         ee.ImageCollection: The filtered ee.ImageCollection.
     """
     ic = ee.ImageCollection(product).filterDate(date_start, date_end)
+
+    if bounds is not None:
+        ic = ic.filterBounds(bounds)
+
     if bands is not None:
         return ic.select(bands)
     return ic
@@ -75,21 +85,117 @@ def mask_clouds(
     return ic.map(_mask_clouds)
 
 
-def aggregate_ic_monthly(ic: ee.ImageCollection) -> ee.ImageCollection:
-    """Aggregates an ImageCollection of monthly averages to calendar month means"""
+def calculate_monthly_averages(ic: ee.ImageCollection, year_start: str, year_end: str):
+    """
+    Calculate monthly averages for each band in an ImageCollection.
 
-    def _reduce_months(month):
-        bn = (
-            ee.String(ic.first().bandNames().get(0))
-            .cat("_mean_m")
-            .cat(ee.Number(month).toInt8().format())
-        )
+    Parameters:
+        ic (ee.ImageCollection): The input image collection.
+        year_start (str): The starting year for calculating monthly averages.
+        year_end (str): The ending year for calculating monthly averages.
 
-        return (
-            ic.filter(ee.Filter.calendarRange(month, month, "month"))
-            .reduce(ee.Reducer.mean())
-            .set("system:index", ee.Number(month).toInt8().format())
-            .rename(bn)
-        )
+    Returns:
+        ee.ImageCollection: The image collection containing monthly average images for each band.
+    """
 
-    return ee.ImageCollection.fromImages(ee.List.sequence(1, 12).map(_reduce_months))
+    months = range(1, 13)
+
+    # Get the first image in the collection to retrieve band names
+    first_image = ee.Image(ic.first())
+    bands = first_image.bandNames().getInfo()
+
+    monthly_averages = []
+
+    for month in months:
+        for band in bands:
+            bn = f"{band}_{year_start}-{year_end}_m{month}_mean"
+            mean_image = (
+                ic.filter(ee.Filter.calendarRange(month, month, "month"))
+                .select(band)
+                .mean()
+                .rename(bn)
+            )
+            monthly_averages.append(mean_image)
+
+    return ee.ImageCollection(monthly_averages)
+
+
+@dataclass
+class ExportParams:
+    """
+    Represents the parameters for exporting data in Google Earth Engine.
+
+    Attributes:
+        crs (str): The coordinate reference system (CRS) for the exported data. Default is "EPSG:4326".
+        scale (int): The scale of the exported data. Default is 1000.
+        target (str): The target destination for the exported data. Default is "gcs".
+        folder (str): The folder name for storing the exported data. Default is "gee_exports".
+    """
+
+    crs: str = "EPSG:4326"
+    scale: int = 1000
+    target: str = "gcs"
+    folder: str = "gee_exports"
+
+    def __post_init__(self):
+        if self.target not in ["gcs", "gdrive"]:
+            raise ValueError("Invalid target. Use 'gcs' or 'gdrive'.")
+
+
+def export_image(image: ee.Image, filename: str, export_params: ExportParams) -> None:
+    """Export an image to Drive or Google Cloud Storage.
+
+    Args:
+        image (ee.Image): Image to export.
+        filename (str): Filename to be used as prefix of exported file and name of task.
+        export_params (ExportParams): Export parameters including destination folder, projection, and scale.
+
+    Returns:
+        None
+    """
+    task_config = {
+        "description": filename,
+        "fileNamePrefix": filename,
+        "crs": export_params.crs,
+        "fileFormat": "GeoTIFF",
+        "formatOptions": {"cloudOptimized": True, "noData": -32768},
+        "maxPixels": 1e13,
+        "scale": export_params.scale,
+        "skipEmptyTiles": True,
+    }
+
+    if export_params.target == "gcs":
+        task_config["bucket"] = export_params.folder
+        task = ee.batch.Export.image.toCloudStorage(image, **task_config)
+        task.start()
+
+    else:
+        task_config["folder"] = export_params.folder
+        task = ee.batch.Export.image.toDrive(image, **task_config)
+        task.start()
+
+
+def export_collection(
+    collection: ee.ImageCollection,
+    export_params: ExportParams,
+    test: bool = False,
+) -> None:
+    """Export an ImageCollection to Drive
+
+    Args:
+        collection (ee.ImageCollection): ImageCollection to be exported
+        export_params (ExportParams): Export parameters specifying the destination folder, projection, and scale
+        test (bool, optional): If True, only exports the first image in the collection for testing purposes.
+            Defaults to False.
+
+    Returns:
+        None
+    """
+    num_images = int(collection.size().getInfo())
+    image_list = collection.toList(num_images)
+
+    for i in range(num_images if not test else 1):
+        image = ee.Image(image_list.get(i))
+        out_name = f"{image.bandNames().getInfo()[0]}"
+        print(f"Exporting {out_name} with scale {export_params.scale} m")
+        export_image(image, out_name, export_params)
