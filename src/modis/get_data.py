@@ -39,7 +39,7 @@ def main(cfg: dict = config["modis"]):
     # Get the bucket
     bucket = storage_client.get_bucket(bucket_name)
 
-    out_dir = Path(project_root, cfg["data_dir"])
+    out_dir = Path(project_root, cfg["out_dir"])
     out_dir.mkdir(parents=True, exist_ok=True)
 
     # While there are tasks
@@ -61,9 +61,7 @@ def main(cfg: dict = config["modis"]):
                 if blob.exists():
                     # Download the file
                     log.info("Downloading %s...", file_name)
-                    blob.download_to_filename(
-                        Path(project_root, cfg["data_dir"]), file_name
-                    )
+                    blob.download_to_filename(Path(out_dir, file_name))
                     log.info("Downloaded %s", file_name)
                 else:
                     # Write a message to the log file
