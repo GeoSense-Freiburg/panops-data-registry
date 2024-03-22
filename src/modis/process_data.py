@@ -1,5 +1,16 @@
 """Generate global multiyear monthly averages of MODIS Terra surface reflectance data from
     2000-2023 at 1 km resolution.
+
+This script processes MODIS Terra surface reflectance data and calculates monthly averages using xarray.
+The processed data is saved in Zarr format.
+
+Usage:
+    python process_data.py [--no-dask] [--verbose]
+
+Options:
+    --no-dask, -d       Use Dask for parallel processing.
+    --verbose, -v       Enable verbose mode for logging.
+
 """
 
 import argparse
@@ -77,7 +88,8 @@ def save_to_zarr(ds: xr.Dataset, output_path: str | os.PathLike):
     """Save the xarray Dataset to Zarr format."""
     compressor = zarr.Blosc(cname="zstd", clevel=3, shuffle=zarr.Blosc.AUTOSHUFFLE)
     ds.to_zarr(
-        output_path, encoding={var: {"compressor": compressor} for var in ds.data_vars}
+        str(output_path),
+        encoding={var: {"compressor": compressor} for var in ds.data_vars},
     )
 
 
@@ -100,7 +112,7 @@ def main(cfg: dict = config):
     modis_cfg = cfg["modis"]
 
     log.info("Initializing the Earth Engine API")
-    client = setup(no_dask=args.no_dask)
+    setup(no_dask=args.no_dask)
 
     log.info("Getting MODIS Terra surface reflectance data")
     modis_ic = get_modis_ic(modis_cfg)

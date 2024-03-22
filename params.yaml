@@ -1,7 +1,6 @@
 modis:
   date_start: "2001-01-01"
-  # date_end: "2024-01-01"
-  date_end: "2003-02-01"
+  date_end: "2024-01-01"
   product: "MODIS/061/MOD09GA"
   bands:
     - "sur_refl_b01" # red
@@ -11,5 +10,5 @@ modis:
     - "sur_refl_b05" # NIR (1230-1250nm)
   qa_band: "state_1km"
   crs: "EPSG:4326"
-  scale: 2
-  output_path: "data/modis/test.zarr"
+  scale: 0.008983
+  output_path: "data/modis/modis_monthly_avg_2000-2024_1km.zarr"
