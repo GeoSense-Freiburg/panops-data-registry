@@ -11,3 +11,14 @@ stages:
       hash: md5
       md5: 4febf32aae0df8376b931d206c4d1565
       size: 2172
+  process_modis_monthly_avgs:
+    cmd: python src/modis/process_data.py -v
+    deps:
+    - path: src/modis/process_data.py
+      hash: md5
+      md5: 9a0347d69272a2191271d977b38887b1
+      size: 5203
+    - path: src/utils/gee.py
+      hash: md5
+      md5: 3013e3d93eee08aa9afaf631843a3d09
+      size: 6397
