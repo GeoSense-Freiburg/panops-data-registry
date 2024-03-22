@@ -1,6 +1,7 @@
 """Setup logging for the project."""
 
 import logging
+import os
 
 
 def setup_logger():
@@ -19,7 +20,11 @@ def subprocess_logger(name: str = "__main__") -> logging.Logger:
     return subp_log
 
 
-def setup_file_logger(logger_name, log_file, level=logging.INFO):
+def setup_file_logger(
+    logger_name: str = "__main__",
+    log_file: str | os.PathLike = "log.txt",
+    level=logging.INFO,
+):
     """Setup a file logger."""
     l = logging.getLogger(logger_name)
     formatter = logging.Formatter("%(asctime)s : %(message)s")
