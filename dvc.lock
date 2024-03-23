@@ -22,3 +22,22 @@ stages:
       hash: md5
       md5: 3013e3d93eee08aa9afaf631843a3d09
       size: 6397
+  get_modis_monthly_avgs:
+    cmd: python src/modis/get_data.py
+    deps:
+    - path: src/modis/get_data.py
+      hash: md5
+      md5: 0a1585137c65d85826ec011da6fd541a
+      size: 2546
+      isexec: true
+    - path: src/modis/process_data.py
+      hash: md5
+      md5: ded9033ce5dc109a510c8d114e40fb0e
+      size: 5209
+      isexec: true
+    outs:
+    - path: data/modis/modis_sur_refl_monthly_avg_1km
+      hash: md5
+      md5: 5659a396fd8895b5d903eb74d628a4e0.dir
+      size: 58238905336
+      nfiles: 60
