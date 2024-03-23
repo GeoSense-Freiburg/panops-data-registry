@@ -16,7 +16,7 @@ import zarr
 from dotenv import find_dotenv, load_dotenv
 
 from src.conf.parse_params import config
-from src.utils.gee import (
+from src.utils.gee_utils import (
     ExportParams,
     calculate_monthly_averages,
     export_collection,
