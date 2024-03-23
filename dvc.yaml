@@ -10,6 +10,3 @@ stages:
     deps:
       - src/modis/process_data.py
       - src/modis/get_data.py
-    outs:
-      - ${modis.out_dir}:
-          persist: true
