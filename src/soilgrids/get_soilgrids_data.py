@@ -15,7 +15,7 @@ import ee
 from dotenv import find_dotenv, load_dotenv
 
 from src.conf.parse_params import config
-from src.utils.gee_utils import ExportParams, download_when_complete, export_image
+from src.utils.gee_utils import ExportParams, download_when_complete, export_collection
 from src.utils.log_utils import setup_logger
 
 # Setup
@@ -73,15 +73,11 @@ def export_soilgrids_images(
         list[ee.batch.Task]: List of export tasks.
 
     """
-    tasks = []
+    images = []
     for prop in soil_properties:
-        image = ee.Image(f"{collection_id}/{prop}_{soil_stat}")
-        for band in image.bandNames().getInfo():
-            task = export_image(
-                image.select(band), band, export_params, dry_run=dry_run
-            )
-            tasks.append(task)
-
+        images.append(ee.Image(f"{collection_id}/{prop}_{soil_stat}"))
+    ic = ee.ImageCollection(images)
+    tasks = export_collection(ic, export_params, flatten=True, dry_run=dry_run)
     return tasks
 
 

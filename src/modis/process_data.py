@@ -101,7 +101,7 @@ def export_modis_ic(ic: ee.ImageCollection, cfg: dict):
         target=cfg["target"],
         folder=cfg["bucket"],
     )
-    export_collection(ic, export_params, test=cfg["test"])
+    export_collection(ic, export_params, dry_run=cfg["test"])
 
 
 def save_to_zarr(ds: xr.Dataset, output_path: str | os.PathLike):

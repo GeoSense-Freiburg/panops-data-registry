@@ -190,7 +190,7 @@ def validate_bucket_and_create_if_not_exists(bucket_id: str) -> storage.Bucket:
     return bucket
 
 
-def export_image(
+def _export_image(
     image: ee.Image, filename: str, export_params: ExportParams, dry_run: bool = False
 ) -> ee.batch.Task:
     """Export an image to Drive or Google Cloud Storage.
@@ -219,7 +219,6 @@ def export_image(
         task_config["formatOptions"]["noData"] = export_params.nodata
 
     if export_params.target == "gcs":
-        validate_bucket_and_create_if_not_exists(export_params.folder)
         task_config["bucket"] = export_params.folder
         task = ee.batch.Export.image.toCloudStorage(image, **task_config)
 
@@ -227,11 +226,11 @@ def export_image(
         task_config["folder"] = export_params.folder
         task = ee.batch.Export.image.toDrive(image, **task_config)
 
+    log.info("Starting task: %s%s", task, " (DRY RUN)" if dry_run else "")
+
     if dry_run:
-        log.info("Would have started task: %s", task)
         return task
 
-    log.info("Starting task: %s", task)
     task.start()
 
     return task
@@ -240,7 +239,8 @@ def export_image(
 def export_collection(
     collection: ee.ImageCollection,
     export_params: ExportParams,
-    test: bool = False,
+    flatten: bool = False,
+    dry_run: bool = False,
 ) -> list[ee.batch.Task]:
     """Export an ImageCollection to Drive
 
@@ -248,22 +248,33 @@ def export_collection(
         collection (ee.ImageCollection): ImageCollection to be exported
         export_params (ExportParams): Export parameters specifying the destination folder,
             projection, and scale
+        flatten (bool, optional): If True, each band of each image in the collection will be
+            exported separately. Defaults to False.
         test (bool, optional): If True, only exports the first image in the collection
             for testing purposes. Defaults to False.
 
     Returns:
         list[ee.batch.Task]: List of export tasks for each image in the collection
     """
+    if export_params.target == "gcs" and not dry_run:
+        validate_bucket_and_create_if_not_exists(export_params.folder)
+
     num_images = int(collection.size().getInfo())
     image_list = collection.toList(num_images)
 
     tasks = []
-    for i in range(num_images if not test else 1):
+    for i in range(num_images):
         image = ee.Image(image_list.get(i))
-        out_name = f"{image.bandNames().getInfo()[0]}"
-        log.info("Exporting %s with scale %s m", out_name, export_params.scale)
-        task = export_image(image, out_name, export_params)
-        tasks.append(task)
+        if flatten:
+            bands = image.bandNames().getInfo()
+            for band in bands:
+                image_band = image.select(band)
+                task = _export_image(image_band, band, export_params, dry_run=dry_run)
+                tasks.append(task)
+        else:
+            out_name = f"{image.bandNames().getInfo()[0]}"
+            task = _export_image(image, out_name, export_params, dry_run=dry_run)
+            tasks.append(task)
 
     return tasks
 
