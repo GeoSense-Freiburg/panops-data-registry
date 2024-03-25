@@ -16,20 +16,6 @@ load_dotenv(find_dotenv(), verbose=True, override=True)
 project_root = os.environ["PROJECT_ROOT"]
 
 
-def setup_logging() -> logging.Logger:
-    """
-    Set up logging configuration.
-
-    Returns:
-        logging.Logger: The logger object.
-
-    """
-    setup_logger()
-    log = logging.getLogger(__name__)
-    log.setLevel(logging.INFO)
-    return log
-
-
 def main(cfg: dict = config["modis"]):
     """
     Main function to download MODIS data from Google Earth Engine and store it in Google
@@ -41,7 +27,7 @@ def main(cfg: dict = config["modis"]):
     Returns:
         None
     """
-    log = setup_logging()
+    log = setup_logger(__name__, verbose=True)
 
     log.info("Initializing Earth Engine...")
     ee.Initialize()

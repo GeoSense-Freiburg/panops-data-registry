@@ -25,8 +25,7 @@ from src.utils.gee_utils import (
 )
 from src.utils.log_utils import setup_logger
 
-setup_logger()
-log = logging.getLogger(__name__)
+log = setup_logger(__name__)
 
 
 def setup(use_dask: bool = False):

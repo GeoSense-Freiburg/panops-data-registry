@@ -4,12 +4,18 @@ import logging
 import os
 
 
-def setup_logger():
+def setup_logger(name: str = "__main__", verbose: bool = False) -> logging.Logger:
     """Setup logging for the project."""
     logging.basicConfig(
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S %Z",
     )
+    log = logging.getLogger(name)
+    if verbose:
+        log.setLevel(logging.INFO)
+    else:
+        log.setLevel(logging.WARNING)
+    return log
 
 
 def subprocess_logger(name: str = "__main__") -> logging.Logger:
