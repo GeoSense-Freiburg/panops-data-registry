@@ -11,7 +11,7 @@ from typing import Optional
 
 import ee
 from google.cloud import storage
-from google.cloud.exceptions import NotFound
+from google.cloud.exceptions import Forbidden, NotFound
 
 from src.utils.log_utils import setup_logger
 
@@ -174,14 +174,24 @@ def validate_bucket_and_create_if_not_exists(bucket_id: str) -> storage.Bucket:
     try:
         bucket = storage_client.get_bucket(bucket_id)
     except NotFound:
-        log.info("Bucket %s not found. Creating...", bucket_id)
-        bucket = storage_client.create_bucket(bucket_id)
+        log.warning("Bucket %s not found. Creating...", bucket_id)
+        bucket = storage_client.create_bucket(
+            bucket_id,
+            location="europe-west1",
+            predefined_acl="private",
+        )
+    except Forbidden:
+        log.error(
+            "Access denied to bucket %s, or the name is already taken. Exiting...",
+            bucket_id,
+        )
+        raise
 
     return bucket
 
 
 def export_image(
-    image: ee.Image, filename: str, export_params: ExportParams
+    image: ee.Image, filename: str, export_params: ExportParams, dry_run: bool = False
 ) -> ee.batch.Task:
     """Export an image to Drive or Google Cloud Storage.
 
@@ -212,12 +222,17 @@ def export_image(
         validate_bucket_and_create_if_not_exists(export_params.folder)
         task_config["bucket"] = export_params.folder
         task = ee.batch.Export.image.toCloudStorage(image, **task_config)
-        task.start()
 
     else:
         task_config["folder"] = export_params.folder
         task = ee.batch.Export.image.toDrive(image, **task_config)
-        task.start()
+
+    if dry_run:
+        log.info("Would have started task: %s", task)
+        return task
+
+    log.info("Starting task: %s", task)
+    task.start()
 
     return task
 
@@ -246,7 +261,7 @@ def export_collection(
     for i in range(num_images if not test else 1):
         image = ee.Image(image_list.get(i))
         out_name = f"{image.bandNames().getInfo()[0]}"
-        print(f"Exporting {out_name} with scale {export_params.scale} m")
+        log.info("Exporting %s with scale %s m", out_name, export_params.scale)
         task = export_image(image, out_name, export_params)
         tasks.append(task)
 
