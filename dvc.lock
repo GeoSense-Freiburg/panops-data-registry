@@ -16,28 +16,23 @@ stages:
     deps:
     - path: src/modis/process_data.py
       hash: md5
-      md5: 9a0347d69272a2191271d977b38887b1
-      size: 5203
-    - path: src/utils/gee.py
-      hash: md5
-      md5: 3013e3d93eee08aa9afaf631843a3d09
-      size: 6397
+      md5: ba72cc1c52a02fbdccb9723fb5c1b10e
+      size: 5189
   get_modis_monthly_avgs:
     cmd: python src/modis/get_data.py
     deps:
     - path: src/modis/get_data.py
       hash: md5
-      md5: 0a1585137c65d85826ec011da6fd541a
-      size: 2546
-      isexec: true
+      md5: e0e7aa9556880ae0a785eefb07a553d6
+      size: 2300
     - path: src/modis/process_data.py
       hash: md5
-      md5: ded9033ce5dc109a510c8d114e40fb0e
-      size: 5209
-      isexec: true
-    outs:
-    - path: data/modis/modis_sur_refl_monthly_avg_1km
+      md5: ba72cc1c52a02fbdccb9723fb5c1b10e
+      size: 5189
+  get_esa_worldcover:
+    cmd: python src/esa_worldcover/get_esa_worldcover_data.py -vd
+    deps:
+    - path: src/esa_worldcover/get_esa_worldcover_data.py
       hash: md5
-      md5: 5659a396fd8895b5d903eb74d628a4e0.dir
-      size: 58238905336
-      nfiles: 60
+      md5: 2a341bdb153fd8f9f5f6244aedd4bc00
+      size: 2477

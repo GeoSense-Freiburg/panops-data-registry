@@ -3,10 +3,14 @@ stages:
     cmd: python src/modis/process_data.py -v
     deps:
       - src/modis/process_data.py
-      - src/utils/gee.py
 
   get_modis_monthly_avgs:
     cmd: python src/modis/get_data.py
     deps:
       - src/modis/process_data.py
       - src/modis/get_data.py
+
+  get_esa_worldcover:
+    cmd: python src/esa_worldcover/get_esa_worldcover_data.py -vd
+    deps:
+      - src/esa_worldcover/get_esa_worldcover_data.py

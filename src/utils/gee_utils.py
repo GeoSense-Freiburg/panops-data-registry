@@ -198,11 +198,14 @@ def export_image(
         "fileNamePrefix": filename,
         "crs": export_params.crs,
         "fileFormat": "GeoTIFF",
-        "formatOptions": {"cloudOptimized": True, "noData": export_params.nodata},
+        "formatOptions": {"cloudOptimized": True},
         "maxPixels": 1e13,
         "scale": export_params.scale,
         "skipEmptyTiles": True,
     }
+
+    if export_params.nodata is not None:
+        task_config["formatOptions"]["noData"] = export_params.nodata
 
     if export_params.target == "gcs":
         validate_bucket_and_create_if_not_exists(export_params.folder)
@@ -302,7 +305,9 @@ def download_when_complete(
                         blob.download_to_filename(str(local_file_path))
                     else:
                         log.info(
-                            "File %s already exists at %s", file_name, str(out_dir)
+                            "File %s already exists at %s. Skipping download...",
+                            file_name,
+                            str(out_dir),
                         )
                 else:
                     log.warning("File %s not found in bucket.", file_name)
