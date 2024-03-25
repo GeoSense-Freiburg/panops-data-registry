@@ -15,6 +15,8 @@ from google.cloud.exceptions import NotFound
 
 from src.utils.log_utils import setup_logger
 
+log = setup_logger(__name__, "INFO")
+
 
 def get_ic(
     product: str,
@@ -166,7 +168,6 @@ def validate_bucket_and_create_if_not_exists(bucket_id: str) -> storage.Bucket:
     Returns:
         storage.Bucket: The Google Cloud Storage bucket.
     """
-    log = setup_logger(__name__)
     storage_client = storage.Client()
 
     log.info("Getting bucket %s...", bucket_id)
@@ -271,7 +272,6 @@ def download_when_complete(
     Returns:
         None
     """
-    log = setup_logger(__name__)
     if verbose:
         log.setLevel(logging.INFO)
 

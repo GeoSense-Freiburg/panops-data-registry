@@ -4,17 +4,16 @@ import logging
 import os
 
 
-def setup_logger(name: str = "__main__", verbose: bool = False) -> logging.Logger:
+def setup_logger(
+    name: str = "__main__", level: str | int = "WARNING"
+) -> logging.Logger:
     """Setup logging for the project."""
     logging.basicConfig(
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S %Z",
     )
     log = logging.getLogger(name)
-    if verbose:
-        log.setLevel(logging.INFO)
-    else:
-        log.setLevel(logging.WARNING)
+    log.setLevel(level)
     return log
 
 
