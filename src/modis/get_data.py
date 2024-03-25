@@ -51,13 +51,18 @@ def main(cfg: dict = config["modis"]):
 
             if status["state"] == "COMPLETED":
                 file_name = status["description"] + ".tif"
+                local_file_path = Path(out_dir) / file_name
 
                 blob = bucket.blob(file_name)
 
                 if blob.exists():
-                    log.info("Downloading %s... to %s", file_name, str(out_dir))
-                    blob.download_to_filename(Path(out_dir, file_name))
-                    log.info("Downloaded %s", file_name)
+                    if not local_file_path.exists():
+                        log.info("Downloading %s... to %s", file_name, str(out_dir))
+                        blob.download_to_filename(str(local_file_path))
+                    else:
+                        log.info(
+                            "File %s already exists at %s", file_name, str(out_dir)
+                        )
                 else:
                     log.warning("File %s not found in bucket.", file_name)
 
