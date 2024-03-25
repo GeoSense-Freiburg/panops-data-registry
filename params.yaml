@@ -45,3 +45,7 @@ soilgrids:
   target: "gcs"
   bucket: "panops_soilgrids"
   out_dir: data/soilgrids
+
+worldclim:
+  url: https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/wc2.1_30s_bio.zip
+  out_dir: data/worldclim
