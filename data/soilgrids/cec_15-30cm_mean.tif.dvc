@@ -1,0 +1,6 @@
+outs:
+- md5: 4306ffa6c405f8d72e9f91c06ca2a001
+  size: 263575174
+  isexec: true
+  hash: md5
+  path: cec_15-30cm_mean.tif

@@ -1,0 +1,6 @@
+outs:
+- md5: 6862a7546b2bf77de18c61eaf87cdb91
+  size: 281305758
+  isexec: true
+  hash: md5
+  path: silt_5-15cm_mean.tif

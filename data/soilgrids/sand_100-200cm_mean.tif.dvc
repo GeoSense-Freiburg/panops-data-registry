@@ -1,0 +1,6 @@
+outs:
+- md5: 049198178dc60be5c2fffa844a9f9001
+  size: 295855114
+  isexec: true
+  hash: md5
+  path: sand_100-200cm_mean.tif

@@ -1,0 +1,6 @@
+outs:
+- md5: 11864f27aba85022349d74ce74850235
+  size: 313594660
+  isexec: true
+  hash: md5
+  path: soc_5-15cm_mean.tif

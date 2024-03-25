@@ -1,0 +1,6 @@
+outs:
+- md5: 7457487a10423a9b38d896c12cc34114
+  size: 270262406
+  isexec: true
+  hash: md5
+  path: ocd_0-5cm_mean.tif

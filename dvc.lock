@@ -36,3 +36,11 @@ stages:
       hash: md5
       md5: 2a341bdb153fd8f9f5f6244aedd4bc00
       size: 2477
+  get_soilgrids:
+    cmd: python src/soilgrids/get_soilgrids_data.py -vd
+    deps:
+    - path: src/soilgrids/get_soilgrids_data.py
+      hash: md5
+      md5: 3ec77483513ced3c148bfabf88ee600c
+      size: 4368
+      isexec: true

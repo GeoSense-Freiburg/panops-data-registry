@@ -1,0 +1,6 @@
+outs:
+- md5: f733b4ec0a77544eedd280df498a0956
+  size: 218481693
+  isexec: true
+  hash: md5
+  path: ocd_60-100cm_mean.tif

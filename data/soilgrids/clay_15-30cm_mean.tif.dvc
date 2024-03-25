@@ -1,0 +1,6 @@
+outs:
+- md5: c8b1c68777708549ae91735e04b1968c
+  size: 277757413
+  isexec: true
+  hash: md5
+  path: clay_15-30cm_mean.tif

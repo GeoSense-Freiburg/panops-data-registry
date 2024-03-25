@@ -1,0 +1,6 @@
+outs:
+- md5: 26003113ba042695529eb9ae45df4608
+  size: 420414086
+  isexec: true
+  hash: md5
+  path: nitrogen_60-100cm_mean.tif

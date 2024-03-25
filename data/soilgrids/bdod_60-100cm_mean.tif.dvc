@@ -1,0 +1,6 @@
+outs:
+- md5: b887aa2d8737d03d25ee8b8e882066a5
+  size: 128152543
+  isexec: true
+  hash: md5
+  path: bdod_60-100cm_mean.tif
