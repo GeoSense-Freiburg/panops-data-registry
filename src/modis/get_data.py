@@ -26,7 +26,7 @@ def main(cfg: dict = config["modis"]):
     Returns:
         None
     """
-    log = setup_logger(__name__, verbose=True)
+    log = setup_logger(__name__, "INFO")
 
     log.info("Initializing Earth Engine...")
     ee.Initialize()
