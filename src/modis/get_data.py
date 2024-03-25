@@ -1,6 +1,5 @@
 """Check for completed MODIS tasks and download the data from Google Cloud Storage."""
 
-import logging
 import os
 import time
 from pathlib import Path
