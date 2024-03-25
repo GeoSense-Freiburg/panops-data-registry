@@ -1,5 +1,5 @@
 """
-Downloads WorldClim BIO variables (v2.1).
+Downloads WorldClim BIO variables (v2.1) at 30s resolution.
 """
 
 import os
@@ -8,6 +8,7 @@ from pathlib import Path
 
 import requests
 from dotenv import find_dotenv, load_dotenv
+from tqdm import tqdm
 
 from src.conf.parse_params import config
 from src.utils.log_utils import setup_logger
@@ -34,17 +35,23 @@ def main(cfg: dict = config["worldclim"]) -> None:
     response = requests.get(cfg["url"], timeout=30)
     response.raise_for_status()
 
-    zip_file_name = response.url.split("/")[-1]
+    total_size = int(response.headers.get("content-length", 0))
+    block_size = 1024
+
+    zip_file_name = response.url.split("/")[-1].replace(".", "-", 1)
     zip_out = out_dir / zip_file_name
 
-    with open(zip_out, "wb") as f:
-        f.write(response.content)
+    with tqdm(total=total_size, unit="B", unit_scale=True) as progress_bar:
+        with open(zip_out, "wb") as f:
+            for data in response.iter_content(block_size):
+                progress_bar.update(len(data))
+                f.write(data)
 
     log.info("Extracting WorldClim BIO variables")
-    extract_dir = Path(cfg["out_dir"], zip_file_name.stem.replace(".", "-", 1))
+    extract_dir = Path(out_dir, zip_out.stem)
     extract_dir.mkdir(parents=True, exist_ok=True)
 
-    with zipfile.ZipFile(Path(cfg["out_dir"], zip_file_name), "r") as zip_ref:
+    with zipfile.ZipFile(Path(out_dir, zip_file_name), "r") as zip_ref:
         zip_ref.extractall(extract_dir)
 
     # Clean up by removing zip file

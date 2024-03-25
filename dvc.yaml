@@ -19,3 +19,8 @@ stages:
     cmd: python src/soilgrids/get_soilgrids_data.py -vd
     deps:
       - src/soilgrids/get_soilgrids_data.py
+
+  get_worldclim:
+    cmd: python src/worldclim/get_worldclim_data.py
+    deps:
+      - src/worldclim/get_worldclim_data.py

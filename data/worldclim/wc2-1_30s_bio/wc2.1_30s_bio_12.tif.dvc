@@ -1,0 +1,6 @@
+outs:
+- md5: a52585de4261957f290c7dde75d1ba65
+  size: 487101349
+  isexec: true
+  hash: md5
+  path: wc2.1_30s_bio_12.tif

@@ -44,3 +44,10 @@ stages:
       md5: 3ec77483513ced3c148bfabf88ee600c
       size: 4368
       isexec: true
+  get_worldclim:
+    cmd: python src/worldclim/get_worldclim_data.py
+    deps:
+    - path: src/worldclim/get_worldclim_data.py
+      hash: md5
+      md5: 27db670af5f76d3ecdaf2d6a86d4804c
+      size: 1729
