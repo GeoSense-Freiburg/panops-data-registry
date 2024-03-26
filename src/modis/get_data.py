@@ -1,4 +1,11 @@
-"""Check for completed MODIS tasks and download the data from Google Cloud Storage."""
+"""
+Check for completed MODIS tasks and download the data from Google Cloud Storage.
+
+Citation:
+Vermote, E., Wolfe, R. (2021). <i>MODIS/Terra Surface Reflectance Daily L2G Global 1km
+and 500m SIN Grid V061</i> [Data set]. NASA EOSDIS Land Processes Distributed Active
+Archive Center. Accessed 2024-03-25 from https://doi.org/10.5067/MODIS/MOD09GA.061
+"""
 
 import os
 import time

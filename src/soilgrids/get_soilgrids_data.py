@@ -4,6 +4,11 @@ This script:
     1. Retrieves the SoilGrids dataset from GEE.
     2. Exports images for each soil property at each depth profile at 1 km resolution to
        Google Cloud Storage.
+
+Citation:
+Poggio, L., de Sousa, L. M., Batjes, N. H., Heuvelink, G. B. M., Kempen, B., Ribeiro, E.,
+and Rossiter, D.: SoilGrids 2.0: producing soil information for the globe with quantified
+spatial uncertainty, SOIL, 7, 217–240, https://doi.org/10.5194/soil-7-217-2021, 2021.
 """
 
 import argparse
