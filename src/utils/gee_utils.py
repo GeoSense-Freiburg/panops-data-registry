@@ -279,6 +279,73 @@ def export_collection(
     return tasks
 
 
+def download_blobs(
+    blobs: list[storage.Blob],
+    out_dir: str | os.PathLike,
+) -> None:
+    """
+    Download multiple blobs from a storage bucket.
+
+    Args:
+        blobs (list[storage.Blob]): List of blobs to download.
+        out_dir (str | os.PathLike): The output directory to save the downloaded files.
+
+    Returns:
+        None
+    """
+    for i, blob in enumerate(blobs):
+        log.info(
+            "Downloading %s... (%s/%s)",
+            blob.name,
+            i + 1,
+            len(blobs),
+        )
+        part_file_name = Path(blob.name).name  # pyright: ignore[reportArgumentType]
+        part_local_file_path = Path(out_dir) / part_file_name
+        blob.download_to_filename(str(part_local_file_path))
+
+
+def download_blob_if_exists(
+    file_stem: str, bucket: storage.Bucket, out_dir: str | os.PathLike
+):
+    """
+    Downloads a blob from a storage bucket if it exists.
+
+    Args:
+        file_stem (str): The stem of the file name.
+        bucket (storage.Bucket): The storage bucket object.
+        out_dir (str | os.PathLike): The output directory to save the downloaded file.
+
+    Returns:
+        None
+    """
+    file_name = file_stem + ".tif"
+    local_file_path = Path(out_dir) / file_name
+
+    blob = bucket.blob(file_name)
+
+    if blob.exists():
+        if not local_file_path.exists():
+            log.info("Downloading %s... to %s", file_name, str(out_dir))
+            blob.download_to_filename(str(local_file_path))
+        else:
+            log.info(
+                "File %s already exists at %s. Skipping download...",
+                file_name,
+                str(out_dir),
+            )
+    else:
+        log.warning(
+            "File %s not found in bucket. Checking if split into parts...",
+            file_name,
+        )
+        blobs = list(bucket.list_blobs(prefix=Path(file_name).stem))
+        if blobs:
+            download_blobs(blobs, out_dir)
+        else:
+            log.error("File %s not found in bucket.", file_name)
+
+
 def download_when_complete(
     bucket_id: str,
     out_dir: str | os.PathLike,
@@ -320,24 +387,7 @@ def download_when_complete(
             status = task.status()
 
             if status["state"] == "COMPLETED":
-                file_name = status["description"] + ".tif"
-                local_file_path = Path(out_dir) / file_name
-
-                blob = bucket.blob(file_name)
-
-                if blob.exists():
-                    if not local_file_path.exists():
-                        log.info("Downloading %s... to %s", file_name, str(out_dir))
-                        blob.download_to_filename(str(local_file_path))
-                    else:
-                        log.info(
-                            "File %s already exists at %s. Skipping download...",
-                            file_name,
-                            str(out_dir),
-                        )
-                else:
-                    log.warning("File %s not found in bucket.", file_name)
-
+                download_blob_if_exists(status["description"], bucket, out_dir)
                 tasks.remove(task)
 
             elif status["state"] == "FAILED":
