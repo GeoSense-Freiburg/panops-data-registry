@@ -1,0 +1,6 @@
+outs:
+- md5: 75d226775fa13076578f950e24b5da67
+  size: 1026505434
+  isexec: true
+  hash: md5
+  path: sur_refl_b04_2001-2024_m2_mean.tif

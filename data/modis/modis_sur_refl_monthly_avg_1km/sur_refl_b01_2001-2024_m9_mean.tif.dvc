@@ -1,0 +1,6 @@
+outs:
+- md5: 9b0bd36a681f7cdc7754379b31b14841
+  size: 1053397087
+  isexec: true
+  hash: md5
+  path: sur_refl_b01_2001-2024_m9_mean.tif

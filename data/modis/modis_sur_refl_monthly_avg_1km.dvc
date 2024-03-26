@@ -1,6 +1,0 @@
-outs:
-- md5: efebf1f9687a237ab30a8b4918eb2b4f.dir
-  size: 58615344120
-  nfiles: 61
-  hash: md5
-  path: modis_sur_refl_monthly_avg_1km
