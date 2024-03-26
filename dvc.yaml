@@ -24,3 +24,8 @@ stages:
     cmd: python src/worldclim/get_worldclim_data.py
     deps:
       - src/worldclim/get_worldclim_data.py
+
+  get_canopy_height:
+    cmd: python src/canopy_height/get_canopy_height_data.py
+    deps:
+      - src/canopy_height/get_canopy_height_data.py

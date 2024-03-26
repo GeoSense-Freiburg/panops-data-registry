@@ -51,3 +51,10 @@ stages:
       hash: md5
       md5: 27db670af5f76d3ecdaf2d6a86d4804c
       size: 1729
+  get_canopy_height:
+    cmd: python src/canopy_height/get_canopy_height_data.py
+    deps:
+    - path: src/canopy_height/get_canopy_height_data.py
+      hash: md5
+      md5: 521bcff89b342a126fce38fe8291a303
+      size: 1858
