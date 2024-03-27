@@ -29,3 +29,8 @@ stages:
     cmd: python src/canopy_height/get_canopy_height_data.py
     deps:
       - src/canopy_height/get_canopy_height_data.py
+
+  get_vodca:
+    cmd: python src/vodca/get_vodca_data.py
+    deps:
+      - src/vodca/get_vodca_data.py

@@ -1,0 +1,6 @@
+outs:
+- md5: a175aac1058314e60318df1f265d5cb9
+  size: 1193197323
+  isexec: true
+  hash: md5
+  path: vodca_k-band_mean.tif
