@@ -1,6 +1,6 @@
 outs:
-- md5: ec5bdb9f469aa743e3850c41b34d1183
-  size: 272296584
+- md5: b4f4a682e5189fb2469530554938420a
+  size: 276924558
   isexec: true
   hash: md5
   path: cfvo_30-60cm_mean.tif

@@ -1,6 +1,6 @@
 outs:
-- md5: 1078486752b4cdc7514f9bc1a510a558
-  size: 89930439
+- md5: 586982f30bf3d1bcb8a6569310f0dedd
+  size: 94248831
   isexec: true
   hash: md5
   path: phh2o_60-100cm_mean.tif

@@ -1,6 +1,6 @@
 outs:
-- md5: 51566180243826e42f02730258aede3b
-  size: 280432844
+- md5: 349bfa2fa0c913fdc2c65efbd025fed5
+  size: 284868620
   isexec: true
   hash: md5
   path: silt_100-200cm_mean.tif

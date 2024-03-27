@@ -1,6 +1,6 @@
 outs:
-- md5: c07066e0ec57336ccdbf13a0504a4d70
-  size: 294187363
+- md5: 7d60648ccb2037b14354c22c984e99f0
+  size: 298588351
   isexec: true
   hash: md5
   path: sand_0-5cm_mean.tif
