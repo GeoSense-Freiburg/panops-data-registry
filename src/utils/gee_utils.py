@@ -11,8 +11,11 @@ from typing import Optional
 
 import ee
 from google.cloud import storage
-from google.cloud.exceptions import Forbidden, NotFound
 
+from src.utils.gcs_utils import (
+    download_blob_if_exists,
+    validate_bucket_and_create_if_not_exists,
+)
 from src.utils.log_utils import setup_logger
 
 log = setup_logger(__name__, "INFO")
@@ -158,38 +161,6 @@ class ExportParams:
             raise ValueError("Invalid target. Use 'gcs' or 'gdrive'.")
 
 
-def validate_bucket_and_create_if_not_exists(bucket_id: str) -> storage.Bucket:
-    """
-    Validate a Google Cloud Storage bucket and create it if it does not exist.
-
-    Args:
-        bucket_id (str): The ID of the Google Cloud Storage bucket.
-
-    Returns:
-        storage.Bucket: The Google Cloud Storage bucket.
-    """
-    storage_client = storage.Client()
-
-    log.info("Getting bucket %s...", bucket_id)
-    try:
-        bucket = storage_client.get_bucket(bucket_id)
-    except NotFound:
-        log.warning("Bucket %s not found. Creating...", bucket_id)
-        bucket = storage_client.create_bucket(
-            bucket_id,
-            location="europe-west1",
-            predefined_acl="private",
-        )
-    except Forbidden:
-        log.error(
-            "Access denied to bucket %s, or the name is already taken. Exiting...",
-            bucket_id,
-        )
-        raise
-
-    return bucket
-
-
 def _export_image(
     image: ee.Image, filename: str, export_params: ExportParams, dry_run: bool = False
 ) -> ee.batch.Task:
@@ -278,98 +249,6 @@ def export_collection(
             tasks.append(task)
 
     return tasks
-
-
-def download_blobs(
-    blobs: list[storage.Blob],
-    out_dir: str | os.PathLike,
-) -> None:
-    """
-    Download multiple blobs from a storage bucket.
-
-    Args:
-        blobs (list[storage.Blob]): List of blobs to download.
-        out_dir (str | os.PathLike): The output directory to save the downloaded files.
-
-    Returns:
-        None
-    """
-    for i, blob in enumerate(blobs):
-        log.info(
-            "Downloading %s... (%s/%s)",
-            blob.name,
-            i + 1,
-            len(blobs),
-        )
-        download_blob(blob, out_dir)
-
-
-def download_blob(blob: storage.Blob, out_dir: str | os.PathLike) -> None:
-    """
-    Download a blob from a storage bucket.
-
-    Args:
-        blob (storage.Blob): The blob to download.
-        out_dir (str | os.PathLike): The output directory to save the downloaded file.
-
-    Returns:
-        None
-    """
-    log.info("Downloading %s to %s", blob.name, str(out_dir))
-    out_file_path = Path(
-        out_dir, Path(blob.name).name  # pyright: ignore[reportArgumentType]
-    )
-    try:
-        blob.download_to_filename(out_file_path)
-    except PermissionError:
-        if out_file_path.exists():
-            out_file_path.unlink()
-            blob.download_to_filename(out_file_path)
-        else:
-            raise
-
-
-def download_blob_if_exists(
-    file_stem: str,
-    bucket: storage.Bucket,
-    out_dir: str | os.PathLike,
-    overwrite: bool = True,
-):
-    """
-    Downloads a blob from a storage bucket if it exists.
-
-    Args:
-        file_stem (str): The stem of the file name.
-        bucket (storage.Bucket): The storage bucket object.
-        out_dir (str | os.PathLike): The output directory to save the downloaded file.
-
-    Returns:
-        None
-    """
-    file_name = file_stem + ".tif"
-    local_file_path = Path(out_dir) / file_name
-
-    blob = bucket.blob(file_name)
-
-    if blob.exists():
-        if not local_file_path.exists() or overwrite:
-            download_blob(blob, out_dir)
-        else:
-            log.info(
-                "File %s already exists at %s. Skipping download...",
-                file_name,
-                str(out_dir),
-            )
-    else:
-        log.warning(
-            "File %s not found in bucket. Checking if split into parts...",
-            file_name,
-        )
-        blobs = list(bucket.list_blobs(prefix=Path(file_name).stem))
-        if blobs:
-            download_blobs(blobs, out_dir)
-        else:
-            log.error("File %s not found in bucket.", file_name)
 
 
 def download_when_complete(
