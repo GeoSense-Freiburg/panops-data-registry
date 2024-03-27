@@ -66,13 +66,7 @@ def download_blobs(
     Returns:
         None
     """
-    for i, blob in enumerate(blobs):
-        log.info(
-            "Downloading %s... (%s/%s)",
-            blob.name,
-            i + 1,
-            len(blobs),
-        )
+    for blob in tqdm(blobs):
         download_blob(blob, out_dir)
 
 
@@ -127,8 +121,7 @@ def download_bucket(bucket_name: str, local_path: str | os.PathLike) -> None:
 
     log.info("Downloading files from bucket %s to %s...", bucket_name, local_path)
 
-    for blob in tqdm(blobs):
-        download_blob(blob, local_path)
+    download_blobs(blobs, local_path)
 
 
 def validate_bucket_and_create_if_not_exists(bucket_id: str) -> storage.Bucket:
