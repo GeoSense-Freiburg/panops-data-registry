@@ -12,18 +12,6 @@ from src.utils.log_utils import setup_logger
 log = setup_logger(__name__, "INFO")
 
 
-def download_bucket(bucket_name: str, local_path: str | os.PathLike) -> None:
-    """Download all files from a Google Cloud Storage bucket to a local directory."""
-    storage_client = storage.Client()
-    bucket = storage_client.get_bucket(bucket_name)
-    blobs = list(bucket.list_blobs())
-
-    log.info("Downloading files from bucket %s to %s...", bucket_name, local_path)
-
-    for blob in tqdm(blobs):
-        blob.download_to_filename(Path(local_path) / blob.name)
-
-
 def cli() -> argparse.Namespace:
     """Parse command-line arguments."""
     parser = argparse.ArgumentParser(
@@ -36,6 +24,18 @@ def cli() -> argparse.Namespace:
         "local_path", type=str, help="Local directory to download files to."
     )
     return parser.parse_args()
+
+
+def download_bucket(bucket_name: str, local_path: str | os.PathLike) -> None:
+    """Download all files from a Google Cloud Storage bucket to a local directory."""
+    storage_client = storage.Client()
+    bucket = storage_client.get_bucket(bucket_name)
+    blobs = list(bucket.list_blobs())
+
+    log.info("Downloading files from bucket %s to %s...", bucket_name, local_path)
+
+    for blob in tqdm(blobs):
+        blob.download_to_filename(Path(local_path) / blob.name)
 
 
 def main() -> None:
