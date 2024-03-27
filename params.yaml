@@ -9,13 +9,12 @@ modis:
     - "sur_refl_b04" # green
     - "sur_refl_b05" # NIR (1230-1250nm)
   qa_band: "state_1km"
+  nodata: -32768
   crs: "EPSG:4326"
   scale: 1000 # In meters for GEE export
   target: "gcs"
   bucket: "modis_monthly_avgs_1km"
   out_dir: data/modis/modis_sur_refl_monthly_avg_1km
-  output_path: data/modis/modis_monthly_avg_2000-2024_1km.zarr # zarr only
-  log_file: logs/modis.log
 
 esa_worldcover:
   collection_id: "ESA/WorldCover/v100"
