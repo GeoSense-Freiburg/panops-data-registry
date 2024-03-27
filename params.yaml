@@ -40,6 +40,7 @@ soilgrids:
     - "silt"
     - "soc"
   soil_stat: "mean"
+  nodata: -32768
   crs: "EPSG:4326"
   scale: 1000 # In meters for GEE export
   target: "gcs"

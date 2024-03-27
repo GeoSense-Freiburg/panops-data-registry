@@ -216,6 +216,7 @@ def _export_image(
     }
 
     if export_params.nodata is not None:
+        image = image.unmask(export_params.nodata)
         task_config["formatOptions"]["noData"] = export_params.nodata
 
     if export_params.target == "gcs":
@@ -300,13 +301,31 @@ def download_blobs(
             i + 1,
             len(blobs),
         )
-        part_file_name = Path(blob.name).name  # pyright: ignore[reportArgumentType]
-        part_local_file_path = Path(out_dir) / part_file_name
-        blob.download_to_filename(str(part_local_file_path))
+        download_blob(blob, out_dir)
+
+
+def download_blob(blob: storage.Blob, out_dir: str | os.PathLike) -> None:
+    """
+    Download a blob from a storage bucket.
+
+    Args:
+        blob (storage.Blob): The blob to download.
+        out_dir (str | os.PathLike): The output directory to save the downloaded file.
+
+    Returns:
+        None
+    """
+    log.info("Downloading %s to %s", blob.name, str(out_dir))
+    blob.download_to_filename(
+        Path(out_dir, Path(blob.name).name)  # pyright: ignore[reportArgumentType]
+    )
 
 
 def download_blob_if_exists(
-    file_stem: str, bucket: storage.Bucket, out_dir: str | os.PathLike
+    file_stem: str,
+    bucket: storage.Bucket,
+    out_dir: str | os.PathLike,
+    overwrite: bool = True,
 ):
     """
     Downloads a blob from a storage bucket if it exists.
@@ -325,9 +344,8 @@ def download_blob_if_exists(
     blob = bucket.blob(file_name)
 
     if blob.exists():
-        if not local_file_path.exists():
-            log.info("Downloading %s... to %s", file_name, str(out_dir))
-            blob.download_to_filename(str(local_file_path))
+        if not local_file_path.exists() or overwrite:
+            download_blob(blob, out_dir)
         else:
             log.info(
                 "File %s already exists at %s. Skipping download...",

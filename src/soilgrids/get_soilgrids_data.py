@@ -132,6 +132,7 @@ def main(cfg: dict = config["soilgrids"]) -> None:
         scale=cfg["scale"],
         target=cfg["target"],
         folder=cfg["bucket"],
+        nodata=cfg["nodata"],
     )
     tasks = export_soilgrids_images(
         soil_properties=cfg["soil_properties"],
