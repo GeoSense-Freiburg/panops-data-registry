@@ -38,18 +38,18 @@ def download_blob(blob: storage.Blob, out_dir: str | os.PathLike) -> None:
     Returns:
         None
     """
-    log.info("Downloading %s to %s", blob.name, str(out_dir))
-    out_file_path = Path(
-        out_dir, Path(blob.name).name  # pyright: ignore[reportArgumentType]
-    )
-    try:
-        blob.download_to_filename(out_file_path)
-    except PermissionError:
-        if out_file_path.exists():
-            out_file_path.unlink()
-            blob.download_to_filename(out_file_path)
-        else:
-            raise
+    blob_name = Path(blob.name).name  # pyright: ignore[reportArgumentType]
+    log.info("Downloading %s to %s", blob_name, str(out_dir))
+    out_file_path = Path(out_dir, blob_name)
+
+    if out_file_path.exists():
+        log.warning(
+            "File %s already exists at %s. Overwriting...",
+            blob_name,
+            str(out_file_path),
+        )
+        out_file_path.unlink()
+    blob.download_to_filename(out_file_path)
 
 
 def download_blobs(
