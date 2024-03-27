@@ -316,9 +316,17 @@ def download_blob(blob: storage.Blob, out_dir: str | os.PathLike) -> None:
         None
     """
     log.info("Downloading %s to %s", blob.name, str(out_dir))
-    blob.download_to_filename(
-        Path(out_dir, Path(blob.name).name)  # pyright: ignore[reportArgumentType]
+    out_file_path = Path(
+        out_dir, Path(blob.name).name  # pyright: ignore[reportArgumentType]
     )
+    try:
+        blob.download_to_filename(out_file_path)
+    except PermissionError:
+        if out_file_path.exists():
+            out_file_path.unlink()
+            blob.download_to_filename(out_file_path)
+        else:
+            raise
 
 
 def download_blob_if_exists(
