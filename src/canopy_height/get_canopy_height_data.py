@@ -47,6 +47,7 @@ def export_canopy_height(cfg: dict) -> list[ee.batch.Task]:
         scale=cfg["scale"],
         target=cfg["target"],
         folder=cfg["bucket"],
+        nodata=cfg["nodata"],
     )
 
     tasks = export_collection(

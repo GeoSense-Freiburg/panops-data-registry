@@ -53,6 +53,7 @@ worldclim:
 canopy_height:
   height_collection: "users/nlang/ETH_GlobalCanopyHeight_2020_10m_v1"
   sd_collection: "users/nlang/ETH_GlobalCanopyHeightSD_2020_10m_v1"
+  nodata: 255
   crs: "EPSG:4326"
   scale: 1000 # In meters for GEE export
   target: "gcs"

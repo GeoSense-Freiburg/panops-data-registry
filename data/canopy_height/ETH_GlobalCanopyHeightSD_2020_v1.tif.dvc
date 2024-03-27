@@ -1,6 +1,6 @@
 outs:
-- md5: fd1e8a978790329cf3be14510540825c
-  size: 80077431
+- md5: 9c86345bfd58d8a9efeefa921be2b572
+  size: 80498306
   isexec: true
   hash: md5
   path: ETH_GlobalCanopyHeightSD_2020_v1.tif
