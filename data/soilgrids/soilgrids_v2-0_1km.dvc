@@ -1,0 +1,6 @@
+outs:
+- md5: c7c807d6306555672a2f93959f7b7bcc.dir
+  size: 15944244263
+  nfiles: 61
+  hash: md5
+  path: soilgrids_v2-0_1km

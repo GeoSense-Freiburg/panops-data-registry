@@ -1,6 +1,0 @@
-outs:
-- md5: 7d6b7838b5e4f62ca25698239c344ed4
-  size: 40502767
-  isexec: true
-  hash: md5
-  path: esa_worldcover_v100_1km.tif

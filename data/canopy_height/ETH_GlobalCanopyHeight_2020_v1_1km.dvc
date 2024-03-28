@@ -1,0 +1,6 @@
+outs:
+- md5: 7f7cab159554265edd5e012518dbb8eb.dir
+  size: 188155434
+  nfiles: 2
+  hash: md5
+  path: ETH_GlobalCanopyHeight_2020_v1_1km

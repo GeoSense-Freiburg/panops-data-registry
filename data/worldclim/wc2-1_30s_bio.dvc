@@ -1,0 +1,6 @@
+outs:
+- md5: 53925e6b695fc9ad52b84dbb92471a22.dir
+  size: 10773356934
+  nfiles: 19
+  hash: md5
+  path: wc2-1_30s_bio

@@ -1,6 +1,0 @@
-outs:
-- md5: a9ece8ba9c870c86b1b646424e06292b
-  size: 295225744
-  isexec: true
-  hash: md5
-  path: soc_100-200cm_mean.tif

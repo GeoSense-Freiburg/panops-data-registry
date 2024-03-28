@@ -22,7 +22,7 @@ esa_worldcover:
   scale: 1000 # In meters for GEE export
   target: "gcs"
   bucket: "esa_worldcover"
-  out_path: data/esa_worldcover/esa_worldcover_v100_1km.tif
+  out_path: data/landcover/esa_worldcover_v100_1km/esa_worldcover_v100_1km.tif
 
 soilgrids:
   collection_id: "projects/soilgrids-isric"
@@ -44,7 +44,7 @@ soilgrids:
   scale: 1000 # In meters for GEE export
   target: "gcs"
   bucket: "panops_soilgrids"
-  out_dir: data/soilgrids
+  out_dir: data/soilgrids/soilgrids_v2-0_1km
 
 worldclim:
   url: https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/wc2.1_30s_bio.zip
@@ -63,7 +63,7 @@ vodca:
   scale: 1000 # In meters for GEE export
   target: "gcs"
   bucket: "panops_vodca"
-  out_dir: "data/vodca"
+  out_dir: "data/vodca/vodca_all-bands_mean-p5-p95_1km"
 
 canopy_height:
   height_collection: "users/nlang/ETH_GlobalCanopyHeight_2020_10m_v1"
@@ -73,4 +73,4 @@ canopy_height:
   scale: 1000 # In meters for GEE export
   target: "gcs"
   bucket: "panops_canopy_height"
-  out_dir: "data/canopy_height"
+  out_dir: "data/canopy_height/ETH_GlobalCanopyHeight_2020_v1_1km"

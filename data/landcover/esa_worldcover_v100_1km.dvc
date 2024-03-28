@@ -1,0 +1,6 @@
+outs:
+- md5: 3cc4d8f50aa3b1441f8843cf46381e42.dir
+  size: 40502767
+  nfiles: 1
+  hash: md5
+  path: esa_worldcover_v100_1km
