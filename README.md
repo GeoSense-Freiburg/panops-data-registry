@@ -33,7 +33,7 @@ Project Organization
 
 --------
 
-<p><small>Project based on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. #cookiecutterdatascience</small></p>
+<p><small>Project structure based loosely on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. #cookiecutterdatascience</small></p>
 
 ## Usage
 ### Important!
@@ -44,13 +44,13 @@ Downloading data from this registry is simple—that's the point!
 
 To see what data is available, use `dvc list`, for example:
 ```bash
-dvc list -R --dvc-only path/to/eo-data data
+dvc list -R --dvc-only path/to/panops-data-registry data
 ```
-The above command lists all files available in the `data` directory of the `eo-data` registry (located in this case at `path/to/eo-data`). The `-R` flag tells DVC to list all directory contents recursively, and `--dvc-only` only shows the actual data, excluding system files like `__pycache__` and `.gitignore`.
+The above command lists all files available in the `data` directory of the PANOPS data registry (located in this case at `path/to/panops-data-registry`). The `-R` flag tells DVC to list all directory contents recursively, and `--dvc-only` only shows the actual data, excluding system files like `__pycache__` and `.gitignore`.
 
 Download the data you want with `dvc get` or `dvc import`. Use `dvc get` if you don't want to automatically track your local copy of the data in your own DVC project. Using `dvc import` checks the files into DVC versioning.
 ```bash
-dvc import path/to/eo-data data/raw/gbif/all_tracheophyta.zip -o myproject/data/raw/gbif
+dvc import path/to/panops-data-registry data/raw/gbif/all_tracheophyta.zip -o myproject/data/raw/gbif
 ```
 
 > [!NOTE]
@@ -62,8 +62,8 @@ dvc import path/to/eo-data data/raw/gbif/all_tracheophyta.zip -o myproject/data/
 #### 1. Clone the project repository
 
 ```bash
-git clone https://github.com/dluks/eo-data
-cd eo-data
+git clone https://github.com/GeoSense-Freiburg/panops-data-registry
+cd panops-data-registry
 ```
 
 #### 2. Install poetry and DVC.
@@ -81,8 +81,8 @@ pipx install dvc
 #### 3. Create a virtual environment
 
 ```bash
-conda create -n eo-data -c conda-forge python=3.10
-conda activate eo-data
+conda create -n panops-data-registry -c conda-forge python=3.10
+conda activate panops-data-registry
 ```
 
 #### 4. Install dependencies
