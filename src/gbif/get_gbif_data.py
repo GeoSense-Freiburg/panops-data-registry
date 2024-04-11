@@ -1,7 +1,6 @@
 """Initiate a GBIF download and save it to disk once it is ready."""
 
 import json
-import logging
 import time
 import zipfile
 from pathlib import Path
@@ -11,7 +10,9 @@ import click
 from dotenv import find_dotenv, load_dotenv
 from pygbif import occurrences as occ  # pylint: disable=import-error
 
-log = logging.getLogger(__name__)
+from src.utils.log_utils import setup_logger
+
+log = setup_logger(__name__, "INFO")
 
 
 class GbifDownloadFailure(Exception):
@@ -112,17 +113,25 @@ def check_download_job_and_download_file(
     return output_file
 
 
-def unzip_and_rename(file_path: Path):
-    """Unzip a file and rename the unzipped directory to the original name."""
+def unzip_and_rename(file_path: Path) -> None:
+    """
+    Unzip a file and rename the unzipped directory to the original name.
+
+    Args:
+        file_path (Path): The path to the zip file.
+    """
     with zipfile.ZipFile(file_path, "r") as zip_ref:
         # Extract all the contents of zip file in current directory
         zip_ref.extractall(path=file_path.parent)
 
         # Get the name of the directory that was extracted (most likely
-        # "occurrences.parquet", but that may change in the future)
+        # "occurrence.parquet", but that may change in the future)
         extracted_dir = Path(zip_ref.namelist()[0]).parent
-
+        extracted_dir = file_path.parent / extracted_dir
         extracted_dir.rename(file_path.with_suffix(".parquet"))
+
+    # Remove the original zip file
+    file_path.unlink()
 
 
 @click.command()

@@ -1,3 +1,8 @@
+gbif:
+  query_file: references/gbif/query_all_tracheophyta.json
+  query_name: all_tracheophyta_non-cult_2024-04-10
+  out_path: data/gbif/all_tracheophyta_non-cult_2024-04-10
+
 modis:
   date_start: "2001-01-01"
   date_end: "2024-01-01"

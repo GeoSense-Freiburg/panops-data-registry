@@ -1,20 +1,22 @@
 """Tests for the download_gbif module."""
 
+import zipfile
 from pathlib import Path
 
 import pytest
 from pygbif import occurrences as occ
 
-from src.gbif.download_gbif import (
+from src.gbif.get_gbif_data import (
     GbifDownloadFailure,
     check_download_job_and_download_file,
     check_download_status,
     download_request_to_disk,
     init_gbif_download,
+    unzip_and_rename,
 )
 
 # Define the module name to be used for mocking
-TESTED_MODULE = "src.gbif.download_gbif"
+TESTED_MODULE = "src.gbif.get_gbif_data"
 
 
 @pytest.fixture(name="gbif_query")
@@ -224,3 +226,25 @@ def test_check_download_job_and_download_file(tmp_path, mocker, gbif_download_in
         check_download_job_and_download_file(gbif_download_info[0], output_path)
 
     assert "failed." in str(excinfo.value)
+
+
+def test_unzip_and_rename(tmp_path):
+    """Test unzip_and_rename"""
+    # Create a temporary zip file
+    file_path = tmp_path / "test.zip"
+    with zipfile.ZipFile(file_path, "w") as zipf:
+        zipf.writestr("test_dir/test.txt", "This is a test file")
+
+    # Call the function
+    unzip_and_rename(file_path)
+
+    # Check if the unzipped file exists
+    unzipped_dir = tmp_path / "test.parquet"
+    assert unzipped_dir.exists()
+
+    # Check if the original zip file has been removed
+    assert not file_path.exists()
+
+    # Check if the file within the unzipped directory exists
+    unzipped_file = unzipped_dir / "test.txt"
+    assert unzipped_file.exists()

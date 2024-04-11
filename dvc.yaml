@@ -1,4 +1,13 @@
 stages:
+  get_latest_gbif:
+    cmd: >
+      python src/gbif/get_gbif_data.py
+      -q ${gbif.query_file}
+      -n ${gbif.query_name}
+      -o ${gbif.out_path}
+    deps:
+      - src/gbif/get_gbif_data.py
+
   get_modis_monthly_avgs:
     cmd: python src/modis/get_modis_data.py -v
     deps:
