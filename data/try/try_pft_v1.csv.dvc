@@ -1,0 +1,6 @@
+outs:
+- md5: c8c8c94250a247ce30b76ce150bedf90
+  size: 3964944
+  isexec: true
+  hash: md5
+  path: try_pft_v1.csv
