@@ -4,3 +4,6 @@
     type = "hardlink,symlink"
 [core]
     autostage = true
+    remote = gcs
+['remote "gcs"']
+    url = gs://panops-data-registry
