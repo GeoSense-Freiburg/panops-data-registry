@@ -1,7 +1,3 @@
-[cache]
-    dir = /mnt/FS_data/panops-data/dvc-cache
-    shared = group
-    type = "hardlink,symlink"
 [core]
     autostage = true
     remote = gcs
