@@ -19,16 +19,13 @@ stages:
       md5: ba72cc1c52a02fbdccb9723fb5c1b10e
       size: 5189
   get_modis_monthly_avgs:
-    cmd: python src/modis/get_data.py
+    cmd: python src/modis/get_modis_data.py -v
     deps:
-    - path: src/modis/get_data.py
+    - path: src/modis/get_modis_data.py
       hash: md5
-      md5: e0e7aa9556880ae0a785eefb07a553d6
-      size: 2300
-    - path: src/modis/process_data.py
-      hash: md5
-      md5: ba72cc1c52a02fbdccb9723fb5c1b10e
-      size: 5189
+      md5: fd6dcc67646dba9bd8aa7851926e4d53
+      size: 3783
+      isexec: true
   get_esa_worldcover:
     cmd: python src/esa_worldcover/get_esa_worldcover_data.py -vd
     deps:
@@ -41,20 +38,34 @@ stages:
     deps:
     - path: src/soilgrids/get_soilgrids_data.py
       hash: md5
-      md5: 3ec77483513ced3c148bfabf88ee600c
-      size: 4368
-      isexec: true
+      md5: 6bf307936fcc98c46f2645c3fc2cbb16
+      size: 4677
   get_worldclim:
     cmd: python src/worldclim/get_worldclim_data.py
     deps:
     - path: src/worldclim/get_worldclim_data.py
       hash: md5
-      md5: 27db670af5f76d3ecdaf2d6a86d4804c
-      size: 1729
+      md5: 08bb2d1b674f81fa217977dd6c7cadf1
+      size: 1913
   get_canopy_height:
     cmd: python src/canopy_height/get_canopy_height_data.py
     deps:
     - path: src/canopy_height/get_canopy_height_data.py
       hash: md5
-      md5: 521bcff89b342a126fce38fe8291a303
-      size: 1858
+      md5: 1659f17590eb1d4f93b2f61c007eb7df
+      size: 1888
+  get_latest_gbif:
+    cmd: "python src/gbif/get_gbif_data.py -q references/gbif/query_all_tracheophyta.json
+      -n all_tracheophyta_non-cult_2024-04-10 -o data/gbif/all_tracheophyta_non-cult_2024-04-10\n"
+    deps:
+    - path: src/gbif/get_gbif_data.py
+      hash: md5
+      md5: 85f3e452c7e7ce4a9a0a2776e5e38b2e
+      size: 6109
+  get_vodca:
+    cmd: python src/vodca/get_vodca_data.py
+    deps:
+    - path: src/vodca/get_vodca_data.py
+      hash: md5
+      md5: b2d2bef8e730c1a280297cc159a9f4d2
+      size: 6042
