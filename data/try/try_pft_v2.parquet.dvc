@@ -1,0 +1,5 @@
+outs:
+- md5: d49a4b1611eebbd529c9e9aba6aa5f69
+  size: 2232209
+  hash: md5
+  path: try_pft_v2.parquet
