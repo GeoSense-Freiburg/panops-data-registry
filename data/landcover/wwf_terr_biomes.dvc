@@ -1,0 +1,6 @@
+outs:
+- md5: 607f424a1564077a588b07b114a6f36b.dir
+  size: 4094574
+  nfiles: 2
+  hash: md5
+  path: wwf_terr_biomes
