@@ -1,0 +1,6 @@
+outs:
+- md5: 2d78d40e6860adc20115ffa9f066903f.dir
+  size: 9621626195
+  nfiles: 7
+  hash: md5
+  path: 20240506_try_sparse_processing
