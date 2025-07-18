@@ -1,3 +1,7 @@
+ee:
+  project_id: "global-traits"
+  high_volume: true
+
 gbif:
   query_file: references/gbif/query_all_tracheophyta.json
   query_name: all_tracheophyta_non-cult_2024-04-10
@@ -79,3 +83,13 @@ canopy_height:
   target: "gcs"
   bucket: "panops_canopy_height"
   out_dir: "data/canopy_height/ETH_GlobalCanopyHeight_2020_v1_1km"
+
+alos_chili:
+  collection_id: "CSP/ERGo/1_0/Global/ALOS_CHILI"  # This might need adjustment based on actual GEE dataset
+  band: "constant"
+  nodata: 255
+  crs: "EPSG:4326"
+  scale: 1000 # In meters for GEE export (1 km resolution)
+  target: "gcs"
+  bucket: "panops_alos_chili"
+  out_dir: "data/topography/alos_chili_1km"

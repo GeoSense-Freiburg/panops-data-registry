@@ -21,6 +21,18 @@ from src.utils.log_utils import setup_logger
 log = setup_logger(__name__, "INFO")
 
 
+def ee_init(project_id: str, high_volume: bool = False) -> None:
+    """Initialize the Earth Engine API."""
+    log.info("Initializing Earth Engine...")
+    opt_url = "https://earthengine-highvolume.googleapis.com/" if high_volume else None
+    try:
+        ee.Initialize(project=project_id, opt_url=opt_url)
+        log.info("Earth Engine initialized")
+    except Exception as e:
+        log.error("Error initializing Earth Engine: %s", e)
+        raise e
+
+
 def get_ic(
     product: str,
     date_start: Optional[str] = None,
@@ -135,6 +147,13 @@ def calculate_monthly_averages(ic: ee.ImageCollection, year_start: str, year_end
             monthly_averages.append(mean_image)
 
     return ee.ImageCollection(monthly_averages)
+
+
+def get_crs_and_transform(image: ee.Image) -> tuple[str, str]:
+    """Get the CRS and transform of an image."""
+    crs = image.projection().crs().getInfo()
+    transform = image.projection().transform().getInfo()
+    return crs, transform
 
 
 @dataclass

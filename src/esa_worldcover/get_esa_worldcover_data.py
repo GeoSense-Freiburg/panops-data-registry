@@ -17,8 +17,8 @@ from dotenv import find_dotenv, load_dotenv
 from src.conf.parse_params import config
 from src.utils.gee_utils import (
     ExportParams,
+    _export_image,
     download_when_complete,
-    export_image,
     get_ic,
 )
 from src.utils.log_utils import setup_logger
@@ -85,7 +85,7 @@ def main(cfg: dict = config["esa_worldcover"]) -> None:
     out_path = Path(project_root, cfg["out_path"])
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
-    task = export_image(wc, out_path.stem, export_params)
+    task = _export_image(wc, out_path.stem, export_params)
 
     if args.download:
         download_when_complete(cfg["bucket"], out_path.parent, [task], args.verbose)
