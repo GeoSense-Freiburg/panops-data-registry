@@ -98,3 +98,4 @@ target/
 outputs
 .local_gitignore
 scratch.ipynb
+debug
