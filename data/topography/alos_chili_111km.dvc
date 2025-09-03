@@ -1,0 +1,6 @@
+outs:
+- md5: 399b5fbca66d16bb4a403eebf271348d.dir
+  size: 16525
+  nfiles: 1
+  hash: md5
+  path: alos_chili_111km

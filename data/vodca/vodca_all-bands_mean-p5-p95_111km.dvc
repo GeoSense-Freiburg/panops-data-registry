@@ -1,0 +1,6 @@
+outs:
+- md5: 9cc37f959035d458a76e794d3c09186c.dir
+  size: 1586185
+  nfiles: 9
+  hash: md5
+  path: vodca_all-bands_mean-p5-p95_111km

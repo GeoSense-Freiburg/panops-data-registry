@@ -1,0 +1,6 @@
+outs:
+- md5: c38e160db8a41b46e7a51ee2e102a6ac.dir
+  size: 6538611
+  nfiles: 60
+  hash: md5
+  path: modis_sur_refl_monthly_avg_111km
