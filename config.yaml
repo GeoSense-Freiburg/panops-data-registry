@@ -1,0 +1,95 @@
+ee:
+  project_id: "global-traits"
+  high_volume: true
+
+gbif:
+  query_file: references/gbif/query_all_tracheophyta.json
+  query_name: all_tracheophyta_non-cult_2024-04-10
+  out_path: data/gbif/all_tracheophyta_non-cult_2024-04-10
+
+modis:
+  date_start: "2001-01-01"
+  date_end: "2025-01-01"
+  product: "MODIS/061/MOD09GA"
+  bands:
+    - "sur_refl_b01" # red
+    - "sur_refl_b02" # NIR (841-876nm)
+    - "sur_refl_b03" # blue
+    - "sur_refl_b04" # green
+    - "sur_refl_b05" # NIR (1230-1250nm)
+  qa_band: "state_1km"
+  nodata: -32768
+  crs: "EPSG:4326"
+  scale: 111000 # In meters for GEE export
+  target: "gcs"
+  bucket: "modis_monthly_avgs_111km"
+  out_dir: data/modis/modis_sur_refl_monthly_avg_111km
+
+esa_worldcover:
+  collection_id: "ESA/WorldCover/v100"
+  crs: "EPSG:4326"
+  scale: 111000 # In meters for GEE export
+  target: "gcs"
+  bucket: "esa_worldcover_111km"
+  out_path: data/landcover/esa_worldcover_v100_111km/esa_worldcover_v100_111km.tif
+
+soilgrids:
+  collection_id: "projects/soilgrids-isric"
+  soil_properties:
+    - "bdod"
+    - "cec"
+    - "cfvo"
+    - "clay"
+    - "nitrogen"
+    - "ocd"
+    - "ocs"
+    - "phh2o"
+    - "sand"
+    - "silt"
+    - "soc"
+  soil_stat: "mean"
+  nodata: -32768
+  crs: "EPSG:4326"
+  scale: 111000 # In meters for GEE export
+  target: "gcs"
+  bucket: "panops_soilgrids_111km"
+  out_dir: data/soilgrids/soilgrids_v2-0_111km
+
+worldclim:
+  url: https://geodata.ucdavis.edu/climate/worldclim/2_1/base/wc2.1_10m_bio.zip
+  out_dir: data/worldclim
+
+vodca:
+  collection_base: "projects/sat-io/open-datasets/VODCA"
+  bands:
+    - "C-BAND"
+    - "K-BAND"
+    - "X-BAND"
+  percentiles:
+    - 5
+    - 95
+  crs: "EPSG:4326"
+  scale: 111000 # In meters for GEE export
+  target: "gcs"
+  bucket: "panops_vodca_111km"
+  out_dir: "data/vodca/vodca_all-bands_mean-p5-p95_111km"
+
+canopy_height:
+  height_collection: "users/nlang/ETH_GlobalCanopyHeight_2020_10m_v1"
+  sd_collection: "users/nlang/ETH_GlobalCanopyHeightSD_2020_10m_v1"
+  nodata: 255
+  crs: "EPSG:4326"
+  scale: 111000 # In meters for GEE export
+  target: "gcs"
+  bucket: "panops_canopy_height_111km"
+  out_dir: "data/canopy_height/ETH_GlobalCanopyHeight_2020_v1_111km"
+
+alos_chili:
+  collection_id: "CSP/ERGo/1_0/Global/ALOS_CHILI"  # This might need adjustment based on actual GEE dataset
+  band: "constant"
+  nodata: 255
+  crs: "EPSG:4326"
+  scale: 111000 # In meters for GEE export (1 km resolution)
+  target: "gcs"
+  bucket: "panops_alos_chili_111km"
+  out_dir: "data/topography/alos_chili_111km"

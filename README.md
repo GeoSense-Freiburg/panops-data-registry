@@ -104,21 +104,88 @@ pre-commit install
 > ```
 > If you've already installed the hooks with `pre-commit install`, you'll need to run `pre-commit uninstall`.
 
-### Running pipelines
-> [!WARNING]
-> This section is for **reproducing core data registry pipelines**. In other words, reproducing pipeline stages may result in modifcations or even removal of data, which could result in breaking changes for other parties who are simply pulling data for their own projects. Only run pipelines (e.g. `dvc repro` or `dvc exp run`) if you are sure you need to! If you only want to download data, see the above section on [Downloading data](#downloading-data).
+ 
 
-The entire data creation and transformation process can be reproduced using DVC pipelines. You can reproduce the entire pipeline with
+### Generate datasets directly (no DVC)
+You can run each stage individually without `dvc repro`. Most stages read their default parameters from `params.yaml`. Adjust values there as needed before running the corresponding command.
+
+> Note: Some stages export via Google Earth Engine (GEE) to Google Cloud Storage (GCS) and then download to the local filesystem. Ensure your environment is authenticated for GEE and that the GCS buckets referenced in `params.yaml` exist and are accessible.
+
+#### GBIF occurrences
+- **Script**: `src/gbif/get_gbif_data.py`
+- **Key parameters (via CLI flags)**:
+  - `-q/--query`: Path to GBIF query JSON (e.g., `references/gbif/query_all_tracheophyta.json`).
+  - `-n/--name`: Human-readable name used for the downloaded files.
+  - `-o/--output`: Output directory (must exist) where files are saved.
+  - `-k/--key` (optional): Existing GBIF download key to re-download.
+- **Run**:
 ```bash
-dvc repro
-```
-but (more common) you may want to simply run a single stage, with
-```bash
-dvc repro my_stage
+mkdir -p data/gbif
+python src/gbif/get_gbif_data.py \
+  -q references/gbif/query_all_tracheophyta.json \
+  -n all_tracheophyta_[YYYY-MM-DD] \
+  -o data/gbif
 ```
 
-#### Data setup
-While it is likely not necessary, if you want to reproduce the GBIF download of all non-cultivated plant occurrences in Tracheophyta, simply run download_gbif.py:
+#### MODIS monthly averages
+- **Script**: `src/modis/get_modis_data.py`
+- **Configure in `params.yaml` under `modis`**: `date_start`, `date_end`, `product`, `bands`, `qa_band`, `nodata`, `crs`, `scale`, `target`, `bucket`, `out_dir`.
+- **Flags**: `-v/--verbose`, `-t/--test` (shorter time range, quicker run).
+- **Run**:
 ```bash
-python src/data/download_gbif.py -n all_tracheophyta_[today's date] -o data/raw/gbif
+python src/modis/get_modis_data.py -v
+```
+
+#### ESA WorldCover
+- **Script**: `src/esa_worldcover/get_esa_worldcover_data.py`
+- **Configure in `params.yaml` under `esa_worldcover`**: `collection_id`, `crs`, `scale`, `target`, `bucket`, `out_path`.
+- **Flags**: `-v/--verbose`, `-d/--download` (download from GCS after export).
+- **Run**:
+```bash
+python src/esa_worldcover/get_esa_worldcover_data.py -v -d
+```
+
+#### SoilGrids
+- **Script**: `src/soilgrids/get_soilgrids_data.py`
+- **Configure in `params.yaml` under `soilgrids`**: `collection_id`, `soil_properties`, `soil_stat`, `nodata`, `crs`, `scale`, `target`, `bucket`, `out_dir`.
+- **Flags**: `-v/--verbose`, `-d/--download`, `--dry-run` (create tasks only).
+- **Run**:
+```bash
+python src/soilgrids/get_soilgrids_data.py -v -d
+```
+
+#### WorldClim BIO variables
+- **Script**: `src/worldclim/get_worldclim_data.py`
+- **Configure in `params.yaml` under `worldclim`**: `url`, `out_dir`.
+- **Run**:
+```bash
+python src/worldclim/get_worldclim_data.py
+```
+
+#### Canopy height (ETH 2020)
+- **Script**: `src/canopy_height/get_canopy_height_data.py`
+- **Configure in `params.yaml` under `canopy_height`**: `height_collection`, `sd_collection`, `nodata`, `crs`, `scale`, `target`, `bucket`, `out_dir`.
+- **Run**:
+```bash
+python src/canopy_height/get_canopy_height_data.py
+```
+
+#### VODCA
+- **Script**: `src/vodca/get_vodca_data.py`
+- **Configure in `params.yaml` under `vodca`**: `collection_base`, `bands`, `percentiles`, `crs`, `scale`, `target`, `bucket`, `out_dir`.
+- **Flags**: `--dry-run` (create tasks only), `--merge-only` (only merge multipart files already downloaded).
+- **Run**:
+```bash
+python src/vodca/get_vodca_data.py
+```
+
+#### ALOS CHILI (Compound Topographic Index)
+- **Script**: `src/topography/chili/get_alos_chili.py`
+- **Configure in `params.yaml`**:
+  - Under `ee`: `project_id`, `high_volume`.
+  - Under `alos_chili`: `collection_id`, `band`, `nodata`, `crs`, `scale`, `target`, `bucket`, `out_dir`.
+- **Flags**: `-d/--debug` (coarser scale and debug output directory).
+- **Run**:
+```bash
+python src/topography/chili/get_alos_chili.py
 ```
