@@ -85,7 +85,7 @@ def main(cfg: dict = config["esa_worldcover"]) -> None:
     out_path = Path(project_root, cfg["out_path"])
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
-    task = _export_image(wc, out_path.stem, export_params)
+    task = _export_image(wc, out_path.stem, export_params, validate_bucket=True)
 
     if args.download:
         download_when_complete(cfg["bucket"], out_path.parent, [task], args.verbose)

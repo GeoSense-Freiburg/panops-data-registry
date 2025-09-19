@@ -181,7 +181,11 @@ class ExportParams:
 
 
 def _export_image(
-    image: ee.Image, filename: str, export_params: ExportParams, dry_run: bool = False
+    image: ee.Image,
+    filename: str,
+    export_params: ExportParams,
+    dry_run: bool = False,
+    validate_bucket: bool = False,
 ) -> ee.batch.Task:
     """Export an image to Drive or Google Cloud Storage.
 
@@ -210,6 +214,8 @@ def _export_image(
         task_config["formatOptions"]["noData"] = export_params.nodata
 
     if export_params.target == "gcs":
+        if not dry_run and validate_bucket:
+            validate_bucket_and_create_if_not_exists(export_params.folder)
         task_config["bucket"] = export_params.folder
         task = ee.batch.Export.image.toCloudStorage(image, **task_config)
 
