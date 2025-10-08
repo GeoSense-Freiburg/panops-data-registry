@@ -633,6 +633,19 @@ urllib3 = ">=1.26.5"
 zict = ">=3.0.0"
 
 [[package]]
+name = "dotenv"
+version = "0.9.9"
+description = "Deprecated package"
+optional = false
+python-versions = "*"
+files = [
+    {file = "dotenv-0.9.9-py2.py3-none-any.whl", hash = "sha256:29cf74a087b31dafdb5a446b6d7e11cbce8ed2741540e2339c69fbef92c94ce9"},
+]
+
+[package.dependencies]
+python-dotenv = "*"
+
+[[package]]
 name = "earthengine-api"
 version = "0.1.395"
 description = "Earth Engine Python API"
@@ -2187,18 +2200,18 @@ files = [
 
 [[package]]
 name = "pygbif"
-version = "0.6.4"
+version = "0.6.5"
 description = "Python client for GBIF"
 optional = false
 python-versions = "*"
 files = [
-    {file = "pygbif-0.6.4-py3-none-any.whl", hash = "sha256:e687a9520523ce908a700e8169e32383a0db27b50dc4b6c277bb0bc7fb8835df"},
-    {file = "pygbif-0.6.4.tar.gz", hash = "sha256:92abe83814ec348649710a97f8f5130410dd6fae71d879ff24c7c81f54c38ab7"},
+    {file = "pygbif-0.6.5-py3-none-any.whl", hash = "sha256:f2c86da2fb9733d86463d83c14f3bb46bf01661021587524e4e5d7517c13a104"},
+    {file = "pygbif-0.6.5.tar.gz", hash = "sha256:4eaaf032d23eaee514061d5ac902c278c3bd54d061cd55d2a0209b072aaf3343"},
 ]
 
 [package.dependencies]
 appdirs = ">=1.4.3"
-geojson-rewind = "*"
+geojson_rewind = "*"
 geomet = "*"
 matplotlib = "*"
 requests = ">2.7"
@@ -3081,4 +3094,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.12"
-content-hash = "4bfcedce6d5df451d3581943ac31ce1f899e01fd7d11922e79fe61e36f70abaf"
+content-hash = "e4ea83956b5a75437622568bb6fe10ea0e7080ce55b7e78c2392bbf8a3c19a04"
