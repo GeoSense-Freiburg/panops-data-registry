@@ -39,6 +39,13 @@ Project Organization
 ### Important!
 This project is still in active development, so before using it, please contact daniel.lusk@geosense.uni-freiburg.de.
 
+### File Naming and Versioning
+**Important change:** Previous versions of GBIF `all_tracheophyta_non-cult` pulls and TRY PFT datasets used date-stamped or version-numbered filenames (e.g., `all_tracheophyta_non-cult_2024-04-10` or `try_pft_v2.parquet`). Since this data registry now uses DVC for version control, these files are saved with generic filenames:
+- `all_tracheophyta_non-cult` (instead of date-stamped versions)
+- `try_pfts.parquet` (instead of version-numbered files)
+
+The most recent version of each dataset is always available under these generic names. To access previous versions, use Git and DVC together to check out earlier commits and their associated data versions.
+
 ### Downloading data (TODO: Update with correct instructions)
 Downloading data from this registry is simple—that's the point!
 

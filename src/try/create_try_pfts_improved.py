@@ -94,7 +94,9 @@ def main() -> None:
     log = logging.getLogger(__name__)
 
     log.info("Reading data...")
-    fp = Path("./data/try/try_growth_forms.parquet")
+    fp = Path(
+        "./data/try/try_life_forms_2025-09-26/1_processed/try_growth_forms.parquet"
+    )
 
     df = pd.read_parquet(fp)
 
@@ -772,4 +774,3 @@ def main() -> None:
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     main()
-
