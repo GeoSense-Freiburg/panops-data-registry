@@ -1,7 +1,93 @@
 import logging
+import re
 from pathlib import Path
 
 import pandas as pd
+
+
+def assign_pft_priority(growth_form: str, search_terms: dict) -> str | None:
+    """
+    Assign PFT using priority-based matching.
+
+    Priority order: Tree > Shrub > Grass
+
+    For compound forms like "herb_tree_shrub", this will:
+    1. Split by common delimiters (_, /, |, comma, space)
+    2. Check each token against search terms
+    3. Return the highest priority match
+    """
+    if pd.isna(growth_form):
+        return None
+
+    # Filter out non-growth forms
+    non_growth_forms = {
+        "yes",
+        "no",
+        "absence",
+        "presence",
+        "unspecified",
+        "?",
+        "`",
+        "rounded",
+        "conical",
+        "oval",
+        "vase",
+        "irregular",
+        "single crown",
+        "soli",
+        "mult",
+        "ss",
+        "c+sc",
+        "nd",
+        "various",
+    }
+
+    # Check if it's a number or clearly not a growth form
+    if growth_form in non_growth_forms:
+        return None
+
+    # Try to parse as float - if successful, it's not a growth form
+    try:
+        float(growth_form)
+        return None
+    except ValueError:
+        pass
+
+    # First try exact match (already lowercase)
+    for pft, terms in search_terms.items():
+        if growth_form in terms:
+            return pft
+
+    # Clean and tokenize the growth form
+    # Split by common delimiters: underscore, slash, pipe, comma, space
+    tokens = re.split(r"[_/|,\s]+", growth_form.strip('"').strip())
+
+    # Priority order
+    priority_order = ["Tree", "Shrub", "Grass"]
+
+    # Check each token against search terms
+    found_pfts = set()
+    for token in tokens:
+        token = token.strip()
+        if not token:
+            continue
+        for pft, terms in search_terms.items():
+            if token in terms:
+                found_pfts.add(pft)
+                break
+
+    # Return highest priority match
+    for pft in priority_order:
+        if pft in found_pfts:
+            return pft
+
+    # If no match, try substring matching (contains)
+    for pft in priority_order:
+        for term in search_terms[pft]:
+            if term in growth_form and len(term) > 2:  # avoid short false positives
+                return pft
+
+    return None
 
 
 def main() -> None:
@@ -15,7 +101,7 @@ def main() -> None:
     log.info("Processing data...")
     df = df.assign(AccSpeciesName=lambda _df: _df["AccSpeciesName"].str.lower())
 
-    # Define the search terms (received from Teja)
+    # Define the search terms (updated with additional terms)
     search_terms_tree = [
         # Basic tree terms
         "tree",
@@ -122,7 +208,6 @@ def main() -> None:
         "tree-shrub",
         "tree_shrub",
         "shrub_tree",
-        "shrub_tree",
         "t/s",
         "t/tree",
         "tree/tree",
@@ -168,6 +253,10 @@ def main() -> None:
         "slt",
         # Forest types
         "USforestTrees",
+        # Successional stages
+        "early-successional",
+        "mid-successional",
+        "late-successional",
     ]
 
     search_terms_grass = [
@@ -198,7 +287,6 @@ def main() -> None:
         "forbs",
         "Forb",
         "forb/herb",
-        "forbs",
         "frobs",
         "annual forb",
         "perennial forb",
@@ -328,6 +416,8 @@ def main() -> None:
         "hydrophyte-annual",
         "hyd",
         "n hyd",
+        "macrophyte",
+        "aquativ",  # Added macrophyte
         # Rosette
         "rosette",
         "rosette plant",
@@ -340,6 +430,8 @@ def main() -> None:
         # Legumes
         "legume",
         "legumes",
+        "annual legume",
+        "perennial legume",  # Added annual/perennial legume
         # Cereals
         "cereal",
         # Weeds
@@ -370,6 +462,7 @@ def main() -> None:
         # Other
         "extensive-stemmed herb",
         "small_herb_",
+        "annuals",  # Added
     ]
 
     search_terms_shrub = [
@@ -402,6 +495,7 @@ def main() -> None:
         "evergreen dwarf shrub",
         "drwarf shrub",
         "Dwarf Shrub community",
+        "dwarf semishrub",  # Added
         # Shrub size
         "small shrub",
         "small_shrub",
@@ -418,6 +512,7 @@ def main() -> None:
         "shrub | chaemaephyte",
         "chaemaephyte | nano-chamaephyte",
         "chaemaephyte | vine",
+        "chasmophyte",  # Added chasmophyte
         # Woody shrub
         "woody shrub",
         "shrub/woody",
@@ -442,6 +537,7 @@ def main() -> None:
         "vine|herb",
         "herbaceous vine|liana/woody vine",
         "vine resp. climb",
+        "shrub/vine",  # FIXED - added this term that was missing due to syntax error
         "w climb resp. v",
         "climb resp. v",
         "climb resp. climb",
@@ -474,6 +570,7 @@ def main() -> None:
         "climber/non-woody/woody",
         "twiner/climber.",
         "twiner/climber",
+        "climber/palmoid/woody",  # Added
         # Epiphyte
         "epiphyte",
         "epiphytic",
@@ -514,6 +611,7 @@ def main() -> None:
         "forb-succulent",
         "l succ",
         "i succ",
+        "caudiciform",  # Added
         # Cactus
         "cactus",
         "cacti",
@@ -541,6 +639,7 @@ def main() -> None:
         "aquatic plants, floating",
         "semi-aquatic",
         "subaquatic",
+        "aquatic/semi-aquatic",  # Added
         # Growth forms
         "stem erect",
         "erect",
@@ -617,24 +716,40 @@ def main() -> None:
         "shrub-like_herb",
         "se",
         "rus",
-        "various",
         # Desert
         "desert sub-shrubs",
         # Free
         "free",
         "free-standing",
+        # Climber variations
+        "climber/epiphyte",
+        "climber/epiphyte/parasitic",
+        "climber/epiphyte/succulent",
+        "climber/fern",
+        "climber/hemiepiphyte",
+        "climber/herb",
+        "climber/succulent",
+        "climber/free/liana",
+        "climber/free/shrub",
+        "climber/free/understory",
+        "climber/free/vine",
+        "climber/parasitic",
+        "climbing_epiphyte",
+        "climibing_herb",  # Added (typo in original data)
     ]
 
-    # Convert all terms to lowercase and remove duplicates
-    search_terms_tree = set([t.lower() for t in search_terms_tree])
-    search_terms_grass = set([t.lower() for t in search_terms_grass])
-    search_terms_shrub = set([t.lower() for t in search_terms_shrub])
+    # Convert all terms to lowercase and create a dictionary
+    search_terms = {
+        "Tree": set([t.lower() for t in search_terms_tree]),
+        "Shrub": set([t.lower() for t in search_terms_shrub]),
+        "Grass": set([t.lower() for t in search_terms_grass]),
+    }
 
-    log.info("Assigning PFTs to species...")
-    # Assign PFTs to the species
-    df.loc[df["X42"].isin(search_terms_tree), "pft"] = "Tree"
-    df.loc[df["X42"].isin(search_terms_grass), "pft"] = "Grass"
-    df.loc[df["X42"].isin(search_terms_shrub), "pft"] = "Shrub"
+    log.info("Assigning PFTs to species using improved matching...")
+    # Assign PFTs using the improved priority-based matching
+    df["pft"] = df["X42"].apply(lambda x: assign_pft_priority(x, search_terms))
+
+    # Drop rows without PFT assignment
     df = df.dropna(subset=["pft"])
 
     log.info("Grouping by species and selecting majority PFT...")
@@ -651,7 +766,10 @@ def main() -> None:
     # Save to file
     df.to_parquet("./data/try/try_pfts.parquet")
 
+    log.info(f"Saved {len(df):,} species with PFT assignments")
+
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     main()
+
