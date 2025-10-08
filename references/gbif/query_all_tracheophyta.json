@@ -11,7 +11,9 @@
       "predicate": {
         "type": "in",
         "key": "DEGREE_OF_ESTABLISHMENT",
-        "values": ["cultivated"]
+        "values": [
+          "cultivated"
+        ]
       }
     },
     {
@@ -23,6 +25,11 @@
       "type": "equals",
       "key": "HAS_COORDINATE",
       "value": "TRUE"
+    },
+    {
+      "type": "lessThanOrEquals",
+      "key": "COORDINATE_UNCERTAINTY_IN_METERS",
+      "value": 5000
     }
   ]
 }
