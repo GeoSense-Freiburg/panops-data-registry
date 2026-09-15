@@ -14,8 +14,13 @@ suppressMessages({library(data.table); library(ggplot2)})
 setwd("/mnt/gsdata/projects/panops/panops-data-registry/data/flux")
 OUT <- "plots/V10/disturbance_split"
 
+args <- commandArgs(trailingOnly = TRUE)
+N_PERM <- if (length(args) >= 1) as.integer(args[1]) else 10
+OUT_SUFFIX <- sprintf("_n%d", N_PERM)
+LOG_FILE <- if (length(args) >= 2) args[2] else "logs/permutation_test_disturbance.log"
+
 # per-EFP null RMSEs are only in the run log, not the summary CSV - reparse
-log_lines <- readLines("logs/permutation_test_disturbance.log")
+log_lines <- readLines(LOG_FILE)
 resp_hdr <- grep("^=== (GPPsat|NEPmax|ETmax|WUE) ===$", log_lines)
 resp_names <- gsub("=== | ===", "", log_lines[resp_hdr])
 perm_rows <- list()
@@ -27,12 +32,14 @@ for (i in seq_along(resp_hdr)) {
 }
 perm_dt <- rbindlist(perm_rows)
 
-summary_dt <- fread(file.path(OUT, "permutation_test_disturbance_12m.csv"))
+summary_dt <- fread(file.path(OUT, sprintf("permutation_test_disturbance_12m%s.csv", OUT_SUFFIX)))
 EFP_ORDER <- c("GPPsat","NEPmax","ETmax","WUE")
 EFP_LAB <- c(GPPsat="GPPsat", NEPmax="NEPmax", ETmax="ETmax", WUE="WUE")
 perm_dt[, response := factor(response, EFP_ORDER)]
 summary_dt[, response := factor(response, EFP_ORDER)]
-summary_dt[, sig_lab := sprintf("p=%.3f%s", p_perm, ifelse(p_perm <= 1/(n_perm+1)+1e-9, "  (best possible at n=10)", ""))]
+summary_dt[, sig_lab := sprintf("p=%.4f%s", p_perm, ifelse(p_perm <= 1/(n_perm+1)+1e-9,
+                                 sprintf("  (best possible at n=%d)", N_PERM), ""))]
+perm_x_lab <- sprintf("Permuted D\n(null, n=%d)", N_PERM)
 
 BG <- "white"; GRID <- "#D9D9D9"; TXT <- "#111111"; AX <- "#444444"
 th <- theme_bw(base_size = 11) + theme(
@@ -51,9 +58,9 @@ th <- theme_bw(base_size = 11) + theme(
   legend.position = "bottom")
 
 p <- ggplot() +
-  geom_jitter(data = perm_dt, aes(x = "Permuted D\n(null, n=10)", y = rmse_perm, colour = "Permuted D (null)"),
+  geom_jitter(data = perm_dt, aes(x = perm_x_lab, y = rmse_perm, colour = "Permuted D (null)"),
               width = 0.08, size = 1.8, alpha = 0.7) +
-  geom_boxplot(data = perm_dt, aes(x = "Permuted D\n(null, n=10)", y = rmse_perm),
+  geom_boxplot(data = perm_dt, aes(x = perm_x_lab, y = rmse_perm),
                width = 0.35, outlier.shape = NA, fill = NA, colour = "#555555", linewidth = 0.4) +
   geom_point(data = summary_dt, aes(x = "M3\n(no disturbance)", y = rmse_M3, colour = "M3 baseline"),
              size = 3, shape = 18) +
@@ -65,11 +72,12 @@ p <- ggplot() +
                                   "M4 real disturbance" = "#2E6F40"), name = NULL) +
   facet_wrap(~response, scales = "free_y", nrow = 1, labeller = labeller(response = EFP_LAB)) +
   labs(title = "Permutation test: is the disturbance-block RMSE gain real information, or added flexibility?",
-       subtitle = "XGBoost-Optuna, tc>=30 (93 sites / 395 site-years), 12-month window, LOSO CV | Null = M4 retrained with the disturbance block's rows block-permuted (10 reps)",
+       subtitle = sprintf("XGBoost-Optuna, tc>=30 (93 sites / 395 site-years), 12-month window, LOSO CV | Null = M4 retrained with the disturbance block's rows block-permuted (%d reps)", N_PERM),
        x = NULL, y = "LOSO RMSE",
-       caption = "p = (# permuted reps with RMSE <= real M4 RMSE + 1) / (n_perm + 1), one-sided. p=0.091 = real M4 beat all 10/10 permutations (the floor at n_perm=10).\nETmax's real M4 falling inside the null cloud is expected: disturbance did not improve ETmax in the main results either - an internal negative control.") +
+       caption = sprintf("p = (# permuted reps with RMSE <= real M4 RMSE + 1) / (n_perm + 1), one-sided. Floor at n_perm=%d is p=%.4f (real M4 beating all %d/%d permutations).\nETmax's real M4 falling inside the null cloud is expected: disturbance did not improve ETmax in the main results either - an internal negative control.",
+                          N_PERM, 1/(N_PERM+1), N_PERM, N_PERM)) +
   th
 
-ggsave(file.path(OUT, "permutation_test_disturbance_12m.png"), p, width = 13, height = 5.5, dpi = 300, bg = BG)
-ggsave(file.path(OUT, "permutation_test_disturbance_12m.pdf"), p, width = 13, height = 5.5, bg = BG)
-cat("Saved:", file.path(OUT, "permutation_test_disturbance_12m.png"), "\n")
+ggsave(file.path(OUT, sprintf("permutation_test_disturbance_12m%s.png", OUT_SUFFIX)), p, width = 13, height = 5.5, dpi = 300, bg = BG)
+ggsave(file.path(OUT, sprintf("permutation_test_disturbance_12m%s.pdf", OUT_SUFFIX)), p, width = 13, height = 5.5, bg = BG)
+cat("Saved:", file.path(OUT, sprintf("permutation_test_disturbance_12m%s.png", OUT_SUFFIX)), "\n")

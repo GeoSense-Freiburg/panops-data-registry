@@ -33,6 +33,7 @@ N_CORES <- as.integer(Sys.getenv("V10_CORES", "60"))
 B <- "derived_tables/outputs_afterEGU_results"
 OUT <- "plots/V10/disturbance_split"; dir.create(OUT, showWarnings = FALSE, recursive = TRUE)
 RESPONSE_VARS <- c("GPPsat", "NEPmax", "ETmax", "WUE")
+OUT_SUFFIX <- sprintf("_n%d", N_PERM)  # keeps every rep-count's results side by side, never overwrites
 
 OPTUNA <- local({
   cfg <- fread("plots/V10/Optuna/optuna_best_configs.csv")[learner == "XGB"]
@@ -112,7 +113,7 @@ for (resp in RESPONSE_VARS) {
 }
 
 out <- rbindlist(results)
-fwrite(out, file.path(OUT, "permutation_test_disturbance_12m.csv"))
+fwrite(out, file.path(OUT, sprintf("permutation_test_disturbance_12m%s.csv", OUT_SUFFIX)))
 cat("\n\n=== SUMMARY ===\n")
 print(out[, .(response, n, rmse_M3 = round(rmse_M3,3), rmse_M4_real = round(rmse_M4_real,3),
               rmse_perm_mean = round(rmse_perm_mean,3), rmse_perm_min = round(rmse_perm_min,3),
