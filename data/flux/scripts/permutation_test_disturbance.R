@@ -10,33 +10,45 @@
 # y/climate/traits), keeping the D block's own internal correlation structure
 # and marginal distribution intact - the standard permutation-importance
 # recipe, scaled from one variable to the whole block. Retrain M4 on this
-# permuted-D data under the IDENTICAL LOSO folds and the SAME Optuna-tuned
-# hyperparameters as the real model (same code path as
-# run_v10_XGB_optuna.R), repeated N_PERM times. If real M4's RMSE is not
-# unusually good compared to this null distribution, the M3->M4 improvement
-# is not distinguishable from adding N random columns.
+# permuted-D data under the IDENTICAL CV scheme and the SAME Optuna-tuned
+# hyperparameters as the real model, repeated N_PERM times. If real M4's
+# RMSE is not unusually good compared to this null distribution, the
+# M3->M4 improvement is not distinguishable from adding N random columns.
 #
-#   Rscript permutation_test_disturbance.R [n_perm]   (default 10)
+# CV_MODE:
+#   loso     - plain leave-one-site-out (scripts/run_v10_XGB_optuna.R /
+#              run_v10_LGB_optuna.R)
+#   repeated - repeated LOSO with 80% site subsampling: for each held-out
+#              site, train N_REPS=3 times on an 80% random subsample of the
+#              remaining training sites (fresh subsample each rep), average
+#              the 3 predictions - identical scheme to the "repeated" branch
+#              of run_v10_lag2_optuna.R
 #
-# Scope (first pass, per the "let's start with" framing): XGBoost-Optuna,
-# tc>=30, 12m window, all 4 EFPs (GPPsat/NEPmax/WUE as the significant ones,
-# ETmax as a built-in negative control since real D didn't help there either).
+#   Rscript permutation_test_disturbance.R [n_perm] [XGB|LGB] [loso|repeated]
+#   defaults: n_perm=10, XGB, loso
 # ============================================================================
-suppressMessages({library(data.table); library(xgboost); library(parallel)})
+suppressMessages({library(data.table); library(parallel)})
 setwd("/mnt/gsdata/projects/panops/panops-data-registry/data/flux")
 
 args <- commandArgs(trailingOnly = TRUE)
-N_PERM <- if (length(args) >= 1) as.integer(args[1]) else 10
-SEED <- 42
+N_PERM   <- if (length(args) >= 1) as.integer(args[1]) else 10
+LEARNER  <- if (length(args) >= 2) args[2] else "XGB"
+CV_MODE  <- if (length(args) >= 3) args[3] else "loso"
+stopifnot(LEARNER %in% c("XGB", "LGB"), CV_MODE %in% c("loso", "repeated"))
+if (LEARNER == "XGB") suppressMessages(library(xgboost)) else suppressMessages(library(lightgbm))
+
+SEED    <- 42
 N_CORES <- as.integer(Sys.getenv("V10_CORES", "60"))
+N_REPS  <- as.integer(Sys.getenv("V10_REPS",  "3"))
+SUBSAMP <- as.numeric(Sys.getenv("V10_SUBSAMP", "0.8"))
 
 B <- "derived_tables/outputs_afterEGU_results"
 OUT <- "plots/V10/disturbance_split"; dir.create(OUT, showWarnings = FALSE, recursive = TRUE)
 RESPONSE_VARS <- c("GPPsat", "NEPmax", "ETmax", "WUE")
-OUT_SUFFIX <- sprintf("_n%d", N_PERM)  # keeps every rep-count's results side by side, never overwrites
+OUT_SUFFIX <- sprintf("_%s_%s_n%d", LEARNER, CV_MODE, N_PERM)  # keeps every combo side by side, never overwrites
 
 OPTUNA <- local({
-  cfg <- fread("plots/V10/Optuna/optuna_best_configs.csv")[learner == "XGB"]
+  cfg <- fread("plots/V10/Optuna/optuna_best_configs.csv")[learner == LEARNER]
   setNames(split(cfg, cfg$response), cfg$response)
 })
 
@@ -51,27 +63,66 @@ get_cols <- function(df, spec) {
   if (grepl('D', spec)) p <- c(p, dist)
   unique(p[!is.na(p)])
 }
+safe <- function(x) make.unique(gsub("[^A-Za-z0-9_]", "_", x), sep = "_")
 
-fit_loso_rmse <- function(dt, xv, resp, o) {
-  sites <- sort(unique(dt$SITE_ID))
-  pars <- list(objective = "reg:squarederror", nthread = 1, seed = SEED,
-               learning_rate = o$learning_rate, max_depth = as.integer(o$max_depth),
-               min_child_weight = o$min_child_weight, subsample = o$subsample,
-               colsample_bytree = o$colsample_bytree, reg_lambda = o$reg_lambda)
-  fold <- rbindlist(mclapply(sites, function(ts) {
-    tr <- dt[SITE_ID != ts]; te <- dt[SITE_ID == ts]
+# one train/predict call, either learner - mirrors run_v10_XGB_optuna.R / run_v10_LGB_optuna.R exactly
+fit_predict <- function(tr, te, xv, resp, o) {
+  if (LEARNER == "XGB") {
+    pars <- list(objective = "reg:squarederror", nthread = 1, seed = SEED,
+                 learning_rate = o$learning_rate, max_depth = as.integer(o$max_depth),
+                 min_child_weight = o$min_child_weight, subsample = o$subsample,
+                 colsample_bytree = o$colsample_bytree, reg_lambda = o$reg_lambda)
     Xtr <- as.matrix(tr[, ..xv]); Xte <- as.matrix(te[, ..xv])
     bst <- tryCatch(xgb.train(params = pars, data = xgb.DMatrix(Xtr, label = tr[[resp]]),
                               nrounds = as.integer(o$nrounds), verbose = 0), error = function(e) NULL)
     if (is.null(bst)) return(NULL)
-    data.table(observed = te[[resp]], predicted = as.numeric(predict(bst, xgb.DMatrix(Xte))))
-  }, mc.cores = N_CORES), fill = TRUE)
+    return(as.numeric(predict(bst, xgb.DMatrix(Xte))))
+  }
+  pars <- list(objective = "regression", metric = "rmse", num_threads = 1, seed = SEED, verbosity = -1,
+               learning_rate = o$learning_rate, num_leaves = as.integer(o$num_leaves),
+               min_data_in_leaf = as.integer(o$min_data_in_leaf), feature_fraction = o$feature_fraction,
+               bagging_fraction = o$bagging_fraction, bagging_freq = 1, lambda_l2 = o$lambda_l2)
+  sv <- safe(xv)
+  Xtr <- as.matrix(tr[, ..xv]); colnames(Xtr) <- sv
+  Xte <- as.matrix(te[, ..xv]); colnames(Xte) <- sv
+  bst <- tryCatch(lgb.train(params = pars, data = lgb.Dataset(Xtr, label = tr[[resp]]),
+                            nrounds = as.integer(o$nrounds), verbose = -1), error = function(e) NULL)
+  if (is.null(bst)) return(NULL)
+  as.numeric(predict(bst, Xte))
+}
+
+fit_cv_rmse <- function(dt, xv, resp, o) {
+  sites <- sort(unique(dt$SITE_ID))
+  if (CV_MODE == "loso") {
+    fold <- rbindlist(mclapply(sites, function(ts) {
+      tr <- dt[SITE_ID != ts]; te <- dt[SITE_ID == ts]
+      pr <- fit_predict(tr, te, xv, resp, o)
+      if (is.null(pr)) return(NULL)
+      data.table(observed = te[[resp]], predicted = pr)
+    }, mc.cores = N_CORES), fill = TRUE)
+  } else {
+    fold <- rbindlist(mclapply(sites, function(ts) {
+      tr_all <- dt[SITE_ID != ts]; te <- dt[SITE_ID == ts]
+      tr_sites <- unique(tr_all$SITE_ID)
+      k <- max(5L, floor(SUBSAMP * length(tr_sites)))
+      preds <- matrix(NA_real_, nrow = nrow(te), ncol = N_REPS)
+      for (r in seq_len(N_REPS)) {
+        set.seed(SEED + r * 1000L + which(sites == ts))
+        keep <- sample(tr_sites, k)
+        pr <- fit_predict(tr_all[SITE_ID %in% keep], te, xv, resp, o)
+        if (!is.null(pr)) preds[, r] <- pr
+      }
+      ok <- rowSums(!is.na(preds)) > 0
+      if (!any(ok)) return(NULL)
+      data.table(observed = te[[resp]], predicted = rowMeans(preds, na.rm = TRUE))[ok]
+    }, mc.cores = N_CORES), fill = TRUE)
+  }
   sqrt(mean((fold$predicted - fold$observed)^2, na.rm = TRUE))
 }
 
 results <- list()
 for (resp in RESPONSE_VARS) {
-  cat(sprintf("\n=== %s ===\n", resp))
+  cat(sprintf("\n=== %s (%s, %s) ===\n", resp, LEARNER, CV_MODE))
   b1 <- as.data.frame(fread(sprintf("%s/v10/v10_B1_%s_harmonized.csv", B, resp)))
   o <- OPTUNA[[resp]]
 
@@ -84,8 +135,8 @@ for (resp in RESPONSE_VARS) {
   cat(sprintf("  n=%d site-years, %d sites | M3 p=%d | M4 p=%d | D block=%d\n",
               nrow(dt), uniqueN(dt$SITE_ID), length(xv3), length(xv4), length(dist_cols)))
 
-  rmse_m3 <- fit_loso_rmse(dt, xv3, resp, o)
-  rmse_m4_real <- fit_loso_rmse(dt, xv4, resp, o)
+  rmse_m3 <- fit_cv_rmse(dt, xv3, resp, o)
+  rmse_m4_real <- fit_cv_rmse(dt, xv4, resp, o)
   cat(sprintf("  M3 (C+T) RMSE       = %.4f\n", rmse_m3))
   cat(sprintf("  M4 (C+T+D) RMSE     = %.4f  (real disturbance, delta=%+.2f%%)\n",
               rmse_m4_real, 100*(rmse_m4_real-rmse_m3)/rmse_m3))
@@ -97,13 +148,14 @@ for (resp in RESPONSE_VARS) {
     perm_idx <- sample(nrow(dt_perm))
     dperm_cols <- dist_cols
     dt_perm[, (dperm_cols) := dt_perm[perm_idx, ..dperm_cols]]  # block-permute D's rows
-    rmse_perm[r] <- fit_loso_rmse(dt_perm, xv4, resp, o)
+    rmse_perm[r] <- fit_cv_rmse(dt_perm, xv4, resp, o)
     cat(sprintf("    perm %2d/%d: RMSE = %.4f\n", r, N_PERM, rmse_perm[r]))
   }
 
   p_val <- (sum(rmse_perm <= rmse_m4_real) + 1) / (N_PERM + 1)  # one-sided: real as good or better than null
   results[[resp]] <- data.table(
-    response = resp, n = nrow(dt), n_predictors_M3 = length(xv3), n_predictors_M4 = length(xv4),
+    response = resp, learner = LEARNER, cv_mode = CV_MODE,
+    n = nrow(dt), n_predictors_M3 = length(xv3), n_predictors_M4 = length(xv4),
     rmse_M3 = rmse_m3, rmse_M4_real = rmse_m4_real,
     rmse_perm_mean = mean(rmse_perm), rmse_perm_sd = sd(rmse_perm),
     rmse_perm_min = min(rmse_perm), n_perm = N_PERM, p_perm = p_val)

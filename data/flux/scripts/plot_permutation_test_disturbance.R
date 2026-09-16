@@ -15,14 +15,17 @@ setwd("/mnt/gsdata/projects/panops/panops-data-registry/data/flux")
 OUT <- "plots/V10/disturbance_split"
 
 args <- commandArgs(trailingOnly = TRUE)
-N_PERM <- if (length(args) >= 1) as.integer(args[1]) else 10
-OUT_SUFFIX <- sprintf("_n%d", N_PERM)
-LOG_FILE <- if (length(args) >= 2) args[2] else "logs/permutation_test_disturbance.log"
+N_PERM  <- if (length(args) >= 1) as.integer(args[1]) else 10
+LEARNER <- if (length(args) >= 2) args[2] else "XGB"
+CV_MODE <- if (length(args) >= 3) args[3] else "loso"
+OUT_SUFFIX <- sprintf("_%s_%s_n%d", LEARNER, CV_MODE, N_PERM)
+LOG_FILE <- if (length(args) >= 4) args[4] else sprintf("logs/permutation_test_disturbance_%s_%s_n%d.log", LEARNER, CV_MODE, N_PERM)
 
 # per-EFP null RMSEs are only in the run log, not the summary CSV - reparse
 log_lines <- readLines(LOG_FILE)
-resp_hdr <- grep("^=== (GPPsat|NEPmax|ETmax|WUE) ===$", log_lines)
-resp_names <- gsub("=== | ===", "", log_lines[resp_hdr])
+resp_hdr <- grep("^=== (GPPsat|NEPmax|ETmax|WUE) \\(", log_lines)
+if (length(resp_hdr) == 0) resp_hdr <- grep("^=== (GPPsat|NEPmax|ETmax|WUE) ===$", log_lines)  # old-format logs (XGB/loso, no learner/cv_mode in header)
+resp_names <- gsub("^=== ([A-Za-z]+).*$", "\\1", log_lines[resp_hdr])
 perm_rows <- list()
 for (i in seq_along(resp_hdr)) {
   seg_end <- if (i < length(resp_hdr)) resp_hdr[i+1] - 1 else length(log_lines)
@@ -72,8 +75,10 @@ p <- ggplot() +
                                   "M4 real disturbance" = "#2E6F40"), name = NULL) +
   facet_wrap(~response, scales = "free_y", nrow = 1, labeller = labeller(response = EFP_LAB)) +
   labs(title = "Permutation test: is the disturbance-block RMSE gain real information, or added flexibility?",
-       subtitle = sprintf("XGBoost-Optuna, tc>=30 (93 sites / 395 site-years), 12-month window, LOSO CV | Null = M4 retrained with the disturbance block's rows block-permuted (%d reps)", N_PERM),
-       x = NULL, y = "LOSO RMSE",
+       subtitle = sprintf("%s-Optuna, tc>=30 (93 sites / 395 site-years), 12-month window, %s CV | Null = M4 retrained with the disturbance block's rows block-permuted (%d reps)",
+                           c(XGB="XGBoost", LGB="LightGBM")[LEARNER],
+                           c(loso="LOSO", repeated="repeated LOSO (3x80% site subsample)")[CV_MODE], N_PERM),
+       x = NULL, y = sprintf("%sRMSE", if (CV_MODE == "repeated") "Mean-of-3-reps " else ""),
        caption = sprintf("p = (# permuted reps with RMSE <= real M4 RMSE + 1) / (n_perm + 1), one-sided. Floor at n_perm=%d is p=%.4f (real M4 beating all %d/%d permutations).\nETmax's real M4 falling inside the null cloud is expected: disturbance did not improve ETmax in the main results either - an internal negative control.",
                           N_PERM, 1/(N_PERM+1), N_PERM, N_PERM)) +
   th
