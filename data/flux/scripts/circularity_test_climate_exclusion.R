@@ -14,9 +14,10 @@
 #                ETmax  -> TA              WUE    -> TA + VPD
 #   precip   : drop TA, VPD and SW_IN for every EFP (only P remains) - strictest
 #
-#   Rscript circularity_test_climate_exclusion.R [XGB|LGB] [n_perm]
+#   Rscript circularity_test_climate_exclusion.R [XGB|LGB] [n_perm] [scenarios]
 #   n_perm > 0 additionally runs the block-permutation null (see
 #   permutation_test_disturbance.R) for every scenario x EFP; default 0.
+#   scenarios: comma-separated subset of baseline,own_vars,precip (default all).
 # ============================================================================
 suppressMessages({library(data.table); library(parallel)})
 setwd("/mnt/gsdata/projects/panops/panops-data-registry/data/flux")
@@ -36,7 +37,9 @@ RESPONSE_VARS <- c("GPPsat", "NEPmax", "ETmax", "WUE")
 OWN_VARS <- list(GPPsat = c("SW_IN", "TA"), NEPmax = "SW_IN", ETmax = "TA", WUE = c("TA", "VPD"))
 scenario_drop <- function(scn, resp) switch(scn,
   baseline = character(0), own_vars = OWN_VARS[[resp]], precip = c("TA", "VPD", "SW_IN"))
-SCENARIOS <- c("baseline", "own_vars", "precip")
+ALL_SCENARIOS <- c("baseline", "own_vars", "precip")
+SCENARIOS <- if (length(args) >= 3) strsplit(args[3], ",")[[1]] else ALL_SCENARIOS
+stopifnot(all(SCENARIOS %in% ALL_SCENARIOS))
 
 OPTUNA <- local({
   cfg <- fread("plots/V10/Optuna/optuna_best_configs.csv")[learner == LEARNER]
@@ -135,9 +138,9 @@ for (resp in RESPONSE_VARS) {
   }
 }
 out <- rbindlist(results)
-fn <- sprintf("circularity_test_%s_LOSO%s.csv", LEARNER, if (N_PERM > 0) sprintf("_perm%d", N_PERM) else "")
+fn <- sprintf("circularity_test_%s_LOSO%s%s.csv", LEARNER, if (N_PERM > 0) sprintf("_perm%d", N_PERM) else "",
+              if (!setequal(SCENARIOS, ALL_SCENARIOS)) paste0("_", paste(SCENARIOS, collapse = "-")) else "")
 fwrite(out, file.path(OUT, fn))
 cat("\n=== SUMMARY: disturbance gain (M3 -> M4 dRMSE%) by scenario ===\n")
-print(dcast(out, response ~ scenario, value.var = "delta_rmse_pct")[, .(response, baseline = round(baseline, 2),
-      own_vars = round(own_vars, 2), precip = round(precip, 2))])
+print(out[, .(response, scenario, delta_rmse_pct = round(delta_rmse_pct, 2), p_perm)])
 cat("\nCIRCULARITY_TEST_DONE\n")
