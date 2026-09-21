@@ -14,10 +14,14 @@
 #                ETmax  -> TA              WUE    -> TA + VPD
 #   precip   : drop TA, VPD and SW_IN for every EFP (only P remains) - strictest
 #
-#   Rscript circularity_test_climate_exclusion.R [XGB|LGB] [n_perm] [scenarios]
+#   Rscript circularity_test_climate_exclusion.R [XGB|LGB] [n_perm] [scenarios] [loso|repeated]
 #   n_perm > 0 additionally runs the block-permutation null (see
 #   permutation_test_disturbance.R) for every scenario x EFP; default 0.
 #   scenarios: comma-separated subset of baseline,own_vars,precip (default all).
+#   loso     : plain leave-one-site-out (default)
+#   repeated : repeated LOSO, 3 reps x 80% site subsample per held-out site,
+#              predictions averaged (same scheme as run_v10_lag2_optuna.R and
+#              permutation_test_disturbance.R)
 # ============================================================================
 suppressMessages({library(data.table); library(parallel)})
 setwd("/mnt/gsdata/projects/panops/panops-data-registry/data/flux")
@@ -25,11 +29,14 @@ setwd("/mnt/gsdata/projects/panops/panops-data-registry/data/flux")
 args <- commandArgs(trailingOnly = TRUE)
 LEARNER <- if (length(args) >= 1) args[1] else "XGB"
 N_PERM  <- if (length(args) >= 2) as.integer(args[2]) else 0
-stopifnot(LEARNER %in% c("XGB", "LGB"))
+CV_MODE <- if (length(args) >= 4) args[4] else "loso"
+stopifnot(LEARNER %in% c("XGB", "LGB"), CV_MODE %in% c("loso", "repeated"))
 if (LEARNER == "XGB") suppressMessages(library(xgboost)) else suppressMessages(library(lightgbm))
 
 SEED <- 42
 N_CORES <- as.integer(Sys.getenv("V10_CORES", "60"))
+N_REPS  <- as.integer(Sys.getenv("V10_REPS",  "3"))
+SUBSAMP <- as.numeric(Sys.getenv("V10_SUBSAMP", "0.8"))
 B <- "derived_tables/outputs_afterEGU_results"
 OUT <- "plots/V10/circularity_test"; dir.create(OUT, showWarnings = FALSE, recursive = TRUE)
 RESPONSE_VARS <- c("GPPsat", "NEPmax", "ETmax", "WUE")
@@ -86,12 +93,30 @@ fit_predict <- function(tr, te, xv, resp, o) {
 
 fit_loso <- function(dt, xv, resp, o) {
   sites <- sort(unique(dt$SITE_ID))
-  fold <- rbindlist(mclapply(sites, function(ts) {
-    tr <- dt[SITE_ID != ts]; te <- dt[SITE_ID == ts]
-    pr <- fit_predict(tr, te, xv, resp, o)
-    if (is.null(pr)) return(NULL)
-    data.table(observed = te[[resp]], predicted = pr)
-  }, mc.cores = N_CORES), fill = TRUE)
+  if (CV_MODE == "loso") {
+    fold <- rbindlist(mclapply(sites, function(ts) {
+      tr <- dt[SITE_ID != ts]; te <- dt[SITE_ID == ts]
+      pr <- fit_predict(tr, te, xv, resp, o)
+      if (is.null(pr)) return(NULL)
+      data.table(observed = te[[resp]], predicted = pr)
+    }, mc.cores = N_CORES), fill = TRUE)
+  } else {
+    fold <- rbindlist(mclapply(sites, function(ts) {
+      tr_all <- dt[SITE_ID != ts]; te <- dt[SITE_ID == ts]
+      tr_sites <- unique(tr_all$SITE_ID)
+      k <- max(5L, floor(SUBSAMP * length(tr_sites)))
+      preds <- matrix(NA_real_, nrow = nrow(te), ncol = N_REPS)
+      for (r in seq_len(N_REPS)) {
+        set.seed(SEED + r * 1000L + which(sites == ts))
+        keep <- sample(tr_sites, k)
+        pr <- fit_predict(tr_all[SITE_ID %in% keep], te, xv, resp, o)
+        if (!is.null(pr)) preds[, r] <- pr
+      }
+      ok <- rowSums(!is.na(preds)) > 0
+      if (!any(ok)) return(NULL)
+      data.table(observed = te[[resp]], predicted = rowMeans(preds, na.rm = TRUE))[ok]
+    }, mc.cores = N_CORES), fill = TRUE)
+  }
   c(rmse = sqrt(mean((fold$predicted - fold$observed)^2)),
     r2 = 1 - sum((fold$observed - fold$predicted)^2) / sum((fold$observed - mean(fold$observed))^2))
 }
@@ -104,7 +129,7 @@ for (resp in RESPONSE_VARS) {
   all_cols <- get_cols(b1, "C+T+D")
   dt <- as.data.table(b1[, unique(c("SITE_ID", "YEAR", resp, all_cols))])
   dt <- dt[complete.cases(dt)]
-  cat(sprintf("\n=== %s (%s, LOSO) : n=%d site-years, %d sites ===\n", resp, LEARNER, nrow(dt), uniqueN(dt$SITE_ID)))
+  cat(sprintf("\n=== %s (%s, %s) : n=%d site-years, %d sites ===\n", resp, LEARNER, CV_MODE, nrow(dt), uniqueN(dt$SITE_ID)))
 
   for (scn in SCENARIOS) {
     drop_v <- scenario_drop(scn, resp)
@@ -131,14 +156,14 @@ for (resp in RESPONSE_VARS) {
       cat(sprintf("            permutation (n=%d): null mean RMSE=%.4f, p=%.4f\n", N_PERM, perm_mean, p_val))
     }
     results[[paste(resp, scn)]] <- data.table(
-      response = resp, learner = LEARNER, scenario = scn, dropped = paste(drop_v, collapse = "+"),
+      response = resp, learner = LEARNER, cv_mode = CV_MODE, scenario = scn, dropped = paste(drop_v, collapse = "+"),
       n = nrow(dt), n_climate = length(setdiff(xv3, get_cols(b1, "T"))),
       rmse_M3 = m3[["rmse"]], r2_M3 = m3[["r2"]], rmse_M4 = m4[["rmse"]], r2_M4 = m4[["r2"]],
       delta_rmse_pct = delta, n_perm = N_PERM, rmse_perm_mean = perm_mean, p_perm = p_val)
   }
 }
 out <- rbindlist(results)
-fn <- sprintf("circularity_test_%s_LOSO%s%s.csv", LEARNER, if (N_PERM > 0) sprintf("_perm%d", N_PERM) else "",
+fn <- sprintf("circularity_test_%s_%s%s%s.csv", LEARNER, if (CV_MODE == "loso") "LOSO" else "repeated", if (N_PERM > 0) sprintf("_perm%d", N_PERM) else "",
               if (!setequal(SCENARIOS, ALL_SCENARIOS)) paste0("_", paste(SCENARIOS, collapse = "-")) else "")
 fwrite(out, file.path(OUT, fn))
 cat("\n=== SUMMARY: disturbance gain (M3 -> M4 dRMSE%) by scenario ===\n")
