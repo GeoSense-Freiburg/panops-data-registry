@@ -7,14 +7,24 @@
 # and-circularity.md for why those EFPs bake in some of the same climate
 # variables used as predictors; a plain accumulated sum doesn't).
 #
-# Predictors (per the user's scope): climate lag1 AND lag2 (the 24m-window
-# convention), plant traits, and mortality/disturbance metrics - sourced
-# from the EXISTING, already-lag2-corrected 24m harmonized file
-# (derived_tables/outputs_afterEGU_results/v10_lag2/v10_lag2_B2_GPPsat_
-# harmonized.csv - any one response's B2 file works, since the predictor
-# columns/values are identical across them; GPPsat's is used only to pull
-# SITE_ID/YEAR + predictors, its own response column is discarded). Same
-# tc>=30, 93-site scope throughout - NOT re-derived, just read from there.
+# Predictors: climate + traits + disturbance/mortality, at two window depths
+# (WINDOW arg), mirroring the main project's standard 12m-vs-24m comparison -
+# NOT same-year/contemporaneous climate, which would reintroduce circularity
+# (this response exists specifically to avoid that; confirmed with the user
+# 2026-09-22).
+#   12m: climate = lag1 only (prior 12 months); disturbance = contemporaneous
+#        + lag1 only (100 cols) - sourced from v10_lag2_B1_<resp>_harmonized.csv
+#   24m: climate = lag1+lag2 (prior 24 months); disturbance = contemporaneous
+#        + lag1 + lag2 (110 cols, +10 mortality/deadwood stock metrics at
+#        5 buffers) - sourced from v10_lag2_B2_<resp>_harmonized.csv
+# B1 and B2 differ ONLY in those 10 lag2 disturbance columns (verified by
+# diffing their headers) - climate lag1/lag2 columns are present in BOTH
+# files regardless of window; the window's climate depth is selected by
+# regex in get_cols(), not by which file is loaded.
+# Source: derived_tables/outputs_afterEGU_results/v10_lag2/ (read-only; any
+# one response's B1/B2 file works for the predictor columns, since they're
+# identical across responses - GPPsat's is used, its own response column
+# discarded). Same tc>=30, 93-site scope throughout - NOT re-derived.
 #
 # Response: GPP_sum_gC, RECO_sum_gC, NEP_sum_gC, ET_sum_mm, WUE_annual from
 # predict_fluxes/derived_tables/yearly_flux_totals_raw.csv (status=="ok"
@@ -30,7 +40,7 @@
 # Independent of the main project: everything reads/writes only within
 # predict_fluxes/ except for the one predictor-source file above (read-only).
 #
-#   Rscript model_M3_M4_flux_totals.R [n_perm]   (default 0, no permutation)
+#   Rscript model_M3_M4_flux_totals.R [n_perm] [12m|24m]   (default 0, 24m)
 # ============================================================================
 suppressMessages({library(data.table); library(xgboost); library(parallel)})
 setwd("/mnt/gsdata/projects/panops/panops-data-registry/data/flux")
@@ -39,23 +49,29 @@ TABLE_OUT <- "predict_fluxes/derived_tables"
 
 args <- commandArgs(trailingOnly = TRUE)
 N_PERM <- if (length(args) >= 1) as.integer(args[1]) else 0
+WINDOW <- if (length(args) >= 2) args[2] else "24m"
+stopifnot(WINDOW %in% c("12m", "24m"))
 SEED <- 42
 N_CORES <- as.integer(Sys.getenv("V10_CORES", "60"))
 RESPONSE_VARS <- c("GPP_sum_gC", "RECO_sum_gC", "NEP_sum_gC", "ET_sum_mm", "WUE_annual")
 
 OPTUNA_GPPSAT <- fread("plots/V10/Optuna/optuna_best_configs.csv")[learner == "XGB" & response == "GPPsat"]
 cat("Reusing GPPsat's XGB-Optuna config for every response (first pass):\n"); print(OPTUNA_GPPSAT)
+cat("WINDOW:", WINDOW, "\n")
 
-pred <- fread("derived_tables/outputs_afterEGU_results/v10_lag2/v10_lag2_B2_GPPsat_harmonized.csv")
+pred_file <- sprintf("derived_tables/outputs_afterEGU_results/v10_lag2/v10_lag2_%s_GPPsat_harmonized.csv",
+                     if (WINDOW == "12m") "B1" else "B2")
+pred <- fread(pred_file)
 flux <- fread(file.path(TABLE_OUT, "yearly_flux_totals_raw.csv"))[status == "ok"]
 dt_all <- merge(pred[, -c("GPPsat","NEPmax","ETmax","WUE","uWUE",
                           grep("_anom", names(pred), value = TRUE)), with = FALSE],
                 flux[, c("SITE_ID","YEAR", RESPONSE_VARS), with = FALSE], by = c("SITE_ID","YEAR"))
-cat(sprintf("\nMerged predictor+response table: %d site-years, %d sites\n", nrow(dt_all), uniqueN(dt_all$SITE_ID)))
+cat(sprintf("\nPredictor source: %s\n", pred_file))
+cat(sprintf("Merged predictor+response table: %d site-years, %d sites\n", nrow(dt_all), uniqueN(dt_all$SITE_ID)))
 
 get_cols <- function(df, spec) {
   ac <- colnames(df)
-  climate <- grep('^(lag1_|lag2_)', ac, value = TRUE)  # 24m-window convention, per user's request
+  climate <- if (WINDOW == "12m") grep('^lag1_', ac, value = TRUE) else grep('^(lag1_|lag2_)', ac, value = TRUE)
   traits  <- grep('^(P12_|P50_|P88_|gsmax_|rdmax_|SSD|SLA|Leaf|Stem)', ac, value = TRUE)
   dist    <- grep('^(absolute_|relative_|new_|mortality_|disturbance_)', ac, value = TRUE)
   p <- c()
@@ -118,13 +134,13 @@ for (resp in RESPONSE_VARS) {
     p_val <- (sum(rp <= m4[["rmse"]]) + 1) / (N_PERM + 1); perm_mean <- mean(rp)
     cat(sprintf("  permutation (n=%d): null mean RMSE=%.4f, p=%.4f\n", N_PERM, perm_mean, p_val))
   }
-  results[[resp]] <- data.table(response = resp, n = nrow(dt), n_sites = uniqueN(dt$SITE_ID),
+  results[[resp]] <- data.table(response = resp, window = WINDOW, n = nrow(dt), n_sites = uniqueN(dt$SITE_ID),
     n_predictors_M3 = length(xv3), n_predictors_M4 = length(xv4),
     rmse_M3 = m3[["rmse"]], r2_M3 = m3[["r2"]], rmse_M4 = m4[["rmse"]], r2_M4 = m4[["r2"]],
     delta_rmse_pct = delta, n_perm = N_PERM, rmse_perm_mean = perm_mean, p_perm = p_val)
 }
 out <- rbindlist(results)
-fwrite(out, file.path(TABLE_OUT, sprintf("model_M3_M4_flux_totals%s.csv", if (N_PERM>0) sprintf("_perm%d",N_PERM) else "")))
+fwrite(out, file.path(TABLE_OUT, sprintf("model_M3_M4_flux_totals_%s%s.csv", WINDOW, if (N_PERM>0) sprintf("_perm%d",N_PERM) else "")))
 cat("\n=== SUMMARY ===\n")
 print(out[, .(response, n, n_sites, rmse_M3=round(rmse_M3,2), r2_M3=round(r2_M3,3),
               rmse_M4=round(rmse_M4,2), r2_M4=round(r2_M4,3), delta_rmse_pct=round(delta_rmse_pct,2), p_perm)])
