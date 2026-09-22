@@ -10,6 +10,7 @@ HH_flux.zip
 **/.DS_Store
 .claude/
 /derived_tables
+/predict_fluxes/derived_tables
 /deadwood_forestloss_output
 /merged_sites_subset
 /merged_sites_subset_renamed
