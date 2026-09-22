@@ -1,32 +1,35 @@
 #!/usr/bin/env Rscript
 # ============================================================================
 # Simplified circularity-check figure for external sharing (Miguel email,
-# 2026-09-22): actual RMSE (not percent change), XGBoost + LightGBM under
-# repeated CV only (drops the XGB/LOSO series and the precip-only scenario,
-# which were never run for repeated CV anyway), no permutation p-values,
-# descriptive labels instead of "M3"/"M4". Complements, does not replace,
-# circularity_test_summary.png (the full technical version).
+# 2026-09-22): actual RMSE (not percent change), XGBoost only, repeated CV
+# only (3x80% site subsample), no permutation p-values, descriptive labels
+# instead of "M3"/"M4". Shows both the all-climate baseline and the
+# own-derivation-excluded scenario side by side, so mortality's benefit is
+# visible whether or not each EFP's own climate driver is included.
+# Complements, does not replace, circularity_test_summary.png (the full
+# technical version).
 # ============================================================================
 suppressMessages({library(data.table); library(ggplot2)})
 setwd("/mnt/gsdata/projects/panops/panops-data-registry/data/flux")
-OUT <- "plots/V10/circularity_test"  # output location unchanged
+OUT <- "plots/V10/circularity_test"
 
-xgb <- fread(file.path(OUT, "circularity_test_XGB_repeated_perm99_own_vars.csv"))
-lgb <- fread(file.path(OUT, "circularity_test_LGB_repeated_perm99_own_vars.csv"))
-dt <- rbindlist(list(xgb, lgb))
+baseline <- fread(file.path(OUT, "circularity_test_XGB_repeated_baseline.csv"))
+own_vars <- fread(file.path(OUT, "circularity_test_XGB_repeated_perm99_own_vars.csv"))
+dt <- rbindlist(list(baseline, own_vars), fill = TRUE)
 
 EFP_ORDER <- c("GPPsat","NEPmax","ETmax","WUE")
 dt[, response := factor(response, EFP_ORDER)]
-dt[, learner := factor(learner, c("XGB","LGB"), labels = c("XGBoost","LightGBM"))]
+dt[, scenario_lab := factor(scenario, c("baseline","own_vars"),
+                            labels = c("All climate variables", "Own climate driver excluded"))]
 
 long <- rbindlist(list(
-  dt[, .(response, learner, model = "Without mortality\n(climate + traits)", rmse = rmse_M3)],
-  dt[, .(response, learner, model = "With mortality\n(+ disturbance)", rmse = rmse_M4)]
+  dt[, .(response, scenario_lab, model = "Without mortality\n(climate + traits)", rmse = rmse_M3)],
+  dt[, .(response, scenario_lab, model = "With mortality\n(+ disturbance)", rmse = rmse_M4)]
 ))
 long[, model := factor(model, c("Without mortality\n(climate + traits)", "With mortality\n(+ disturbance)"))]
 
 BG <- "white"; GRID <- "#D9D9D9"; TXT <- "#111111"; AX <- "#444444"
-LEARNER_COL <- c("XGBoost" = "#2E6F40", "LightGBM" = "#B0413E")
+SCN_COL <- c("All climate variables" = "#5AA469", "Own climate driver excluded" = "#2E6F40")
 th <- theme_bw(base_size = 12) + theme(
   plot.background = element_rect(fill = BG, colour = NA),
   panel.background = element_rect(fill = BG, colour = NA),
@@ -41,14 +44,14 @@ th <- theme_bw(base_size = 12) + theme(
   plot.caption = element_text(colour = AX, size = 8, hjust = 0),
   legend.position = "bottom")
 
-p <- ggplot(long, aes(x = model, y = rmse, fill = learner)) +
+p <- ggplot(long, aes(x = model, y = rmse, fill = scenario_lab)) +
   geom_col(position = position_dodge(width = 0.65), width = 0.6) +
-  scale_fill_manual(values = LEARNER_COL, name = NULL) +
+  scale_fill_manual(values = SCN_COL, name = NULL) +
   facet_wrap(~response, nrow = 1, scales = "free_y") +
   labs(title = "Does mortality improve prediction, even without the climate variables each EFP is derived from?",
-       subtitle = "tc>=30, 93 sites, repeated leave-one-site-out cross-validation",
+       subtitle = "XGBoost, tc>=30, 93 sites, repeated leave-one-site-out cross-validation (3x80% site subsample)",
        x = NULL, y = "Prediction error (RMSE, lower is better)",
-       caption = "Each EFP's own climate driver is excluded from both models (GPPsat: radiation & temperature; NEPmax: radiation; ETmax: temperature; WUE: temperature & VPD),\nso the comparison cannot be explained by that circularity. Lower bar = better prediction.") +
+       caption = "\"Own climate driver excluded\": GPPsat without radiation & temperature; NEPmax without radiation; ETmax without temperature; WUE without temperature & VPD -\nthe variables each EFP's own calculation depends on. The benefit of adding mortality holds with or without those variables. Lower bar = better prediction.") +
   th
 
 ggsave(file.path(OUT, "circularity_test_for_miguel.png"), p, width = 12, height = 5.5, dpi = 300, bg = BG)
