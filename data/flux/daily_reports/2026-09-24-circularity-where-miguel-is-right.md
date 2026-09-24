@@ -32,6 +32,10 @@
 - **The hypothesis is already stated there.** p. 470: "Consider two contiguous plots of forest experiencing the same climate conditions, one disturbed and the other not", with the undisturbed one expected to have higher maximum photosynthesis and NEP. p. 471: land surface models "lack flexibility in representing the response of respiration rates and carbon-use efficiency to climate, nutrients, disturbances and substrate availability".
 - **Circularity cannot manufacture a dose-response in the disturbance variable.** The signed disturbance SHAP falls with relative disturbance (rho about -0.5 to -0.7 at 24 m, Fig. 5 panel E).
 
+![Fig. 5 IGBP board, 24 m window](../manuscript_coauthor_draft/figures/fig5_igbp_board_24m.png)
+
+*Fig. 5 board (24 m window). Panel E is the relevant one: each point is a site, x = relative disturbance, y = net signed disturbance SHAP (effect on the predicted EFP). The line is a linear fit with Spearman rho and BH-FDR stars. The downward trend is a dose-response in the disturbance variable itself, which a climate-EFP definitional link cannot produce.*
+
 ## 3. What the fight-back does not cover
 
 - Baseline skill and any interpretation of the climate block.
@@ -43,15 +47,28 @@
 1. **Reframe (no new analysis).** Climate is a confounder control; the M3 to M4 increment is the estimand. Use associational language, do not interpret climate importance, cite Reichstein 2014 and Migliavacca 2021.
 2. **Keep the climate-exclusion check as one Methods/Supplement paragraph.** It turns the argument into evidence (section 5).
 3. **Put the flux-totals result in the supplement as robustness** (section 5).
-4. **Align or disclose the NEPmax definition.** Notebook: 99th percentile of daytime NEP (`q_safe(daytime_nep, 0.99)`). Migliavacca et al. Methods: 90th percentile of half-hourly NEP in the growing season. GPPsat (90th percentile of per-window asymptotes) and ETmax (95th percentile) look consistent. Reviewers from this community will compare against the reference definitions.
-5. **Static long-term climate descriptors only if a coauthor or reviewer pushes** (René's suggestion, also what Migliavacca et al. do). It would also probe the "substitution" reading.
+
+4. **Static long-term climate descriptors only if a coauthor or reviewer pushes** (René's suggestion, also what Migliavacca et al. do). It would also probe the "substitution" reading.
 
 Not recommended now: restructuring the main analysis, or the NDVI/LAI/AGB alternative predictors (heavy, and NDVI overlaps with the spectral origin of the disturbance product, as Clemens noted).
 
 ## 5. How the post-meeting tests fit (evidence, not needed for the argument above)
 
 - **Climate-exclusion check** (each EFP's own derivation variables dropped, plus a precipitation-only extreme; XGBoost/LightGBM, LOSO and repeated CV, 99-rep permutation): the disturbance gain persisted at -9% to -16% (p = 0.01) for GPPsat, NEPmax and WUE; ETmax stayed null. The gain often *grew* as climate was removed, which is why the claim should be "adds information beyond climate and traits", not "is the cause".
+
+![Circularity check, simplified](../plots/V10/circularity_test/circularity_test_for_miguel.png)
+
+*Simplified version (XGBoost, repeated CV 3x80%). Bars are prediction error (RMSE, lower is better) without and with mortality, once with all climate variables and once with each EFP's own climate driver excluded. Mortality lowers the error for GPPsat, NEPmax and WUE in both cases; ETmax stays flat.*
+
+![Circularity check, full technical version](../plots/V10/circularity_test/circularity_test_summary.png)
+
+*Full version: change in RMSE from adding mortality (negative = improvement) across scenarios (all climate, own-derivation variables dropped, precipitation only), for XGBoost (LOSO and repeated CV) and LightGBM (repeated CV). Point shape shows the 99-rep permutation result (filled = p < 0.05). Precipitation-only and baseline were not run under repeated CV, so those points are absent, not zero.*
+
 - **Circularity-free response** (growing-season accumulated flux totals from raw FLUXNET daily data, `predict_fluxes/`): GPP -9 to -11%, WUE -7.5 to -8%, NEP about -5% (p = 0.01 each); RECO and ET null. Same significance pattern as the EFPs, smaller effects.
+
+![Flux totals, 12m vs 24m window](../predict_fluxes/plots/M3_M4_flux_totals_window_compare.png)
+
+*Change in RMSE from adding disturbance for growing-season accumulated GPP, NEP, RECO, ET and WUE, at the 12 m (lag 1) and 24 m (lag 1+2) climate and disturbance windows, with permutation p-values. These totals are plain sums, so they cannot share the climate dependency of the fitted EFPs. The 12 m window is slightly stronger; RECO is borderline at 12 m (p = 0.06) and ET is null at both.*
 
 ## Provenance
 
