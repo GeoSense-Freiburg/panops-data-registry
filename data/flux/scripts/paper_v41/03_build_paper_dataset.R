@@ -149,7 +149,6 @@ for (variant in c("full", "stock")) {
     all_sites[, (intersect(drop, names(all_sites))) := NULL]
     tc30 <- all_sites[tc_site_mean_500m >= 30]
     tc30_tr <- tc30[complete.cases(tc30[, ..trait_cols])]
-    fwrite(all_sites, file.path(D, sprintf("paper_dataset_%s_lags_%s_allsites%s.csv", variant, climate, SUF)))
     fwrite(tc30, file.path(D, sprintf("paper_dataset_%s_lags_%s_tc30%s.csv", variant, climate, SUF)))
     if (climate == "monthly")
       count(tc30_tr, sprintf("%s lags, tc >= 30, all %d traits non-NA", variant, length(trait_cols)))
