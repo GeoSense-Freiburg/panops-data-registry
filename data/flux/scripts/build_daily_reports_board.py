@@ -17,13 +17,11 @@ SITE = os.path.join(ROOT, "fluxVSmortality")
 OUT = os.path.join(SITE, "daily_reports")
 IMG = os.path.join(OUT, "img")
 PANDOC = "/home/nk1125/miniconda3/envs/clean_r_env/bin/pandoc"
-# Reports left off the public site: they name coauthors and discuss meeting feedback / how to answer
-# reviewers (decision 2026-09-25). Remove a name from this set to publish that report.
-EXCLUDE = {
-    "2026-09-16-meeting-followup-permutation-and-simple-tests.md",
-    "2026-09-17-efp-calculation-and-circularity.md",
-    "2026-09-24-circularity-where-miguel-is-right.md",
-}
+# Reports left off the public site. Empty = publish every report in daily_reports/. On 2026-09-25 the
+# three September reports (they name coauthors and discuss meeting feedback / how to answer reviewers)
+# were first held back, then published at the user's explicit request ("publish all nine"). To hold a
+# report back again add its file name here; the output folder is cleared on each run, so it cannot linger.
+EXCLUDE = set()
 
 CSS = """
 *{box-sizing:border-box;margin:0;padding:0}
