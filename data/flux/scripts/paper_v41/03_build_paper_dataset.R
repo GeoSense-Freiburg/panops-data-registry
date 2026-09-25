@@ -17,6 +17,11 @@
 suppressMessages(library(data.table))
 setwd("/mnt/gsdata/projects/panops/panops-data-registry/data/flux")
 D <- "derived_tables/paper_v41"
+# scenario switches (defaults = the agreed design). COUNTS_ONLY=1 prints counts and writes nothing.
+MIN_RUN <- as.integer(Sys.getenv("PAPER_MIN_RUN", "4"))            # min continuous EFP years
+BUFS <- as.integer(strsplit(Sys.getenv("PAPER_BUFFERS", "100,200,300,400,500"), ",")[[1]])
+COUNTS_ONLY <- Sys.getenv("COUNTS_ONLY", "0") == "1"
+SUF <- if (MIN_RUN == 4 && length(BUFS) == 5) "" else sprintf("_minrun%d_buf%s", MIN_RUN, paste(BUFS, collapse = "-"))  # default names = original 4-year build
 log_lines <- character(0)
 say <- function(...) { s <- sprintf(...); cat(s, "\n"); log_lines <<- c(log_lines, s) }
 count <- function(dt, label) say("%-62s %4d sites | %5d site-years", label, uniqueN(dt$SITE_ID), nrow(dt))
@@ -24,7 +29,7 @@ runs4 <- function(dt, key_years = "YEAR") {          # keep years that sit in a 
   setorder(dt, SITE_ID, YEAR)
   dt[, run := cumsum(c(1, diff(YEAR) != 1)), by = SITE_ID]
   dt[, run_len := .N, by = .(SITE_ID, run)]
-  out <- dt[run_len >= 4][, c("run", "run_len") := NULL]
+  out <- dt[run_len >= MIN_RUN][, c("run", "run_len") := NULL]
   dt[, c("run", "run_len") := NULL]
   out
 }
@@ -40,13 +45,13 @@ efp <- efp[YEAR >= 2017 & is.finite(GPPsat) & is.finite(NEPmax) & is.finite(ETma
 say("== Stage counts ==")
 count(efp, "EFPs: all four available (2017-2025)")
 efp4 <- runs4(copy(efp))
-count(efp4, "EFPs: in a run of >= 4 continuous years")
+count(efp4, sprintf("EFPs: in a run of >= %d continuous years", MIN_RUN))
 
 # ---- 2. mortality (current year) + climate availability ------------------------
 mort <- fread(file.path(D, "mortality_v41_multibuffer.csv"))
 MVARS <- c("absolute_mortality", "relative_mortality", "new_deadwood_gain_pp", "new_deadwood_gain_pp_thresh",
            "relative_tree_loss_pct", "relative_tree_loss_pct_thresh", "relative_disturbance")
-mcols <- as.vector(outer(MVARS, paste0("_", c(100, 200, 300, 400, 500), "m"), paste0))
+mcols <- as.vector(outer(MVARS, paste0("_", BUFS, "m"), paste0))
 met <- fread(file.path(D, "monthly_meteo_2015_2025.csv"))
 CV <- c("TA_mean", "TA_p05", "TA_p95", "VPD_mean", "VPD_p05", "VPD_p95", "SW_IN_mean", "SW_IN_p05", "SW_IN_p95", "P_sum")
 met <- met[is.finite(TA_mean) & is.finite(VPD_mean) & is.finite(SW_IN_mean) & is.finite(P_sum)]
@@ -89,7 +94,7 @@ cl_ok <- merge(w1$complete[, .(SITE_ID, YEAR, ok1 = ok)], w2$complete[, .(SITE_I
 key <- merge(base, cl_ok[ok1 == TRUE], by = c("SITE_ID", "YEAR"))
 count(key, "+ lag-1 climate window complete")
 key4 <- runs4(copy(key[, .(SITE_ID, YEAR)]))
-count(key4, "EFP + mortality + climate on the same site-years, >= 4 continuous")
+count(key4, sprintf("EFP + mortality + climate on the same site-years, >= %d continuous", MIN_RUN))
 
 # ---- 4. lags for mortality, then NA cleaning -------------------------------------
 mt <- mort[, c("SITE_ID", "YEAR", mcols), with = FALSE]
@@ -99,7 +104,7 @@ full <- merge(full, lagm(2), by = c("SITE_ID", "YEAR"), all.x = TRUE)
 full <- merge(full, cl_ok, by = c("SITE_ID", "YEAR"), all.x = TRUE)
 full <- full[SITE_ID %in% key4$SITE_ID]
 EFP <- c("GPPsat", "NEPmax", "ETmax", "WUE")
-lag2_stock <- paste0(as.vector(outer(c("absolute_mortality", "relative_mortality"), paste0("_", c(100, 200, 300, 400, 500), "m"), paste0)), "_lag2")
+lag2_stock <- paste0(as.vector(outer(c("absolute_mortality", "relative_mortality"), paste0("_", BUFS, "m"), paste0)), "_lag2")
 pred_full <- c(mcols, paste0(mcols, "_lag1"), paste0(mcols, "_lag2"))
 pred_stock <- c(mcols, paste0(mcols, "_lag1"), lag2_stock)
 clean_full <- full[ok1 %in% TRUE & ok2 %in% TRUE & complete.cases(full[, c(EFP, pred_full), with = FALSE])]
@@ -108,10 +113,10 @@ say("")
 say("== After lag 1/2 and NA cleaning ==")
 count(clean_full, "A) all mortality metrics with lag 1 and lag 2")
 say("     years present: %s", paste(sort(unique(clean_full$YEAR)), collapse = ", "))
-count(runs4(copy(clean_full[, .(SITE_ID, YEAR)])), "   ... of which in a run of >= 4 continuous years")
+count(runs4(copy(clean_full[, .(SITE_ID, YEAR)])), sprintf("   ... of which in a run of >= %d continuous years", MIN_RUN))
 count(clean_stock, "B) lag 2 only for stock metrics (abs./rel. mortality), as V10")
 say("     years present: %s", paste(sort(unique(clean_stock$YEAR)), collapse = ", "))
-count(runs4(copy(clean_stock[, .(SITE_ID, YEAR)])), "   ... of which in a run of >= 4 continuous years")
+count(runs4(copy(clean_stock[, .(SITE_ID, YEAR)])), sprintf("   ... of which in a run of >= %d continuous years", MIN_RUN))
 
 # ---- 5. tree cover >= 30 % (500 m, site mean over 2017-2025, v4.1) ---------------
 tcm <- mort[, .(tc_site_mean_500m = mean(tree_cover_mean_pct_500m, na.rm = TRUE)), by = SITE_ID]
@@ -122,6 +127,7 @@ for (nm in c("clean_full", "clean_stock")) {
   count(x[tc_site_mean_500m >= 30], sprintf("%s, tree cover >= 30 %%", nm))
 }
 
+if (COUNTS_ONLY) { cat("COUNTS_ONLY_DONE\n"); quit(save = "no") }
 # ---- 6. traits + write outputs --------------------------------------------------
 tr <- fread(file.path(D, "traits_lusk1km_500m_by_site.csv"))
 trait_cols <- setdiff(names(tr), c("SITE_ID", grep("^aoa_", names(tr), value = TRUE)))
@@ -143,11 +149,11 @@ for (variant in c("full", "stock")) {
     all_sites[, (intersect(drop, names(all_sites))) := NULL]
     tc30 <- all_sites[tc_site_mean_500m >= 30]
     tc30_tr <- tc30[complete.cases(tc30[, ..trait_cols])]
-    fwrite(all_sites, file.path(D, sprintf("paper_dataset_%s_lags_%s_allsites.csv", variant, climate)))
-    fwrite(tc30, file.path(D, sprintf("paper_dataset_%s_lags_%s_tc30.csv", variant, climate)))
+    fwrite(all_sites, file.path(D, sprintf("paper_dataset_%s_lags_%s_allsites%s.csv", variant, climate, SUF)))
+    fwrite(tc30, file.path(D, sprintf("paper_dataset_%s_lags_%s_tc30%s.csv", variant, climate, SUF)))
     if (climate == "monthly")
       count(tc30_tr, sprintf("%s lags, tc >= 30, all %d traits non-NA", variant, length(trait_cols)))
   }
 }
-writeLines(log_lines, file.path(D, "paper_dataset_counts.txt"))
+writeLines(log_lines, file.path(D, sprintf("paper_dataset_counts%s.txt", SUF)))
 cat("STEP03_DONE\n")
