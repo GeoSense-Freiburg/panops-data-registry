@@ -1,0 +1,15 @@
+{
+  "learner": "XGB",
+  "response": "GPP_gs",
+  "best_value": 0.70589361,
+  "n_trials": 50,
+  "params": {
+    "learning_rate": 0.05673304617447113,
+    "nrounds": 400,
+    "max_depth": 6,
+    "min_child_weight": 18.6063190620863,
+    "subsample": 0.9256486276207933,
+    "colsample_bytree": 0.2768027099453383,
+    "reg_lambda": 38.87780484332849
+  }
+}

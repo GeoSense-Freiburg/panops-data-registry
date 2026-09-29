@@ -24,9 +24,8 @@ TEXT_COL <- "#111111"; AXIS_COL <- "#444444"
 COL_WO <- "#22C4E0"; COL_W <- "#E8257A"
 COL_UP <- "#2ECC71"; COL_NC <- "#9AA0A6"; COL_DN <- "#E74C3C"
 
-EFP_ORDER  <- c("GPPsat", "NEPmax", "ETmax", "WUE")
-EFP_LABELS <- c(GPPsat = "GPPsat  (µmol m⁻² s⁻¹)", NEPmax = "NEPmax  (µmol m⁻² s⁻¹)",
-                ETmax  = "ETmax  (mm d⁻¹)",         WUE    = "WUE  (g C mm⁻¹)")
+EFP_LABELS <- RESP_UNITS   # active response set (paper_common.R)
+PN <- paper_n()
 
 LEARNERS <- list(   # random forest dropped at the user's request
   # 2026-09-09: repointed to the lag2-corrected 24m data (true_24m/*) - the
@@ -122,7 +121,7 @@ p <- ggplot(dt, aes(x = grp, y = rmse, fill = model_type)) +
   coord_cartesian(clip = "on") +
   labs(x = NULL, y = NULL,
        title = "Effect of adding disturbance predictors on per-site RMSE",
-       subtitle = paste0("Tree cover ≥30 % (106 sites, 388 site-years) · deadtrees v4.1 · repeated CV (3×80 %) · C+T vs C+T+D · cyan = without D, pink = with D\n",
+       subtitle = paste0("Tree cover ≥30 % (", PN[["sites"]], " sites, ", PN[["sy"]], " site-years) · ", PAPER_MAPS, " · repeated CV (3×80 %) · C+T vs C+T+D · cyan = without D, pink = with D\n",
                          "% = median PAIRED change in per-site RMSE (negative = less error) · ",
                          "stars = one-sided paired Wilcoxon, BH-FDR across the figure (*** q<0.001, ** q<0.01, * q<0.05)\n",
                          "%↓ = share of sites whose RMSE improved · y axis zoomed to the 95th percentile (no data removed)")) +

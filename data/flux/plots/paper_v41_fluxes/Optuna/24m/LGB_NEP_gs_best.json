@@ -1,0 +1,15 @@
+{
+  "learner": "LGB",
+  "response": "NEP_gs",
+  "best_value": 0.85936486,
+  "n_trials": 50,
+  "params": {
+    "learning_rate": 0.012290616973735208,
+    "nrounds": 1000,
+    "num_leaves": 26,
+    "min_data_in_leaf": 12,
+    "feature_fraction": 0.8899683372925065,
+    "bagging_fraction": 0.7446009551138942,
+    "lambda_l2": 0.005096944277238919
+  }
+}

@@ -20,9 +20,8 @@ OUT <- PAPER_FIG; dir.create(OUT, showWarnings = FALSE, recursive = TRUE)
 
 BG <- "white"; PANEL <- "white"; GRID <- "#D9D9D9"; TXT <- "#111111"; AX <- "#444444"
 CAT_COLS <- c("Low+Mid" = "#22C4E0", "High" = "#E8257A")
-EFP_ORDER <- c("GPPsat","NEPmax","ETmax","WUE")
-EFP_LAB <- c(GPPsat="GPPsat  (µmol m⁻² s⁻¹)", NEPmax="NEPmax  (µmol m⁻² s⁻¹)",
-             ETmax="ETmax  (mm d⁻¹)", WUE="WUE  (g C mm⁻¹)")
+EFP_LAB <- RESP_UNITS   # active response set (paper_common.R)
+PN <- paper_n()
 # 2026-09-09: repointed to true_24m/ - see plot_draft_fig2_M3M4.R for why.
 LEARNERS <- list(list(lab="XGBoost (Optuna)",  fam="XGB"),
                  list(lab="LightGBM (Optuna)", fam="LGB"))
@@ -90,8 +89,8 @@ for (M in METRICS) {
                        labeller=labeller(response=EFP_LAB), switch="y") +
     labs(x=NULL, y="Net signed disturbance SHAP\n(effect on the PREDICTED value, response units)",
          title=sprintf("Direction of the disturbance effect — by %s", M$lab),
-         subtitle=paste0("Tree cover ≥30 % (106 sites) · deadtrees v4.1 · M4 · natural-breaks split (site max > mean + 0.5 SD) on ", M$lab,
-                         " · below zero = the model predicts a LOWER value of the EFP (not worse accuracy)\n",
+         subtitle=paste0("Tree cover ≥30 % (", PN[["sites"]], " sites) · ", PAPER_MAPS, " · M4 · natural-breaks split (site max > mean + 0.5 SD) on ", M$lab,
+                         " · below zero = the model predicts a LOWER value of the ", RESP_WORD, " (not worse accuracy)\n",
                          "stars = Mann-Whitney U between Low+Mid and High (unequal n), BH-FDR across the figure ",
                          "(*** q<0.001, ** q<0.01, * q<0.05)")) +
     th + theme(strip.placement="outside")

@@ -29,11 +29,10 @@ IGBP_ORDER <- c("ENF","EBF","DNF","DBF","MF","CSH","OSH","WSA","SAV","WET")
 IGBP_COL <- c(ENF="#1F6B3A", EBF="#33A14A", DNF="#7BC87E", DBF="#B2DF8A",
               MF="#FDBF6F", CSH="#E5820B", OSH="#D4A017", WSA="#C4A85C",
               SAV="#E8D44D", WET="#4DAECC")
-EFP_ORDER <- c("GPPsat","NEPmax","ETmax","WUE")   # DRAFT: uWUE dropped
+source("scripts/paper_v41/paper_common.R")   # responses: EFP_ORDER (active response set)
 # lines below already filter on response %in% EFP_ORDER, so no empty facet appears
 EFP_LAB <- as_labeller(setNames(EFP_ORDER, EFP_ORDER))
-
-source("scripts/paper_v41/paper_common.R")
+PN <- paper_n()
 FAM <- if (length(args) >= 2) args[2] else "XGB"            # XGB | LGB
 pred_file <- file.path(PAPER_OUT, sprintf("%s_predictions_repCV.csv", FAM))
 shap_file <- file.path(PAPER_OUT, sprintf("%s_site_shap_M4.csv", FAM))
@@ -197,7 +196,7 @@ for (s in sets) {
                     "White dot = median | Yellow diamond = mean | negative = D improved", TRUE)
   pB <- violin_igbp(sh, "dist_signed", "Net signed disturbance SHAP\n(effect on PREDICTED value)",
                     "B · Direction of the disturbance effect by IGBP class",
-                    "Net signed SHAP of the disturbance block | below zero = model predicts a LOWER EFP value (not worse accuracy)", TRUE)
+                    paste0("Net signed SHAP of the disturbance block | below zero = model predicts a LOWER ", RESP_WORD, " value (not worse accuracy)"), TRUE)
   # Spearman correlation, one test per EFP panel; BH-FDR across all 12 tests
   # in this board (4 EFPs x panels C+D+E), same convention as the other
   # figures' significance tests. E is D repeated with relative_disturbance
@@ -212,25 +211,25 @@ for (s in sets) {
   stat_all[, response := factor(response, levels = EFP_ORDER)]
   labC <- stat_all[panel == "C"]; labD <- stat_all[panel == "D"]; labE <- stat_all[panel == "E"]
 
-  pC <- scatter_tc(dR, "tree_cover", "Tree cover — deadtrees v4.1, 500 m, site mean (%)",
+  pC <- scatter_tc(dR, "tree_cover", paste0("Tree cover — ", PAPER_MAPS, ", 500 m, site mean (%)"),
                    "delta_rmse", expression(Delta*"RMSE (with D - without D)"),
                    "C · Tree cover vs. disturbance benefit",
                    "Each point = one site | Linear fit with 95% CI | Spearman rho, BH-FDR within this board (*** q<0.001, ** q<0.01, * q<0.05)",
                    TRUE, FALSE, labC)
-  pD <- scatter_tc(sh, "tree_cover", "Tree cover — deadtrees v4.1, 500 m, site mean (%)",
+  pD <- scatter_tc(sh, "tree_cover", paste0("Tree cover — ", PAPER_MAPS, ", 500 m, site mean (%)"),
                    "dist_signed", "Net signed disturbance SHAP\n(effect on PREDICTED value)",
                    "D · Tree cover vs. direction of the disturbance effect",
-                   "Each point = one site | Linear fit with 95% CI | below zero = model predicts a LOWER EFP value",
+                   paste0("Each point = one site | Linear fit with 95% CI | below zero = model predicts a LOWER ", RESP_WORD, " value"),
                    TRUE, TRUE, labD)
   pE <- scatter_tc(sh, "rel_disturbance", "Relative disturbance (500m, %, max across years)",
                    "dist_signed", "Net signed disturbance SHAP\n(effect on PREDICTED value)",
                    "E · Relative disturbance vs. direction of the disturbance effect",
-                   "Each point = one site | Linear fit with 95% CI | below zero = model predicts a LOWER EFP value",
+                   paste0("Each point = one site | Linear fit with 95% CI | below zero = model predicts a LOWER ", RESP_WORD, " value"),
                    TRUE, TRUE, labE)
 
   board <- (pA / pB / pC / pD / pE) +
     plot_annotation(
-      title = sprintf("IGBP board — %s | %s window | %s | tree cover ≥30 %% (106 sites, deadtrees v4.1)", s$label, s$win, FAM),
+      title = sprintf("IGBP board — %s | %s window | %s | tree cover ≥30 %% (%d sites, %s)", s$label, s$win, FAM, PN[["sites"]], PAPER_MAPS),
       theme = theme(plot.title = element_text(colour = TEXT_COL, size = 14, face = "bold"),
                     plot.background = element_rect(fill = DARK_BG, colour = NA))
     ) & theme(plot.background = element_rect(fill = DARK_BG, colour = NA))

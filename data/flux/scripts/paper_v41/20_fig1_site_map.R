@@ -19,7 +19,7 @@ if (length(args) < 1) stop("Usage: Rscript plot_v10_fig1_site_map.R <dataset_typ
 dataset_type <- args[1]
 
 cat("\n", strrep("=", 80), "\n", sep = "")
-cat("COAUTHOR DRAFT FIG1 - tree cover >=30% (106 sites, deadtrees v4.1), uWUE dropped,\n    violins restricted to the modelling site-years\n")
+cat("COAUTHOR DRAFT FIG1 - tree cover >=30%, uWUE dropped,\n    violins restricted to the modelling site-years\n")
 cat(strrep("=", 80), "\n\n", sep = "")
 
 source("scripts/paper_v41/paper_common.R")
@@ -33,12 +33,7 @@ IGBP_ORDER <- c("ENF","EBF","DNF","DBF","MF","CSH","OSH","WSA","SAV","WET")
 IGBP_COL <- c(ENF="#1F6B3A", EBF="#33A14A", DNF="#7BC87E", DBF="#B2DF8A",
               MF="#FDBF6F", CSH="#E5820B", OSH="#D4A017", WSA="#C4A85C",
               SAV="#E8D44D", WET="#4DAECC")
-EFP_LABELS <- c(
-  GPPsat = expression(GPP[sat]~~(mu*mol~m^{-2}~s^{-1})),
-  NEPmax = expression(NEP[max]~~(mu*mol~m^{-2}~s^{-1})),
-  ETmax  = expression(ET[max]~~(mm~d^{-1})),
-  WUE    = expression(WUE~~(g~C~mm^{-1}))
-)
+EFP_LABELS <- RESP_EXPR   # active response set (paper_common.R)
 
 # ── V10 site list ────────────────────────────────────────────
 harm <- read.csv(harm_file)[, c("SITE_ID", "YEAR")]   # the 388 modelling site-years (paper_v41)
@@ -47,14 +42,14 @@ v10_sites <- unique(harm$SITE_ID)
 # ── EFP data (filter to V10 sites) ───────────────────────────
 dt <- read.csv(PAPER_DATA, check.names = FALSE)   # EFPs incl. the Migliavacca NEPmax
 dt <- dt[, c("SITE_ID","YEAR","IGBP","LOCATION_LAT","LOCATION_LONG",
-             "GPPsat","NEPmax","ETmax","WUE")]
+             EFP_ORDER)]
 # DRAFT CHANGE: the report version keeps every site-year with a valid EFP (600 rows).
 # Here the violins are restricted to the site-years actually modelled, so the figure and
 # the results describe exactly the same data.
 dt <- merge(dt, harm, by = c("SITE_ID", "YEAR"))
 
 clip99 <- function(x) { q <- quantile(x, 0.99, na.rm = TRUE); ifelse(x > q, NA, x) }
-for (e in c("GPPsat","NEPmax","ETmax","WUE")) dt[[e]] <- clip99(dt[[e]])
+for (e in EFP_ORDER) dt[[e]] <- clip99(dt[[e]])
 dt$IGBP <- factor(dt$IGBP, levels = IGBP_ORDER)
 
 sites <- dt[!duplicated(dt$SITE_ID), c("SITE_ID","IGBP","LOCATION_LAT","LOCATION_LONG")]
@@ -118,10 +113,10 @@ make_violin <- function(efp_col, tag_label, acc = 0.1, nbrk = 4) {
     )
 }
 
-p_gpp  <- make_violin("GPPsat", "b", acc = 1,   nbrk = 3)
-p_nep  <- make_violin("NEPmax", "c", acc = 1,   nbrk = 3)
-p_et   <- make_violin("ETmax",  "d", acc = 0.1, nbrk = 3)
-p_wue  <- make_violin("WUE",    "e", acc = 1,   nbrk = 4)
+p_gpp  <- make_violin(EFP_ORDER[1], "b", acc = 1,   nbrk = 3)
+p_nep  <- make_violin(EFP_ORDER[2], "c", acc = 1,   nbrk = 3)
+p_et   <- make_violin(EFP_ORDER[3], "d", acc = if (PAPER_RESP_SET == "flux") 1 else 0.1, nbrk = 3)
+p_wue  <- make_violin(EFP_ORDER[4], "e", acc = 1,   nbrk = 4)
 
 layout <- "
 AAAA

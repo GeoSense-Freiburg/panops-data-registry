@@ -30,9 +30,7 @@ harm_file <- PAPER_DATA   # site-level metric values (max across a site's years)
 
 GROUP_COLOURS <- c(Climate = "#4A90D9", Traits = "#3DBDAA", Disturbance = "#D4A017", Memory = "#9B5DE5")
 GROUP_LEVELS  <- c("Climate", "Traits", "Disturbance", "Memory")
-EFP_ORDER <- c("GPPsat", "NEPmax", "ETmax", "WUE")   # uWUE dropped, matches the rest of the draft
-EFP_UNITS <- c(GPPsat = "GPPsat  (µmol m⁻² s⁻¹)", NEPmax = "NEPmax  (µmol m⁻² s⁻¹)",
-               ETmax  = "ETmax  (mm d⁻¹)",         WUE    = "WUE  (g C mm⁻¹)")
+EFP_UNITS <- RESP_UNITS   # active response set (paper_common.R)
 
 shap_raw <- fread(shap_file)
 shap_grp <- shap_raw[group %in% GROUP_LEVELS & model %in% c("M4_12m", "M4_24m") & response %in% EFP_ORDER,
