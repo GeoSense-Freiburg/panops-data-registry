@@ -261,6 +261,18 @@ body = body.replace("""    <div class="controls">
     <div class="controls v10only">
       <div class="ctrl"><label>View</label><select id="sel9_type">""")
 
+a = '''    <div class="controls v10only">
+      <div class="ctrl"><label>Model</label><select id="sel7_model"></select></div>'''
+assert body.count(a) == 1
+body = body.replace(a, '''    <div class="note v10only" id="note7_signed" style="display:none"><b>Signed disturbance SHAP (V10):</b> net signed
+      SHAP of the disturbance block for M4 (response units), bars coloured by the site's disturbance intensity, sites
+      sorted by intensity, dashed line = natural break (High above, Low+Mid below). From the V10 Optuna models
+      (lag2-corrected 24&nbsp;m); computed for XGBoost and LightGBM only.</div>
+    <div class="controls v10only">
+      <div class="ctrl"><label>View</label><select id="sel7_view"></select></div>
+      <div class="ctrl" style="display:none"><label>Mortality metric</label><select id="sel7_metric10"></select></div>
+      <div class="ctrl"><label>Model</label><select id="sel7_model"></select></div>''')
+
 # ---------------------------------------------------------------- new sections
 def pct_cell(v):
     cls = "pos" if v < 0 else "neg"
@@ -500,7 +512,7 @@ s14 = s14.replace("""<h2>What gets reported — and why</h2>""", """<h2>What get
       XGBoost + LightGBM Optuna. The dataset, learner and CV comparisons below still describe V10.</div>""")
 
 tail = """  <div class="note">All figures are also available as PDF next to each PNG. This report references the image files by
-    relative path: keep it inside <code>plots/V10/</code> (v4.1 and flux figures are read from <code>../paper_v41/</code>, <code>../paper_v41_fluxes/</code> and <code>../paper_v10_fluxes/</code>).</div>
+    relative path: keep it inside <code>plots/V10/</code> (v4.1, flux and signed-SHAP figures are read from <code>../paper_v41/</code>, <code>../paper_v41_fluxes/</code>, <code>../paper_v10_fluxes/</code> and <code>../paper_v10_efp/</code>).</div>
 </main>
 
 <div class="lightbox" id="lb"><img id="lbimg" alt="zoom"></div>
@@ -523,7 +535,7 @@ const V10PATH={{loo:{{rfopt:'true_24m/RF_optuna/',xgbopt:'true_24m/XGB_optuna/',
 function P(){{return V10PATH[CV][CFG];}}
 // PS(): SHAP figures come from a full-data model, identical under both structures.
 function PS(){{return V10PATH.loo[CFG];}}
-const V41P='../paper_v41/', V41F='../paper_v41_fluxes/', V10F='../paper_v10_fluxes/';
+const V41P='../paper_v41/', V41F='../paper_v41_fluxes/', V10F='../paper_v10_fluxes/', V10E='../paper_v10_efp/';
 const V41=()=>({{v41:V41P,v41f:V41F,v10f:V10F}})[DS];   // image root of the active paper-pipeline dataset
 const LFAM={{rfopt:'RF',xgbopt:'XGB',lgbopt:'LGB'}};
 const is41=()=>DS==='v41'||DS==='v41f'||DS==='v10f';   // datasets run through the paper_v41 pipeline
@@ -540,7 +552,7 @@ const setImg=(id,path,capId)=>{{const el=document.getElementById(id);el.src=enc(
 
 function opt(val,label){{const o=document.createElement('option');o.value=val;o.textContent=label||val;return o;}}
 function fill(sel,items){{sel.innerHTML='';items.forEach(it=>{{if(Array.isArray(it))sel.appendChild(opt(it[0],it[1]));else sel.appendChild(opt(it));}});}}
-const V41_METRICS=[['abs_mort','Absolute mortality'],['rel_mort','Relative mortality'],['rel_dist','Relative disturbance']];
+const V41_METRICS=[['rel_mort','Relative mortality'],['rel_dist','Relative disturbance']];   // absolute mortality not shown
 const D_VIEWS=[['family','Metric by metric'],['concept','Three sub-blocks (share and per variable)']];
 
 fill(document.getElementById('sel5_efp'),EFPS);
@@ -549,6 +561,8 @@ fill(document.getElementById('sel6_method'),METHODS);
 fill(document.getElementById('sel7_model'),SHAP_MODELS);
 fill(document.getElementById('sel7_efp'),EFPS);
 fill(document.getElementById('sel7_win'),WINDOWS);
+fill(document.getElementById('sel7_view'),[['comp','Composition (driver groups)'],['signed','Signed disturbance SHAP (M4)']]);
+fill(document.getElementById('sel7_metric10'),V41_METRICS);
 fill(document.getElementById('sel7v_metric'),V41_METRICS);
 fill(document.getElementById('sel7v_win'),WINDOWS);
 fill(document.getElementById('sel7v_style'),[['comp','Composition (relative |SHAP|)'],['signed','Signed disturbance SHAP']]);
@@ -605,6 +619,14 @@ function r6(){{if(is41())return;const mg=document.getElementById('sel6_merged').
   const sub=mg?'delta_RMSE_category/merged_low_disturbance/':'delta_RMSE_category/';
   setImg('img_dcat',`${{P()}}${{DS}}/RMSE/${{sub}}delta_RMSE_${{val('sel6_unit')}}_${{val('sel6_method')}}.png`,'cap_dcat');}}
 function r7(){{
+  const im=document.getElementById('img_sshap'),sig=val('sel7_view')==='signed';
+  im.style.display='';
+  const show=(id,on)=>{{document.getElementById(id).closest('.ctrl').style.display=on?'':'none';}};
+  show('sel7_metric10',sig);show('sel7_model',!sig);show('sel7_efp',!sig);
+  document.getElementById('note7_signed').style.display=(sig&&!is41())?'':'none';
+  if(!is41()&&sig){{
+    if(CFG==='rfopt'){{im.style.display='none';document.getElementById('cap_sshap').textContent='Signed disturbance SHAP was computed for XGBoost and LightGBM only - switch the learner.';return;}}
+    setImg('img_sshap',`${{V10E}}fig3b_signed_${{val('sel7_metric10')}}_${{val('sel7_win')}}_${{LFAM[CFG]}}.png`,'cap_sshap');return;}}
   if(is41()){{const m=val('sel7v_metric'),w=val('sel7v_win'),L=LFAM[CFG];
     const f=val('sel7v_style')==='signed'?`fig3b_signed_${{m}}_${{w}}_${{L}}.png`:`fig3_${{m}}_${{w}}_${{L}}.png`;
     setImg('img_sshap',V41()+f,'cap_sshap');return;}}
@@ -662,7 +684,7 @@ document.querySelectorAll('#metricsTbl th').forEach(th=>th.addEventListener('cli
   const k=th.dataset.k;if(mSort.k===k)mSort.dir*=-1;else{{mSort.k=k;mSort.dir=(k==='R2')?-1:1;}}renderMetrics();}}));
 ['sel5_efp'].forEach(id=>document.getElementById(id).addEventListener('change',r5));
 ['sel6_unit','sel6_method','sel6_merged'].forEach(id=>document.getElementById(id).addEventListener('change',r6));
-['sel7_model','sel7_efp','sel7_win','sel7v_metric','sel7v_win','sel7v_style'].forEach(id=>document.getElementById(id).addEventListener('change',r7));
+['sel7_view','sel7_metric10','sel7_model','sel7_efp','sel7_win','sel7v_metric','sel7v_win','sel7v_style'].forEach(id=>document.getElementById(id).addEventListener('change',r7));
 ['sel8_model','sel8_win','sel8_method','sel8_merged','sel8v_metric'].forEach(id=>document.getElementById(id).addEventListener('change',r8));
 ['sel9v_win'].forEach(id=>document.getElementById(id).addEventListener('change',r9));
 ['sel10_view'].forEach(id=>document.getElementById(id).addEventListener('change',r10));

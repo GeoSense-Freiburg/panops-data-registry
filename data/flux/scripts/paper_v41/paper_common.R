@@ -14,14 +14,18 @@ PAPER_ROOT <- "/mnt/gsdata/projects/panops/panops-data-registry/data/flux"
 #   "flux"     same rows, growing-season flux totals instead (scripts/paper_v41_fluxes/)
 #   "v10flux"  V10 tc>=30 predictors (deadtrees v2-2, V10 traits and mortality block, 93 sites) with
 #              the same half-hourly flux totals (scripts/paper_v41_fluxes/32_build_v10_flux_dataset.R)
+#   "v10efp"   V10 tc>=30 EFP models (93 sites / 395 site-years), figures only: reads the V10 Optuna
+#              true_24m signed SHAP (28_v10_efp_inputs.R copies it and builds the site table)
 # EFP_ORDER keeps its name in every mode so each script reads the active responses from here;
 # RESP_UNITS = text labels (Figs 2-4), RESP_EXPR = plotmath labels (Fig 1), RESP_WORD = noun in captions,
 # PAPER_MAPS = mortality map product named in figure subtitles.
 PAPER_RESP_SET <- Sys.getenv("PAPER_RESP_SET", "efp")
-stopifnot(PAPER_RESP_SET %in% c("efp", "flux", "v10flux"))
-if (PAPER_RESP_SET == "efp") {
-  PAPER_DATA <- file.path(PAPER_ROOT, "derived_tables/paper_v41/paper_dataset_full_lags_monthly_tc30_minrun2_buf100-200-300-400-500.csv")
-  .sub <- "paper_v41"
+stopifnot(PAPER_RESP_SET %in% c("efp", "flux", "v10flux", "v10efp"))
+if (PAPER_RESP_SET %in% c("efp", "v10efp")) {
+  PAPER_DATA <- file.path(PAPER_ROOT, if (PAPER_RESP_SET == "efp")
+    "derived_tables/paper_v41/paper_dataset_full_lags_monthly_tc30_minrun2_buf100-200-300-400-500.csv" else
+    "derived_tables/paper_v10_efp/paper_dataset_v10_efp.csv")
+  .sub <- if (PAPER_RESP_SET == "efp") "paper_v41" else "paper_v10_efp"
   EFP_ORDER  <- c("GPPsat", "NEPmax", "ETmax", "WUE")
   RESP_UNITS <- c(GPPsat = "GPPsat  (µmol m⁻² s⁻¹)", NEPmax = "NEPmax  (µmol m⁻² s⁻¹)",
                   ETmax  = "ETmax  (mm d⁻¹)",         WUE    = "WUE  (g C mm⁻¹)")
@@ -43,12 +47,12 @@ if (PAPER_RESP_SET == "efp") {
                   WUE_gs = expression(WUE~~(g~C~mm^{-1})))
   RESP_WORD  <- "flux"
 }
-PAPER_MAPS <- if (PAPER_RESP_SET == "v10flux") "deadtrees v2-2" else "deadtrees v4.1"
+PAPER_MAPS <- if (PAPER_RESP_SET %in% c("v10flux", "v10efp")) "deadtrees v2-2" else "deadtrees v4.1"
 PAPER_OUT  <- Sys.getenv("PAPER_OUT_DIR", file.path(PAPER_ROOT, "derived_tables", .sub, "models"))
 PAPER_FIG  <- Sys.getenv("PAPER_FIG_DIR", file.path(PAPER_ROOT, "plots", .sub))
 PAPER_TUNE <- Sys.getenv("PAPER_TUNE_DIR", file.path(PAPER_ROOT, "plots", .sub, "Optuna"))
 WINDOWS    <- c("12m", "24m")
-if (PAPER_RESP_SET == "v10flux") {
+if (PAPER_RESP_SET %in% c("v10flux", "v10efp")) {
   # V10 predictor definitions (V10 get_predictor_cols(), as in predict_fluxes/): 21 traits; mortality block =
   # 11 families (tree_cover_mean_pct, live_tree_cover_pct and tree_loss_pp are not predictors there);
   # mortality_loss_severity_pct exists only at lag1, lag2 only for absolute and relative mortality.
