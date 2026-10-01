@@ -233,8 +233,9 @@ body = body.replace("""    <div class="controls">
       <div class="ctrl"><label>Model</label><select id="sel7_model"></select></div>""", """    <div class="note v41only"><b>v4.1 and flux sets:</b> M4 only, one board per mortality metric with the four EFPs side by side.
       <b>Composition</b> = relative mean |SHAP| per driver group with the site's metric value as dots (Fig.&nbsp;3).
       <b>Signed disturbance SHAP</b> = net signed SHAP of the disturbance block in response units (same quantity as
-      Fig.&nbsp;4 and 5), bars coloured by the site's disturbance intensity, sites sorted by intensity, dashed line =
-      natural break (High above, Low+Mid below).</div>
+      Fig.&nbsp;4 and 5), bars coloured by the site's disturbance intensity (dark teal → yellow → pink,
+      colour-blind safe), sites sorted by intensity, dashed lines = the two natural breaks, mean ± 0.5 SD (High above
+      the upper, Mid between, Low below the lower).</div>
     <div class="controls v41only">
       <div class="ctrl"><label>Mortality metric</label><select id="sel7v_metric"></select></div>
       <div class="ctrl"><label>Window</label><select id="sel7v_win"></select></div>
@@ -265,13 +266,80 @@ a = '''    <div class="controls v10only">
       <div class="ctrl"><label>Model</label><select id="sel7_model"></select></div>'''
 assert body.count(a) == 1
 body = body.replace(a, '''    <div class="note v10only" id="note7_signed" style="display:none"><b>Signed disturbance SHAP (V10):</b> net signed
-      SHAP of the disturbance block for M4 (response units), bars coloured by the site's disturbance intensity, sites
-      sorted by intensity, dashed line = natural break (High above, Low+Mid below). From the V10 Optuna models
+      SHAP of the disturbance block for M4 (response units), bars coloured by the site's disturbance intensity (dark teal → yellow → pink,
+      colour-blind safe), sites sorted by intensity, dashed lines = the two natural breaks, mean ± 0.5 SD (High above
+      the upper, Mid between, Low below the lower). From the V10 Optuna models
       (lag2-corrected 24&nbsp;m); computed for XGBoost and LightGBM only.</div>
     <div class="controls v10only">
       <div class="ctrl"><label>View</label><select id="sel7_view"></select></div>
       <div class="ctrl" style="display:none"><label>Mortality metric</label><select id="sel7_metric10"></select></div>
       <div class="ctrl"><label>Model</label><select id="sel7_model"></select></div>''')
+
+a = '    <div class="imgwrap"><img id="img_rmse"'
+assert body.count(a) == 1
+body = body.replace(a, '''    <div class="controls">
+      <div class="ctrl"><label>Sites</label><select id="sel3_sites"></select></div>
+    </div>
+    <div class="note" id="note3_high" style="display:none"><b>High-disturbance sites only.</b> The same figure and
+      statistics restricted to the sites whose maximum disturbance across years lies above the natural break
+      (mean + 0.5&nbsp;SD over sites; the number of sites is given in the figure subtitle). M3 vs M4, XGBoost and LightGBM
+      Optuna, repeated CV (3&nbsp;×&nbsp;80&nbsp;%); models are trained on all sites, only the sites shown and tested
+      change. With ~20–26 sites the tests have less power, so read the effect size together with the stars. For the V10
+      dataset this view does not follow the learner and CV switches.</div>
+''' + a)
+
+i3 = body.index('  <section id="s3">'); j3 = body.index('</section>', i3) + len('</section>')
+body = body[:i3] + '''  <section id="s3">
+    <div class="secnum">SECTION 3</div>
+    <h2>Model performance &amp; effect of disturbance on RMSE</h2>
+    <p class="desc">Per-site RMSE without disturbance (cyan, M3 = climate + traits) and with it (pink, M4 = + mortality),
+      for XGBoost and LightGBM (Optuna) at the 12&nbsp;m and 24&nbsp;m windows, repeated CV (3&nbsp;×&nbsp;80&nbsp;%). The same
+      figure for all four datasets; it does not follow the learner and CV switches.</p>
+    <p class="itxt"><b>Reading the labels.</b> Each pair carries three numbers:
+      <span class="pill">%</span> the <b>median paired change</b> in per-site RMSE (negative = less error, green);
+      <span class="pill">stars</span> a <b>one-sided paired Wilcoxon signed-rank test</b>, H<sub>1</sub>: adding D
+      <i>reduces</i> per-site RMSE, with Benjamini–Hochberg FDR across the 16 tests in the figure
+      (*** q&lt;0.001, ** q&lt;0.01, * q&lt;0.05, ns); and <span class="pill">%↓</span> the share of sites whose RMSE
+      improved. Sites are paired on <code>SITE_ID</code>. Statistics are written to <code>fig2_statistics.csv</code>
+      (or <code>fig2_high_*_statistics.csv</code>) beside each figure.</p>
+    <p class="itxt"><b>Caveat.</b> The effect size is the <i>median of the paired per-site changes</i>, not the difference
+      of the two medians. Because the models share training sites, the per-site errors are not fully independent, which
+      makes p-values mildly <b>anti-conservative</b>; strong results are safe, marginal ones (q ≈ 0.05) should not be
+      over-read.</p>
+    <div class="controls">
+      <div class="ctrl"><label>Sites</label><select id="sel3_sites"></select></div>
+    </div>
+    <div class="note" id="note3_high" style="display:none"><b>High-disturbance sites only.</b> The same figure and
+      statistics restricted to the sites whose maximum disturbance across years lies above the natural break
+      (mean + 0.5&nbsp;SD over sites; the number of sites is given in the figure subtitle). Models are trained on all
+      sites; only the sites shown and tested change. With ~20–26 sites the tests have less power, so read the effect
+      size together with the stars.</div>
+    <div class="imgwrap"><img id="img_rmse" loading="lazy" alt="paired RMSE"></div>
+    <div class="cap" id="cap_rmse"></div>
+  </section>''' + body[j3:]
+
+i5 = body.index('  <section id="s5">'); j5 = body.index('</section>', i5) + len('</section>')
+body = body[:i5] + '''  <section id="s5">
+    <div class="secnum">SECTION 5</div>
+    <h2>Site-specific ΔRMSE (diverging bars)</h2>
+    <p class="desc">Per-site change in RMSE from adding disturbance (ΔRMSE = RMSE<sub>with D</sub> − RMSE<sub>without D</sub>),
+      M3 (climate + traits) vs M4 (+ mortality): one bar per site, sorted within each panel; below zero = mortality
+      reduces that site's error. Rows = responses, columns = XGBoost and LightGBM (Optuna) at 12&nbsp;m and 24&nbsp;m,
+      repeated CV (3&nbsp;×&nbsp;80&nbsp;%). Bars are coloured by the site's disturbance intensity (site maximum, 500&nbsp;m) on
+      the same dark teal → yellow → pink scale as the signed-SHAP figure in Section&nbsp;7; each panel gives the share of
+      sites improved. Numbers, including the rank correlation between ΔRMSE and intensity, are in
+      <code>fig_site_dRMSE_statistics.csv</code> beside the figure. Does not follow the learner and CV switches.</p>
+    <div class="controls">
+      <div class="ctrl v10only"><label>View</label><select id="sel5_view"></select></div>
+      <div class="ctrl"><label>Colour by</label><select id="sel5_metric"></select></div>
+      <div class="ctrl" style="display:none"><label>Response (EFP)</label><select id="sel5_efp"></select></div>
+    </div>
+    <div class="note v10only" id="note5_all" style="display:none"><b>All model pairs (V2.2).</b> The earlier figure:
+      one board per EFP with all four model pairs (C vs C+D … C+T+M vs C+T+D+M) × memory type × window, bars coloured by
+      relative-disturbance tier. Follows the learner and CV switches.</div>
+    <div class="imgwrap"><img id="img_dbar" loading="lazy" alt="delta RMSE bars"></div>
+    <div class="cap" id="cap_dbar"></div>
+  </section>''' + body[j5:]
 
 # ---------------------------------------------------------------- new sections
 def pct_cell(v):
@@ -556,6 +624,9 @@ const V41_METRICS=[['rel_mort','Relative mortality'],['rel_dist','Relative distu
 const D_VIEWS=[['family','Metric by metric'],['concept','Three sub-blocks (share and per variable)']];
 
 fill(document.getElementById('sel5_efp'),EFPS);
+fill(document.getElementById('sel5_view'),[['m34','M3 vs M4 · XGBoost + LightGBM'],['all','All model pairs (per learner and CV)']]);
+fill(document.getElementById('sel5_metric'),[['reldist','Relative disturbance'],['relmort','Relative mortality']]);
+const showCtl=(id,on)=>{{document.getElementById(id).closest('.ctrl').style.display=on?'':'none';}};
 fill(document.getElementById('sel6_unit'),DELTA_UNITS);
 fill(document.getElementById('sel6_method'),METHODS);
 fill(document.getElementById('sel7_model'),SHAP_MODELS);
@@ -572,6 +643,7 @@ fill(document.getElementById('sel8_method'),METHODS);
 fill(document.getElementById('sel8v_metric'),[['relmort','Relative mortality'],['reldist','Relative disturbance']]);
 fill(document.getElementById('sel9v_win'),WINDOWS);
 fill(document.getElementById('sel10_view'),D_VIEWS);
+fill(document.getElementById('sel3_sites'),[['all','All sites'],['high_reldist','High disturbance only (relative disturbance)'],['high_relmort','High disturbance only (relative mortality)']]);
 const RESP_OF={{sites_with_high_Tcover:EFPS,v41:['GPPsat','NEPmax','ETmax','WUE'],v41f:['GPP_gs','NEP_gs','ET_gs','WUE_gs'],
   v10f:['GPP_gs','NEP_gs','ET_gs','WUE_gs']}};
 function fillResp(){{const sel=document.getElementById('selm_resp'),prev=sel.value;fill(sel,['All',...RESP_OF[DS]]);
@@ -610,11 +682,17 @@ function rMeta(){{const m=META[DS];document.getElementById('metaBar').innerHTML=
 const val=id=>document.getElementById(id).value;
 function r1(){{setImg('img_fig1',is41()?`${{V41()}}fig1_site_map.png`:`${{DS}}/fig1_site_map_EFP_distributions.png`);}}
 function r2(){{if(!is41())setImg('img_bar',`${{DS}}/bar_sites_per_IGBP.png`);}}
-function r3(){{setImg('img_rmse',is41()?`${{V41()}}fig2_disturbance_effect_M3M4.png`:`${{P()}}${{DS}}/RMSE/RMSE_disturbance_effect_paired_violin.png`);}}
+function r3(){{const v=val('sel3_sites'),root=is41()?V41():V10E;
+  document.getElementById('note3_high').style.display=(v==='all')?'none':'';
+  setImg('img_rmse',`${{root}}fig2${{v==='all'?'':'_'+v}}_disturbance_effect_M3M4.png`,'cap_rmse');}}
 function r4(){{if(is41())return;setImg('img_thr1',`${{DS}}/01_abs_mort_comparison.png`);
   setImg('img_thr2',`${{DS}}/02_rel_mort_comparison.png`);
   setImg('img_thr3',`${{DS}}/03_rel_dist_comparison.png`);}}
-function r5(){{if(is41())return;setImg('img_dbar',`${{P()}}${{DS}}/RMSE/delta_RMSE_bars_${{val('sel5_efp')}}.png`,'cap_dbar');}}
+function r5(){{const allv=!is41()&&val('sel5_view')==='all';
+  showCtl('sel5_efp',allv);showCtl('sel5_metric',!allv);
+  document.getElementById('note5_all').style.display=allv?'':'none';
+  if(allv){{setImg('img_dbar',`${{P()}}${{DS}}/RMSE/delta_RMSE_bars_${{val('sel5_efp')}}.png`,'cap_dbar');return;}}
+  setImg('img_dbar',`${{is41()?V41():V10E}}fig_site_dRMSE_${{val('sel5_metric')}}.png`,'cap_dbar');}}
 function r6(){{if(is41())return;const mg=document.getElementById('sel6_merged').checked;
   const sub=mg?'delta_RMSE_category/merged_low_disturbance/':'delta_RMSE_category/';
   setImg('img_dcat',`${{P()}}${{DS}}/RMSE/${{sub}}delta_RMSE_${{val('sel6_unit')}}_${{val('sel6_method')}}.png`,'cap_dcat');}}
@@ -682,7 +760,8 @@ document.querySelectorAll('#cfgToggle button').forEach(b=>b.addEventListener('cl
 ['selm_resp','selm_fam'].forEach(id=>document.getElementById(id).addEventListener('change',renderMetrics));
 document.querySelectorAll('#metricsTbl th').forEach(th=>th.addEventListener('click',()=>{{
   const k=th.dataset.k;if(mSort.k===k)mSort.dir*=-1;else{{mSort.k=k;mSort.dir=(k==='R2')?-1:1;}}renderMetrics();}}));
-['sel5_efp'].forEach(id=>document.getElementById(id).addEventListener('change',r5));
+['sel3_sites'].forEach(id=>document.getElementById(id).addEventListener('change',r3));
+['sel5_efp','sel5_view','sel5_metric'].forEach(id=>document.getElementById(id).addEventListener('change',r5));
 ['sel6_unit','sel6_method','sel6_merged'].forEach(id=>document.getElementById(id).addEventListener('change',r6));
 ['sel7_view','sel7_metric10','sel7_model','sel7_efp','sel7_win','sel7v_metric','sel7v_win','sel7v_style'].forEach(id=>document.getElementById(id).addEventListener('change',r7));
 ['sel8_model','sel8_win','sel8_method','sel8_merged','sel8v_metric'].forEach(id=>document.getElementById(id).addEventListener('change',r8));
@@ -704,5 +783,33 @@ renderAll();
 """
 
 html = head + header + s0 + "\n" + body + new_sections + s13 + s14 + tail + "\n" + script
+
+# ---------------------------------------------------------------- dataset naming (user, 2026-10-01)
+# V2.2 EFP (93) | V2.2 Flux (93) | V4.1 EFP (106) | V4.1 Flux (102). "V2.2" = the analysis so far called
+# V10 (deadtrees v2-2 maps); folders, scripts and file names keep "V10" / "v10". Applied as a last pass
+# to visible text only: <code> spans (paths), tag attributes and the product names "deadtrees v2-2 /
+# v4.1" are left alone.
+NAMES = [("V10 · tree cover &ge;30% (93)", "V2.2 EFP (93)"), ("V10 · tree cover \\u226530% (93)", "V2.2 EFP (93)"),
+         ("V10 · flux totals (93)", "V2.2 Flux (93)"), ("v4.1 paper dataset (106)", "V4.1 EFP (106)"),
+         ("v4.1 · flux totals (102)", "V4.1 Flux (102)"),
+         ("V10 · tree cover &ge;30%", "V2.2 EFP"), ("V10 · flux totals", "V2.2 Flux"), ("V10 flux totals", "V2.2 Flux"),
+         ("v4.1 paper dataset", "V4.1 EFP"), ("v4.1 · flux totals", "V4.1 Flux"), ("v4.1 flux totals", "V4.1 Flux")]
+for a_, b_ in NAMES:
+    html = html.replace(a_, b_)
+cut_ = html.index("<script>")
+def _visible(txt):
+    out = []
+    for part in re.split(r"(<code>.*?</code>|<[^>]+>)", txt, flags=re.S):      # keep code spans and tags as they are
+        if not part.startswith("<"):
+            part = re.sub(r"\bV10\b", "V2.2", part)
+            part = re.sub(r"(?<!deadtrees )\bv4\.1\b", "V4.1", part)
+        out.append(part)
+    return "".join(out)
+html = _visible(html[:cut_]) + html[cut_:]
+note = ('    <p class="itxt"><b>Naming.</b> <b>V2.2</b> is the analysis previously called V10 (deadtrees v2-2 maps, 93 sites); '
+        '<b>V4.1</b> is the new paper dataset (deadtrees v4.1 maps). Folder and file names still use <code>V10</code>.</p>\n')
+anchor = '    <table class="deftbl">\n      <thead><tr><th>Dataset</th><th>Sites</th>'
+assert html.count(anchor) == 1
+html = html.replace(anchor, note + anchor)
 OUT.write_text(html)
 print(f"written {OUT} ({len(html)/1024:.0f} KB)")

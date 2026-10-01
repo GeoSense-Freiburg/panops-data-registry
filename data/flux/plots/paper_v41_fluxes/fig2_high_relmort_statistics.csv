@@ -1,0 +1,17 @@
+learner,response,grp,median_pct,sites_improved,p,q,sig
+XGBoost (Optuna),GPP_gs,12m,-13.51,78.3,0.0127,0.0508,ns
+XGBoost (Optuna),GPP_gs,24m,-10.46,73.9,0.00269,0.0259,*
+LightGBM (Optuna),GPP_gs,12m,-14.76,82.6,0.0127,0.0508,ns
+LightGBM (Optuna),GPP_gs,24m,-15.37,82.6,0.00324,0.0259,*
+XGBoost (Optuna),NEP_gs,12m,-2.63,56.5,0.21,0.336,ns
+XGBoost (Optuna),NEP_gs,24m,-5.41,65.2,0.266,0.388,ns
+LightGBM (Optuna),NEP_gs,12m,-6.08,65.2,0.109,0.242,ns
+LightGBM (Optuna),NEP_gs,24m,-1.88,56.5,0.375,0.5,ns
+XGBoost (Optuna),ET_gs,12m,7.75,26.1,0.954,0.954,ns
+XGBoost (Optuna),ET_gs,24m,3.38,47.8,0.637,0.741,ns
+LightGBM (Optuna),ET_gs,12m,3.03,30.4,0.853,0.91,ns
+LightGBM (Optuna),ET_gs,24m,-0.64,52.2,0.648,0.741,ns
+XGBoost (Optuna),WUE_gs,12m,-1.58,60.9,0.14,0.249,ns
+XGBoost (Optuna),WUE_gs,24m,-12.92,69.6,0.0173,0.0552,ns
+LightGBM (Optuna),WUE_gs,12m,-2.27,56.5,0.121,0.242,ns
+LightGBM (Optuna),WUE_gs,24m,-9.24,73.9,0.088,0.235,ns

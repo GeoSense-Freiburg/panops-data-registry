@@ -34,10 +34,10 @@ AXIS_COL <- "#CCCCCC"
 # Category levels + fill colors depend on merge mode
 if (MERGE) {
   LEVELS <- c("Low+Mid", "High")
-  FILL_MAP <- setNames(c("#4DAECC", "#E8257A"), LEVELS)
+  FILL_MAP <- setNames(c("#B5CC45", "#EE6FA8"), LEVELS)   # yellowish green / pink (Fig 3b scale, CVD-checked)
 } else {
   LEVELS <- c("Low", "Mid", "High")
-  FILL_MAP <- setNames(c("#4DAECC", "#F0A500", "#E8257A"), LEVELS)
+  FILL_MAP <- setNames(c("#006D5B", "#F0E442", "#EE6FA8"), LEVELS)   # teal / yellow / pink (Fig 3b scale, CVD-checked)
 }
 
 EFP_ORDER <- c("GPPsat", "NEPmax", "ETmax", "uWUE", "WUE")

@@ -19,7 +19,9 @@ source("scripts/paper_v41/paper_common.R")
 OUT <- PAPER_FIG; dir.create(OUT, showWarnings = FALSE, recursive = TRUE)
 
 BG <- "white"; PANEL <- "white"; GRID <- "#D9D9D9"; TXT <- "#111111"; AX <- "#444444"
-CAT_COLS <- c("Low+Mid" = "#22C4E0", "High" = "#E8257A")
+# class colours on the Fig 3b teal -> yellow -> pink scale (colour-vision-deficiency checked: CIEDE2000 >= 28
+# between the two under simulated deutan / protan / tritan)
+CAT_COLS <- c("Low+Mid" = "#B5CC45", "High" = "#EE6FA8")
 EFP_LAB <- RESP_UNITS   # active response set (paper_common.R)
 PN <- paper_n()
 # 2026-09-09: repointed to true_24m/ - see plot_draft_fig2_M3M4.R for why.

@@ -5,6 +5,7 @@
 # lag2-corrected 24m models (true_24m). No refitting - SHAP was computed by the V10 runs.
 #   derived_tables/paper_v10_efp/paper_dataset_v10_efp.csv   site-years with IGBP, EFPs, mortality metrics
 #   derived_tables/paper_v10_efp/models/<L>_site_signed_shap_M4.csv   copied from <L>_v10_true24m_optuna/
+#   derived_tables/paper_v10_efp/models/<L>_predictions_repCV.csv     M3/M4 rows of <L>_optuna_repCV_true24m/
 # Then e.g.  PAPER_RESP_SET=v10efp Rscript scripts/paper_v41/25_fig3b_site_signed_shap.R XGB
 # ============================================================================
 suppressMessages(library(data.table))
@@ -27,5 +28,9 @@ for (L in c("XGB", "LGB")) {
   s <- fread(file.path(B, sprintf("%s_v10_true24m_optuna/%s_site_signed_shap_M4.csv", L, L)))
   stopifnot(uniqueN(s$test_site) == 93, all(c("M4_12m", "M4_24m") %in% s$model))
   fwrite(s, file.path(OUT, "models", sprintf("%s_site_signed_shap_M4.csv", L)))
+  # repeated-CV predictions (3 x 80 %), M3 and M4 only, for Fig 2 and its high-disturbance version
+  p <- fread(file.path(B, sprintf("%s_optuna_repCV_true24m/%s_predictions_LOSO.csv", L, L)))[grepl("^M[34]_(12m|24m)$", model)]
+  stopifnot(uniqueN(p$SITE_ID) == 93)
+  fwrite(p, file.path(OUT, "models", sprintf("%s_predictions_repCV.csv", L)))
 }
 cat(sprintf("written %s: %d site-years, %d sites; signed SHAP for XGB and LGB\n", OUT, nrow(d), uniqueN(d$SITE_ID)))
