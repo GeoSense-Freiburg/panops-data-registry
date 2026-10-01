@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>Circularity of climate predictors for EFPs: where Miguel is right, where the analysis can fight back</title><style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0D0D0D;color:#E0E0E0;font-family:Arial,Helvetica,sans-serif;line-height:1.6;padding:28px 18px 60px}
+a{color:#22D4EB;text-decoration:none} a:hover{text-decoration:underline}
+.wrap{max-width:900px;margin:0 auto}
+.nav{font-size:.85em;color:#6B7280;margin-bottom:22px} .nav a{margin-right:14px}
+h1{font-size:1.65em;color:#fff;line-height:1.25;margin-bottom:6px;letter-spacing:-.01em}
+.article h1{display:none}
+.article h2{font-size:1.3em;color:#22D4EB;margin:34px 0 12px;padding-bottom:6px;border-bottom:1px solid #22D4EB55}
+.article h3{font-size:1.1em;color:#E5E7EB;margin:24px 0 8px}
+.article h4{font-size:1em;color:#9CA3AF;margin:18px 0 6px}
+.article p{margin:10px 0} .article ul,.article ol{margin:8px 0 8px 24px} .article li{margin:4px 0}
+.article hr{border:0;border-top:1px solid #2A2A3A;margin:26px 0}
+.article blockquote{border-left:3px solid #22D4EB;padding:2px 14px;color:#9CA3AF;margin:12px 0}
+.article code{background:#1F2937;border-radius:4px;padding:1px 5px;font-size:.88em;color:#A7F3D0;font-family:Consolas,Menlo,monospace}
+.article pre{background:#111827;border:1px solid #2A2A3A;border-radius:8px;padding:12px 14px;overflow-x:auto;margin:12px 0}
+.article pre code{background:none;padding:0;color:#E5E7EB}
+.tw{overflow-x:auto;margin:14px 0}
+.article table{border-collapse:collapse;font-size:.88em;min-width:60%}
+.article th{background:#1F2937;color:#22D4EB;text-align:left}
+.article th,.article td{border:1px solid #2A2A3A;padding:6px 10px;vertical-align:top}
+.article tr:nth-child(even) td{background:#111827}
+.article img{max-width:100%;height:auto;background:#fff;border-radius:6px;margin:12px 0 4px;display:block}
+.article em{color:#9CA3AF}
+.badge{display:inline-block;font-size:.75em;background:#1F2937;border:1px solid #374151;border-radius:4px;padding:2px 8px;color:#9CA3AF;margin-right:6px}
+.meta{margin:6px 0 22px}
+.footer{margin-top:50px;font-size:.75em;color:#4B5563;text-align:center}
+
+.month{font-size:1.05em;color:#22D4EB;margin:34px 0 12px;padding-bottom:6px;border-bottom:1px solid #22D4EB55}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.card{display:flex;flex-direction:column;gap:8px;background:#111827;border:1px solid #2A2A3A;border-radius:12px;padding:20px 20px;color:#E0E0E0;transition:border-color .2s,transform .15s}
+.card:hover{border-color:#22D4EB;transform:translateY(-2px);text-decoration:none}
+.card-title{font-size:1.02em;font-weight:bold;color:#22D4EB;line-height:1.3}
+.card-desc{font-size:.83em;color:#9CA3AF;line-height:1.5}
+.card-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto;padding-top:4px}
+.tag{font-size:.72em;background:#1F2937;border:1px solid #374151;border-radius:4px;padding:2px 8px;color:#6B7280}
+#q{width:100%;background:#111827;border:1px solid #2A2A3A;border-radius:8px;color:#E0E0E0;padding:10px 14px;font-size:.95em;margin:14px 0 4px}
+#q:focus{outline:none;border-color:#22D4EB}
+.sub{color:#9CA3AF;font-size:.9em}
+</style></head>
+<body><div class="wrap">
+<div class="nav"><a href="index.html">&larr; Daily reports</a><a href="../index.html">Hub</a></div>
+<h1>Circularity of climate predictors for EFPs: where Miguel is right, where the analysis can fight back</h1><div class="meta"><span class="badge">2026-09-24</span><span class="badge">4 figures</span><span class="badge">1 table</span></div>
+<div class="article"><h1 id="circularity-of-climate-predictors-for-efps-where-miguel-is-right-where-the-analysis-can-fight-back">Circularity of climate predictors for EFPs: where Miguel is right, where the analysis can fight back</h1>
+<p><strong>Date:</strong> 2026-09-24 <strong>Question addressed:</strong> how serious is the conceptual circularity Miguel raised at the 2026-09-14 FORTRACK meeting (climate variables used to predict EFPs that are themselves derived from those variables), how much of it the analysis defends against, and what to do about it. Written from the two key papers (Reichstein et al. 2014, Migliavacca et al. 2021) plus the EFP code, and deliberately independent of the post-meeting tests (see the end for how those fit in).</p>
+<p><strong>Short version:</strong> Miguel is right about the mechanism, but the consequence falls mainly on what can be said about <em>climate</em>, not on the mortality result.</p>
+<hr />
+<h2 id="1-where-miguel-is-right">1. Where Miguel is right</h2>
+<ul>
+<li><strong>The EFPs embed climate variables that are also predictors.</strong> From <code>notebooks/14_calc_EFPs.ipynb</code> (<code>EFPcalc_year()</code>), confirmed against the Methods of Migliavacca et al. 2021:</li>
+</ul>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>EFP</th>
+<th>climate quantities inside its own derivation</th>
+<th>how</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GPPsat</td>
+<td>radiation (continuous), temperature</td>
+<td>light-response curve; growing-season filter; upstream Reco partitioning</td>
+</tr>
+<tr>
+<td>NEPmax</td>
+<td>radiation (threshold only)</td>
+<td>daytime filter</td>
+</tr>
+<tr>
+<td>ETmax</td>
+<td>temperature</td>
+<td>LE to ET conversion</td>
+</tr>
+<tr>
+<td>WUE / uWUE</td>
+<td>temperature, VPD</td>
+<td>GPP/ET; uWUE = GPP x sqrt(VPD) / ET</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li><strong>Lagging does not fully dissolve it.</strong> The climate block is the prior 12 (or 24) months, never same-year, so there is no literal reuse of data. But last year's climate is a good proxy for this year's at the same site, so the baseline model can partly rediscover the EFP definition.</li>
+<li><strong>Leave-one-site-out CV does not help here.</strong> It stops site-identity leakage; a definitional link generalises to held-out sites just as well.</li>
+<li><strong>Consequence:</strong> the climate block cannot be interpreted. No "climate explains X%", and no climate-versus-disturbance importance shares.</li>
+<li><strong>The precedent papers do not match this exact design.</strong> Migliavacca et al. use site-mean climate and between-site variation; this analysis uses lagged monthly climate at the site-year level.</li>
+</ul>
+<h2 id="2-where-the-analysis-can-fight-back">2. Where the analysis can fight back</h2>
+<ul>
+<li><strong>The estimand is the increment from mortality.</strong> M3 and M4 differ only in the disturbance block, which comes from an independent satellite product (no shared derivation with the tower data). Climate-EFP coupling makes the baseline stronger, which works <em>against</em> finding a mortality effect. Not airtight: climate and mortality are correlated, so the two blocks can trade information.</li>
+<li><strong>Dropping climate would be worse.</strong> Drought stresses ecosystems and kills trees; without a climate block the mortality effect is confounded.</li>
+<li><strong>EFPs are not tautological with climate (Reichstein et al. 2014).</strong> The abstract reports that correlations between an EFP (seasonal carbon-use efficiency) and climate or environmental variables "remain below 0.6, leaving almost 70% of variance unexplained" (Fig. 3, p. 13700). The residual is attributed to traits and to processes that set carbon residence time, explicitly including disturbance events such as fire (p. 13699). That is the rationale for a disturbance block.</li>
+<li><strong>The reference EFP paper does the same thing (Migliavacca et al. 2021).</strong> It predicts EFP principal components from mean Tair, VPD, SWin, precipitation and CSWI alongside vegetation structure, with random-forest importance (p. 469, Fig. 3, p. 471). Coauthors include Reichstein, Mahecha, Musavi and Nelson.</li>
+<li><strong>The hypothesis is already stated there.</strong> p. 470: "Consider two contiguous plots of forest experiencing the same climate conditions, one disturbed and the other not", with the undisturbed one expected to have higher maximum photosynthesis and NEP. p. 471: land surface models "lack flexibility in representing the response of respiration rates and carbon-use efficiency to climate, nutrients, disturbances and substrate availability".</li>
+<li><strong>Circularity cannot manufacture a dose-response in the disturbance variable.</strong> The signed disturbance SHAP falls with relative disturbance (rho about -0.5 to -0.7 at 24 m, Fig. 5 panel E).</li>
+</ul>
+<p><a href="img/fig5_igbp_board_24m.png" target="_blank"><img src="img/fig5_igbp_board_24m.png" loading="lazy" alt="Fig. 5 IGBP board, 24 m window" /></a></p>
+<p><em>Fig. 5 board (24 m window). Panel E is the relevant one: each point is a site, x = relative disturbance, y = net signed disturbance SHAP (effect on the predicted EFP). The line is a linear fit with Spearman rho and BH-FDR stars. The downward trend is a dose-response in the disturbance variable itself, which a climate-EFP definitional link cannot produce.</em></p>
+<h2 id="3-what-the-fight-back-does-not-cover">3. What the fight-back does not cover</h2>
+<ul>
+<li>Baseline skill and any interpretation of the climate block.</li>
+<li>Causal wording. Migliavacca et al. warn that regression dependencies are causal only in the absence of hidden confounders and test this with invariant causal prediction. "Effect of tree mortality on EFPs" should be worded as an association conditional on climate and traits unless causality can be defended.</li>
+<li>Disturbance partly standing in for missing climate information (see section 5).</li>
+</ul>
+<h2 id="4-recommended-actions-in-order-of-value-for-cost">4. Recommended actions, in order of value for cost</h2>
+<ol type="1">
+<li><p><strong>Reframe (no new analysis).</strong> Climate is a confounder control; the M3 to M4 increment is the estimand. Use associational language, do not interpret climate importance, cite Reichstein 2014 and Migliavacca 2021.</p></li>
+<li><p><strong>Keep the climate-exclusion check as one Methods/Supplement paragraph.</strong> It turns the argument into evidence (section 5).</p></li>
+<li><p><strong>Put the flux-totals result in the supplement as robustness</strong> (section 5).</p></li>
+<li><p><strong>Static long-term climate descriptors only if a coauthor or reviewer pushes</strong> (René's suggestion, also what Migliavacca et al. do). It would also probe the "substitution" reading.</p></li>
+</ol>
+<p>Not recommended now: restructuring the main analysis, or the NDVI/LAI/AGB alternative predictors (heavy, and NDVI overlaps with the spectral origin of the disturbance product, as Clemens noted).</p>
+<h2 id="5-how-the-post-meeting-tests-fit-evidence-not-needed-for-the-argument-above">5. How the post-meeting tests fit (evidence, not needed for the argument above)</h2>
+<ul>
+<li><strong>Climate-exclusion check</strong> (each EFP's own derivation variables dropped, plus a precipitation-only extreme; XGBoost/LightGBM, LOSO and repeated CV, 99-rep permutation): the disturbance gain persisted at -9% to -16% (p = 0.01) for GPPsat, NEPmax and WUE; ETmax stayed null. The gain often <em>grew</em> as climate was removed, which is why the claim should be "adds information beyond climate and traits", not "is the cause".</li>
+</ul>
+<p><a href="img/circularity_test_for_miguel.png" target="_blank"><img src="img/circularity_test_for_miguel.png" loading="lazy" alt="Circularity check, simplified" /></a></p>
+<p><em>Simplified version (XGBoost, repeated CV 3x80%). Bars are prediction error (RMSE, lower is better) without and with mortality, once with all climate variables and once with each EFP's own climate driver excluded. Mortality lowers the error for GPPsat, NEPmax and WUE in both cases; ETmax stays flat.</em></p>
+<p><a href="img/circularity_test_summary.png" target="_blank"><img src="img/circularity_test_summary.png" loading="lazy" alt="Circularity check, full technical version" /></a></p>
+<p><em>Full version: change in RMSE from adding mortality (negative = improvement) across scenarios (all climate, own-derivation variables dropped, precipitation only), for XGBoost (LOSO and repeated CV) and LightGBM (repeated CV). Point shape shows the 99-rep permutation result (filled = p &lt; 0.05). Precipitation-only and baseline were not run under repeated CV, so those points are absent, not zero.</em></p>
+<ul>
+<li><strong>Circularity-free response</strong> (growing-season accumulated flux totals from raw FLUXNET daily data, <code>predict_fluxes/</code>): GPP -9 to -11%, WUE -7.5 to -8%, NEP about -5% (p = 0.01 each); RECO and ET null. Same significance pattern as the EFPs, smaller effects.</li>
+</ul>
+<p><a href="img/M3_M4_flux_totals_window_compare.png" target="_blank"><img src="img/M3_M4_flux_totals_window_compare.png" loading="lazy" alt="Flux totals, 12m vs 24m window" /></a></p>
+<p><em>Change in RMSE from adding disturbance for growing-season accumulated GPP, NEP, RECO, ET and WUE, at the 12 m (lag 1) and 24 m (lag 1+2) climate and disturbance windows, with permutation p-values. These totals are plain sums, so they cannot share the climate dependency of the fitted EFPs. The 12 m window is slightly stronger; RECO is borderline at 12 m (p = 0.06) and ET is null at both.</em></p>
+<h2 id="provenance">Provenance</h2>
+<ul>
+<li>Reichstein M. et al. (2014), <em>Linking plant and ecosystem functional biogeography</em>, PNAS 111(38):13697-13702.</li>
+<li>Migliavacca M. et al. (2021), <em>The three major axes of terrestrial ecosystem function</em>, Nature 598:468-472. Only the main text and the start of Methods were read; Extended Data and the Supplement (including the invariant causal prediction details) were not.</li>
+<li>Both PDFs are in <code>manuscript/key papers/</code> and are not tracked in git (copyright).</li>
+<li>EFP code: <code>notebooks/14_calc_EFPs.ipynb</code>, <code>EFPcalc_year()</code>. Earlier report: <code>daily_reports/2026-09-17-efp-calculation-and-circularity.md</code>.</li>
+</ul>
+</div>
+<div class="footer">FluxNet &times; Mortality &middot; generated from daily_reports/*.md</div>
+</div></body></html>

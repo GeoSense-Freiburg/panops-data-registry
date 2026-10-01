@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>Daily Report — 2026-06-29</title><style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0D0D0D;color:#E0E0E0;font-family:Arial,Helvetica,sans-serif;line-height:1.6;padding:28px 18px 60px}
+a{color:#22D4EB;text-decoration:none} a:hover{text-decoration:underline}
+.wrap{max-width:900px;margin:0 auto}
+.nav{font-size:.85em;color:#6B7280;margin-bottom:22px} .nav a{margin-right:14px}
+h1{font-size:1.65em;color:#fff;line-height:1.25;margin-bottom:6px;letter-spacing:-.01em}
+.article h1{display:none}
+.article h2{font-size:1.3em;color:#22D4EB;margin:34px 0 12px;padding-bottom:6px;border-bottom:1px solid #22D4EB55}
+.article h3{font-size:1.1em;color:#E5E7EB;margin:24px 0 8px}
+.article h4{font-size:1em;color:#9CA3AF;margin:18px 0 6px}
+.article p{margin:10px 0} .article ul,.article ol{margin:8px 0 8px 24px} .article li{margin:4px 0}
+.article hr{border:0;border-top:1px solid #2A2A3A;margin:26px 0}
+.article blockquote{border-left:3px solid #22D4EB;padding:2px 14px;color:#9CA3AF;margin:12px 0}
+.article code{background:#1F2937;border-radius:4px;padding:1px 5px;font-size:.88em;color:#A7F3D0;font-family:Consolas,Menlo,monospace}
+.article pre{background:#111827;border:1px solid #2A2A3A;border-radius:8px;padding:12px 14px;overflow-x:auto;margin:12px 0}
+.article pre code{background:none;padding:0;color:#E5E7EB}
+.tw{overflow-x:auto;margin:14px 0}
+.article table{border-collapse:collapse;font-size:.88em;min-width:60%}
+.article th{background:#1F2937;color:#22D4EB;text-align:left}
+.article th,.article td{border:1px solid #2A2A3A;padding:6px 10px;vertical-align:top}
+.article tr:nth-child(even) td{background:#111827}
+.article img{max-width:100%;height:auto;background:#fff;border-radius:6px;margin:12px 0 4px;display:block}
+.article em{color:#9CA3AF}
+.badge{display:inline-block;font-size:.75em;background:#1F2937;border:1px solid #374151;border-radius:4px;padding:2px 8px;color:#9CA3AF;margin-right:6px}
+.meta{margin:6px 0 22px}
+.footer{margin-top:50px;font-size:.75em;color:#4B5563;text-align:center}
+
+.month{font-size:1.05em;color:#22D4EB;margin:34px 0 12px;padding-bottom:6px;border-bottom:1px solid #22D4EB55}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.card{display:flex;flex-direction:column;gap:8px;background:#111827;border:1px solid #2A2A3A;border-radius:12px;padding:20px 20px;color:#E0E0E0;transition:border-color .2s,transform .15s}
+.card:hover{border-color:#22D4EB;transform:translateY(-2px);text-decoration:none}
+.card-title{font-size:1.02em;font-weight:bold;color:#22D4EB;line-height:1.3}
+.card-desc{font-size:.83em;color:#9CA3AF;line-height:1.5}
+.card-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto;padding-top:4px}
+.tag{font-size:.72em;background:#1F2937;border:1px solid #374151;border-radius:4px;padding:2px 8px;color:#6B7280}
+#q{width:100%;background:#111827;border:1px solid #2A2A3A;border-radius:8px;color:#E0E0E0;padding:10px 14px;font-size:.95em;margin:14px 0 4px}
+#q:focus{outline:none;border-color:#22D4EB}
+.sub{color:#9CA3AF;font-size:.9em}
+</style></head>
+<body><div class="wrap">
+<div class="nav"><a href="index.html">&larr; Daily reports</a><a href="../index.html">Hub</a></div>
+<h1>Daily Report — 2026-06-29</h1><div class="meta"><span class="badge">2026-06-29</span><span class="badge">2 tables</span></div>
+<div class="article"><h1 id="daily-report--2026-06-29">Daily Report — 2026-06-29</h1>
+<hr />
+<h2 id="earlier-in-session-before-context-compaction">Earlier in session (before context compaction)</h2>
+<p><strong>WUE added alongside uWUE across all scripts</strong></p>
+<ul>
+<li>Kept uWUE and added WUE as a 5th EFP in <code>plot_14</code> through <code>plot_20</code> (all violin, RF performance, and threshold plots)</li>
+<li>RF runs for WUE completed (<code>run_32</code>), merge script (<code>run_33</code>) appended WUE rows to main CSVs without dropping uWUE</li>
+<li>Created <code>run_34_RF_shap_WUE_anomaly.R</code> and launched SHAP computation in <code>wue_shap</code> tmux session</li>
+</ul>
+<p><strong>Delta RMSE sign flipped</strong> in all threshold plots (16–19)</p>
+<ul>
+<li>Changed from <code>RMSE(without D) − RMSE(with D)</code> → <code>RMSE(with D) − RMSE(without D)</code> so negative = disturbance improved the model</li>
+</ul>
+<p><strong>Methods section rewritten</strong> in <code>sn-article.tex</code></p>
+<ul>
+<li>Correct numbers: 166 sites, 644 site-years, 5 EFPs, 130 disturbance vars, M01–M08 table, LOSO-CV, delta RMSE equation</li>
+</ul>
+<p><strong>Zotero sync set up</strong></p>
+<ul>
+<li>Connected to "Tree mortality" collection (user ID 7361769, collection 4B2EEQ27)</li>
+<li>13 entries added to <code>sn-bibliography.bib</code>; <code>manuscript/sync_zotero.sh</code> created for future syncs</li>
+</ul>
+<hr />
+<h2 id="main-session--2026-06-29">Main session — 2026-06-29</h2>
+<p><strong>Flux data quality analysis</strong></p>
+<ul>
+<li>Spawned an agent to check all 5 EFPs and 4 meteo variables across 233 sites / 1,535 site-years / 20,664 site-months from 9 networks (AMF, ICOS, EUF, CNF, JPF, KOF, TERN, FLX, SAEON)</li>
+<li>Generated <code>reports/data_quality_report.md</code> (594 lines)</li>
+</ul>
+<h3 id="key-findings">Key findings</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Status</th>
+<th>Finding</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>🚨</td>
+<td><strong>CD-Ygb (ICOS)</strong> — VPD in Pa not hPa; divide by 100 (→ 14–21 hPa, plausible for tropical DRC)</td>
+</tr>
+<tr>
+<td>🚨</td>
+<td><strong>US-HB4 (AMF)</strong> — precipitation up to 39,000 mm/month; instrument error, exclude 6 months</td>
+</tr>
+<tr>
+<td>🚨</td>
+<td><strong>GPPsat / uWUE / WUE ~21.5% missing</strong> — concentrated in 72 sites where <code>Gavail=no</code> (EBF and DNF worst at ~62%)</td>
+</tr>
+<tr>
+<td>🚨</td>
+<td><strong>13 negative WUE/uWUE values</strong> in 6 AMF sites (CA-PB1, US-EML, US-xMB, US-xML, US-xNW, US-xYE); near-zero numerical artifacts</td>
+</tr>
+<tr>
+<td>⚠️</td>
+<td><strong>CN-Sb1 / CN-Sb2</strong> — WUE/uWUE outliers z-scores 6–14; likely rice paddy / cropland</td>
+</tr>
+<tr>
+<td>⚠️</td>
+<td><strong>KOF KR-SmM &amp; TERN AU-How</strong> — only GPP_DT_VUT_REF available, no NT partitioning</td>
+</tr>
+<tr>
+<td>⚠️</td>
+<td><strong>AMF uses hourly (<em>HR</em>) not half-hourly</strong> — <code>n_obs ≥ 1488</code> thresholds need halving (~744)</td>
+</tr>
+<tr>
+<td>✓</td>
+<td>All other unit checks passed: TA, SW_IN, VPD (excluding CD-Ygb), no negative ET</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="files-created">Files created</h3>
+<ul>
+<li><code>reports/data_quality_report.md</code> — full markdown report with stats tables</li>
+<li><code>scripts/inject_dq_section.py</code> — injects DQ section into disturbance_dashboard.html (local)</li>
+<li><code>scripts/build_dq_page.py</code> — builds standalone dark-theme page for GitHub Pages</li>
+</ul>
+<p><strong>Visual HTML data quality section</strong> injected into <code>manuscript/site_disturbance_history/disturbance_dashboard.html</code></p>
+<ul>
+<li>6 KPI cards, alert banners, EFP violin+box chart, missing data heatmap, meteo stats table</li>
+</ul>
+<p><strong>GitHub Pages — <code>negin-katal/fluxVSmortality</code></strong></p>
+<ul>
+<li>New page <code>data_quality.html</code> (dark theme, 142 KB): EFP violins, missing heatmap, outlier scatter, year coverage, network TA/VPD comparison, all stats tables</li>
+<li><code>index.html</code> updated with a "📊 Data Quality Report" card (3rd card on hub)</li>
+<li><code>mortality.html</code>: deadwood standing color changed from <code>#8FBC45</code> (green) → <code>#A0835A</code> (grey-brown / bleached bark)</li>
+</ul>
+<h3 id="commits-pushed-today">Commits pushed today</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Repo</th>
+<th>Commit</th>
+<th>Message</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>negin-katal/fluxVSmortality</code></td>
+<td>7778285</td>
+<td>Add data quality report page and hub card</td>
+</tr>
+<tr>
+<td><code>negin-katal/fluxVSmortality</code></td>
+<td>57146b0</td>
+<td>Change deadwood standing color to grey-brown</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="pending--next-steps">Pending / next steps</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />Wait for <code>wue_shap</code> tmux session (<code>run_34_RF_shap_WUE_anomaly.R</code>) to finish → merge SHAP → rerun <code>plot_17</code></label></li>
+<li><label><input type="checkbox" />Fix CD-Ygb VPD (divide by 100) in monthly meteo CSV and re-run EFPs if needed</label></li>
+<li><label><input type="checkbox" />Exclude US-HB4 anomalous precipitation months from meteo CSV</label></li>
+<li><label><input type="checkbox" />Decide on CN-Sb1 / CN-Sb2: exclude or flag as cropland in sensitivity analysis</label></li>
+<li><label><input type="checkbox" />Results section of manuscript: needs rewrite with actual RF output numbers</label></li>
+</ul>
+</div>
+<div class="footer">FluxNet &times; Mortality &middot; generated from daily_reports/*.md</div>
+</div></body></html>

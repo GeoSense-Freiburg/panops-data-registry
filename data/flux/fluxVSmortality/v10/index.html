@@ -92,8 +92,8 @@
 <body>
 <header>
   <div class="hwrap">
-    <h1>Disturbance effects on ecosystem functional properties · V10 and v4.1</h1>
-    <p class="sub">Optuna-tuned learners on the tree-cover &ge;30&nbsp;% datasets: V10 (deadtrees v2-2, 93 sites) and the
+    <h1>Disturbance effects on ecosystem functional properties · V2.2 and V4.1</h1>
+    <p class="sub">Optuna-tuned learners on the tree-cover &ge;30&nbsp;% datasets: V2.2 (deadtrees v2-2, 93 sites) and the
       new paper dataset (deadtrees v4.1, 106 sites), each with the EFPs or with growing-season flux totals as the
       response — interactive browser</p>
     <div class="toprow">
@@ -102,10 +102,10 @@
         <button data-cv="rep">Repeated CV (3x80%)</button>
       </div>
       <div class="toggle" id="dsToggle">
-        <button data-ds="sites_with_high_Tcover" class="active">V10 · tree cover &ge;30% (93)</button>
-        <button data-ds="v10f">V10 · flux totals (93)</button>
-        <button data-ds="v41">v4.1 paper dataset (106)</button>
-        <button data-ds="v41f">v4.1 · flux totals (102)</button>
+        <button data-ds="sites_with_high_Tcover" class="active">V2.2 EFP (93)</button>
+        <button data-ds="v10f">V2.2 Flux (93)</button>
+        <button data-ds="v41">V4.1 EFP (106)</button>
+        <button data-ds="v41f">V4.1 Flux (102)</button>
       </div>
       <div class="toggle" id="cfgToggle" title="Learner - all tuned with Optuna (TPE, 50 trials)">
         <button data-cfg="rfopt">RF Optuna</button>
@@ -128,8 +128,8 @@
     <a href="#s8">8 · Grouped SHAP</a>
     <a href="#s9">9 · IGBP &amp; tree cover</a>
     <a href="#s10">10 · Disturbance block</a>
-    <a href="#s11">11 · V10 vs v4.1 · EFPs vs fluxes</a>
-    <a href="#s13">12 · Model structures</a><a href="#s14">13 · Decisions (V10)</a>
+    <a href="#s11">11 · V2.2 vs V4.1 · EFPs vs fluxes</a>
+    <a href="#s13">12 · Model structures</a><a href="#s14">13 · Decisions (V2.2)</a>
   </nav>
 </header>
 
@@ -140,28 +140,29 @@
     <p class="itxt">Two datasets, both restricted to sites with mean tree cover &ge;&nbsp;30&nbsp;% within 500&nbsp;m, and
       three learners, all tuned with <b>Optuna</b> (TPE, 50 trials, grouped 5-fold site CV). Switch between them at the
       top; every figure and the metrics table follow the switches.</p>
+    <p class="itxt"><b>Naming.</b> <b>V2.2</b> is the analysis previously called V10 (deadtrees v2-2 maps, 93 sites); <b>V4.1</b> is the new paper dataset (deadtrees v4.1 maps). Folder and file names still use <code>V10</code>.</p>
     <table class="deftbl">
       <thead><tr><th>Dataset</th><th>Sites</th><th>Site-years</th><th>Mortality maps</th><th>Models</th><th>CV</th><th>Learners</th></tr></thead>
       <tbody>
-        <tr><td class="k">V10 · tree cover &ge;30%</td><td>93</td><td>395</td><td>deadtrees v2-2</td><td>M1–M8 (raw / anomaly memory)</td><td>LOSO + repeated</td><td>RF, XGBoost, LightGBM</td></tr>
-        <tr class="add"><td class="k">v4.1 paper dataset</td><td>106</td><td>388</td><td>deadtrees v4.1</td><td>M3, M4 only</td><td>repeated only</td><td>XGBoost, LightGBM</td></tr>
-        <tr><td class="k">V10 · flux totals</td><td>93</td><td>372</td><td>deadtrees v2-2</td><td>M3, M4 only</td><td>repeated only</td><td>XGBoost, LightGBM</td></tr>
-        <tr class="add"><td class="k">v4.1 · flux totals</td><td>102</td><td>362</td><td>deadtrees v4.1</td><td>M3, M4 only</td><td>repeated only</td><td>XGBoost, LightGBM</td></tr>
+        <tr><td class="k">V2.2 EFP</td><td>93</td><td>395</td><td>deadtrees v2-2</td><td>M1–M8 (raw / anomaly memory)</td><td>LOSO + repeated</td><td>RF, XGBoost, LightGBM</td></tr>
+        <tr class="add"><td class="k">V4.1 EFP</td><td>106</td><td>388</td><td>deadtrees v4.1</td><td>M3, M4 only</td><td>repeated only</td><td>XGBoost, LightGBM</td></tr>
+        <tr><td class="k">V2.2 Flux</td><td>93</td><td>372</td><td>deadtrees v2-2</td><td>M3, M4 only</td><td>repeated only</td><td>XGBoost, LightGBM</td></tr>
+        <tr class="add"><td class="k">V4.1 Flux</td><td>102</td><td>362</td><td>deadtrees v4.1</td><td>M3, M4 only</td><td>repeated only</td><td>XGBoost, LightGBM</td></tr>
       </tbody>
     </table>
-    <p class="itxt" style="margin-top:10px"><b>v4.1 · flux totals</b> is the v4.1 paper dataset with the four EFPs
+    <p class="itxt" style="margin-top:10px"><b>V4.1 Flux</b> is the V4.1 EFP with the four EFPs
       replaced by growing-season totals from the half-hourly FLUXNET data: GPP and NEP (g&nbsp;C&nbsp;m<sup>&minus;2</sup>),
       ET (mm) and WUE = GPP/ET (g&nbsp;C&nbsp;mm<sup>&minus;1</sup>), summed over the same growing-season days as the EFPs.
       Identical predictors and pipeline. A seasonal sum is deflated by missing data, so site-years with &lt;&nbsp;80&nbsp;%
       of the growing season present are dropped (26 of 388; CA-LU1, US-GLE, US-NC3 and US-SHC lose all years).</p>
-    <p class="itxt" style="margin-top:10px"><b>V10 · flux totals</b> uses the V10 predictors (deadtrees v2-2, V10 climate
+    <p class="itxt" style="margin-top:10px"><b>V2.2 Flux</b> uses the V2.2 predictors (deadtrees v2-2, V2.2 climate
       lags, traits and 11-family mortality block; 93 sites) with exactly the same flux totals, completeness gate (23 of
-      395 site-years dropped, no site lost), tuning, repeated CV, SHAP and figures as the v4.1 flux set, so the two flux
+      395 site-years dropped, no site lost), tuning, repeated CV, SHAP and figures as the V4.1 flux set, so the two flux
       sets differ only in their predictors and site-years. It replaces the earlier <code>predict_fluxes/</code> run
       (daily files, GPP<sub>sat</sub> tuning reused, no SHAP), whose results are kept in that folder.</p>
-    <p class="itxt" style="margin-top:10px">With either <b>v4.1</b> dataset or the V10 flux totals selected, <span class="pill">RF Optuna</span> and
+    <p class="itxt" style="margin-top:10px">With either <b>V4.1</b> dataset or the V2.2 Flux selected, <span class="pill">RF Optuna</span> and
       <span class="pill">Leave-one-site-out</span> are greyed out because they were not run for it. Sections without a
-      v4.1 counterpart say so. What differs between the two datasets beyond the mortality maps (climate window, NEPmax
+      V4.1 counterpart say so. What differs between the two datasets beyond the mortality maps (climate window, NEPmax
       definition, traits, years) is listed in <a href="#s11">Section&nbsp;11</a>, together with a direct comparison of
       the results.</p>
 
@@ -214,10 +215,10 @@
     <p class="itxt">Predictor blocks:
       <span class="pill">C</span> climate,
       <span class="pill">T</span> plant traits,
-      <span class="pill">M</span> memory (the response's own previous-year value, V10 only),
+      <span class="pill">M</span> memory (the response's own previous-year value, V2.2 only),
       <span class="pill">D</span> disturbance / mortality metrics. Pairs that differ only by <span class="pill">D</span>
       isolate the effect of adding disturbance. Every model runs at a <b>12-month</b> and a <b>24-month</b> lag window.
-      <b>The v4.1 paper dataset uses only M3 and M4.</b></p>
+      <b>The V4.1 EFP uses only M3 and M4.</b></p>
     <table class="deftbl">
       <thead><tr><th>Model</th><th>Predictors</th><th>Adds disturbance?</th></tr></thead>
       <tbody>
@@ -252,7 +253,7 @@
     <div class="secnum">SECTION 1</div>
     <h2>Site distribution &amp; EFP characteristics</h2>
     <p class="desc">Global map of the analysed FLUXNET sites coloured by IGBP land-cover class (panel a), with the
-      distribution of each ecosystem functional property by IGBP class. v4.1: GPP<sub>sat</sub>, NEP<sub>max</sub>,
+      distribution of each ecosystem functional property by IGBP class. V4.1: GPP<sub>sat</sub>, NEP<sub>max</sub>,
       ET<sub>max</sub>, WUE (uWUE dropped).</p>
     <div class="imgwrap"><img id="img_fig1" loading="lazy" alt="site map"></div>
   </section>
@@ -271,7 +272,7 @@
     <div class="secnum">MODEL METRICS</div>
     <h2>Model metrics</h2>
     <p class="desc">Cross-validation metrics for every model × window × response of the selected dataset, learner
-      and CV structure (V10: 24 model configurations × 5 EFPs; v4.1: M3/M4 × 2 windows × 4 EFPs). Click a column
+      and CV structure (V2.2: 24 model configurations × 5 EFPs; V4.1: M3/M4 × 2 windows × 4 EFPs). Click a column
       header to sort; filter by response. R² cells are shaded from red (low) to green (high).</p>
     <div class="controls">
       <div class="ctrl"><label>Response (EFP)</label><select id="selm_resp"></select></div>
@@ -299,26 +300,30 @@
   <section id="s3">
     <div class="secnum">SECTION 3</div>
     <h2>Model performance &amp; effect of disturbance on RMSE</h2>
-    <p class="desc">Paired per-site RMSE (cyan = without disturbance, pink = with disturbance) for the four model
-      comparisons (C vs C+D, C+T vs C+T+D, C+M vs C+M+D, C+T+M vs C+T+D+M) across memory type × window.</p>
+    <p class="desc">Per-site RMSE without disturbance (cyan, M3 = climate + traits) and with it (pink, M4 = + mortality),
+      for XGBoost and LightGBM (Optuna) at the 12&nbsp;m and 24&nbsp;m windows, repeated CV (3&nbsp;×&nbsp;80&nbsp;%). The same
+      figure for all four datasets; it does not follow the learner and CV switches.</p>
     <p class="itxt"><b>Reading the labels.</b> Each pair carries three numbers:
       <span class="pill">%</span> the <b>median paired change</b> in per-site RMSE (negative = less error, green);
       <span class="pill">stars</span> a <b>one-sided paired Wilcoxon signed-rank test</b>, H<sub>1</sub>: adding D
-      <i>reduces</i> per-site RMSE, with Benjamini–Hochberg FDR applied across the 80 tests in the figure
+      <i>reduces</i> per-site RMSE, with Benjamini–Hochberg FDR across the 16 tests in the figure
       (*** q&lt;0.001, ** q&lt;0.01, * q&lt;0.05, ns); and <span class="pill">%↓</span> the share of sites whose RMSE
-      improved. Sites are paired on <code>SITE_ID</code>, so both models saw identical training data for each held-out
-      site. Full statistics (p, q, n, medians) are written to
-      <code>RMSE_disturbance_significance.csv</code> beside the figure.</p>
-    <p class="itxt"><b>Two caveats.</b> The effect size is the <i>median of the paired per-site changes</i>, not the
-      difference of the two medians — the latter ignores the pairing and disagreed in sign with the paired statistic in
-      half of the comparisons checked. And because LOSO models share training sites, the per-site errors are not fully
-      independent, which makes p-values mildly <b>anti-conservative</b>; strong results are safe, marginal ones
-      (q ≈ 0.05) should not be over-read.</p>
-    <div class="note v41only"><b>v4.1 and flux sets:</b> one figure for both learners (XGBoost and LightGBM Optuna, repeated CV
-      3&nbsp;×&nbsp;80&nbsp;%) and both windows, M3 vs M4 only. Same paired statistics: median per-site change,
-      one-sided Wilcoxon, BH-FDR across the 16 tests, share of sites improved. Numbers in
-      <code>plots/paper_v41/fig2_statistics.csv</code>.</div>
+      improved. Sites are paired on <code>SITE_ID</code>. Statistics are written to <code>fig2_statistics.csv</code>
+      (or <code>fig2_high_*_statistics.csv</code>) beside each figure.</p>
+    <p class="itxt"><b>Caveat.</b> The effect size is the <i>median of the paired per-site changes</i>, not the difference
+      of the two medians. Because the models share training sites, the per-site errors are not fully independent, which
+      makes p-values mildly <b>anti-conservative</b>; strong results are safe, marginal ones (q ≈ 0.05) should not be
+      over-read.</p>
+    <div class="controls">
+      <div class="ctrl"><label>Sites</label><select id="sel3_sites"></select></div>
+    </div>
+    <div class="note" id="note3_high" style="display:none"><b>High-disturbance sites only.</b> The same figure and
+      statistics restricted to the sites whose maximum disturbance across years lies above the natural break
+      (mean + 0.5&nbsp;SD over sites; the number of sites is given in the figure subtitle). Models are trained on all
+      sites; only the sites shown and tested change. With ~20–26 sites the tests have less power, so read the effect
+      size together with the stars.</div>
     <div class="imgwrap"><img id="img_rmse" loading="lazy" alt="paired RMSE"></div>
+    <div class="cap" id="cap_rmse"></div>
   </section>
 
   <!-- 4 -->
@@ -340,16 +345,22 @@
     <div class="secnum">SECTION 5</div>
     <h2>Site-specific ΔRMSE (diverging bars)</h2>
     <p class="desc">Per-site change in RMSE from adding disturbance (ΔRMSE = RMSE<sub>with D</sub> − RMSE<sub>without D</sub>),
-      sorted, one bar per site, coloured by Relative-Disturbance natural-break tier (blue = Low, grey = Mid, red = High).
-      Facets = comparison × memory/window.</p>
-    <div class="note na41">Not produced for this dataset.</div>
-    <div class="v10only">
+      M3 (climate + traits) vs M4 (+ mortality): one bar per site, sorted within each panel; below zero = mortality
+      reduces that site's error. Rows = responses, columns = XGBoost and LightGBM (Optuna) at 12&nbsp;m and 24&nbsp;m,
+      repeated CV (3&nbsp;×&nbsp;80&nbsp;%). Bars are coloured by the site's disturbance intensity (site maximum, 500&nbsp;m) on
+      the same dark teal → yellow → pink scale as the signed-SHAP figure in Section&nbsp;7; each panel gives the share of
+      sites improved. Numbers, including the rank correlation between ΔRMSE and intensity, are in
+      <code>fig_site_dRMSE_statistics.csv</code> beside the figure. Does not follow the learner and CV switches.</p>
     <div class="controls">
-      <div class="ctrl"><label>Response (EFP)</label><select id="sel5_efp"></select></div>
+      <div class="ctrl v10only"><label>View</label><select id="sel5_view"></select></div>
+      <div class="ctrl"><label>Colour by</label><select id="sel5_metric"></select></div>
+      <div class="ctrl" style="display:none"><label>Response (EFP)</label><select id="sel5_efp"></select></div>
     </div>
+    <div class="note v10only" id="note5_all" style="display:none"><b>All model pairs (V2.2).</b> The earlier figure:
+      one board per EFP with all four model pairs (C vs C+D … C+T+M vs C+T+D+M) × memory type × window, bars coloured by
+      relative-disturbance tier. Follows the learner and CV switches.</div>
     <div class="imgwrap"><img id="img_dbar" loading="lazy" alt="delta RMSE bars"></div>
     <div class="cap" id="cap_dbar"></div>
-    </div>
   </section>
 
   <!-- 6 -->
@@ -384,19 +395,21 @@
     <h2>Site-specific SHAP composition</h2>
     <p class="desc">Per-site stacked driver-group SHAP (Climate / Traits / Disturbance / Memory), with dot columns
       coloured by three mortality metrics and IGBP on the right axis. Sites ordered by disturbance SHAP share.</p>
-    <div class="note v41only"><b>v4.1 and flux sets:</b> M4 only, one board per mortality metric with the four EFPs side by side.
+    <div class="note v41only"><b>V4.1 and flux sets:</b> M4 only, one board per mortality metric with the four EFPs side by side.
       <b>Composition</b> = relative mean |SHAP| per driver group with the site's metric value as dots (Fig.&nbsp;3).
       <b>Signed disturbance SHAP</b> = net signed SHAP of the disturbance block in response units (same quantity as
-      Fig.&nbsp;4 and 5), bars coloured by the site's disturbance intensity, sites sorted by intensity, dashed line =
-      natural break (High above, Low+Mid below).</div>
+      Fig.&nbsp;4 and 5), bars coloured by the site's disturbance intensity (dark teal → yellow → pink,
+      colour-blind safe), sites sorted by intensity, dashed lines = the two natural breaks, mean ± 0.5 SD (High above
+      the upper, Mid between, Low below the lower).</div>
     <div class="controls v41only">
       <div class="ctrl"><label>Mortality metric</label><select id="sel7v_metric"></select></div>
       <div class="ctrl"><label>Window</label><select id="sel7v_win"></select></div>
       <div class="ctrl"><label>View</label><select id="sel7v_style"></select></div>
     </div>
-    <div class="note v10only" id="note7_signed" style="display:none"><b>Signed disturbance SHAP (V10):</b> net signed
-      SHAP of the disturbance block for M4 (response units), bars coloured by the site's disturbance intensity, sites
-      sorted by intensity, dashed line = natural break (High above, Low+Mid below). From the V10 Optuna models
+    <div class="note v10only" id="note7_signed" style="display:none"><b>Signed disturbance SHAP (V2.2):</b> net signed
+      SHAP of the disturbance block for M4 (response units), bars coloured by the site's disturbance intensity (dark teal → yellow → pink,
+      colour-blind safe), sites sorted by intensity, dashed lines = the two natural breaks, mean ± 0.5 SD (High above
+      the upper, Mid between, Low below the lower). From the V2.2 Optuna models
       (lag2-corrected 24&nbsp;m); computed for XGBoost and LightGBM only.</div>
     <div class="controls v10only">
       <div class="ctrl"><label>View</label><select id="sel7_view"></select></div>
@@ -415,7 +428,7 @@
     <h2>Grouped disturbance SHAP by threshold category</h2>
     <p class="desc">Disturbance SHAP % (violins) grouped by Low / Mid / High disturbance category — 3 mortality-metric
       rows × 5 EFP columns.</p>
-    <div class="note v41only"><b>v4.1 and flux sets:</b> net signed disturbance SHAP (M4) for High vs Low+Mid sites, natural break
+    <div class="note v41only"><b>V4.1 and flux sets:</b> net signed disturbance SHAP (M4) for High vs Low+Mid sites, natural break
       = site maximum &gt; mean + 0.5&nbsp;SD. Both learners and windows in one figure; Mann–Whitney, BH-FDR. Numbers in
       <code>plots/paper_v41/fig4_statistics.csv</code>.</div>
     <div class="controls v41only">
@@ -437,7 +450,7 @@
     <h2>Disturbance benefit &amp; SHAP vs. IGBP and tree cover</h2>
     <p class="desc">Combined boards and individual panels: ΔRMSE and disturbance-SHAP by IGBP class (violins) and vs.
       tree cover (loess scatters). Boards stack all four panels for one model set.</p>
-    <div class="note v41only"><b>v4.1 and flux sets:</b> 4-panel board for M4 (M3 vs M4 per site), per window and learner.</div>
+    <div class="note v41only"><b>V4.1 and flux sets:</b> 4-panel board for M4 (M3 vs M4 per site), per window and learner.</div>
     <div class="controls v41only">
       <div class="ctrl"><label>Window</label><select id="sel9v_win"></select></div>
     </div>
@@ -463,10 +476,10 @@
       (5 buffers and all lags pooled) or per sub-block: <b>mortality</b> (deadwood stock and new deadwood),
       <b>tree cover loss</b>, and the <b>combined index</b> (relative disturbance). Mean over sites. Follows the dataset
       and learner switches.</p>
-    <p class="itxt"><b>V10 vs v4.1.</b> v4.1 has 7 metric families instead of 11 (no <code>new_mortality_rate_pct</code>,
+    <p class="itxt"><b>V2.2 vs V4.1.</b> V4.1 has 7 metric families instead of 11 (no <code>new_mortality_rate_pct</code>,
       no severity metrics) and lag&nbsp;2 of every metric at 24&nbsp;m. The largest change is <b>tree cover loss</b>:
       <code>relative_tree_loss_pct</code> is now the single largest metric for GPP<sub>sat</sub> and ET<sub>max</sub>
-      (27–39&nbsp;%, versus ~10–13&nbsp;% in V10); by sub-block, mortality 39–45&nbsp;%, tree cover loss 34–36&nbsp;%,
+      (27–39&nbsp;%, versus ~10–13&nbsp;% in V2.2); by sub-block, mortality 39–45&nbsp;%, tree cover loss 34–36&nbsp;%,
       combined index 21–25&nbsp;%.</p>
     <div class="controls">
       <div class="ctrl"><label>View</label><select id="sel10_view"></select></div>
@@ -478,13 +491,13 @@
   <!-- 11 -->
   <section id="s11">
     <div class="secnum">SECTION 11</div>
-    <h2>V10 vs v4.1 — what changed and how the results compare</h2>
+    <h2>V2.2 vs V4.1 — what changed and how the results compare</h2>
     <p class="desc">Both on tree cover &ge;&nbsp;30&nbsp;%, repeated CV (3&nbsp;×&nbsp;80&nbsp;%), XGBoost and LightGBM
       Optuna, M3 (climate + traits) vs M4 (+ mortality). Independent of the switches at the top.</p>
 
     <h3 class="mini">What changed between the two datasets</h3>
     <table class="deftbl">
-      <thead><tr><th></th><th>V10</th><th>v4.1 paper dataset</th></tr></thead>
+      <thead><tr><th></th><th>V2.2</th><th>V4.1 EFP</th></tr></thead>
       <tbody>
         <tr><td class="k">Mortality maps</td><td>deadtrees v2-2</td><td>deadtrees v4.1: mid-season prediction date fixed (median shift 38&nbsp;days), cube-corner pixels fixed at 42 sites, per-year <code>covered</code> mask</td></tr>
         <tr><td class="k">Sites / site-years</td><td>93 / 395, 2019–2025</td><td>106 / 388, 2020–2025 (83 sites shared, 10 dropped, 23 new)</td></tr>
@@ -504,7 +517,7 @@
     <p class="desc">Median per-site change in RMSE (M3&nbsp;→&nbsp;M4), one-sided Wilcoxon, BH-FDR. Negative = mortality
       reduces the error.</p>
     <div class="tblwrap"><table class="metrics cmp">
-      <thead><tr><th class="txt" rowspan="2">EFP</th><th colspan="2">XGB 12m</th><th colspan="2">XGB 24m</th><th colspan="2">LGB 12m</th><th colspan="2">LGB 24m</th></tr><tr><th>V10</th><th>v4.1</th><th>V10</th><th>v4.1</th><th>V10</th><th>v4.1</th><th>V10</th><th>v4.1</th></tr></thead>
+      <thead><tr><th class="txt" rowspan="2">EFP</th><th colspan="2">XGB 12m</th><th colspan="2">XGB 24m</th><th colspan="2">LGB 12m</th><th colspan="2">LGB 24m</th></tr><tr><th>V2.2</th><th>V4.1</th><th>V2.2</th><th>V4.1</th><th>V2.2</th><th>V4.1</th><th>V2.2</th><th>V4.1</th></tr></thead>
       <tbody>
         <tr><td class="txt"><b>GPPsat</b></td><td>-7.6% ***</td><td><b>-4.3% *</b></td><td>-6.7% **</td><td><b>-1.5% ns</b></td><td>-8.3% ***</td><td><b>-3.8% *</b></td><td>-8.7% **</td><td><b>-4.8% *</b></td></tr>
         <tr><td class="txt"><b>NEPmax</b></td><td>-13.3% ***</td><td><b>-7.3% ***</b></td><td>-4.8% *</td><td><b>-9.6% ***</b></td><td>-12.7% ***</td><td><b>-9.5% ***</b></td><td>-16.0% ***</td><td><b>-8.0% ***</b></td></tr>
@@ -515,7 +528,7 @@
 
     <h3 class="mini">Pooled R² (all site-years)</h3>
     <div class="tblwrap"><table class="metrics cmp">
-      <thead><tr><th class="txt">EFP</th><th class="txt">learner · window</th><th>V10 M3</th><th>V10 M4</th><th>V10 gain</th><th>v4.1 M3</th><th>v4.1 M4</th><th>v4.1 gain</th></tr></thead>
+      <thead><tr><th class="txt">EFP</th><th class="txt">learner · window</th><th>V2.2 M3</th><th>V2.2 M4</th><th>V2.2 gain</th><th>V4.1 M3</th><th>V4.1 M4</th><th>V4.1 gain</th></tr></thead>
       <tbody>
         <tr><td class="txt">GPPsat</td><td class="txt">XGB 12m</td><td>0.19</td><td>0.35</td><td>+0.16</td><td>0.33</td><td>0.39</td><td><b>+0.06</b></td></tr>
         <tr><td class="txt">GPPsat</td><td class="txt">XGB 24m</td><td>0.17</td><td>0.33</td><td>+0.16</td><td>0.33</td><td>0.38</td><td><b>+0.05</b></td></tr>
@@ -536,12 +549,12 @@
       </tbody>
     </table></div>
 
-    <h3 class="mini">Flux totals: V10 (93 sites) vs v4.1 (102 sites), with the v4.1 EFPs for reference</h3>
+    <h3 class="mini">Flux totals: V2.2 (93 sites) vs V4.1 (102 sites), with the V4.1 EFPs for reference</h3>
     <p class="desc">Pooled R² M3&nbsp;→&nbsp;M4 and median per-site RMSE change (one-sided Wilcoxon, BH-FDR), repeated CV.
       Both flux sets: identical half-hourly totals, completeness gate, tuning and pipeline; they differ only in their
-      predictors (V10 vs v4.1) and site-years (372 at 93 sites vs 362 at 102 sites).</p>
+      predictors (V2.2 vs V4.1) and site-years (372 at 93 sites vs 362 at 102 sites).</p>
     <div class="tblwrap"><table class="metrics cmp">
-      <thead><tr><th class="txt" rowspan="2">flux</th><th class="txt" rowspan="2">learner · window</th><th colspan="2">V10 flux totals</th><th colspan="2">v4.1 flux totals</th><th>v4.1 EFP</th></tr>
+      <thead><tr><th class="txt" rowspan="2">flux</th><th class="txt" rowspan="2">learner · window</th><th colspan="2">V2.2 Flux</th><th colspan="2">V4.1 Flux</th><th>V4.1 EFP</th></tr>
       <tr><th>R²</th><th>ΔRMSE</th><th>R²</th><th>ΔRMSE</th><th>ΔRMSE</th></tr></thead>
       <tbody>
         <tr><td class="txt">GPP</td><td class="txt">XGB 12m</td><td>0.31 → 0.43</td><td>-5.7% *</td><td>0.56 → 0.59</td><td><b>-4.0% ns</b></td><td>-4.3% *</td></tr>
@@ -563,40 +576,40 @@
       </tbody>
     </table></div>
     <ul class="itxt">
-      <li><b>Same pattern in all four sets.</b> Mortality improves the carbon fluxes and WUE and not ET, in V10 and v4.1,
-        for EFPs and for totals. The ET null holds everywhere except the v4.1 ET<sub>max</sub>.</li>
-      <li><b>V10 vs v4.1 totals.</b> Mortality adds more in V10: GPP R² 0.27–0.31&nbsp;→&nbsp;0.40–0.43 (per site
+      <li><b>Same pattern in all four sets.</b> Mortality improves the carbon fluxes and WUE and not ET, in V2.2 and V4.1,
+        for EFPs and for totals. The ET null holds everywhere except the V4.1 ET<sub>max</sub>.</li>
+      <li><b>V2.2 vs V4.1 totals.</b> Mortality adds more in V2.2: GPP R² 0.27–0.31&nbsp;→&nbsp;0.40–0.43 (per site
         −6 to −10&nbsp;%, all significant) and NEP −5 to −7&nbsp;% (all significant), versus GPP 0.55–0.57&nbsp;→&nbsp;0.57–0.59
-        in v4.1. The difference sits in the <b>baseline</b>: with the same responses and tuning, v4.1 climate + traits
+        in V4.1. The difference sits in the <b>baseline</b>: with the same responses and tuning, V4.1 climate + traits
         explain GPP far better (R² ≈&nbsp;0.56 vs 0.29) and NEP too (≈&nbsp;0.24 vs ≈&nbsp;0), leaving less for mortality.
-        What makes the v4.1 baseline stronger (pre-season climate window, Lusk traits, site set) has not been isolated.</li>
-      <li><b>Windows.</b> 24&nbsp;m beats 12&nbsp;m for the v4.1 fluxes (GPP and WUE significant mainly at 24&nbsp;m); for the
-        V10 fluxes and the EFPs the two windows are about equal.</li>
+        What makes the V4.1 baseline stronger (pre-season climate window, Lusk traits, site set) has not been isolated.</li>
+      <li><b>Windows.</b> 24&nbsp;m beats 12&nbsp;m for the V4.1 fluxes (GPP and WUE significant mainly at 24&nbsp;m); for the
+        V2.2 fluxes and the EFPs the two windows are about equal.</li>
       <li><b>High vs Low+Mid SHAP</b> (Fig.&nbsp;4): GPP and WUE significant in all 8 tests in both flux sets; NEP in 7 of 8
-        (V10) and 4 of 8 (v4.1, relative disturbance only); ET never.</li>
-      <li><b>Caveat:</b> the v4.1 completeness gate removes all years of two strongly disturbed sites (CA-LU1, US-GLE)
-        and some of DE-Akm and US-NC2, so the v4.1 flux set carries less high-disturbance data.</li>
+        (V2.2) and 4 of 8 (V4.1, relative disturbance only); ET never.</li>
+      <li><b>Caveat:</b> the V4.1 completeness gate removes all years of two strongly disturbed sites (CA-LU1, US-GLE)
+        and some of DE-Akm and US-NC2, so the V4.1 flux set carries less high-disturbance data.</li>
     </ul>
 
     <h3 class="mini">Reading the comparison</h3>
     <ul class="itxt">
       <li><b>Same direction, smaller increment.</b> Mortality still helps GPP<sub>sat</sub>, NEP<sub>max</sub> and WUE,
-        and NEP<sub>max</sub> is still the strongest. M4 is as good as or better than in V10, but the M3 baseline is much
+        and NEP<sub>max</sub> is still the strongest. M4 is as good as or better than in V2.2, but the M3 baseline is much
         stronger (GPP<sub>sat</sub> ≈&nbsp;0.18&nbsp;→&nbsp;0.33, NEP<sub>max</sub> 0.18&nbsp;→&nbsp;0.42, WUE
-        0.12&nbsp;→&nbsp;0.43), so the R² gain from mortality is about a third to a half of V10's (a quarter for WUE).</li>
-      <li><b>The stronger baseline is mostly the site set.</b> On the 303 shared site-years M3 is not stronger in v4.1
+        0.12&nbsp;→&nbsp;0.43), so the R² gain from mortality is about a third to a half of V2.2's (a quarter for WUE).</li>
+      <li><b>The stronger baseline is mostly the site set.</b> On the 303 shared site-years M3 is not stronger in V4.1
         (GPP<sub>sat</sub> 0.16–0.20 vs 0.12–0.16; WUE −0.23 to −0.06 vs 0.04–0.09). The 23 new sites and years widen the
         range of WUE between sites, which traits capture. On the shared site-years mortality still adds +0.07 to +0.09 R²
         (GPP<sub>sat</sub>) and +0.07 to +0.27 (WUE). R² depends on the spread of the sample, so compare the datasets on
         RMSE.</li>
       <li><b>ET<sub>max</sub> moved from a slight loss to a slight gain</b> (≈&nbsp;+0.02 R²). It holds on the 83 shared
-        sites (median −1 to −4&nbsp;% per site vs +1 to +2&nbsp;% in V10) and is larger at the 23 new sites (−6 to −12&nbsp;%).
+        sites (median −1 to −4&nbsp;% per site vs +1 to +2&nbsp;% in V2.2) and is larger at the 23 new sites (−6 to −12&nbsp;%).
         M3 skill for ET<sub>max</sub> is unchanged, so the change is in what mortality adds; it is concentrated in ENF and
         MF, not DBF.</li>
-      <li><b>Not explained by the date fix.</b> The per-site change in gain is unrelated to how far v4.1 moved the map
+      <li><b>Not explained by the date fix.</b> The per-site change in gain is unrelated to how far V4.1 moved the map
         date (Spearman ρ between −0.15 and 0.12, all p&nbsp;&gt;&nbsp;0.17), and DBF sites, with the largest shifts, show
         no ET<sub>max</sub> change. The corner fix, masking, lag structure, traits, years and tuning also changed; a swap
-        test (v4.1 pipeline with the v2-2 mortality block) would isolate the maps.</li>
+        test (V4.1 pipeline with the v2-2 mortality block) would isolate the maps.</li>
     </ul>
   </section>
 
@@ -607,7 +620,7 @@
 
     <h3 class="mini">Optuna tuning</h3>
     <table class="deftbl">
-      <thead><tr><th>Learner</th><th>Search space</th><th>V10</th><th>v4.1</th></tr></thead>
+      <thead><tr><th>Learner</th><th>Search space</th><th>V2.2</th><th>V4.1</th></tr></thead>
       <tbody>
         <tr><td class="k">RF Optuna (<code>ranger</code>)</td><td><code>mtry_frac</code> 0.02–1.0, <code>num.trees</code> 250–1500, <code>min.node.size</code> 1–30, <code>sample.fraction</code> 0.4–1.0</td><td>50 trials per response</td><td>not run</td></tr>
         <tr><td class="k">XGBoost Optuna</td><td><code>learning_rate</code> 0.01–0.3, <code>nrounds</code> 100–1000, <code>max_depth</code> 1–8, <code>min_child_weight</code> 1–20, <code>subsample</code> 0.5–1, <code>colsample_bytree</code> 0.2–1, <code>reg_lambda</code> 0.001–50</td><td>50 trials per response</td><td>50 trials per response × window</td></tr>
@@ -615,7 +628,7 @@
       </tbody>
     </table>
     <p class="itxt" style="margin-top:8px">TPE sampler; every trial scored by grouped 5-fold CV (folds = disjoint site
-      groups), so tuning never touches the reported CV metrics. In v4.1 the objective is the scale-free RMSE averaged
+      groups), so tuning never touches the reported CV metrics. In V4.1 the objective is the scale-free RMSE averaged
       over M3 and M4, so both models share one configuration per EFP and window (best configurations in
       <code>plots/paper_v41/Optuna/{12m,24m}/best_configs.csv</code>).</p>
 
@@ -625,7 +638,7 @@
     <table class="deftbl">
       <thead><tr><th></th><th>Leave-one-site-out</th><th>Repeated CV (3 × 80 %)</th></tr></thead>
       <tbody>
-        <tr><td class="k">Training set per held-out site</td><td>all remaining sites (92 in V10)</td><td>a random 80 % of them (~74 in V10, ~84 in v4.1), <b>3 independent times</b></td></tr>
+        <tr><td class="k">Training set per held-out site</td><td>all remaining sites (92 in V2.2)</td><td>a random 80 % of them (~74 in V2.2, ~84 in V4.1), <b>3 independent times</b></td></tr>
         <tr><td class="k">Prediction</td><td>one model, one prediction</td><td>mean of the 3 repetitions</td></tr>
         <tr class="add"><td class="k">Extra diagnostic</td><td>—</td><td><b>SD across repetitions</b> = prediction stability, which LOSO cannot provide</td></tr>
         <tr><td class="k">Hyperparameters</td><td colspan="2">identical — each variant uses exactly its own configuration under both structures</td></tr>
@@ -639,7 +652,7 @@
 
     <h3 class="mini">Model families and predictor counts</h3>
     <table class="deftbl">
-      <thead><tr><th rowspan="2">Model</th><th rowspan="2">Blocks</th><th colspan="2">V10 · tree cover &ge;30%</th><th rowspan="2">Adds D vs</th></tr><tr><th>p (12m)</th><th>p (24m)</th></tr></thead>
+      <thead><tr><th rowspan="2">Model</th><th rowspan="2">Blocks</th><th colspan="2">V2.2 EFP</th><th rowspan="2">Adds D vs</th></tr><tr><th>p (12m)</th><th>p (24m)</th></tr></thead>
       <tbody>
         <tr><td class="k">M1</td><td>C</td><td>143</td><td>286</td><td>—</td></tr>
         <tr class="add"><td class="k">M2</td><td>C + D</td><td style="background:#FFF4D6">243</td><td style="background:#FFF4D6">386</td><td>M1</td></tr>
@@ -653,7 +666,7 @@
     </table>
 
 
-    <h3 class="mini">v4.1 predictor counts</h3>
+    <h3 class="mini">V4.1 predictor counts</h3>
     <table class="deftbl">
       <thead><tr><th>Model</th><th>Blocks</th><th>p (12m)</th><th>p (24m)</th></tr></thead>
       <tbody>
@@ -667,11 +680,11 @@
   </section>
 
   <section id="s14">
-    <div class="secnum">SECTION 13 · DECISIONS (V10)</div>
-    <h2>What gets reported — and why (V10, 2026-08-19)</h2>
-    <div class="note"><b>Superseded for the paper.</b> This section records the V10 decisions as written on 2026-08-19.
-      The paper now uses the v4.1 dataset (106 sites), M3 and M4 only, repeated CV (3&nbsp;×&nbsp;80&nbsp;%) and
-      XGBoost + LightGBM Optuna. The dataset, learner and CV comparisons below still describe V10.</div>
+    <div class="secnum">SECTION 13 · DECISIONS (V2.2)</div>
+    <h2>What gets reported — and why (V2.2, 2026-08-19)</h2>
+    <div class="note"><b>Superseded for the paper.</b> This section records the V2.2 decisions as written on 2026-08-19.
+      The paper now uses the V4.1 dataset (106 sites), M3 and M4 only, repeated CV (3&nbsp;×&nbsp;80&nbsp;%) and
+      XGBoost + LightGBM Optuna. The dataset, learner and CV comparisons below still describe V2.2.</div>
     <p class="desc">The full grid is 3 datasets &times; 9 learners &times; 2 CV structures &times; 24 models.
       This section records which cell goes in the manuscript, the evidence behind each choice, and the claims the
       results do and do not support. Written 2026-08-19; source:
@@ -792,12 +805,12 @@
   </section>
 
   <div class="note">All figures are also available as PDF next to each PNG. This report references the image files by
-    relative path: keep it inside <code>plots/V10/</code> (v4.1, flux and signed-SHAP figures are read from <code>paper_v41/</code>, <code>paper_v41_fluxes/</code>, <code>paper_v10_fluxes/</code> and <code>paper_v10_efp/</code>).</div>
+    relative path: keep it inside <code>plots/V10/</code> (V4.1, flux and signed-SHAP figures are read from <code>paper_v41/</code>, <code>paper_v41_fluxes/</code>, <code>paper_v10_fluxes/</code> and <code>paper_v10_efp/</code>).</div>
 </main>
 
 <div class="lightbox" id="lb"><img id="lbimg" alt="zoom"></div>
 
-<footer>Disturbance–flux interactive report (V10 and v4.1) · Optuna learners, tree cover &ge;30&nbsp;%.</footer>
+<footer>Disturbance–flux interactive report (V2.2 and V4.1) · Optuna learners, tree cover &ge;30&nbsp;%.</footer>
 
 <script>
 const EFPS=['GPPsat','NEPmax','ETmax','uWUE','WUE'];
@@ -844,6 +857,9 @@ const V41_METRICS=[['rel_mort','Relative mortality'],['rel_dist','Relative distu
 const D_VIEWS=[['family','Metric by metric'],['concept','Three sub-blocks (share and per variable)']];
 
 fill(document.getElementById('sel5_efp'),EFPS);
+fill(document.getElementById('sel5_view'),[['m34','M3 vs M4 · XGBoost + LightGBM'],['all','All model pairs (per learner and CV)']]);
+fill(document.getElementById('sel5_metric'),[['reldist','Relative disturbance'],['relmort','Relative mortality']]);
+const showCtl=(id,on)=>{document.getElementById(id).closest('.ctrl').style.display=on?'':'none';};
 fill(document.getElementById('sel6_unit'),DELTA_UNITS);
 fill(document.getElementById('sel6_method'),METHODS);
 fill(document.getElementById('sel7_model'),SHAP_MODELS);
@@ -860,6 +876,7 @@ fill(document.getElementById('sel8_method'),METHODS);
 fill(document.getElementById('sel8v_metric'),[['relmort','Relative mortality'],['reldist','Relative disturbance']]);
 fill(document.getElementById('sel9v_win'),WINDOWS);
 fill(document.getElementById('sel10_view'),D_VIEWS);
+fill(document.getElementById('sel3_sites'),[['all','All sites'],['high_reldist','High disturbance only (relative disturbance)'],['high_relmort','High disturbance only (relative mortality)']]);
 const RESP_OF={sites_with_high_Tcover:EFPS,v41:['GPPsat','NEPmax','ETmax','WUE'],v41f:['GPP_gs','NEP_gs','ET_gs','WUE_gs'],
   v10f:['GPP_gs','NEP_gs','ET_gs','WUE_gs']};
 function fillResp(){const sel=document.getElementById('selm_resp'),prev=sel.value;fill(sel,['All',...RESP_OF[DS]]);
@@ -889,7 +906,7 @@ function renderMetrics(){
   document.querySelectorAll('#metricsTbl th').forEach(th=>{th.classList.remove('sorted','desc');
     if(th.dataset.k===k){th.classList.add('sorted');if(d<0)th.classList.add('desc');}});
 }
-const DSLABEL={sites_with_high_Tcover:'V10 · tree cover \u226530% (93)',v10f:'V10 · flux totals (93)',v41:'v4.1 paper dataset (106)',v41f:'v4.1 · flux totals (102)'};
+const DSLABEL={sites_with_high_Tcover:'V2.2 EFP (93)',v10f:'V2.2 Flux (93)',v41:'V4.1 EFP (106)',v41f:'V4.1 Flux (102)'};
 function dsName(){return DSLABEL[DS]||DS;}
 function rMeta(){const m=META[DS];document.getElementById('metaBar').innerHTML=
   `<span class="chip"><b>${m.sites}</b> sites</span>`+
@@ -898,11 +915,17 @@ function rMeta(){const m=META[DS];document.getElementById('metaBar').innerHTML=
 const val=id=>document.getElementById(id).value;
 function r1(){setImg('img_fig1',is41()?`${V41()}fig1_site_map.png`:`${DS}/fig1_site_map_EFP_distributions.png`);}
 function r2(){if(!is41())setImg('img_bar',`${DS}/bar_sites_per_IGBP.png`);}
-function r3(){setImg('img_rmse',is41()?`${V41()}fig2_disturbance_effect_M3M4.png`:`${P()}${DS}/RMSE/RMSE_disturbance_effect_paired_violin.png`);}
+function r3(){const v=val('sel3_sites'),root=is41()?V41():V10E;
+  document.getElementById('note3_high').style.display=(v==='all')?'none':'';
+  setImg('img_rmse',`${root}fig2${v==='all'?'':'_'+v}_disturbance_effect_M3M4.png`,'cap_rmse');}
 function r4(){if(is41())return;setImg('img_thr1',`${DS}/01_abs_mort_comparison.png`);
   setImg('img_thr2',`${DS}/02_rel_mort_comparison.png`);
   setImg('img_thr3',`${DS}/03_rel_dist_comparison.png`);}
-function r5(){if(is41())return;setImg('img_dbar',`${P()}${DS}/RMSE/delta_RMSE_bars_${val('sel5_efp')}.png`,'cap_dbar');}
+function r5(){const allv=!is41()&&val('sel5_view')==='all';
+  showCtl('sel5_efp',allv);showCtl('sel5_metric',!allv);
+  document.getElementById('note5_all').style.display=allv?'':'none';
+  if(allv){setImg('img_dbar',`${P()}${DS}/RMSE/delta_RMSE_bars_${val('sel5_efp')}.png`,'cap_dbar');return;}
+  setImg('img_dbar',`${is41()?V41():V10E}fig_site_dRMSE_${val('sel5_metric')}.png`,'cap_dbar');}
 function r6(){if(is41())return;const mg=document.getElementById('sel6_merged').checked;
   const sub=mg?'delta_RMSE_category/merged_low_disturbance/':'delta_RMSE_category/';
   setImg('img_dcat',`${P()}${DS}/RMSE/${sub}delta_RMSE_${val('sel6_unit')}_${val('sel6_method')}.png`,'cap_dcat');}
@@ -970,7 +993,8 @@ document.querySelectorAll('#cfgToggle button').forEach(b=>b.addEventListener('cl
 ['selm_resp','selm_fam'].forEach(id=>document.getElementById(id).addEventListener('change',renderMetrics));
 document.querySelectorAll('#metricsTbl th').forEach(th=>th.addEventListener('click',()=>{
   const k=th.dataset.k;if(mSort.k===k)mSort.dir*=-1;else{mSort.k=k;mSort.dir=(k==='R2')?-1:1;}renderMetrics();}));
-['sel5_efp'].forEach(id=>document.getElementById(id).addEventListener('change',r5));
+['sel3_sites'].forEach(id=>document.getElementById(id).addEventListener('change',r3));
+['sel5_efp','sel5_view','sel5_metric'].forEach(id=>document.getElementById(id).addEventListener('change',r5));
 ['sel6_unit','sel6_method','sel6_merged'].forEach(id=>document.getElementById(id).addEventListener('change',r6));
 ['sel7_view','sel7_metric10','sel7_model','sel7_efp','sel7_win','sel7v_metric','sel7v_win','sel7v_style'].forEach(id=>document.getElementById(id).addEventListener('change',r7));
 ['sel8_model','sel8_win','sel8_method','sel8_merged','sel8v_metric'].forEach(id=>document.getElementById(id).addEventListener('change',r8));

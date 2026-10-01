@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>Daily Report — 2026-06-30</title><style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0D0D0D;color:#E0E0E0;font-family:Arial,Helvetica,sans-serif;line-height:1.6;padding:28px 18px 60px}
+a{color:#22D4EB;text-decoration:none} a:hover{text-decoration:underline}
+.wrap{max-width:900px;margin:0 auto}
+.nav{font-size:.85em;color:#6B7280;margin-bottom:22px} .nav a{margin-right:14px}
+h1{font-size:1.65em;color:#fff;line-height:1.25;margin-bottom:6px;letter-spacing:-.01em}
+.article h1{display:none}
+.article h2{font-size:1.3em;color:#22D4EB;margin:34px 0 12px;padding-bottom:6px;border-bottom:1px solid #22D4EB55}
+.article h3{font-size:1.1em;color:#E5E7EB;margin:24px 0 8px}
+.article h4{font-size:1em;color:#9CA3AF;margin:18px 0 6px}
+.article p{margin:10px 0} .article ul,.article ol{margin:8px 0 8px 24px} .article li{margin:4px 0}
+.article hr{border:0;border-top:1px solid #2A2A3A;margin:26px 0}
+.article blockquote{border-left:3px solid #22D4EB;padding:2px 14px;color:#9CA3AF;margin:12px 0}
+.article code{background:#1F2937;border-radius:4px;padding:1px 5px;font-size:.88em;color:#A7F3D0;font-family:Consolas,Menlo,monospace}
+.article pre{background:#111827;border:1px solid #2A2A3A;border-radius:8px;padding:12px 14px;overflow-x:auto;margin:12px 0}
+.article pre code{background:none;padding:0;color:#E5E7EB}
+.tw{overflow-x:auto;margin:14px 0}
+.article table{border-collapse:collapse;font-size:.88em;min-width:60%}
+.article th{background:#1F2937;color:#22D4EB;text-align:left}
+.article th,.article td{border:1px solid #2A2A3A;padding:6px 10px;vertical-align:top}
+.article tr:nth-child(even) td{background:#111827}
+.article img{max-width:100%;height:auto;background:#fff;border-radius:6px;margin:12px 0 4px;display:block}
+.article em{color:#9CA3AF}
+.badge{display:inline-block;font-size:.75em;background:#1F2937;border:1px solid #374151;border-radius:4px;padding:2px 8px;color:#9CA3AF;margin-right:6px}
+.meta{margin:6px 0 22px}
+.footer{margin-top:50px;font-size:.75em;color:#4B5563;text-align:center}
+
+.month{font-size:1.05em;color:#22D4EB;margin:34px 0 12px;padding-bottom:6px;border-bottom:1px solid #22D4EB55}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.card{display:flex;flex-direction:column;gap:8px;background:#111827;border:1px solid #2A2A3A;border-radius:12px;padding:20px 20px;color:#E0E0E0;transition:border-color .2s,transform .15s}
+.card:hover{border-color:#22D4EB;transform:translateY(-2px);text-decoration:none}
+.card-title{font-size:1.02em;font-weight:bold;color:#22D4EB;line-height:1.3}
+.card-desc{font-size:.83em;color:#9CA3AF;line-height:1.5}
+.card-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto;padding-top:4px}
+.tag{font-size:.72em;background:#1F2937;border:1px solid #374151;border-radius:4px;padding:2px 8px;color:#6B7280}
+#q{width:100%;background:#111827;border:1px solid #2A2A3A;border-radius:8px;color:#E0E0E0;padding:10px 14px;font-size:.95em;margin:14px 0 4px}
+#q:focus{outline:none;border-color:#22D4EB}
+.sub{color:#9CA3AF;font-size:.9em}
+</style></head>
+<body><div class="wrap">
+<div class="nav"><a href="index.html">&larr; Daily reports</a><a href="../index.html">Hub</a></div>
+<h1>Daily Report — 2026-06-30</h1><div class="meta"><span class="badge">2026-06-30</span><span class="badge">3 tables</span></div>
+<div class="article"><h1 id="daily-report--2026-06-30">Daily Report — 2026-06-30</h1>
+<hr />
+<h2 id="1-shap-v2--anomaly-symlink-fix">1. SHAP v2 — Anomaly symlink fix</h2>
+<p>The anomaly SHAP v2 run (<code>run_37_RF_shap_anomaly_24mbench_v2.R</code>) had followed a temporary symlink and written its output into the v1 directory instead of v2. Fixed by:</p>
+<ul>
+<li>Removing the dangling symlink from <code>RF_outputs_anomaly_24mbench_v2/RF_site_shap_M04_M08.csv</code></li>
+<li>Copying the v1 file (which now contained v2 SHAP data) as a real file into the v2 directory</li>
+<li>Rawmem v2 SHAP was already correct (29M real file)</li>
+</ul>
+<hr />
+<h2 id="2-plots-16-and-17-re-run-with-true-v2-shap">2. Plots 16 and 17 re-run with true v2 SHAP</h2>
+<p>After the symlink fix, re-ran:</p>
+<ul>
+<li><code>plot_16_disturbance_threshold.R</code> → <code>plots/manuscript_candidates/fig_threshold_SHAP.pdf/png</code></li>
+<li><code>plot_17_IGBP_treecover.R</code> → <code>plots/manuscript_candidates/fig_IGBP_treecover.pdf/png</code></li>
+</ul>
+<p>Both now use true v2 SHAP values (not v1 proxied through symlink).</p>
+<hr />
+<h2 id="3-latex-performance-tables-v2-5-efps">3. LaTeX performance tables (v2, 5 EFPs)</h2>
+<p>Created <code>scripts/build_metric_tables.py</code> generating two new tables:</p>
+<h3 id="manuscripttablestable_rf_loso_results_v2tex"><code>manuscript/tables/table_RF_LOSO_results_v2.tex</code></h3>
+<ul>
+<li>Replaces <code>table_RF_LOSO_results_24mbench.tex</code> in <code>sn-article.tex</code></li>
+<li>All 5 EFPs: GPPsat, NEPmax, ETmax, uWUE, <strong>WUE added</strong></li>
+<li>4 panels: 12m anomaly / 24m anomaly / 12m rawmem / 24m rawmem</li>
+<li>M01–M08, R² (RMSE), bold = best per EFP per panel</li>
+<li>Key numbers (Panel B, 24m anomaly v2):</li>
+</ul>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>EFP</th>
+<th>Best model</th>
+<th>R²</th>
+<th>RMSE</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GPPsat</td>
+<td>M08</td>
+<td>0.561</td>
+<td>6.810</td>
+</tr>
+<tr>
+<td>NEPmax</td>
+<td>M04/M08</td>
+<td>0.532</td>
+<td>6.619</td>
+</tr>
+<tr>
+<td>ETmax</td>
+<td>M03</td>
+<td>0.460</td>
+<td>0.056</td>
+</tr>
+<tr>
+<td>uWUE</td>
+<td>M07</td>
+<td>0.213</td>
+<td>1.55</td>
+</tr>
+<tr>
+<td>WUE</td>
+<td>M02/M06</td>
+<td>0.282</td>
+<td>1.143</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="manuscripttablestable_rmse_ratio_v2tex"><code>manuscript/tables/table_RMSE_ratio_v2.tex</code></h3>
+<ul>
+<li>RMSE ratio (with D / without D) per IGBP biome × 5 EFPs</li>
+<li>4 comparison pairs (C vs C+D, C+T vs C+T+D, C+M vs C+D+M, C+T+M vs C+T+D+M)</li>
+<li>Bold &lt; 1 (D improved), italic &gt; 1 (D worsened)</li>
+<li>DNF shows <code>---</code> for uWUE/WUE (CN-Sb1/2 outliers were removed in v2 data fix)</li>
+<li>WUE and uWUE added alongside existing EFPs</li>
+</ul>
+<p>Both tables pushed to Overleaf (commit <code>66d77a7</code>).</p>
+<hr />
+<h2 id="4-site-level-shap-plots-with-3-disturbance-metrics">4. Site-level SHAP plots with 3 disturbance metrics</h2>
+<p>Created <code>plot_21_site_shap_distmetrics.R</code> and new output folder <code>plots/site_shap_disturbance_metrics/</code>.</p>
+<p><strong>Scope</strong>: M04 (C+T+D), 12m and 24m windows, all 5 EFPs (GPPsat, NEPmax, ETmax, uWUE, WUE)</p>
+<p><strong>Layout</strong>: 3-panel patchwork per plot — same stacked SHAP bars in each panel, dots coloured by a different disturbance metric</p>
+<p><strong>Driver groups shown</strong>: Climate, Traits, Disturbance (Memory removed; re-normalized to 3 groups)</p>
+<p><strong>Disturbance metrics (all peak value across years per site, 500m radius)</strong>:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Panel</th>
+<th>Metric</th>
+<th>Formula</th>
+<th>Range</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Absolute Mortality</td>
+<td><code>deadwood_mean_pct_500m</code></td>
+<td>0–42%</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Relative Mortality</td>
+<td><code>(deadwood / forest) × 100</code></td>
+<td>0–81%</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Relative Disturbance</td>
+<td><code>(deadwood + loss×100) / (forest + loss×100) × 100</code></td>
+<td>0–100%</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Color scale</strong>: green (low) → orange → red (high), midpoint at 10% (abs/rel mortality) and 20% (rel disturbance). Red threshold = 20% for all metrics.</p>
+<p><strong>Relative disturbance formula rationale</strong>: denominator uses original forest extent (current forest + already lost forest), so the metric is bounded 0–100% and reads as "fraction of original forest showing disturbance signal (standing deadwood + forest loss)". Previous version divided by current forest only, allowing values &gt;100%.</p>
+<p><strong>Outputs</strong> (20 files = 10 PNG + 10 PDF):</p>
+<ul>
+<li><code>site_shap_M04_{EFP}_{12m|24m}_distmetrics.{png|pdf}</code></li>
+</ul>
+<hr />
+<h2 id="5-wue-shap-v2">5. WUE SHAP v2</h2>
+<ul>
+<li>Created <code>run_38_RF_shap_WUE_anomaly_v2.R</code> (from <code>run_37</code> template, response = WUE only, out_dir = <code>RF_outputs_anomaly_24mbench_WUE_v2</code>)</li>
+<li>Launched in tmux session <code>rf38_shap_wue</code>; completed with 89,872 rows, 164 sites</li>
+<li>Merged WUE SHAP rows into main v2 SHAP file:
+<ul>
+<li>Before: 362,776 rows (GPPsat, NEPmax, ETmax, uWUE)</li>
+<li>After: 452,648 rows (+ WUE)</li>
+</ul></li>
+<li>Re-ran <code>plot_21</code> → WUE 12m and 24m plots now generated</li>
+</ul>
+<hr />
+<h2 id="files-addedmodified-today">Files added/modified today</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Path</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>New script</td>
+<td><code>scripts/build_metric_tables.py</code></td>
+</tr>
+<tr>
+<td>New script</td>
+<td><code>plot_21_site_shap_distmetrics.R</code></td>
+</tr>
+<tr>
+<td>New script</td>
+<td><code>run_38_RF_shap_WUE_anomaly_v2.R</code></td>
+</tr>
+<tr>
+<td>New table</td>
+<td><code>manuscript/tables/table_RF_LOSO_results_v2.tex</code></td>
+</tr>
+<tr>
+<td>New table</td>
+<td><code>manuscript/tables/table_RMSE_ratio_v2.tex</code></td>
+</tr>
+<tr>
+<td>Updated</td>
+<td><code>manuscript/sn-article.tex</code> (table inputs updated to v2)</td>
+</tr>
+<tr>
+<td>New plots (10)</td>
+<td><code>plots/site_shap_disturbance_metrics/site_shap_M04_*</code></td>
+</tr>
+<tr>
+<td>Updated plots</td>
+<td><code>plots/manuscript_candidates/fig_threshold_SHAP.pdf/png</code></td>
+</tr>
+<tr>
+<td>Updated plots</td>
+<td><code>plots/manuscript_candidates/fig_IGBP_treecover.pdf/png</code></td>
+</tr>
+<tr>
+<td>Fixed SHAP</td>
+<td><code>derived_tables/outputs_afterEGU_results/RF_outputs_anomaly_24mbench_v2/RF_site_shap_M04_M08.csv</code> (symlink → real file, WUE merged)</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="pending">Pending</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" />Results section of manuscript: rewrite with actual v2 numbers</label></li>
+<li><label><input type="checkbox" />WUE SHAP rawmem v2: not yet computed (only anomaly done)</label></li>
+<li><label><input type="checkbox" />Push <code>negin-katal/fluxVSmortality</code> GitHub Pages with any new figures if needed</label></li>
+</ul>
+</div>
+<div class="footer">FluxNet &times; Mortality &middot; generated from daily_reports/*.md</div>
+</div></body></html>
