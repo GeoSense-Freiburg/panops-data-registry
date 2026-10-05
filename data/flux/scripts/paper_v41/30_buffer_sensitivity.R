@@ -18,8 +18,8 @@ OUT <- file.path(PAPER_FIG, "buffer_sensitivity"); dir.create(OUT, showWarnings 
 PN <- paper_n()
 BUFS <- c(100, 200, 300, 400, 500)
 METRICS <- c(tree_cover_mean_pct = "Tree cover (%)",
-             absolute_mortality = "Total standing deadwood (%)",
-             relative_mortality = "Relative mortality (%)",
+             absolute_mortality = "Absolute deadwood (% of area)",
+             relative_mortality = "Relative standing deadwood (% of tree cover)",
              relative_disturbance = "Total mortality (%)",
              new_deadwood_gain_pp = "New deadwood gain (pp)",
              relative_tree_loss_pct = "Relative tree loss (%)")

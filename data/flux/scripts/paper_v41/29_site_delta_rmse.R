@@ -25,7 +25,7 @@ CLASS_COLS <- c(Low = "#004D4D", Mid = "#F0E442", High = "#EE6FA8")   # dark tea
 GRID <- "#D9D9D9"; TXT <- "#111111"; AX <- "#444444"
 LEARNERS <- c(XGB = "XGBoost (Optuna)", LGB = "LightGBM (Optuna)")
 METRICS <- list(reldist = list(col = "relative_disturbance_cls", lab = "Total mortality"),
-                relmort = list(col = "relative_mortality_cls",   lab = "Relative mortality"))
+                relmort = list(col = "relative_mortality_cls",   lab = "Relative standing deadwood"))
 
 # per-site RMSE of M3 and M4 -> dRMSE
 d <- rbindlist(lapply(names(LEARNERS), function(L) {

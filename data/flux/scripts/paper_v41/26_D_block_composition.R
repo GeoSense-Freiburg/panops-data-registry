@@ -27,7 +27,7 @@ LEARNERS <- list(list(lab = "XGBoost (Optuna)",  fam = "XGB"),
 # of this dataset (500 m), used in the legend label
 dd <- fread(PAPER_DATA, select = c("relative_disturbance_500m", "relative_mortality_500m"))
 RHO <- cor(dd$relative_disturbance_500m, dd$relative_mortality_500m, method = "spearman", use = "complete.obs")
-CMB <- sprintf("Total mortality (rho = %.2f with rel. mortality)", RHO)
+CMB <- sprintf("Total mortality (rho = %.2f with relative standing deadwood)", RHO)
 PD  <- fread(PAPER_DATA, select = "SITE_ID"); N_SITES <- uniqueN(PD$SITE_ID); N_SY <- nrow(PD)
 # family = drop the buffer and lag suffix, keep the _thresh distinction
 famof <- function(v) sub("_[0-9]+00m(_lag[12])?$", "", v)

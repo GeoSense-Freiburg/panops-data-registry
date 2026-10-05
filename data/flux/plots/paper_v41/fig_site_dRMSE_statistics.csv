@@ -15,19 +15,19 @@ NEPmax,LGB,12m,104,73.1,-0.318,-0.166,0.0923,Total mortality
 NEPmax,LGB,24m,104,70.2,-0.371,-0.154,0.119,Total mortality
 WUE,LGB,12m,104,56.7,-0.0168,0.021,0.833,Total mortality
 WUE,LGB,24m,104,54.8,-0.0222,-0.032,0.748,Total mortality
-ETmax,XGB,12m,104,56.7,-0.000379,-0.125,0.207,Relative mortality
-ETmax,XGB,24m,104,55.8,-0.000983,-0.254,0.00926,Relative mortality
-GPPsat,XGB,12m,104,62.5,-0.459,-0.14,0.158,Relative mortality
-GPPsat,XGB,24m,104,59.6,-0.275,-0.237,0.0154,Relative mortality
-NEPmax,XGB,12m,104,74,-0.351,-0.142,0.151,Relative mortality
-NEPmax,XGB,24m,104,73.1,-0.372,-0.202,0.0399,Relative mortality
-WUE,XGB,12m,104,53.8,-0.0196,-0.104,0.293,Relative mortality
-WUE,XGB,24m,104,67.3,-0.0442,0.034,0.728,Relative mortality
-ETmax,LGB,12m,104,58.7,-0.00105,-0.131,0.186,Relative mortality
-ETmax,LGB,24m,104,52.9,-0.000695,-0.19,0.0538,Relative mortality
-GPPsat,LGB,12m,104,64.4,-0.395,-0.214,0.0289,Relative mortality
-GPPsat,LGB,24m,104,61.5,-0.319,-0.246,0.012,Relative mortality
-NEPmax,LGB,12m,104,73.1,-0.318,-0.213,0.0301,Relative mortality
-NEPmax,LGB,24m,104,70.2,-0.371,-0.241,0.0136,Relative mortality
-WUE,LGB,12m,104,56.7,-0.0168,0.068,0.492,Relative mortality
-WUE,LGB,24m,104,54.8,-0.0222,0.01,0.919,Relative mortality
+ETmax,XGB,12m,104,56.7,-0.000379,-0.125,0.207,Relative standing deadwood
+ETmax,XGB,24m,104,55.8,-0.000983,-0.254,0.00926,Relative standing deadwood
+GPPsat,XGB,12m,104,62.5,-0.459,-0.14,0.158,Relative standing deadwood
+GPPsat,XGB,24m,104,59.6,-0.275,-0.237,0.0154,Relative standing deadwood
+NEPmax,XGB,12m,104,74,-0.351,-0.142,0.151,Relative standing deadwood
+NEPmax,XGB,24m,104,73.1,-0.372,-0.202,0.0399,Relative standing deadwood
+WUE,XGB,12m,104,53.8,-0.0196,-0.104,0.293,Relative standing deadwood
+WUE,XGB,24m,104,67.3,-0.0442,0.034,0.728,Relative standing deadwood
+ETmax,LGB,12m,104,58.7,-0.00105,-0.131,0.186,Relative standing deadwood
+ETmax,LGB,24m,104,52.9,-0.000695,-0.19,0.0538,Relative standing deadwood
+GPPsat,LGB,12m,104,64.4,-0.395,-0.214,0.0289,Relative standing deadwood
+GPPsat,LGB,24m,104,61.5,-0.319,-0.246,0.012,Relative standing deadwood
+NEPmax,LGB,12m,104,73.1,-0.318,-0.213,0.0301,Relative standing deadwood
+NEPmax,LGB,24m,104,70.2,-0.371,-0.241,0.0136,Relative standing deadwood
+WUE,LGB,12m,104,56.7,-0.0168,0.068,0.492,Relative standing deadwood
+WUE,LGB,24m,104,54.8,-0.0222,0.01,0.919,Relative standing deadwood

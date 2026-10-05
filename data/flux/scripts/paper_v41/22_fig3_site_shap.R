@@ -53,8 +53,8 @@ NB <- list(abs_mort = nb_high(site_dist$abs_mort), rel_mort = nb_high(site_dist$
           rel_dist = nb_high(site_dist$rel_dist))
 
 DIST_META <- list(
-  abs_mort = list(col = "abs_mort", label = sprintf("Total Standing Deadwood\n(%s, %%)  NB=%.1f", CLASS_LAB, NB$abs_mort), mid_v = NB$abs_mort),
-  rel_mort = list(col = "rel_mort", label = sprintf("Relative Mortality\n(%s, %%)  NB=%.1f", CLASS_LAB, NB$rel_mort), mid_v = NB$rel_mort),
+  abs_mort = list(col = "abs_mort", label = sprintf("Absolute Deadwood\n(%s, %%)  NB=%.1f", CLASS_LAB, NB$abs_mort), mid_v = NB$abs_mort),
+  rel_mort = list(col = "rel_mort", label = sprintf("Relative Standing Deadwood\n(%s, %%)  NB=%.1f", CLASS_LAB, NB$rel_mort), mid_v = NB$rel_mort),
   rel_dist = list(col = "rel_dist", label = sprintf("Total Mortality\n(%s, %%)  NB=%.1f", CLASS_LAB, NB$rel_dist), mid_v = NB$rel_dist)
 )
 

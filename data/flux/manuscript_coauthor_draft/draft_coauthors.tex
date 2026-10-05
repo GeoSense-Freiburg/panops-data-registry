@@ -86,7 +86,7 @@
         at that site because of its mortality values.
   \item Shown for \textbf{LightGBM--Optuna}, 24-month window; the 12-month window and the XGBoost--Optuna version
         are in the Appendix.
-        Only total mortality is shown; total standing deadwood and relative mortality are dropped from the draft.
+        Only total mortality is shown; absolute deadwood and relative standing deadwood are dropped from the draft.
   \item \textbf{The sign follows the mortality class.} Share of sites with a negative contribution
         (LightGBM, 24\,m): GPP$_{sat}$ 15\,\% of Low, 70\,\% of Mid, 81\,\% of High sites; NEP$_{max}$ 18 / 70 / 81\,\%;
         WUE 12 / 56 / 81\,\%; ET$_{max}$ 22 / 53 / 81\,\%. XGBoost and the 12\,m window give the same picture
@@ -117,7 +117,7 @@ coloured by total mortality (mean of the five buffers).}
         \emph{less error}; here negative means \emph{lower predicted carbon uptake}. C+T+M model, natural-breaks thresholds,
         Low+Mid vs High, both Optuna learners, both windows.
   \item Classes: site maximum of the metric, mean of the five buffers; High $>$ mean + 0.5\,SD
-        (total mortality: 21 High vs 83 Low+Mid; relative mortality: 23 vs 81). Mann--Whitney U between
+        (total mortality: 21 High vs 83 Low+Mid; relative standing deadwood: 23 vs 81). Mann--Whitney U between
         the two groups, BH-FDR across the figure.
   \item \textbf{A clear dose--response.} At \textbf{High}-mortality sites the block pushes predicted
         carbon uptake \emph{down}; at \textbf{Low+Mid} sites it pushes it slightly \emph{up}
@@ -127,8 +127,8 @@ coloured by total mortality (mean of the five buffers).}
   \item NEP$_{max}$: High $-1.35$ to $-1.59$, Low+Mid $+0.15$ to $+0.44$; WUE: High $-0.20$ to $-0.31$,
         Low+Mid $+0.11$ g\,C\,mm$^{-1}$; all $q<0.001$.
   \item \textbf{ET$_{max}$:} the shift is tiny ($-0.003$ to $-0.006$\,mm\,d$^{-1}$) but significant for total
-        mortality in all four configurations; for relative mortality only in 1 of 4.
-  \item Overall 16 of 16 tests significant for total mortality, 13 of 16 for relative mortality, and the sign
+        mortality in all four configurations; for relative standing deadwood only in 1 of 4.
+  \item Overall 16 of 16 tests significant for total mortality, 13 of 16 for relative standing deadwood, and the sign
         never disagrees between learners or windows.
   \item \textbf{Read with Figure 2:} mortality improves accuracy (Figure 2) by lowering predictions at
         damaged sites. Note that sites are grouped by the same variables whose contribution is measured, so
@@ -141,7 +141,7 @@ coloured by total mortality (mean of the five buffers).}
 
 \begin{center}
 \includegraphics[width=\linewidth]{figures/fig4_signed_shap_relmort.png}\\[2pt]
-{\small \textbf{Fig.\ 4a} --- split by \textbf{relative mortality}}
+{\small \textbf{Fig.\ 4a} --- split by \textbf{relative standing deadwood}}
 \end{center}
 \begin{center}
 \includegraphics[width=\linewidth]{figures/fig4_signed_shap_reldist.png}\\[2pt]
@@ -266,14 +266,14 @@ Mean, C+T & 0.358 & 0.359 & \textbf{0.395} & 0.361 & 0.374 & \textbf{0.404} \\
         use the mean of the five buffers (site maximum across years; breaks mean $\pm$ 0.5\,SD).
   \item \textbf{Mortality metrics}: For visualisation and thresholding we define three mortality metrics, each computed within five buffers (100, 200, 300, 400, 500\,m) around the tower from the deadtrees v4.1 deadwood / tree-cover maps; the models use all buffers, the figures classify sites by the mean of the five:
 
-\textbf{Total standing deadwood}
+\textbf{Absolute deadwood}
 Standing deadwood cover as a percentage of the total buffer area — the absolute amount of dead canopy.
-total standing deadwood = deadwood / area × 100 (\%)
+absolute deadwood = deadwood / area × 100 (\%)
 \\
-\textbf{Relative mortality}
+\textbf{Relative standing deadwood}
 Deadwood relative to tree cover, what \% of the standing trees are currently dead (defined where tree cover $\geq$ 10 \%, capped at 100 \%).
 
-relative mortality = deadwood / tree cover × 100 (\%)
+relative standing deadwood = deadwood / tree cover × 100 (\%)
 \\
 \textbf{Total mortality}
 Combines standing deadwood and tree-cover loss relative to forest plus loss — captures both dead-standing and removed/lost canopy.

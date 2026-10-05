@@ -42,7 +42,7 @@ h <- as.data.frame(paper_class_data())   # <metric>_cls = class buffer (paper_co
 nb <- function(v){m<-mean(v,na.rm=TRUE); s<-sd(v,na.rm=TRUE)
   factor(cut(v, c(-Inf, m-0.5*s, m+0.5*s, Inf), c("Low","Mid","High")), levels=c("Low","Mid","High"))}
 METRICS <- list(
-  list(key="relmort", col="relative_mortality_cls",   lab="relative mortality"),
+  list(key="relmort", col="relative_mortality_cls",   lab="relative standing deadwood"),
   list(key="reldist", col="relative_disturbance_cls", lab="total mortality"))
 
 th <- theme_bw(base_size=11) + theme(
