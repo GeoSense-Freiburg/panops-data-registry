@@ -70,6 +70,27 @@ if (PAPER_RESP_SET %in% c("v10flux", "v10efp")) {
 }
 
 paper_load <- function() as.data.frame(fread(PAPER_DATA))
+
+# Buffer that describes a SITE's disturbance in the figures (Low / Mid / High classes, high-disturbance
+# subsets, colour scales) - NOT the model predictors, which always carry all buffers.
+# env PAPER_CLASS_BUFFER: "avg" = per site-year mean over the five nested buffers 100-500 m, which weights
+# the area nearest the tower most (it lies inside all five), like a flux footprint (user, 2026-10-05;
+# default for the v4.1 sets) | "100" ... "500" = one buffer (default "500" for the V10 sets, as before).
+# paper_class_data() returns SITE_ID, YEAR, `extra` and <metric>_cls for the three class metrics.
+CLASS_BUF <- Sys.getenv("PAPER_CLASS_BUFFER", if (PAPER_RESP_SET %in% c("efp", "flux")) "avg" else "500")
+CLASS_LAB <- if (CLASS_BUF == "avg") "mean of 100-500 m buffers" else paste0(CLASS_BUF, " m")
+CLASS_TAG <- if (CLASS_BUF == "avg") "" else paste0("_cls", CLASS_BUF, "m")   # file-name tag; none for the default
+CLASS_METRICS <- c("absolute_mortality", "relative_mortality", "relative_disturbance")
+paper_class_data <- function(extra = character(0)) {
+  bufs <- if (CLASS_BUF == "avg") c(100, 200, 300, 400, 500) else as.integer(CLASS_BUF)
+  need <- as.vector(outer(CLASS_METRICS, paste0("_", bufs, "m"), paste0))
+  d <- fread(PAPER_DATA, select = unique(c("SITE_ID", "YEAR", extra, intersect(need, names(fread(PAPER_DATA, nrows = 0))))))
+  for (m in CLASS_METRICS) {
+    cs <- paste0(m, "_", bufs, "m")
+    if (all(cs %in% names(d))) d[, paste0(m, "_cls") := rowMeans(.SD), .SDcols = cs]
+  }
+  d
+}
 # sites and site-years of the active dataset, for figure labels
 paper_n <- function() { d <- fread(PAPER_DATA, select = "SITE_ID"); c(sites = uniqueN(d$SITE_ID), sy = nrow(d)) }
 

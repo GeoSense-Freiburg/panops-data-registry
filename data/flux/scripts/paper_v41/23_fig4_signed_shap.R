@@ -38,12 +38,12 @@ d[, learner := factor(learner, levels = sapply(LEARNERS, `[[`, "lab"))]
 d[, window  := factor(sub("M4_","",model), levels = c("12m","24m"))]
 
 # natural-breaks categories, one metric per figure
-h <- as.data.frame(fread(PAPER_DATA))
+h <- as.data.frame(paper_class_data())   # <metric>_cls = class buffer (paper_common.R)
 nb <- function(v){m<-mean(v,na.rm=TRUE); s<-sd(v,na.rm=TRUE)
   factor(cut(v, c(-Inf, m-0.5*s, m+0.5*s, Inf), c("Low","Mid","High")), levels=c("Low","Mid","High"))}
 METRICS <- list(
-  list(key="relmort", col="relative_mortality_500m",   lab="relative mortality"),
-  list(key="reldist", col="relative_disturbance_500m", lab="relative disturbance"))
+  list(key="relmort", col="relative_mortality_cls",   lab="relative mortality"),
+  list(key="reldist", col="relative_disturbance_cls", lab="relative disturbance"))
 
 th <- theme_bw(base_size=11) + theme(
   plot.background=element_rect(fill=BG,colour=NA), panel.background=element_rect(fill=PANEL,colour=NA),
@@ -91,14 +91,14 @@ for (M in METRICS) {
                        labeller=labeller(response=EFP_LAB), switch="y") +
     labs(x=NULL, y="Net signed disturbance SHAP\n(effect on the PREDICTED value, response units)",
          title=sprintf("Direction of the disturbance effect — by %s", M$lab),
-         subtitle=paste0("Tree cover ≥30 % (", PN[["sites"]], " sites) · ", PAPER_MAPS, " · M4 · natural-breaks split (site max > mean + 0.5 SD) on ", M$lab,
+         subtitle=paste0("Tree cover ≥30 % (", PN[["sites"]], " sites) · ", PAPER_MAPS, " · M4 · natural-breaks split (site max > mean + 0.5 SD) on ", M$lab, " (", CLASS_LAB, ")",
                          " · below zero = the model predicts a LOWER value of the ", RESP_WORD, " (not worse accuracy)\n",
                          "stars = Mann-Whitney U between Low+Mid and High (unequal n), BH-FDR across the figure ",
                          "(*** q<0.001, ** q<0.01, * q<0.05)")) +
     th + theme(strip.placement="outside")
 
-  ggsave(file.path(OUT, sprintf("fig4_signed_shap_%s.png", M$key)), p, width=11, height=11, dpi=300, bg=BG)
-  ggsave(file.path(OUT, sprintf("fig4_signed_shap_%s.pdf", M$key)), p, width=11, height=11, bg=BG)
+  ggsave(file.path(OUT, sprintf("fig4_signed_shap_%s%s.png", M$key, CLASS_TAG)), p, width=11, height=11, dpi=300, bg=BG)
+  ggsave(file.path(OUT, sprintf("fig4_signed_shap_%s%s.pdf", M$key, CLASS_TAG)), p, width=11, height=11, bg=BG)
   cat(sprintf("  saved fig4_signed_shap_%s (%d tests)\n", M$key, nrow(st)))
 }
 fwrite(rbindlist(all_stats)[, .(metric, learner, response, window, n_low, n_high,

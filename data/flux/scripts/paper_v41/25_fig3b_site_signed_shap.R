@@ -31,19 +31,18 @@ signed <- fread(file.path(PAPER_OUT, sprintf("%s_site_signed_shap_M4.csv", LEARN
   .(model, response, test_site, dist_signed = mean_signed_shap)]
 
 # site-level metric value = max across the site's years (same as Fig 3 / Fig 4)
-dt_raw <- fread(PAPER_DATA, select = c("SITE_ID", "IGBP", "absolute_mortality_500m",
-                                        "relative_mortality_500m", "relative_disturbance_500m"))
+dt_raw <- paper_class_data("IGBP")   # <metric>_cls = class buffer (paper_common.R)
 na_inf <- function(x) { x[!is.finite(x)] <- NA; x }
 site_dist <- dt_raw[, .(IGBP = IGBP[1],
-                        abs_mort = na_inf(max(absolute_mortality_500m, na.rm = TRUE)),
-                        rel_mort = na_inf(max(relative_mortality_500m, na.rm = TRUE)),
-                        rel_dist = na_inf(max(relative_disturbance_500m, na.rm = TRUE))), by = SITE_ID]
+                        abs_mort = na_inf(max(absolute_mortality_cls, na.rm = TRUE)),
+                        rel_mort = na_inf(max(relative_mortality_cls, na.rm = TRUE)),
+                        rel_dist = na_inf(max(relative_disturbance_cls, na.rm = TRUE))), by = SITE_ID]
 
 SCALE_COLS <- c("#004D4D", "#F0E442", "#EE6FA8")   # dark teal -> yellow -> pink
 DIST_META <- list(
-  abs_mort = list(label = "Absolute Mortality\n(500m, %)"),
-  rel_mort = list(label = "Relative Mortality\n(%)"),
-  rel_dist = list(label = "Relative Disturbance\n(%)"))
+  abs_mort = list(label = paste0("Absolute Mortality\n(", CLASS_LAB, ", %)")),
+  rel_mort = list(label = paste0("Relative Mortality\n(", CLASS_LAB, ", %)")),
+  rel_dist = list(label = paste0("Relative Disturbance\n(", CLASS_LAB, ", %)")))
 DIST_META <- DIST_META[intersect(names(DIST_META), strsplit(Sys.getenv("FIG3B_METRICS", "abs_mort,rel_mort,rel_dist"), ",")[[1]])]
 for (k in names(DIST_META)) {     # natural breaks: Low < mean - 0.5 SD <= Mid <= mean + 0.5 SD < High
   x <- site_dist[[k]]
@@ -123,7 +122,7 @@ for (metric_key in names(DIST_META)) {
       plot_layout(guides = "collect") & theme(legend.position = "right")
 
     h <- max(6, nrow(sites) * 0.17 + 2)
-    stem <- file.path(OUT, sprintf("fig3b_signed_%s_%s_%s", metric_key, win, LEARNER))
+    stem <- file.path(OUT, sprintf("fig3b_signed_%s_%s_%s%s", metric_key, win, LEARNER, CLASS_TAG))
     ggsave(paste0(stem, ".png"), p, width = 20, height = h, dpi = 150, limitsize = FALSE)
     ggsave(paste0(stem, ".pdf"), p, width = 20, height = h, limitsize = FALSE, device = cairo_pdf)
     cat(sprintf("  OK %s (%d sites: %d High, %d Mid, %d Low)\n", basename(stem), nrow(sites), n_high, n_mid, n_low))

@@ -5,9 +5,10 @@
 #   dRMSE = RMSE(M4, with mortality) - RMSE(M3, without) per site, repeated CV (3 x 80 %);
 #   one bar per site, sorted by dRMSE within each panel; below 0 = mortality reduces the site's error.
 #   rows = responses, columns = learner x window (XGBoost / LightGBM Optuna, 12m / 24m).
-# Bars are coloured by the site's disturbance intensity (site maximum across years, 500 m) on the
-# Fig 3b scale: dark teal (0) -> yellow (site mean) -> pink (max), colour-vision-deficiency checked
-# (see 25_fig3b_site_signed_shap.R). One figure per intensity metric:
+# Bars are coloured by the site's disturbance CLASS (site maximum across years; buffer = CLASS_BUF in paper_common.R, default the mean of 100-500 m), the natural
+# breaks of Fig 3b: Low < mean - 0.5 SD <= Mid <= mean + 0.5 SD < High over sites. Colours are the three
+# anchors of the Fig 3b scale (dark teal / yellow / pink, colour-vision-deficiency checked, see
+# 25_fig3b_site_signed_shap.R). One figure per intensity metric:
 #   fig_site_dRMSE_reldist.png / .pdf   relative disturbance
 #   fig_site_dRMSE_relmort.png / .pdf   relative mortality
 #   fig_site_dRMSE_statistics.csv       % sites improved and median dRMSE per panel, plus Spearman rho
@@ -20,11 +21,11 @@ source("scripts/paper_v41/paper_common.R")
 OUT <- PAPER_FIG; dir.create(OUT, showWarnings = FALSE, recursive = TRUE)
 PN <- paper_n()
 
-SCALE_COLS <- c("#004D4D", "#F0E442", "#EE6FA8")   # dark teal -> yellow -> pink (as Fig 3b)
+CLASS_COLS <- c(Low = "#004D4D", Mid = "#F0E442", High = "#EE6FA8")   # dark teal / yellow / pink (as Fig 3b)
 GRID <- "#D9D9D9"; TXT <- "#111111"; AX <- "#444444"
 LEARNERS <- c(XGB = "XGBoost (Optuna)", LGB = "LightGBM (Optuna)")
-METRICS <- list(reldist = list(col = "relative_disturbance_500m", lab = "Relative disturbance"),
-                relmort = list(col = "relative_mortality_500m",   lab = "Relative mortality"))
+METRICS <- list(reldist = list(col = "relative_disturbance_cls", lab = "Relative disturbance"),
+                relmort = list(col = "relative_mortality_cls",   lab = "Relative mortality"))
 
 # per-site RMSE of M3 and M4 -> dRMSE
 d <- rbindlist(lapply(names(LEARNERS), function(L) {
@@ -38,7 +39,7 @@ d[, col := factor(paste0(LEARNERS[learner], " · ", win), levels = c(outer(c("12
 d[, response := factor(response, levels = EFP_ORDER)]
 
 # site intensity = maximum across the site's years
-raw <- fread(PAPER_DATA, select = c("SITE_ID", unname(sapply(METRICS, `[[`, "col"))))
+raw <- paper_class_data()[, c("SITE_ID", unname(sapply(METRICS, `[[`, "col"))), with = FALSE]
 na_inf <- function(x) { x[!is.finite(x)] <- NA; x }
 site <- raw[, lapply(.SD, function(x) na_inf(suppressWarnings(max(x, na.rm = TRUE)))), by = SITE_ID]
 
@@ -63,7 +64,12 @@ for (k in names(METRICS)) {
   # bar position = rank of dRMSE within each panel
   x[, pos := frank(dRMSE, ties.method = "first"), by = .(response, col)]
   mu <- mean(site[[M$col]], na.rm = TRUE); sdv <- sd(site[[M$col]], na.rm = TRUE)
-  max_val <- max(ceiling(max(site[[M$col]], na.rm = TRUE) / 5) * 5, (mu + 0.5 * sdv) * 2)
+  b_lo <- max(mu - 0.5 * sdv, 0); b_hi <- mu + 0.5 * sdv
+  x[, cls := factor(ifelse(is.na(v), NA, ifelse(v < b_lo, "Low", ifelse(v > b_hi, "High", "Mid"))), levels = names(CLASS_COLS))]
+  n_cls <- table(unique(x[, .(SITE_ID, cls)])$cls)
+  cls_lab <- setNames(sprintf("%s  (%s, %d sites)", names(CLASS_COLS),
+                              c(sprintf("< %.1f %%", b_lo), sprintf("%.1f\u2013%.1f %%", b_lo, b_hi), sprintf("> %.1f %%", b_hi)),
+                              as.integer(n_cls[names(CLASS_COLS)])), names(CLASS_COLS))
   lab <- x[, .(txt = sprintf("%.0f%% improved", 100 * mean(dRMSE < 0)), ytop = max(dRMSE)), by = .(response, col)]
   lab[, ytop := max(ytop), by = response]
   st <- x[, .(n_sites = .N, pct_improved = round(100 * mean(dRMSE < 0), 1), median_dRMSE = signif(median(dRMSE), 3),
@@ -72,21 +78,20 @@ for (k in names(METRICS)) {
           by = .(response, learner, window = win)]
   st[, metric := M$lab]; stats[[k]] <- st
 
-  p <- ggplot(x, aes(pos, dRMSE, fill = v)) +
+  p <- ggplot(x, aes(pos, dRMSE, fill = cls)) +
     geom_col(width = 1, colour = NA) +
     geom_hline(yintercept = 0, colour = "#555555", linewidth = 0.3) +
     geom_text(data = lab, aes(x = 1, y = ytop, label = txt), inherit.aes = FALSE, hjust = 0, vjust = 1,
               size = 2.9, colour = AX) +
-    scale_fill_gradientn(colours = SCALE_COLS, values = c(0, min(max(mu / max_val, 0.01), 0.99), 1),
-                         limits = c(0, max_val), na.value = "grey80",
-                         name = sprintf("%s (%%)\nsite maximum, 500 m\nbreaks %.1f | %.1f", M$lab, max(mu - 0.5 * sdv, 0), mu + 0.5 * sdv)) +
+    scale_fill_manual(values = CLASS_COLS, labels = cls_lab, drop = FALSE, na.value = "grey80",
+                      name = sprintf("%s\nsite maximum, %s\n(breaks: mean \u00b1 0.5 SD)", M$lab, CLASS_LAB)) +
     facet_grid(response ~ col, scales = "free_y", switch = "y", labeller = labeller(response = RESP_UNITS)) +
     labs(x = "Sites (sorted by ΔRMSE within each panel)", y = "ΔRMSE  =  RMSE(with D) − RMSE(without D)",
          title = "Per-site ΔRMSE from adding disturbance — M3 (C+T) vs M4 (C+T+D)",
-         subtitle = sprintf("Below 0 = D reduces the site's RMSE | bars coloured by %s (site maximum) | repeated CV (3×80 %%) | tree cover ≥30 %% (%d sites, %d site-years) · %s",
+         subtitle = sprintf("Below 0 = D reduces the site's RMSE | bars coloured by %s class (site maximum) | repeated CV (3×80 %%) | tree cover ≥30 %% (%d sites, %d site-years) · %s",
                             tolower(M$lab), PN[["sites"]], PN[["sy"]], PAPER_MAPS)) +
-    th + guides(fill = guide_colourbar(barheight = unit(4, "cm")))
-  stem <- file.path(OUT, sprintf("fig_site_dRMSE_%s", k))
+    th
+  stem <- file.path(OUT, sprintf("fig_site_dRMSE_%s%s", k, CLASS_TAG))
   ggsave(paste0(stem, ".png"), p, width = 15, height = 11, dpi = 200, bg = "white")
   ggsave(paste0(stem, ".pdf"), p, width = 15, height = 11, bg = "white", device = cairo_pdf)
   cat(sprintf("  OK %s (%d sites)\n", basename(stem), uniqueN(x$SITE_ID)))

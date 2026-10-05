@@ -44,6 +44,13 @@ efp <- merge(efp, nep[, .(SITE_ID, YEAR, NEPmax = NEPmax90_gs_all)], by = c("SIT
 efp <- efp[YEAR >= 2017 & is.finite(GPPsat) & is.finite(NEPmax) & is.finite(ETmax) & is.finite(WUE)]
 say("== Stage counts ==")
 count(efp, "EFPs: all four available (2017-2025)")
+# Quality control carried over from the June/July 2026 data-quality checks (scripts/fix_flagged_sites.py,
+# scripts/prepare_rf_v3_harmonized.py; daily_reports/data_quality_report.md), re-applied 2026-10-02:
+#   CN-Sb1 / CN-Sb2: extreme WUE (12-34 vs a median near 3.5, z = 6-14) - removed for every EFP so all
+#   responses share the same site-years; negative WUE is not physical - that site-year is removed.
+QC_SITES <- c("CN-Sb1", "CN-Sb2")
+efp <- efp[!SITE_ID %in% QC_SITES & WUE >= 0]
+count(efp, "+ QC: without CN-Sb1 / CN-Sb2 and negative-WUE site-years")
 efp4 <- runs4(copy(efp))
 count(efp4, sprintf("EFPs: in a run of >= %d continuous years", MIN_RUN))
 

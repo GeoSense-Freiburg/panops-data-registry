@@ -70,8 +70,8 @@ site_meta[, IGBP := factor(IGBP, levels = IGBP_ORDER)]
 # above. Per-site value = max across years, same convention as Fig 3 / the
 # mortality world map (site_dist aggregation).
 na_inf <- function(x) { x[!is.finite(x)] <- NA; x }
-harm_dist <- fread(harm_file, select = c("SITE_ID", "relative_disturbance_500m"))
-dist_meta <- harm_dist[, .(rel_disturbance = na_inf(max(relative_disturbance_500m, na.rm = TRUE))), by = SITE_ID]
+harm_dist <- paper_class_data()   # relative_disturbance_cls = class buffer (paper_common.R)
+dist_meta <- harm_dist[, .(rel_disturbance = na_inf(max(relative_disturbance_cls, na.rm = TRUE))), by = SITE_ID]
 site_meta <- merge(site_meta, dist_meta, by = "SITE_ID", all.x = TRUE)
 
 # ── per-site RMSE ────────────────────────────────────────────
@@ -221,7 +221,7 @@ for (s in sets) {
                    "D · Tree cover vs. direction of the disturbance effect",
                    paste0("Each point = one site | Linear fit with 95% CI | below zero = model predicts a LOWER ", RESP_WORD, " value"),
                    TRUE, TRUE, labD)
-  pE <- scatter_tc(sh, "rel_disturbance", "Relative disturbance (500m, %, max across years)",
+  pE <- scatter_tc(sh, "rel_disturbance", paste0("Relative disturbance (", CLASS_LAB, ", %, max across years)"),
                    "dist_signed", "Net signed disturbance SHAP\n(effect on PREDICTED value)",
                    "E · Relative disturbance vs. direction of the disturbance effect",
                    paste0("Each point = one site | Linear fit with 95% CI | below zero = model predicts a LOWER ", RESP_WORD, " value"),
@@ -234,7 +234,7 @@ for (s in sets) {
                     plot.background = element_rect(fill = DARK_BG, colour = NA))
     ) & theme(plot.background = element_rect(fill = DARK_BG, colour = NA))
 
-  stem <- file.path(out_dir, sprintf("fig5_igbp_board_%s_%s", sub("^M4_", "", s$wd), FAM))
+  stem <- file.path(out_dir, sprintf("fig5_igbp_board_%s_%s%s", sub("^M4_", "", s$wd), FAM, CLASS_TAG))
   ggsave(paste0(stem, ".png"), board, width = 14, height = 25, dpi = 190, bg = DARK_BG, limitsize = FALSE)
   ggsave(paste0(stem, ".pdf"), board, width = 14, height = 25, bg = DARK_BG, limitsize = FALSE)
   cat(sprintf("  ✓ %s\n", basename(stem)))

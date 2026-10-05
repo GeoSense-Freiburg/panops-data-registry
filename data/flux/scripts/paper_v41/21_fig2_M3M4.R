@@ -36,16 +36,16 @@ if (is.na(SUBSET)) SUBSET <- "all"
 stopifnot(SUBSET %in% c("all", "high_reldist", "high_relmort"))
 KEEP_SITES <- NULL; SUB_TXT <- ""; FILE_TAG <- ""
 if (SUBSET != "all") {
-  mcol <- c(high_reldist = "relative_disturbance_500m", high_relmort = "relative_mortality_500m")[[SUBSET]]
+  mcol <- c(high_reldist = "relative_disturbance_cls", high_relmort = "relative_mortality_cls")[[SUBSET]]
   mlab <- c(high_reldist = "relative disturbance", high_relmort = "relative mortality")[[SUBSET]]
-  sm <- fread(PAPER_DATA, select = c("SITE_ID", mcol))
+  sm <- paper_class_data()[, c("SITE_ID", mcol), with = FALSE]
   setnames(sm, mcol, "v")
   sm <- sm[, .(v = suppressWarnings(max(v, na.rm = TRUE))), by = SITE_ID][is.finite(v)]
   nb <- mean(sm$v) + 0.5 * sd(sm$v)
   KEEP_SITES <- sm[v > nb, SITE_ID]
-  SUB_TXT <- sprintf("HIGH-disturbance sites only: %d of %d sites (site-maximum %s > %.1f %% = mean + 0.5 SD); models trained on all sites\n",
-                     length(KEEP_SITES), PN[["sites"]], mlab, nb)
-  FILE_TAG <- paste0("_", SUBSET)
+  SUB_TXT <- sprintf("HIGH-disturbance sites only: %d of %d sites (site-maximum %s, %s, > %.1f %% = mean + 0.5 SD); models trained on all sites\n",
+                     length(KEEP_SITES), PN[["sites"]], mlab, CLASS_LAB, nb)
+  FILE_TAG <- paste0("_", SUBSET, CLASS_TAG)
 }
 
 LEARNERS <- list(   # random forest dropped at the user's request

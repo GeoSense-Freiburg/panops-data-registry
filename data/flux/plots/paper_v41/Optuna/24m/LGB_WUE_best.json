@@ -1,15 +1,15 @@
 {
   "learner": "LGB",
   "response": "WUE",
-  "best_value": 0.63567438,
+  "best_value": 0.80470322,
   "n_trials": 50,
   "params": {
-    "learning_rate": 0.02947040328673991,
-    "nrounds": 1000,
-    "num_leaves": 26,
-    "min_data_in_leaf": 9,
-    "feature_fraction": 0.5376547614215892,
-    "bagging_fraction": 0.605891687882357,
-    "lambda_l2": 0.12143180051349352
+    "learning_rate": 0.020225338353047163,
+    "nrounds": 600,
+    "num_leaves": 14,
+    "min_data_in_leaf": 12,
+    "feature_fraction": 0.20274968049532613,
+    "bagging_fraction": 0.94376135872709,
+    "lambda_l2": 1.0791759733725241
   }
 }

@@ -1,15 +1,15 @@
 {
   "learner": "XGB",
   "response": "WUE",
-  "best_value": 0.65454765,
+  "best_value": 0.80078876,
   "n_trials": 50,
   "params": {
-    "learning_rate": 0.015126383027715004,
+    "learning_rate": 0.028025163160137957,
     "nrounds": 900,
-    "max_depth": 8,
-    "min_child_weight": 7.736073126357695,
-    "subsample": 0.6031591376529277,
-    "colsample_bytree": 0.7704318959633194,
-    "reg_lambda": 0.08144602811431617
+    "max_depth": 7,
+    "min_child_weight": 9.421344119316016,
+    "subsample": 0.5419331947227972,
+    "colsample_bytree": 0.2688898811445494,
+    "reg_lambda": 0.020581378306905315
   }
 }

@@ -1,15 +1,15 @@
 {
   "learner": "LGB",
   "response": "ETmax",
-  "best_value": 0.76217629,
+  "best_value": 0.76885342,
   "n_trials": 50,
   "params": {
-    "learning_rate": 0.012302182746513516,
-    "nrounds": 500,
-    "num_leaves": 60,
-    "min_data_in_leaf": 24,
-    "feature_fraction": 0.20230639935492203,
-    "bagging_fraction": 0.508166775364223,
-    "lambda_l2": 9.815530735315402
+    "learning_rate": 0.011920069510821122,
+    "nrounds": 700,
+    "num_leaves": 45,
+    "min_data_in_leaf": 16,
+    "feature_fraction": 0.26272165527120395,
+    "bagging_fraction": 0.5262729589381884,
+    "lambda_l2": 23.11999644886793
   }
 }

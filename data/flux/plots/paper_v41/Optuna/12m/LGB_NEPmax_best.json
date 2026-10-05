@@ -1,15 +1,15 @@
 {
   "learner": "LGB",
   "response": "NEPmax",
-  "best_value": 0.75150283,
+  "best_value": 0.73805975,
   "n_trials": 50,
   "params": {
-    "learning_rate": 0.010351204492602996,
-    "nrounds": 700,
-    "num_leaves": 52,
-    "min_data_in_leaf": 6,
-    "feature_fraction": 0.2940006447552211,
-    "bagging_fraction": 0.6221165098790155,
-    "lambda_l2": 1.5650601864919285
+    "learning_rate": 0.01016033031504662,
+    "nrounds": 400,
+    "num_leaves": 16,
+    "min_data_in_leaf": 32,
+    "feature_fraction": 0.3631456894264885,
+    "bagging_fraction": 0.8033959805397728,
+    "lambda_l2": 0.26518614367927285
   }
 }

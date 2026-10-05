@@ -40,21 +40,20 @@ site_tot <- shap_grp[, .(total = sum(grp_shap)), by = .(model, response, test_si
 shap_grp <- merge(shap_grp, site_tot, by = c("model", "response", "test_site"))
 shap_grp[, rel_shap := grp_shap / total]
 
-dt_raw <- fread(harm_file, select = c("SITE_ID", "YEAR", "absolute_mortality_500m",
-                                       "relative_mortality_500m", "relative_disturbance_500m"))
+dt_raw <- paper_class_data()   # <metric>_cls = class buffer (paper_common.R)
 na_inf <- function(x) { x[!is.finite(x)] <- NA; x }
-site_dist <- dt_raw[, .(abs_mort = na_inf(max(absolute_mortality_500m, na.rm = TRUE)),
-                        rel_mort = na_inf(max(relative_mortality_500m, na.rm = TRUE)),
-                        rel_dist = na_inf(max(relative_disturbance_500m, na.rm = TRUE))), by = SITE_ID]
+site_dist <- dt_raw[, .(abs_mort = na_inf(max(absolute_mortality_cls, na.rm = TRUE)),
+                        rel_mort = na_inf(max(relative_mortality_cls, na.rm = TRUE)),
+                        rel_dist = na_inf(max(relative_disturbance_cls, na.rm = TRUE))), by = SITE_ID]
 
 nb_high <- function(x) mean(x, na.rm = TRUE) + 0.5 * sd(x, na.rm = TRUE)
 NB <- list(abs_mort = nb_high(site_dist$abs_mort), rel_mort = nb_high(site_dist$rel_mort),
           rel_dist = nb_high(site_dist$rel_dist))
 
 DIST_META <- list(
-  abs_mort = list(col = "abs_mort", label = sprintf("Absolute Mortality\n(500m, %%)  NB=%.1f", NB$abs_mort), mid_v = NB$abs_mort),
-  rel_mort = list(col = "rel_mort", label = sprintf("Relative Mortality\n(%%)  NB=%.1f", NB$rel_mort), mid_v = NB$rel_mort),
-  rel_dist = list(col = "rel_dist", label = sprintf("Relative Disturbance\n(%%)  NB=%.1f", NB$rel_dist), mid_v = NB$rel_dist)
+  abs_mort = list(col = "abs_mort", label = sprintf("Absolute Mortality\n(%s, %%)  NB=%.1f", CLASS_LAB, NB$abs_mort), mid_v = NB$abs_mort),
+  rel_mort = list(col = "rel_mort", label = sprintf("Relative Mortality\n(%s, %%)  NB=%.1f", CLASS_LAB, NB$rel_mort), mid_v = NB$rel_mort),
+  rel_dist = list(col = "rel_dist", label = sprintf("Relative Disturbance\n(%s, %%)  NB=%.1f", CLASS_LAB, NB$rel_dist), mid_v = NB$rel_dist)
 )
 
 shap_grp <- merge(shap_grp, site_dist, by.x = "test_site", by.y = "SITE_ID", all.x = TRUE)
@@ -138,7 +137,7 @@ for (metric_key in names(DIST_META)) {
     n_sites <- uniqueN(dt_model$test_site)
     h <- max(6, n_sites * 0.17 + 2)
 
-    stem <- file.path(OUT, sprintf("fig3_%s_%s_%s", metric_key, win, LEARNER))
+    stem <- file.path(OUT, sprintf("fig3_%s_%s_%s%s", metric_key, win, LEARNER, CLASS_TAG))
     ggsave(paste0(stem, ".png"), p, width = 20, height = h, dpi = 150, limitsize = FALSE)
     ggsave(paste0(stem, ".pdf"), p, width = 20, height = h, limitsize = FALSE)
     cat(sprintf("  OK %s (%d sites)\n", basename(stem), n_sites))
