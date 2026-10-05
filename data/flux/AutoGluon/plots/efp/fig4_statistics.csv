@@ -1,28 +1,28 @@
 metric,learner,response,window,n_low,n_high,med_low,med_high,p,q,sig
-relative standing deadwood,XGBoost (Optuna),GPPsat,12m,81,23,0.595,-1.771,0.000113,0.000338,***
-relative standing deadwood,XGBoost (Optuna),GPPsat,24m,81,23,0.522,-1.437,0.000437,0.000874,***
-relative standing deadwood,LightGBM (Optuna),GPPsat,12m,81,23,0.282,-1.56,0.00125,0.00188,**
-relative standing deadwood,LightGBM (Optuna),GPPsat,24m,81,23,0.464,-1.382,0.00109,0.00174,**
-relative standing deadwood,AutoGluon (ensemble),GPPsat,12m,81,23,0.878,-1.364,5.87e-05,0.000282,***
-relative standing deadwood,AutoGluon (ensemble),GPPsat,24m,81,23,0.952,-1.405,2.51e-05,0.000151,***
-relative standing deadwood,XGBoost (Optuna),NEPmax,12m,81,23,0.182,-0.924,0.000315,0.000687,***
-relative standing deadwood,XGBoost (Optuna),NEPmax,24m,81,23,0.443,-0.905,0.000199,0.000531,***
-relative standing deadwood,LightGBM (Optuna),NEPmax,12m,81,23,0.14,-0.722,0.000897,0.00154,**
-relative standing deadwood,LightGBM (Optuna),NEPmax,24m,81,23,0.215,-0.819,0.000477,0.000881,***
-relative standing deadwood,AutoGluon (ensemble),NEPmax,12m,81,23,0.626,-0.653,9.29e-05,0.000338,***
-relative standing deadwood,AutoGluon (ensemble),NEPmax,24m,81,23,0.552,-0.883,1.71e-05,0.000137,***
-relative standing deadwood,XGBoost (Optuna),ETmax,12m,81,23,0.001,-0.003,0.188,0.215,ns
-relative standing deadwood,XGBoost (Optuna),ETmax,24m,81,23,0.002,-0.006,0.0261,0.033,*
-relative standing deadwood,LightGBM (Optuna),ETmax,12m,81,23,0.001,-0.004,0.415,0.453,ns
-relative standing deadwood,LightGBM (Optuna),ETmax,24m,81,23,0.002,-0.005,0.0591,0.0709,ns
-relative standing deadwood,AutoGluon (ensemble),ETmax,12m,81,23,0.003,0.001,0.845,0.845,ns
-relative standing deadwood,AutoGluon (ensemble),ETmax,24m,81,23,0.003,0.002,0.826,0.845,ns
-relative standing deadwood,XGBoost (Optuna),WUE,12m,81,23,0.099,-0.249,9.92e-05,0.000338,***
-relative standing deadwood,XGBoost (Optuna),WUE,24m,81,23,0.098,-0.297,0.00183,0.00258,**
-relative standing deadwood,LightGBM (Optuna),WUE,12m,81,23,0.101,-0.2,0.00237,0.00317,**
-relative standing deadwood,LightGBM (Optuna),WUE,24m,81,23,0.111,-0.264,0.000296,0.000687,***
-relative standing deadwood,AutoGluon (ensemble),WUE,12m,81,23,0.115,-0.324,1.15e-05,0.000137,***
-relative standing deadwood,AutoGluon (ensemble),WUE,24m,81,23,0.116,-0.31,1.11e-05,0.000137,***
+relative deadwood,XGBoost (Optuna),GPPsat,12m,81,23,0.595,-1.771,0.000113,0.000338,***
+relative deadwood,XGBoost (Optuna),GPPsat,24m,81,23,0.522,-1.437,0.000437,0.000874,***
+relative deadwood,LightGBM (Optuna),GPPsat,12m,81,23,0.282,-1.56,0.00125,0.00188,**
+relative deadwood,LightGBM (Optuna),GPPsat,24m,81,23,0.464,-1.382,0.00109,0.00174,**
+relative deadwood,AutoGluon (ensemble),GPPsat,12m,81,23,0.878,-1.364,5.87e-05,0.000282,***
+relative deadwood,AutoGluon (ensemble),GPPsat,24m,81,23,0.952,-1.405,2.51e-05,0.000151,***
+relative deadwood,XGBoost (Optuna),NEPmax,12m,81,23,0.182,-0.924,0.000315,0.000687,***
+relative deadwood,XGBoost (Optuna),NEPmax,24m,81,23,0.443,-0.905,0.000199,0.000531,***
+relative deadwood,LightGBM (Optuna),NEPmax,12m,81,23,0.14,-0.722,0.000897,0.00154,**
+relative deadwood,LightGBM (Optuna),NEPmax,24m,81,23,0.215,-0.819,0.000477,0.000881,***
+relative deadwood,AutoGluon (ensemble),NEPmax,12m,81,23,0.626,-0.653,9.29e-05,0.000338,***
+relative deadwood,AutoGluon (ensemble),NEPmax,24m,81,23,0.552,-0.883,1.71e-05,0.000137,***
+relative deadwood,XGBoost (Optuna),ETmax,12m,81,23,0.001,-0.003,0.188,0.215,ns
+relative deadwood,XGBoost (Optuna),ETmax,24m,81,23,0.002,-0.006,0.0261,0.033,*
+relative deadwood,LightGBM (Optuna),ETmax,12m,81,23,0.001,-0.004,0.415,0.453,ns
+relative deadwood,LightGBM (Optuna),ETmax,24m,81,23,0.002,-0.005,0.0591,0.0709,ns
+relative deadwood,AutoGluon (ensemble),ETmax,12m,81,23,0.003,0.001,0.845,0.845,ns
+relative deadwood,AutoGluon (ensemble),ETmax,24m,81,23,0.003,0.002,0.826,0.845,ns
+relative deadwood,XGBoost (Optuna),WUE,12m,81,23,0.099,-0.249,9.92e-05,0.000338,***
+relative deadwood,XGBoost (Optuna),WUE,24m,81,23,0.098,-0.297,0.00183,0.00258,**
+relative deadwood,LightGBM (Optuna),WUE,12m,81,23,0.101,-0.2,0.00237,0.00317,**
+relative deadwood,LightGBM (Optuna),WUE,24m,81,23,0.111,-0.264,0.000296,0.000687,***
+relative deadwood,AutoGluon (ensemble),WUE,12m,81,23,0.115,-0.324,1.15e-05,0.000137,***
+relative deadwood,AutoGluon (ensemble),WUE,24m,81,23,0.116,-0.31,1.11e-05,0.000137,***
 total mortality,XGBoost (Optuna),GPPsat,12m,83,21,0.595,-2.051,2.26e-06,7.74e-06,***
 total mortality,XGBoost (Optuna),GPPsat,24m,83,21,0.522,-2.321,3.77e-06,9.05e-06,***
 total mortality,LightGBM (Optuna),GPPsat,12m,83,21,0.282,-1.955,3.04e-05,4.57e-05,***

@@ -46,7 +46,7 @@ site_dist <- dt_raw[, .(IGBP = IGBP[1],
 SCALE_COLS <- c("#004D4D", "#F0E442", "#EE6FA8")   # dark teal -> yellow -> pink
 DIST_META <- list(
   abs_mort = list(label = paste0("Absolute Deadwood\n(", CLASS_LAB, ", %)")),
-  rel_mort = list(label = paste0("Relative Standing Deadwood\n(", CLASS_LAB, ", %)")),
+  rel_mort = list(label = paste0("Relative Deadwood\n(", CLASS_LAB, ", %)")),
   rel_dist = list(label = paste0("Total Mortality\n(", CLASS_LAB, ", %)")))
 DIST_META <- DIST_META[intersect(names(DIST_META), strsplit(Sys.getenv("FIG3B_METRICS", "abs_mort,rel_mort,rel_dist"), ",")[[1]])]
 for (k in names(DIST_META)) {     # natural breaks: Low < mean - 0.5 SD <= Mid <= mean + 0.5 SD < High
@@ -152,7 +152,7 @@ for (metric_key in names(DIST_META)) {
             legend.title = element_text(size = if (PAPER_LAYOUT) 6 else 7.5),
             legend.text = element_text(size = if (PAPER_LAYOUT) 5.5 else 7))
 
-    stem <- file.path(OUT, sprintf("fig3b_signed_%s_%s_%s%s", metric_key, win, LEARNER, CLASS_TAG))
+    stem <- file.path(OUT, sprintf("fig3b_signed_%s_%s_%s%s", FILE_KEY[[metric_key]], win, LEARNER, CLASS_TAG))
     if (PAPER_LAYOUT) {
       h <- min(10, max(6, nrow(sites) * 0.082 + 1.4))
       ggsave(paste0(stem, ".png"), p, width = 7, height = h, dpi = 300)

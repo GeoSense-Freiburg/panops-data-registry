@@ -25,7 +25,7 @@ CLASS_COLS <- c(Low = "#004D4D", Mid = "#F0E442", High = "#EE6FA8")   # dark tea
 GRID <- "#D9D9D9"; TXT <- "#111111"; AX <- "#444444"
 LEARNERS <- c(XGB = "XGBoost (Optuna)", LGB = "LightGBM (Optuna)")
 METRICS <- list(reldist = list(col = "relative_disturbance_cls", lab = "Total mortality"),
-                relmort = list(col = "relative_mortality_cls",   lab = "Relative standing deadwood"))
+                relmort = list(col = "relative_mortality_cls",   lab = "Relative deadwood"))
 
 # per-site RMSE of M3 and M4 -> dRMSE
 d <- rbindlist(lapply(names(LEARNERS), function(L) {
@@ -91,7 +91,7 @@ for (k in names(METRICS)) {
          subtitle = sprintf("Below 0 = mortality reduces the site's RMSE | bars coloured by %s class (site maximum) | repeated CV (3×80 %%) | tree cover ≥30 %% (%d sites, %d site-years) · %s",
                             tolower(M$lab), PN[["sites"]], PN[["sy"]], PAPER_MAPS)) +
     th
-  stem <- file.path(OUT, sprintf("fig_site_dRMSE_%s%s", k, CLASS_TAG))
+  stem <- file.path(OUT, sprintf("fig_site_dRMSE_%s%s", FILE_KEY[[k]], CLASS_TAG))
   ggsave(paste0(stem, ".png"), p, width = 15, height = 11, dpi = 200, bg = "white")
   ggsave(paste0(stem, ".pdf"), p, width = 15, height = 11, bg = "white", device = cairo_pdf)
   cat(sprintf("  OK %s (%d sites)\n", basename(stem), uniqueN(x$SITE_ID)))

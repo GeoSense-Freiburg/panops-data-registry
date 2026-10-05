@@ -54,7 +54,7 @@ NB <- list(abs_mort = nb_high(site_dist$abs_mort), rel_mort = nb_high(site_dist$
 
 DIST_META <- list(
   abs_mort = list(col = "abs_mort", label = sprintf("Absolute Deadwood\n(%s, %%)  NB=%.1f", CLASS_LAB, NB$abs_mort), mid_v = NB$abs_mort),
-  rel_mort = list(col = "rel_mort", label = sprintf("Relative Standing Deadwood\n(%s, %%)  NB=%.1f", CLASS_LAB, NB$rel_mort), mid_v = NB$rel_mort),
+  rel_mort = list(col = "rel_mort", label = sprintf("Relative Deadwood\n(%s, %%)  NB=%.1f", CLASS_LAB, NB$rel_mort), mid_v = NB$rel_mort),
   rel_dist = list(col = "rel_dist", label = sprintf("Total Mortality\n(%s, %%)  NB=%.1f", CLASS_LAB, NB$rel_dist), mid_v = NB$rel_dist)
 )
 
@@ -154,7 +154,7 @@ for (metric_key in names(DIST_META)) {
 
     p <- make_combined_plot(dt_model, metric_key, MODEL_LABELS[[this_model]])
     n_sites <- uniqueN(dt_model$test_site)
-    stem <- file.path(OUT, sprintf("fig3_%s_%s_%s%s", metric_key, win, LEARNER, CLASS_TAG))
+    stem <- file.path(OUT, sprintf("fig3_%s_%s_%s%s", FILE_KEY[[metric_key]], win, LEARNER, CLASS_TAG))
     if (PAPER_LAYOUT) {
       h <- min(10, max(6, n_sites * 0.082 + 1.4))
       ggsave(paste0(stem, ".png"), p, width = 7, height = h, dpi = 300)

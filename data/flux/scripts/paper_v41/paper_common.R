@@ -80,6 +80,10 @@ paper_load <- function() as.data.frame(fread(PAPER_DATA))
 CLASS_BUF <- Sys.getenv("PAPER_CLASS_BUFFER", if (PAPER_RESP_SET %in% c("efp", "flux")) "avg" else "500")
 CLASS_LAB <- if (CLASS_BUF == "avg") "mean of 100-500 m buffers" else paste0(CLASS_BUF, " m")
 CLASS_TAG <- if (CLASS_BUF == "avg") "" else paste0("_cls", CLASS_BUF, "m")   # file-name tag; none for the default
+# Figure FILE names use the paper's metric names (user, 2026-10-05); the short keys inside the scripts stay:
+#   absolute_mortality = absolute deadwood, relative_mortality = relative deadwood, relative_disturbance = total mortality
+FILE_KEY <- c(abs_mort = "abs_deadwood", rel_mort = "rel_deadwood", rel_dist = "total_mort",
+              relmort = "rel_deadwood", reldist = "total_mort", high_relmort = "high_rel_deadwood", high_reldist = "high_total_mort")
 CLASS_METRICS <- c("absolute_mortality", "relative_mortality", "relative_disturbance")
 paper_class_data <- function(extra = character(0)) {
   bufs <- if (CLASS_BUF == "avg") c(100, 200, 300, 400, 500) else as.integer(CLASS_BUF)

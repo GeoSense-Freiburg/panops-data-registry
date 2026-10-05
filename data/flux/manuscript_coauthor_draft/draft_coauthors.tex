@@ -60,7 +60,7 @@
         five buffers 100--500\,m, exceeds 25.0\,\% = mean + 0.5\,SD): the gain roughly doubles ---
         GPP$_{sat}$ $-10.3$ to $-15.5$\,\% (76--86\,\% of sites improve), NEP$_{max}$ $-16.5$ to $-19.7$\,\%
         (86--95\,\%), ET$_{max}$ $-2.9$ to $-5.3$\,\%, WUE significant only for XGBoost 12\,m ($-8.3$\,\%).
-  \item Table~\ref{tab:fig2_dRMSE_reldist_v41} summarises all sites, Mid + High and High sites in one place,
+  \item Table~\ref{tab:fig2_dRMSE_total_mort_v41} summarises all sites, Mid + High and High sites in one place,
         including AutoGluon.
   \item Site classes now use the \textbf{mean of the five nested buffers} rather than 500\,m only: the 100\,m
         circle lies inside all five, so the mean weights the area nearest the tower most, like a flux footprint.
@@ -68,14 +68,14 @@
   \item \decide{site classes from the buffer mean (main) with 500\,m and 100\,m versions in the supplement?}
 \end{itemize}
 
-\begin{center}\includegraphics[width=\linewidth]{figures/fig2_disturbance_effect_M3M4.png}\\[2pt]
+\begin{center}\includegraphics[width=\linewidth]{figures/fig2_mortality_effect.png}\\[2pt]
 {\small \textbf{Fig.\ 2a} --- all 104 sites}\end{center}
-\begin{center}\includegraphics[width=\linewidth]{figures/fig2_high_reldist_disturbance_effect_M3M4.png}\\[2pt]
+\begin{center}\includegraphics[width=\linewidth]{figures/fig2_high_total_mort_mortality_effect.png}\\[2pt]
 {\small \textbf{Fig.\ 2b} --- high total-mortality sites only (21 sites; models trained on all sites)}\end{center}
-\begin{center}\includegraphics[width=\linewidth]{figures/fig_site_dRMSE_reldist.png}\\[2pt]
+\begin{center}\includegraphics[width=\linewidth]{figures/fig_site_dRMSE_total_mort.png}\\[2pt]
 {\small \textbf{Fig.\ 2c} --- per-site $\Delta$RMSE, bars coloured by total-mortality class (Low / Mid / High)}\end{center}
 
-\input{tables/table_fig2_dRMSE_reldist_v41}
+\input{tables/table_fig2_dRMSE_total_mort_v41}
 
 \section*{Figure 3: Direction of the mortality effect at each site (signed SHAP)}
 \begin{itemize}
@@ -86,7 +86,7 @@
         at that site because of its mortality values.
   \item Shown for \textbf{LightGBM--Optuna}, 24-month window; the 12-month window and the XGBoost--Optuna version
         are in the Appendix.
-        Only total mortality is shown; absolute deadwood and relative standing deadwood are dropped from the draft.
+        Only total mortality is shown; absolute deadwood and relative deadwood are dropped from the draft.
   \item \textbf{The sign follows the mortality class.} Share of sites with a negative contribution
         (LightGBM, 24\,m): GPP$_{sat}$ 15\,\% of Low, 70\,\% of Mid, 81\,\% of High sites; NEP$_{max}$ 18 / 70 / 81\,\%;
         WUE 12 / 56 / 81\,\%; ET$_{max}$ 22 / 53 / 81\,\%. XGBoost and the 12\,m window give the same picture
@@ -101,7 +101,7 @@
 \end{itemize}
 
 \begin{center}
-\includegraphics[width=\linewidth]{figures/fig3b_signed_rel_dist_24m_LGB.png}\\[2pt]
+\includegraphics[width=\linewidth]{figures/fig3b_signed_total_mort_24m_LGB.png}\\[2pt]
 {\small \textbf{Fig.\ 3} --- Net signed mortality SHAP per site, C+T+M model, 24\,m, LightGBM--Optuna; sites sorted and
 coloured by total mortality (mean of the five buffers).}
 \end{center}
@@ -117,7 +117,7 @@ coloured by total mortality (mean of the five buffers).}
         \emph{less error}; here negative means \emph{lower predicted carbon uptake}. C+T+M model, natural-breaks thresholds,
         Low+Mid vs High, both Optuna learners, both windows.
   \item Classes: site maximum of the metric, mean of the five buffers; High $>$ mean + 0.5\,SD
-        (total mortality: 21 High vs 83 Low+Mid; relative standing deadwood: 23 vs 81). Mann--Whitney U between
+        (total mortality: 21 High vs 83 Low+Mid; relative deadwood: 23 vs 81). Mann--Whitney U between
         the two groups, BH-FDR across the figure.
   \item \textbf{A clear dose--response.} At \textbf{High}-mortality sites the block pushes predicted
         carbon uptake \emph{down}; at \textbf{Low+Mid} sites it pushes it slightly \emph{up}
@@ -127,8 +127,8 @@ coloured by total mortality (mean of the five buffers).}
   \item NEP$_{max}$: High $-1.35$ to $-1.59$, Low+Mid $+0.15$ to $+0.44$; WUE: High $-0.20$ to $-0.31$,
         Low+Mid $+0.11$ g\,C\,mm$^{-1}$; all $q<0.001$.
   \item \textbf{ET$_{max}$:} the shift is tiny ($-0.003$ to $-0.006$\,mm\,d$^{-1}$) but significant for total
-        mortality in all four configurations; for relative standing deadwood only in 1 of 4.
-  \item Overall 16 of 16 tests significant for total mortality, 13 of 16 for relative standing deadwood, and the sign
+        mortality in all four configurations; for relative deadwood only in 1 of 4.
+  \item Overall 16 of 16 tests significant for total mortality, 13 of 16 for relative deadwood, and the sign
         never disagrees between learners or windows.
   \item \textbf{Read with Figure 2:} mortality improves accuracy (Figure 2) by lowering predictions at
         damaged sites. Note that sites are grouped by the same variables whose contribution is measured, so
@@ -140,11 +140,11 @@ coloured by total mortality (mean of the five buffers).}
 \end{itemize}
 
 \begin{center}
-\includegraphics[width=\linewidth]{figures/fig4_signed_shap_relmort.png}\\[2pt]
-{\small \textbf{Fig.\ 4a} --- split by \textbf{relative standing deadwood}}
+\includegraphics[width=\linewidth]{figures/fig4_signed_shap_rel_deadwood.png}\\[2pt]
+{\small \textbf{Fig.\ 4a} --- split by \textbf{relative deadwood}}
 \end{center}
 \begin{center}
-\includegraphics[width=\linewidth]{figures/fig4_signed_shap_reldist.png}\\[2pt]
+\includegraphics[width=\linewidth]{figures/fig4_signed_shap_total_mort.png}\\[2pt]
 {\small \textbf{Fig.\ 4b} --- split by \textbf{total mortality}}
 \end{center}
 
@@ -233,9 +233,9 @@ Mean, C+T & 0.358 & 0.359 & \textbf{0.395} & 0.361 & 0.374 & \textbf{0.404} \\
 \end{tabular}
 \end{table}
 
-\begin{center}\includegraphics[width=\linewidth]{figures/ag_fig2_disturbance_effect_M3M4.png}\\[2pt]
+\begin{center}\includegraphics[width=\linewidth]{figures/ag_fig2_mortality_effect.png}\\[2pt]
 {\small \textbf{Fig.\ 6a} --- Figure 2 with AutoGluon as third learner, all sites}\end{center}
-\begin{center}\includegraphics[width=\linewidth]{figures/ag_fig2_high_reldist_disturbance_effect_M3M4.png}\\[2pt]
+\begin{center}\includegraphics[width=\linewidth]{figures/ag_fig2_high_total_mort_mortality_effect.png}\\[2pt]
 {\small \textbf{Fig.\ 6b} --- the same, high total-mortality sites only (21 sites)}\end{center}
 
 \section*{Discussions}
@@ -270,10 +270,10 @@ Mean, C+T & 0.358 & 0.359 & \textbf{0.395} & 0.361 & 0.374 & \textbf{0.404} \\
 Standing deadwood cover as a percentage of the total buffer area — the absolute amount of dead canopy.
 absolute deadwood = deadwood / area × 100 (\%)
 \\
-\textbf{Relative standing deadwood}
+\textbf{Relative deadwood}
 Deadwood relative to tree cover, what \% of the standing trees are currently dead (defined where tree cover $\geq$ 10 \%, capped at 100 \%).
 
-relative standing deadwood = deadwood / tree cover × 100 (\%)
+relative deadwood = deadwood / tree cover × 100 (\%)
 \\
 \textbf{Total mortality}
 Combines standing deadwood and tree-cover loss relative to forest plus loss — captures both dead-standing and removed/lost canopy.
@@ -317,16 +317,16 @@ total mortality = (deadwood + loss×100) / (forest + loss×100) × 100 (\%)
 \end{itemize}
 
 \begin{center}
-\includegraphics[width=\linewidth]{figures/fig3b_signed_rel_dist_12m_LGB.png}\\[2pt]
+\includegraphics[width=\linewidth]{figures/fig3b_signed_total_mort_12m_LGB.png}\\[2pt]
 {\small \textbf{Fig.\ A0} --- Total mortality, C+T+M model, 12\,m, LightGBM--Optuna.}
 \end{center}
 
 \begin{center}
-\includegraphics[width=\linewidth]{figures/fig3b_signed_rel_dist_12m_XGB.png}\\[2pt]
+\includegraphics[width=\linewidth]{figures/fig3b_signed_total_mort_12m_XGB.png}\\[2pt]
 {\small \textbf{Fig.\ A1} --- Total mortality, C+T+M model, 12\,m, XGBoost--Optuna.}
 \end{center}
 \begin{center}
-\includegraphics[width=\linewidth]{figures/fig3b_signed_rel_dist_24m_XGB.png}\\[2pt]
+\includegraphics[width=\linewidth]{figures/fig3b_signed_total_mort_24m_XGB.png}\\[2pt]
 {\small \textbf{Fig.\ A2} --- Same, 24\,m window.}
 \end{center}
 

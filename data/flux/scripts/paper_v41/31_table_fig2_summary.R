@@ -47,7 +47,7 @@ for (L in names(LEARNERS)) {
 st <- rbindlist(rows)
 st[, q := p.adjust(p, method = "BH")]
 st[, sig := fifelse(q < 0.001, "***", fifelse(q < 0.01, "**", fifelse(q < 0.05, "*", "")))]
-fwrite(st, file.path(PAPER_FIG, "table_fig2_dRMSE_reldist_statistics.csv"))
+fwrite(st, file.path(PAPER_FIG, "table_fig2_dRMSE_total_mort_statistics.csv"))
 n_sub <- sapply(SUBSETS, length)
 
 # ---- LaTeX ---------------------------------------------------------------------------
@@ -68,7 +68,7 @@ tex <- c(
     "Stars: one-sided paired Wilcoxon signed-rank test (C+T+M $<$ C+T), Benjamini--Hochberg corrected across all %d tests in the table ",
     "($^{*}$\\,$q<0.05$, $^{**}$\\,$q<0.01$, $^{***}$\\,$q<0.001$). Tree cover $\\geq$ 30\\%%, %d sites, %d site-years, deadtrees v4.1.}"),
     b_hi, b_lo, nrow(st), PN[["sites"]], PN[["sy"]]),
-  "\\label{tab:fig2_dRMSE_reldist_v41}",
+  "\\label{tab:fig2_dRMSE_total_mort_v41}",
   "\\scriptsize",
   "\\setlength{\\tabcolsep}{4pt}",
   "\\renewcommand{\\arraystretch}{0.92}",
@@ -93,7 +93,7 @@ for (L in L_ok) for (wn in WINDOWS) {
   }
 }
 tex <- c(tex, "\\bottomrule", "\\end{tabular}", "\\end{table}")
-out <- file.path(PAPER_ROOT, "manuscript/tables", sprintf("table_fig2_dRMSE_reldist_v41%s.tex", if (PAPER_RESP_SET == "efp") "" else paste0("_", PAPER_RESP_SET)))
+out <- file.path(PAPER_ROOT, "manuscript/tables", sprintf("table_fig2_dRMSE_total_mort_v41%s.tex", if (PAPER_RESP_SET == "efp") "" else paste0("_", PAPER_RESP_SET)))
 writeLines(tex, out)
 cat("wrote", out, "\n")
 print(dcast(st, learner + window + response ~ subset, value.var = "median_pct", fun.aggregate = function(v) round(v, 1)))

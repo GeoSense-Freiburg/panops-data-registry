@@ -42,7 +42,7 @@ h <- as.data.frame(paper_class_data())   # <metric>_cls = class buffer (paper_co
 nb <- function(v){m<-mean(v,na.rm=TRUE); s<-sd(v,na.rm=TRUE)
   factor(cut(v, c(-Inf, m-0.5*s, m+0.5*s, Inf), c("Low","Mid","High")), levels=c("Low","Mid","High"))}
 METRICS <- list(
-  list(key="relmort", col="relative_mortality_cls",   lab="relative standing deadwood"),
+  list(key="relmort", col="relative_mortality_cls",   lab="relative deadwood"),
   list(key="reldist", col="relative_disturbance_cls", lab="total mortality"))
 
 th <- theme_bw(base_size=11) + theme(
@@ -97,8 +97,8 @@ for (M in METRICS) {
                          "(*** q<0.001, ** q<0.01, * q<0.05)")) +
     th + theme(strip.placement="outside")
 
-  ggsave(file.path(OUT, sprintf("fig4_signed_shap_%s%s.png", M$key, CLASS_TAG)), p, width=11, height=11, dpi=300, bg=BG)
-  ggsave(file.path(OUT, sprintf("fig4_signed_shap_%s%s.pdf", M$key, CLASS_TAG)), p, width=11, height=11, bg=BG)
+  ggsave(file.path(OUT, sprintf("fig4_signed_shap_%s%s.png", FILE_KEY[[M$key]], CLASS_TAG)), p, width=11, height=11, dpi=300, bg=BG)
+  ggsave(file.path(OUT, sprintf("fig4_signed_shap_%s%s.pdf", FILE_KEY[[M$key]], CLASS_TAG)), p, width=11, height=11, bg=BG)
   cat(sprintf("  saved fig4_signed_shap_%s (%d tests)\n", M$key, nrow(st)))
 }
 fwrite(rbindlist(all_stats)[, .(metric, learner, response, window, n_low, n_high,

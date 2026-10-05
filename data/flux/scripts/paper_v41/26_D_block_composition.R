@@ -16,7 +16,7 @@
 suppressMessages({library(data.table); library(ggplot2)})
 setwd("/mnt/gsdata/projects/panops/panops-data-registry/data/flux")
 source("scripts/paper_v41/paper_common.R")
-OUT <- file.path(PAPER_FIG, "disturbance_split")
+OUT <- file.path(PAPER_FIG, "mortality_split")
 dir.create(OUT, showWarnings = FALSE, recursive = TRUE)
 
 BG <- "white"; GRID <- "#D9D9D9"; TXT <- "#111111"; AX <- "#444444"
@@ -27,7 +27,7 @@ LEARNERS <- list(list(lab = "XGBoost (Optuna)",  fam = "XGB"),
 # of this dataset (500 m), used in the legend label
 dd <- fread(PAPER_DATA, select = c("relative_disturbance_500m", "relative_mortality_500m"))
 RHO <- cor(dd$relative_disturbance_500m, dd$relative_mortality_500m, method = "spearman", use = "complete.obs")
-CMB <- sprintf("Total mortality (rho = %.2f with relative standing deadwood)", RHO)
+CMB <- sprintf("Total mortality (rho = %.2f with relative deadwood)", RHO)
 PD  <- fread(PAPER_DATA, select = "SITE_ID"); N_SITES <- uniqueN(PD$SITE_ID); N_SY <- nrow(PD)
 # family = drop the buffer and lag suffix, keep the _thresh distinction
 famof <- function(v) sub("_[0-9]+00m(_lag[12])?$", "", v)
@@ -126,7 +126,7 @@ for (L in LEARNERS) {
                strip.text.y.left = element_text(angle = 90, size = 10, face = "bold",
                                                 colour = TXT, margin = margin(r = 6)),
                plot.margin = margin(10, 14, 8, 10))
-  ggsave(sprintf("%s/D_composition_concept_%s.png", OUT, L$fam), p,
+  ggsave(sprintf("%s/mortality_composition_concept_%s.png", OUT, L$fam), p,
          width = 10, height = 7.5, dpi = 320, bg = BG)
 
   ## ---- Figure 2: metric-family detail -------------------------------------
@@ -149,15 +149,15 @@ for (L in LEARNERS) {
                             L$lab, .sub, N_SITES),
          x = NULL, y = "% of mortality-block |SHAP|") +
     th
-  ggsave(sprintf("%s/D_composition_family_%s.png", OUT, L$fam), p2,
+  ggsave(sprintf("%s/mortality_composition_family_%s.png", OUT, L$fam), p2,
          width = 11, height = 8, dpi = 320, bg = BG)
   message("  written: ", L$fam)
 }
 
 cc  <- rbindlist(lapply(tables, `[[`, "cc"))
 fam <- rbindlist(lapply(tables, `[[`, "fam"))
-fwrite(cc,  sprintf("%s/D_composition_by_concept.csv", OUT))
-fwrite(fam, sprintf("%s/D_composition_by_family.csv", OUT))
+fwrite(cc,  sprintf("%s/mortality_composition_by_concept.csv", OUT))
+fwrite(fam, sprintf("%s/mortality_composition_by_family.csv", OUT))
 
 cat("\n=== XGBoost (Optuna), share of the disturbance block (%) ===\n")
 print(dcast(cc[learner == "XGBoost (Optuna)"], window + response ~ cc,

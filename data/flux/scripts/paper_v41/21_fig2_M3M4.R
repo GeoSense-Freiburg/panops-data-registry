@@ -37,7 +37,7 @@ stopifnot(SUBSET %in% c("all", "high_reldist", "high_relmort"))
 KEEP_SITES <- NULL; SUB_TXT <- ""; FILE_TAG <- ""
 if (SUBSET != "all") {
   mcol <- c(high_reldist = "relative_disturbance_cls", high_relmort = "relative_mortality_cls")[[SUBSET]]
-  mlab <- c(high_reldist = "total mortality", high_relmort = "relative standing deadwood")[[SUBSET]]
+  mlab <- c(high_reldist = "total mortality", high_relmort = "relative deadwood")[[SUBSET]]
   sm <- paper_class_data()[, c("SITE_ID", mcol), with = FALSE]
   setnames(sm, mcol, "v")
   sm <- sm[, .(v = suppressWarnings(max(v, na.rm = TRUE))), by = SITE_ID][is.finite(v)]
@@ -45,7 +45,7 @@ if (SUBSET != "all") {
   KEEP_SITES <- sm[v > nb, SITE_ID]
   SUB_TXT <- sprintf("HIGH-mortality sites only: %d of %d sites (site-maximum %s, %s, > %.1f %% = mean + 0.5 SD); models trained on all sites\n",
                      length(KEEP_SITES), PN[["sites"]], mlab, CLASS_LAB, nb)
-  FILE_TAG <- paste0("_", SUBSET, CLASS_TAG)
+  FILE_TAG <- paste0("_", FILE_KEY[[SUBSET]], CLASS_TAG)
 }
 
 LEARNERS <- list(   # random forest dropped at the user's request
@@ -150,8 +150,8 @@ p <- ggplot(dt, aes(x = grp, y = rmse, fill = model_type)) +
   th + theme(strip.placement = "outside") +
   guides(colour = "none", fill = guide_legend(override.aes = list(alpha = 0.9)))
 
-ggsave(file.path(OUT, sprintf("fig2%s_disturbance_effect_M3M4.png", FILE_TAG)), p, width = 15, height = 12, dpi = 300, bg = DARK_BG)
-ggsave(file.path(OUT, sprintf("fig2%s_disturbance_effect_M3M4.pdf", FILE_TAG)), p, width = 15, height = 12, bg = DARK_BG)
+ggsave(file.path(OUT, sprintf("fig2%s_mortality_effect.png", FILE_TAG)), p, width = 15, height = 12, dpi = 300, bg = DARK_BG)
+ggsave(file.path(OUT, sprintf("fig2%s_mortality_effect.pdf", FILE_TAG)), p, width = 15, height = 12, bg = DARK_BG)
 fwrite(labs[, .(learner, response, grp, median_pct = round(pct,2), sites_improved = round(imp,1),
                 p = signif(p,3), q = signif(q,3), sig)],
        file.path(OUT, sprintf("fig2%s_statistics.csv", FILE_TAG)))
