@@ -77,27 +77,36 @@
 
 \input{tables/table_fig2_dRMSE_reldist_v41}
 
-\section*{Figure 3: What the models actually use (per-site SHAP)}
+\section*{Figure 3: Direction of the disturbance effect at each site (signed SHAP)}
 \begin{itemize}
-  \item M4, per-site stacked driver-group composition, all four EFPs shown together (one panel each),
-        sites ordered by disturbance share (shared order across panels), IGBP on the right. Each figure
-        fixes one disturbance metric's dot column; \textbf{relative disturbance} (12- and 24-month
-        windows) is shown here, absolute mortality and relative mortality are in the Appendix.
-        Shown here for \textbf{LightGBM--Optuna}; the XGBoost--Optuna version (all three metrics,
-        both windows) is in the Appendix.
-  \item SHAP comes from models fit on all site-years (TreeSHAP).
-  \item \textbf{Disturbance (gold) is a large, consistent share} of the carbon fluxes: 27\,\% for
-        GPP$_{sat}$ and 29\,\% for NEP$_{max}$ (mean of XGBoost and LightGBM), rising to 29--34\,\% at the
-        high-disturbance sites.
-  \item \textbf{ET$_{max}$ is the exception:} disturbance takes only 16\,\%, climate 56\,\% --- consistent with
-        its small effect in Figure 2.
-  \item \textbf{WUE} draws 28\,\% on disturbance and little on traits (13\,\%); climate dominates (59\,\%).
-  \item NEP$_{max}$ draws most on traits (39\,\%).
-  \item Sites vary widely: the top of each panel draws little from disturbance, the bottom draws heavily.
+  \item M4, per site the \textbf{net signed SHAP of the disturbance block} (sum over the disturbance predictors,
+        averaged over the site's years, response units), all four EFPs side by side. Sites sorted by their
+        maximum \textbf{relative disturbance} (mean of the five buffers), bars coloured by it; dashed lines =
+        the Low / Mid / High breaks (12.4\,\% and 25.0\,\%). Below zero = the model predicts a \emph{lower} EFP
+        at that site because of its disturbance values.
+  \item Shown for \textbf{LightGBM--Optuna}, 24-month window; the 12-month window and the XGBoost--Optuna version
+        are in the Appendix.
+        Only relative disturbance is shown; absolute and relative mortality are dropped from the draft.
+  \item \textbf{The sign follows the disturbance class.} Share of sites with a negative contribution
+        (LightGBM, 24\,m): GPP$_{sat}$ 15\,\% of Low, 70\,\% of Mid, 81\,\% of High sites; NEP$_{max}$ 18 / 70 / 81\,\%;
+        WUE 12 / 56 / 81\,\%; ET$_{max}$ 22 / 53 / 81\,\%. XGBoost and the 12\,m window give the same picture
+        (High 71--86\,\% negative, Low 10--30\,\%).
+  \item \textbf{Size:} for the carbon fluxes the push reaches $-2$ to $-6$\,$\mu$mol\,m$^{-2}$\,s$^{-1}$ at the most
+        disturbed sites and $+2$ to $+4$ at undisturbed sites; ET$_{max}$ contributions are tiny
+        ($\pm$0.02\,mm\,d$^{-1}$).
+  \item For reference, the overall importance (share of mean $|$SHAP$|$, XGBoost and LightGBM): disturbance
+        27\,\% (GPP$_{sat}$), 29\,\% (NEP$_{max}$), 16\,\% (ET$_{max}$), 28\,\% (WUE); climate dominates ET$_{max}$
+        (56\,\%) and WUE (59\,\%), traits NEP$_{max}$ (39\,\%).
   \item \decide{show one learner or both?}
 \end{itemize}
 
-Which \emph{direction} does disturbance push? (signed SHAP)
+\begin{center}
+\includegraphics[width=\linewidth]{figures/fig3b_signed_rel_dist_24m_LGB.png}\\[2pt]
+{\small \textbf{Fig.\ 3} --- Net signed disturbance SHAP per site, C+T+D model, 24\,m, LightGBM--Optuna; sites sorted and
+coloured by relative disturbance (mean of the five buffers).}
+\end{center}
+
+\textbf{Figure 4: Does the direction differ between High and Low+Mid sites?} (signed SHAP)
 \begin{itemize}
   \item Earlier versions of this figure used $|$SHAP$|$, which says how much the disturbance block
         matters but not which way it acts. Here SHAP is recomputed keeping the \textbf{sign}: per
@@ -279,15 +288,7 @@ relative disturbance = (deadwood + loss×100) / (forest + loss×100) × 100 (\%)
 %%%%%%%%%%%%%%%%%
 
 
-\begin{center}
-\includegraphics[width=0.98\linewidth]{figures/fig3_rel_dist_12m_LGB.png}\\[2pt]
-{\small \textbf{Fig.\ 3a} --- Relative disturbance, M4, 12\,m, LightGBM--Optuna. All four EFPs shown
-together; dot colour/size = each site's relative disturbance (mean of the five buffers).}
-\end{center}
-\begin{center}
-\includegraphics[width=0.98\linewidth]{figures/fig3_rel_dist_24m_LGB.png}\\[2pt]
-{\small \textbf{Fig.\ 3b} --- Same, 24\,m window .}
-\end{center}
+
 
 
 
@@ -308,36 +309,25 @@ together; dot colour/size = each site's relative disturbance (mean of the five b
     \end{itemize}
 
 
-\section*{Appendix: Figure 3, XGBoost--Optuna and the other disturbance metrics}
+\section*{Appendix: Figure 3, 12-month window and XGBoost--Optuna}
 \begin{itemize}
-  \item Same design as Figure 3 (M4, all four EFPs, sites ordered by disturbance share, IGBP on
-        the right), all three metrics, both windows, for \textbf{XGBoost--Optuna} (the main text
-        shows LightGBM--Optuna, relative disturbance only).
+  \item Same design as Figure 3 (C+T+D model, net signed disturbance SHAP per site, sites sorted by relative
+        disturbance, all four EFPs): LightGBM--Optuna with the 12-month window (A0) and XGBoost--Optuna with both
+        windows (A1, A2).
 \end{itemize}
 
 \begin{center}
-\includegraphics[width=0.98\linewidth]{figures/fig3_rel_dist_12m_XGB.png}\\[2pt]
-{\small \textbf{Fig.\ A1} --- Relative disturbance, M4, 12\,m, XGBoost--Optuna.}
+\includegraphics[width=\linewidth]{figures/fig3b_signed_rel_dist_12m_LGB.png}\\[2pt]
+{\small \textbf{Fig.\ A0} --- Relative disturbance, C+T+D model, 12\,m, LightGBM--Optuna.}
+\end{center}
+
+\begin{center}
+\includegraphics[width=\linewidth]{figures/fig3b_signed_rel_dist_12m_XGB.png}\\[2pt]
+{\small \textbf{Fig.\ A1} --- Relative disturbance, C+T+D model, 12\,m, XGBoost--Optuna.}
 \end{center}
 \begin{center}
-\includegraphics[width=0.98\linewidth]{figures/fig3_rel_dist_24m_XGB.png}\\[2pt]
-{\small \textbf{Fig.\ A2} --- Relative disturbance, 24\,m window .}
-\end{center}
-\begin{center}
-\includegraphics[width=0.98\linewidth]{figures/fig3_abs_mort_12m_XGB.png}\\[2pt]
-{\small \textbf{Fig.\ A3} --- Absolute mortality, M4, 12\,m, XGBoost--Optuna.}
-\end{center}
-\begin{center}
-\includegraphics[width=0.98\linewidth]{figures/fig3_abs_mort_24m_XGB.png}\\[2pt]
-{\small \textbf{Fig.\ A4} --- Absolute mortality, 24\,m window .}
-\end{center}
-\begin{center}
-\includegraphics[width=0.98\linewidth]{figures/fig3_rel_mort_12m_XGB.png}\\[2pt]
-{\small \textbf{Fig.\ A5} --- Relative mortality, M4, 12\,m, XGBoost--Optuna.}
-\end{center}
-\begin{center}
-\includegraphics[width=0.98\linewidth]{figures/fig3_rel_mort_24m_XGB.png}\\[2pt]
-{\small \textbf{Fig.\ A6} --- Relative mortality, 24\,m window .}
+\includegraphics[width=\linewidth]{figures/fig3b_signed_rel_dist_24m_XGB.png}\\[2pt]
+{\small \textbf{Fig.\ A2} --- Same, 24\,m window.}
 \end{center}
 
 \end{document}

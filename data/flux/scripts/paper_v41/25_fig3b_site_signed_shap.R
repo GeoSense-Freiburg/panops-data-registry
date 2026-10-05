@@ -12,6 +12,10 @@
 # in lightness (L* 29 / 89 / 64), so the scale also reads in greyscale.
 # Usage: Rscript 25_fig3b_site_signed_shap.R <XGB|LGB>
 #   env FIG3B_METRICS = comma list of abs_mort,rel_mort,rel_dist (default all)
+#   env FIG3B_LAYOUT  = paper (default, 2026-10-05): drawn at print size (7 x 10 in, 300 dpi), site labels
+#                       alternate left / right of the panels (odd rows left, even rows right, "SITE (IGBP)")
+#                       so each label has two rows of space; faint row lines guide the eye across panels
+#                     | wide: the earlier 20-inch layout (all sites left, IGBP right)
 # ============================================================================
 suppressMessages({library(data.table); library(ggplot2); library(patchwork)})
 setwd("/mnt/gsdata/projects/panops/panops-data-registry/data/flux")
@@ -25,6 +29,7 @@ stopifnot(LEARNER %in% c("XGB", "LGB"))
 LEARNER_LAB <- c(XGB = "XGBoost--Optuna", LGB = "LightGBM--Optuna")[[LEARNER]]
 
 EFP_UNITS <- RESP_UNITS   # active response set (paper_common.R)
+PAPER_LAYOUT <- Sys.getenv("FIG3B_LAYOUT", "paper") == "paper"
 
 signed <- fread(file.path(PAPER_OUT, sprintf("%s_site_signed_shap_M4.csv", LEARNER)))[
   group == "Disturbance" & model %in% c("M4_12m", "M4_24m") & response %in% EFP_ORDER,
@@ -59,8 +64,15 @@ make_one_panel <- function(dt_sub, site_order, metric_key, igbp_vec, efp_label, 
   d <- copy(dt_sub)
   d[, metric_val := get(metric_key)]
   d[, test_site := factor(test_site, levels = site_order)]
-  y_scale <- if (show_igbp) scale_y_discrete(sec.axis = dup_axis(labels = igbp_vec, name = "IGBP"))
-             else scale_y_discrete()
+  if (PAPER_LAYOUT) {
+    lab <- sprintf("%s (%s)", site_order, igbp_vec); odd <- seq_along(site_order) %% 2 == 1
+    lab_left <- ifelse(odd, lab, ""); lab_right <- ifelse(odd, "", lab)
+    y_scale <- if (show_igbp) scale_y_discrete(labels = NULL, sec.axis = dup_axis(labels = lab_right, name = NULL))
+               else if (show_y) scale_y_discrete(labels = lab_left) else scale_y_discrete(labels = NULL)
+  } else {
+    y_scale <- if (show_igbp) scale_y_discrete(sec.axis = dup_axis(labels = igbp_vec, name = "IGBP"))
+               else scale_y_discrete()
+  }
   # sites run bottom -> top in factor order: Low = first n_low levels, High = last n_high levels
   nb_lines <- c(if (n_low > 0) n_low + 0.5, length(site_order) - n_high + 0.5)
 
@@ -72,22 +84,38 @@ make_one_panel <- function(dt_sub, site_order, metric_key, igbp_vec, efp_label, 
                          limits = c(0, max_val), na.value = "grey80",
                          name = sprintf("%s\nbreaks %.1f | %.1f", meta$label, max(meta$nb_low, 0), meta$nb)) +
     y_scale +
-    labs(x = "Net signed disturbance SHAP\n(response units)", y = NULL, title = efp_label) +
-    theme_bw(base_size = 9) +
-    theme(
-      plot.title = element_text(size = 9, face = "bold", hjust = 0.5),
-      axis.text.y = if (show_y) element_text(size = 6.5) else element_blank(),
-      axis.ticks.y = if (show_y) element_line() else element_blank(),
-      axis.text.y.right = if (show_igbp) element_text(size = 6, colour = "grey30") else element_blank(),
-      legend.position = "right", legend.key.size = unit(0.4, "cm"),
-      legend.title = element_text(size = 7.5), legend.text = element_text(size = 7),
-      panel.grid.major.y = element_blank(), panel.grid.minor = element_blank()
-    ) +
-    guides(fill = guide_colourbar(barheight = unit(2.5, "cm")))
+    (if (PAPER_LAYOUT)   # few, compact x ticks (ETmax ticks overlapped); one shared x title (plot_layout below)
+       scale_x_continuous(breaks = scales::breaks_pretty(n = 4), labels = scales::label_number(drop0trailing = TRUE),
+                          guide = guide_axis(check.overlap = TRUE))) +
+    labs(x = if (PAPER_LAYOUT) "Mortality SHAP (response units)" else "Net signed disturbance SHAP\n(response units)",
+         y = NULL, title = efp_label) +
+    (if (PAPER_LAYOUT) list(theme_bw(base_size = 7),
+      theme(
+        plot.title = element_text(size = 7, face = "bold", hjust = 0.5),
+        axis.text.y.left = if (show_y) element_text(size = 5.6, colour = "grey15") else element_blank(),
+        axis.text.y.right = if (show_igbp) element_text(size = 5.6, colour = "grey15") else element_blank(),
+        axis.ticks.y = element_blank(), axis.text.x = element_text(size = 5.5),
+        axis.title.x = element_text(size = 6),
+        panel.grid.major.y = element_line(colour = "grey93", linewidth = 0.15),
+        panel.grid.minor = element_blank(), panel.grid.major.x = element_line(colour = "grey90", linewidth = 0.15),
+        plot.margin = margin(2, 2, 2, 2)
+      ),
+      guides(fill = guide_colourbar(barwidth = unit(4, "cm"), barheight = unit(0.25, "cm"), title.position = "top")))
+    else list(theme_bw(base_size = 9),
+      theme(
+        plot.title = element_text(size = 9, face = "bold", hjust = 0.5),
+        axis.text.y = if (show_y) element_text(size = 6.5) else element_blank(),
+        axis.ticks.y = if (show_y) element_line() else element_blank(),
+        axis.text.y.right = if (show_igbp) element_text(size = 6, colour = "grey30") else element_blank(),
+        legend.position = "right", legend.key.size = unit(0.4, "cm"),
+        legend.title = element_text(size = 7.5), legend.text = element_text(size = 7),
+        panel.grid.major.y = element_blank(), panel.grid.minor = element_blank()
+      ),
+      guides(fill = guide_colourbar(barheight = unit(2.5, "cm")))))
 }
 
-MODEL_LABELS <- list(M4_12m = sprintf("M4 (C+T+D), 12m window, %s", LEARNER_LAB),
-                     M4_24m = sprintf("M4 (C+T+D), 24m window, %s", LEARNER_LAB))
+MODEL_LABELS <- list(M4_12m = sprintf("C+T+D, 12m window, %s", LEARNER_LAB),
+                     M4_24m = sprintf("C+T+D, 24m window, %s", LEARNER_LAB))
 
 cat(sprintf("Fig 3b signed disturbance SHAP (%s):\n", LEARNER_LAB))
 for (metric_key in names(DIST_META)) {
@@ -117,14 +145,23 @@ for (metric_key in names(DIST_META)) {
         title = sprintf("%s  |  %s", MODEL_LABELS[[this_model]], metric_title),
         subtitle = sprintf("Sites sorted by site-maximum %s; dashed lines = natural breaks, mean \u00b1 0.5 SD (top to bottom: %d High, %d Mid, %d Low)",
                            tolower(metric_title), n_high, n_mid, n_low),
-        theme = theme(plot.title = element_text(face = "bold", size = 11, hjust = 0.5),
-                      plot.subtitle = element_text(size = 8.5, hjust = 0.5))) +
-      plot_layout(guides = "collect") & theme(legend.position = "right")
+        theme = theme(plot.title = element_text(face = "bold", size = if (PAPER_LAYOUT) 8 else 11, hjust = 0.5),
+                      plot.subtitle = element_text(size = if (PAPER_LAYOUT) 6 else 8.5, hjust = 0.5))) +
+      plot_layout(guides = "collect", axis_titles = if (PAPER_LAYOUT) "collect_x" else "keep") &
+      theme(legend.position = if (PAPER_LAYOUT) "bottom" else "right",
+            legend.title = element_text(size = if (PAPER_LAYOUT) 6 else 7.5),
+            legend.text = element_text(size = if (PAPER_LAYOUT) 5.5 else 7))
 
-    h <- max(6, nrow(sites) * 0.17 + 2)
     stem <- file.path(OUT, sprintf("fig3b_signed_%s_%s_%s%s", metric_key, win, LEARNER, CLASS_TAG))
-    ggsave(paste0(stem, ".png"), p, width = 20, height = h, dpi = 150, limitsize = FALSE)
-    ggsave(paste0(stem, ".pdf"), p, width = 20, height = h, limitsize = FALSE, device = cairo_pdf)
+    if (PAPER_LAYOUT) {
+      h <- min(10, max(6, nrow(sites) * 0.082 + 1.4))
+      ggsave(paste0(stem, ".png"), p, width = 7, height = h, dpi = 300)
+      ggsave(paste0(stem, ".pdf"), p, width = 7, height = h, device = cairo_pdf)
+    } else {
+      h <- max(6, nrow(sites) * 0.17 + 2)
+      ggsave(paste0(stem, ".png"), p, width = 20, height = h, dpi = 150, limitsize = FALSE)
+      ggsave(paste0(stem, ".pdf"), p, width = 20, height = h, limitsize = FALSE, device = cairo_pdf)
+    }
     cat(sprintf("  OK %s (%d sites: %d High, %d Mid, %d Low)\n", basename(stem), nrow(sites), n_high, n_mid, n_low))
   }
 }
