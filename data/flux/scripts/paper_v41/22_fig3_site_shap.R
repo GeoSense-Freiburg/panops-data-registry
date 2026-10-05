@@ -106,10 +106,10 @@ make_one_panel <- function(dt_sub, site_order, metric_key, igbp_vec, efp_label,
       axis.text.y.left = if (show_y) element_text(size = 7, colour = "grey15") else element_blank(),
       axis.text.y.right = if (show_igbp) element_text(size = 7, colour = "grey15") else element_blank(),
       axis.ticks.y = element_blank(), axis.text.x = element_text(size = 6), axis.title.x = element_text(size = 6.5),
-      legend.title = element_text(size = 6), legend.text = element_text(size = 5.5), legend.key.size = unit(0.3, "cm"),
+      legend.title = element_text(size = 8), legend.text = element_text(size = 7.5), legend.key.size = unit(0.42, "cm"),
       panel.grid.major.y = element_blank(), panel.grid.minor = element_blank(), plot.margin = margin(2, 2, 2, 2)),
-      guides(fill = guide_legend(order = 1, override.aes = list(size = 2.5)),
-             colour = guide_colourbar(order = 2, barwidth = unit(3.5, "cm"), barheight = unit(0.25, "cm"), title.position = "top"),
+      guides(fill = guide_legend(order = 1, override.aes = list(size = 3)),
+             colour = guide_colourbar(order = 2, barwidth = unit(5, "cm"), barheight = unit(0.35, "cm"), title.position = "top"),
              size = "none"))
      else list(theme_bw(base_size = 9), theme(
       plot.title = element_text(size = 9, face = "bold", hjust = 0.5),
