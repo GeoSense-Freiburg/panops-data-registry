@@ -2,18 +2,21 @@
 
 Bullet points and figures only — no prose. Built to support decisions, not to be submitted.
 
-## Scope
+## Scope (updated 2026-10-05 to dataset v4.1)
 
 | | |
 |---|---|
-| Dataset | tree cover ≥30% (500 m buffer) — **93 sites / 395 site-years** |
+| Dataset | deadtrees v4.1, tree cover >= 30 % (500 m, site mean), CN-Sb1/2 removed — **104 sites / 381 site-years** |
 | Models | **M3 (C+T) vs M4 (C+T+D)** only |
-| Learners | Random forest, XGBoost, LightGBM — **all Optuna-tuned** |
-| Windows | 12 m and 24 m |
-| Cross-validation | leave-one-site-out **and** repeated LOSO (3 × 80%) |
-| Responses | GPPsat, NEPmax, ETmax, **WUE** (uWUE dropped) |
+| Learners | XGBoost, LightGBM (Optuna-tuned); AutoGluon as AutoML check |
+| Windows | 12 m and 24 m, climate strictly pre-season |
+| Cross-validation | repeated leave-one-site-out (3 x 80 %) |
+| Responses | GPPsat, NEPmax, ETmax, WUE |
+| Site classes | mean of the five buffers 100-500 m (site maximum, mean +/- 0.5 SD) |
 
-Everything is filtered from results already computed. No models were retrained.
+Figures are copied from `plots/paper_v41/` and `AutoGluon/plots/efp/` (`ag_*`); the Fig 2 summary table
+from `manuscript/tables/` (made by `scripts/paper_v41/31_table_fig2_summary.R`). The previous V10 version of
+the draft is in git history (commit before 2026-10-05) and on Overleaf's history.
 
 ## Files
 
