@@ -89,8 +89,10 @@ make_one_panel <- function(dt_sub, site_order, metric_key, igbp_vec, efp_label,
     geom_col(data = dt_plot, aes(x = rel_shap, y = test_site, fill = group), position = "stack", width = 0.75) +
     geom_point(data = dot_dt, aes(x = dx, y = test_site, colour = metric_val, size = metric_val)) +
     scale_fill_manual(values = GROUP_COLOURS, labels = c(Climate = "Climate", Traits = "Traits", Disturbance = "Mortality", Memory = "Memory"), name = "Driver group", drop = TRUE) +
-    (if (PAPER_LAYOUT) scale_colour_gradient(low = "#7ee588", high = "#eb8e12", limits = c(0, max_val),
-                                             na.value = "grey80", name = meta$label)   # user, 2026-10-05
+    (if (PAPER_LAYOUT)   # same scale as Fig 3b: dark teal (0) -> yellow (site mean) -> pink (max) (user, 2026-10-05)
+       scale_colour_gradientn(colours = c("#004D4D", "#F0E442", "#EE6FA8"),
+                              values = c(0, min(max(mean(site_dist[[col_var]], na.rm = TRUE) / max_val, 0.01), 0.99), 1),
+                              limits = c(0, max_val), na.value = "grey80", name = meta$label)
      else scale_colour_gradient2(low = "#1B4965", mid = "#F5F5F5", high = "#C41E3A",
                                  midpoint = meta$mid_v, limits = c(0, max_val), na.value = "grey80", name = meta$label)) +
     scale_size_continuous(name = meta$label, range = if (PAPER_LAYOUT) c(0.3, 2.2) else c(0.5, 4.5), limits = c(0, max_val)) +
