@@ -9,15 +9,17 @@
 #                                                  bars coloured by the metric, dashed lines = Low/Mid/High breaks
 #   fig3_<metric>_<window>_<L>_landscape           relative |SHAP| composition per site (as Fig 3);
 #                                                  a coloured strip under the bars shows the metric (Fig 3b scale)
-#   Rscript 32_fig3_landscape.R <XGB|LGB> [window = 24m] [metric = rel_dist]
+#   Rscript 32_fig3_landscape.R <XGB|LGB|AG> [window = 24m | all] [metric = rel_dist | all]
+#   (AG: set PAPER_OUT_DIR / PAPER_FIG_DIR to the AutoGluon staging / plot folders, as 05_figures.sh does)
 # ============================================================================
 suppressMessages({library(data.table); library(ggplot2); library(patchwork)})
 setwd("/mnt/gsdata/projects/panops/panops-data-registry/data/flux")
 source("scripts/paper_v41/paper_common.R")
 args <- commandArgs(trailingOnly = TRUE)
 LEARNER <- if (length(args) >= 1) args[1] else "LGB"
-WIN     <- if (length(args) >= 2) args[2] else "24m"
-MKEY    <- if (length(args) >= 3) args[3] else "rel_dist"
+WINS    <- if (length(args) >= 2 && args[2] != "all") args[2] else c("12m", "24m")
+MKEYS   <- if (length(args) >= 3 && args[3] != "all") args[3] else c("rel_dist", "rel_mort", "abs_mort")
+for (WIN in WINS) for (MKEY in MKEYS) {
 LEARNER_LAB <- c(XGB = "XGBoost--Optuna", LGB = "LightGBM--Optuna", AG = "AutoGluon")[[LEARNER]]
 OUT <- PAPER_FIG
 MODEL <- paste0("M4_", WIN)
@@ -50,7 +52,7 @@ th <- theme_bw(base_size = 7) + theme(
   legend.title = element_text(size = 7.5), legend.text = element_text(size = 7),
   plot.title = element_text(size = 9, face = "bold", hjust = 0.5),
   plot.subtitle = element_text(size = 6.5, hjust = 0.5), plot.margin = margin(4, 4, 4, 4))
-lab_of <- function(ids) setNames(sprintf("%s (%s)", ids, site[match(ids, SITE_ID), IGBP]), ids)
+lab_of <- function(ids) setNames(ids, ids)   # site code only (user, 2026-10-05: no IGBP)
 EFP_LAB <- setNames(sub("  ", "\n", RESP_UNITS[EFP_ORDER]), EFP_ORDER)
 
 # ---- A. signed mortality SHAP (as Fig 3b) ----------------------------------------------
@@ -68,7 +70,7 @@ pA <- ggplot(sg, aes(test_site, val, fill = v)) +
   fill_scale("fill") +
   scale_x_discrete(labels = lab_of(ord)) +
   scale_y_continuous(breaks = scales::breaks_pretty(n = 3), labels = scales::label_number(drop0trailing = TRUE)) +
-  facet_grid(response ~ ., scales = "free_y", switch = "y", labeller = labeller(response = EFP_LAB)) +
+  facet_grid(response ~ ., scales = "free_y", labeller = labeller(response = EFP_LAB)) +   # EFP names on the right, SHAP axis title on the left
   labs(x = NULL, y = "Mortality SHAP (response units)",
        title = sprintf("C+T+M, %s window, %s  |  %s", WIN, LEARNER_LAB, METRIC_LAB),
        subtitle = sprintf("Sites sorted by site-maximum %s, highest on the left; dashed lines = breaks, mean ± 0.5 SD (left to right: %d High, %d Mid, %d Low)",
@@ -92,7 +94,7 @@ pB_bars <- ggplot(sh, aes(test_site, rel, fill = group)) +
   scale_fill_manual(values = GROUP_COLOURS, breaks = names(GROUP_COLOURS),
                     labels = c(Climate = "Climate", Traits = "Traits", Disturbance = "Mortality"), name = "Driver group") +
   scale_y_continuous(breaks = c(0, 0.5, 1), labels = c("0", "0.5", "1"), expand = expansion(0)) +
-  facet_grid(response ~ ., switch = "y", labeller = labeller(response = EFP_LAB)) +
+  facet_grid(response ~ ., labeller = labeller(response = EFP_LAB)) +
   labs(x = NULL, y = "Relative mean |SHAP|",
        title = sprintf("C+T+M, %s window, %s  |  driver composition", WIN, LEARNER_LAB),
        subtitle = sprintf("Sites sorted by mean mortality share over the four EFPs, highest on the left; strip below = site %s", tolower(METRIC_LAB))) +
@@ -109,3 +111,4 @@ stemB <- file.path(OUT, sprintf("fig3_%s_%s_%s%s_landscape", FILE_KEY[[MKEY]], W
 ggsave(paste0(stemB, ".png"), pB, width = 10, height = 6.6, dpi = 300)
 ggsave(paste0(stemB, ".pdf"), pB, width = 10, height = 6.6, device = cairo_pdf)
 cat("written:", basename(stemA), basename(stemB), "\n")
+}
