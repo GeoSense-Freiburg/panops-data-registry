@@ -81,15 +81,21 @@ make_one_panel <- function(dt_sub, site_order, metric_key, igbp_vec, efp_label,
     y_scale <- if (show_igbp) scale_y_discrete(sec.axis = dup_axis(labels = igbp_vec, name = "IGBP")) else scale_y_discrete()
   }
 
+  if (PAPER_LAYOUT) {   # dots only next to the site names: odd rows left of the first panel, even rows right of the last
+    pos <- as.integer(dot_dt$test_site)
+    dot_dt <- if (show_y) dot_dt[pos %% 2 == 1][, dx := -0.05] else if (show_igbp) dot_dt[pos %% 2 == 0][, dx := 1.06] else dot_dt[0][, dx := numeric(0)]
+  } else dot_dt[, dx := -0.05]
   ggplot() +
     geom_col(data = dt_plot, aes(x = rel_shap, y = test_site, fill = group), position = "stack", width = 0.75) +
-    geom_point(data = dot_dt, aes(x = -0.05, y = test_site, colour = metric_val, size = metric_val)) +
+    geom_point(data = dot_dt, aes(x = dx, y = test_site, colour = metric_val, size = metric_val)) +
     scale_fill_manual(values = GROUP_COLOURS, labels = c(Climate = "Climate", Traits = "Traits", Disturbance = "Mortality", Memory = "Memory"), name = "Driver group", drop = TRUE) +
-    scale_colour_gradient2(low = "#1B4965", mid = "#F5F5F5", high = "#C41E3A",
-                           midpoint = meta$mid_v, limits = c(0, max_val), na.value = "grey80", name = meta$label) +
+    (if (PAPER_LAYOUT) scale_colour_gradient(low = "#7ee588", high = "#eb8e12", limits = c(0, max_val),
+                                             na.value = "grey80", name = meta$label)   # user, 2026-10-05
+     else scale_colour_gradient2(low = "#1B4965", mid = "#F5F5F5", high = "#C41E3A",
+                                 midpoint = meta$mid_v, limits = c(0, max_val), na.value = "grey80", name = meta$label)) +
     scale_size_continuous(name = meta$label, range = if (PAPER_LAYOUT) c(0.3, 2.2) else c(0.5, 4.5), limits = c(0, max_val)) +
     y_scale +
-    scale_x_continuous(limits = c(-0.09, 1.02), breaks = if (PAPER_LAYOUT) c(0, 0.5, 1) else seq(0, 1, 0.25),
+    scale_x_continuous(limits = if (!PAPER_LAYOUT) c(-0.09, 1.02) else if (show_y) c(-0.09, 1.02) else if (show_igbp) c(0, 1.1) else c(0, 1.02), breaks = if (PAPER_LAYOUT) c(0, 0.5, 1) else seq(0, 1, 0.25),
                        labels = if (PAPER_LAYOUT) c("0", "0.5", "1") else c("0", "0.25", "0.50", "0.75", "1.00"),
                        expand = expansion(0)) +
     labs(x = "Relative mean |SHAP|", y = NULL, title = efp_label) +
