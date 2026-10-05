@@ -46,7 +46,7 @@
 \section*{Results}
 \begin{center}\includegraphics[width=\linewidth]{figures/fig1_site_map.png}\end{center}
 
-\textbf{Figure 2: Does disturbance/ mortality reduce error? (climate + trait $\rightarrow$ climate + trait + disturbance)}
+\textbf{Figure 2: Does mortality reduce error? (climate + traits $\rightarrow$ climate + traits + mortality)}
 \begin{itemize}
   \item Four configurations per EFP (XGBoost and LightGBM, both Optuna-tuned; 12- and 24-month windows),
         repeated leave-one-site-out CV.
@@ -56,7 +56,7 @@
   \item \textbf{ET$_{max}$: small.} $-1.2$ to $-3.0$\,\%, significant only for LightGBM 12\,m (1 of 4).
   \item \textbf{WUE: small and variable.} $-2.5$ to $-8.2$\,\%, significant only for XGBoost 24\,m (1 of 4).
   \item \textbf{Both learners agree} within about 2 percentage points; 12 vs 24\,months makes no systematic difference.
-  \item \textbf{High-disturbance sites} (Fig.~2b; 21 sites whose maximum relative disturbance, averaged over the
+  \item \textbf{High-mortality sites} (Fig.~2b; 21 sites whose maximum total mortality, averaged over the
         five buffers 100--500\,m, exceeds 25.0\,\% = mean + 0.5\,SD): the gain roughly doubles ---
         GPP$_{sat}$ $-10.3$ to $-15.5$\,\% (76--86\,\% of sites improve), NEP$_{max}$ $-16.5$ to $-19.7$\,\%
         (86--95\,\%), ET$_{max}$ $-2.9$ to $-5.3$\,\%, WUE significant only for XGBoost 12\,m ($-8.3$\,\%).
@@ -64,37 +64,37 @@
         including AutoGluon.
   \item Site classes now use the \textbf{mean of the five nested buffers} rather than 500\,m only: the 100\,m
         circle lies inside all five, so the mean weights the area nearest the tower most, like a flux footprint.
-        With 500\,m alone and 100\,m alone, about a third of the high-disturbance sites differ.
+        With 500\,m alone and 100\,m alone, about a third of the high-mortality sites differ.
   \item \decide{site classes from the buffer mean (main) with 500\,m and 100\,m versions in the supplement?}
 \end{itemize}
 
 \begin{center}\includegraphics[width=\linewidth]{figures/fig2_disturbance_effect_M3M4.png}\\[2pt]
 {\small \textbf{Fig.\ 2a} --- all 104 sites}\end{center}
 \begin{center}\includegraphics[width=\linewidth]{figures/fig2_high_reldist_disturbance_effect_M3M4.png}\\[2pt]
-{\small \textbf{Fig.\ 2b} --- high relative-disturbance sites only (21 sites; models trained on all sites)}\end{center}
+{\small \textbf{Fig.\ 2b} --- high total-mortality sites only (21 sites; models trained on all sites)}\end{center}
 \begin{center}\includegraphics[width=\linewidth]{figures/fig_site_dRMSE_reldist.png}\\[2pt]
-{\small \textbf{Fig.\ 2c} --- per-site $\Delta$RMSE, bars coloured by relative-disturbance class (Low / Mid / High)}\end{center}
+{\small \textbf{Fig.\ 2c} --- per-site $\Delta$RMSE, bars coloured by total-mortality class (Low / Mid / High)}\end{center}
 
 \input{tables/table_fig2_dRMSE_reldist_v41}
 
-\section*{Figure 3: Direction of the disturbance effect at each site (signed SHAP)}
+\section*{Figure 3: Direction of the mortality effect at each site (signed SHAP)}
 \begin{itemize}
-  \item M4, per site the \textbf{net signed SHAP of the disturbance block} (sum over the disturbance predictors,
+  \item C+T+M model, per site the \textbf{net signed SHAP of the mortality block} (sum over the mortality predictors,
         averaged over the site's years, response units), all four EFPs side by side. Sites sorted by their
-        maximum \textbf{relative disturbance} (mean of the five buffers), bars coloured by it; dashed lines =
+        maximum \textbf{total mortality} (mean of the five buffers), bars coloured by it; dashed lines =
         the Low / Mid / High breaks (12.4\,\% and 25.0\,\%). Below zero = the model predicts a \emph{lower} EFP
-        at that site because of its disturbance values.
+        at that site because of its mortality values.
   \item Shown for \textbf{LightGBM--Optuna}, 24-month window; the 12-month window and the XGBoost--Optuna version
         are in the Appendix.
-        Only relative disturbance is shown; absolute and relative mortality are dropped from the draft.
-  \item \textbf{The sign follows the disturbance class.} Share of sites with a negative contribution
+        Only total mortality is shown; total standing deadwood and relative mortality are dropped from the draft.
+  \item \textbf{The sign follows the mortality class.} Share of sites with a negative contribution
         (LightGBM, 24\,m): GPP$_{sat}$ 15\,\% of Low, 70\,\% of Mid, 81\,\% of High sites; NEP$_{max}$ 18 / 70 / 81\,\%;
         WUE 12 / 56 / 81\,\%; ET$_{max}$ 22 / 53 / 81\,\%. XGBoost and the 12\,m window give the same picture
         (High 71--86\,\% negative, Low 10--30\,\%).
   \item \textbf{Size:} for the carbon fluxes the push reaches $-2$ to $-6$\,$\mu$mol\,m$^{-2}$\,s$^{-1}$ at the most
-        disturbed sites and $+2$ to $+4$ at undisturbed sites; ET$_{max}$ contributions are tiny
+        sites with the highest mortality and $+2$ to $+4$ at sites with little mortality; ET$_{max}$ contributions are tiny
         ($\pm$0.02\,mm\,d$^{-1}$).
-  \item For reference, the overall importance (share of mean $|$SHAP$|$, XGBoost and LightGBM): disturbance
+  \item For reference, the overall importance (share of mean $|$SHAP$|$, XGBoost and LightGBM): mortality
         27\,\% (GPP$_{sat}$), 29\,\% (NEP$_{max}$), 16\,\% (ET$_{max}$), 28\,\% (WUE); climate dominates ET$_{max}$
         (56\,\%) and WUE (59\,\%), traits NEP$_{max}$ (39\,\%).
   \item \decide{show one learner or both?}
@@ -102,35 +102,35 @@
 
 \begin{center}
 \includegraphics[width=\linewidth]{figures/fig3b_signed_rel_dist_24m_LGB.png}\\[2pt]
-{\small \textbf{Fig.\ 3} --- Net signed disturbance SHAP per site, C+T+D model, 24\,m, LightGBM--Optuna; sites sorted and
-coloured by relative disturbance (mean of the five buffers).}
+{\small \textbf{Fig.\ 3} --- Net signed mortality SHAP per site, C+T+M model, 24\,m, LightGBM--Optuna; sites sorted and
+coloured by total mortality (mean of the five buffers).}
 \end{center}
 
 \textbf{Figure 4: Does the direction differ between High and Low+Mid sites?} (signed SHAP)
 \begin{itemize}
-  \item Earlier versions of this figure used $|$SHAP$|$, which says how much the disturbance block
+  \item Earlier versions of this figure used $|$SHAP$|$, which says how much the mortality block
         matters but not which way it acts. Here SHAP is recomputed keeping the \textbf{sign}: per
-        site-year we sum the signed SHAP across the disturbance predictors (70 for 12\,m, 105 for 24\,m) --- the block's net push
+        site-year we sum the signed SHAP across the mortality predictors (70 for 12\,m, 105 for 24\,m) --- the block's net push
         on the prediction, in response units --- and average over the site's years.
         \textbf{Below zero means the model predicts a LOWER value of the EFP at that site} --- not
         that it predicts less accurately. Accuracy is Figure 2, where negative $\Delta$RMSE means
-        \emph{less error}; here negative means \emph{lower predicted carbon uptake}. M4, natural-breaks thresholds,
+        \emph{less error}; here negative means \emph{lower predicted carbon uptake}. C+T+M model, natural-breaks thresholds,
         Low+Mid vs High, both Optuna learners, both windows.
   \item Classes: site maximum of the metric, mean of the five buffers; High $>$ mean + 0.5\,SD
-        (relative disturbance: 21 High vs 83 Low+Mid; relative mortality: 23 vs 81). Mann--Whitney U between
+        (total mortality: 21 High vs 83 Low+Mid; relative mortality: 23 vs 81). Mann--Whitney U between
         the two groups, BH-FDR across the figure.
-  \item \textbf{A clear dose--response.} At \textbf{High}-disturbance sites the block pushes predicted
+  \item \textbf{A clear dose--response.} At \textbf{High}-mortality sites the block pushes predicted
         carbon uptake \emph{down}; at \textbf{Low+Mid} sites it pushes it slightly \emph{up}
         (relative to the average site).
-  \item GPP$_{sat}$ (relative disturbance): High $-1.76$ to $-2.32$, Low+Mid $+0.28$ to $+0.60$
+  \item GPP$_{sat}$ (total mortality): High $-1.76$ to $-2.32$, Low+Mid $+0.28$ to $+0.60$
         $\mu$mol\,m$^{-2}$\,s$^{-1}$, $q<0.001$ in all four configurations.
   \item NEP$_{max}$: High $-1.35$ to $-1.59$, Low+Mid $+0.15$ to $+0.44$; WUE: High $-0.20$ to $-0.31$,
         Low+Mid $+0.11$ g\,C\,mm$^{-1}$; all $q<0.001$.
-  \item \textbf{ET$_{max}$:} the shift is tiny ($-0.003$ to $-0.006$\,mm\,d$^{-1}$) but significant for relative
-        disturbance in all four configurations; for relative mortality only in 1 of 4.
-  \item Overall 16 of 16 tests significant for relative disturbance, 13 of 16 for relative mortality, and the sign
+  \item \textbf{ET$_{max}$:} the shift is tiny ($-0.003$ to $-0.006$\,mm\,d$^{-1}$) but significant for total
+        mortality in all four configurations; for relative mortality only in 1 of 4.
+  \item Overall 16 of 16 tests significant for total mortality, 13 of 16 for relative mortality, and the sign
         never disagrees between learners or windows.
-  \item \textbf{Read with Figure 2:} disturbance improves accuracy (Figure 2) by lowering predictions at
+  \item \textbf{Read with Figure 2:} mortality improves accuracy (Figure 2) by lowering predictions at
         damaged sites. Note that sites are grouped by the same variables whose contribution is measured, so
         the test confirms that the learned relationship is consistent; the direction and size are the
         informative part.
@@ -145,28 +145,28 @@ coloured by relative disturbance (mean of the five buffers).}
 \end{center}
 \begin{center}
 \includegraphics[width=\linewidth]{figures/fig4_signed_shap_reldist.png}\\[2pt]
-{\small \textbf{Fig.\ 4b} --- split by \textbf{relative disturbance}}
+{\small \textbf{Fig.\ 4b} --- split by \textbf{total mortality}}
 \end{center}
 
 \textbf{Does it depend on ecosystem type or tree cover?}
 \begin{itemize}
-  \item XGBoost--Optuna, M4, both windows. \textbf{A} $\Delta$RMSE by IGBP, \textbf{B} net signed disturbance
+  \item XGBoost--Optuna, C+T+M model, both windows. \textbf{A} $\Delta$RMSE by IGBP, \textbf{B} net signed mortality
         SHAP by IGBP, \textbf{C} tree cover vs benefit, \textbf{D} tree cover vs direction,
-        \textbf{E} relative disturbance (mean of the five buffers) vs direction. C/D/E: linear fit with a
+        \textbf{E} total mortality (mean of the five buffers) vs direction. C/D/E: linear fit with a
         Spearman test per panel, BH-FDR across the board.
   \item \textbf{Panel C (benefit):} no relationship with tree cover ($\rho$ = 0.05--0.20).
   \item \textbf{Panel D (direction vs tree cover):} strong and positive for every EFP and window,
-        $\rho$ = +0.46 to +0.71, all $p<0.001$ --- at low tree cover disturbance pulls predicted carbon uptake
+        $\rho$ = +0.46 to +0.71, all $p<0.001$ --- at low tree cover mortality pulls predicted carbon uptake
         \emph{down}, at high tree cover it pushes it \emph{up}; the linear fit crosses zero near 68\,\% cover
         (GPP$_{sat}$, 12\,m).
-  \item \textbf{Panel E (direction vs disturbance):} stronger still and negative, $\rho = -0.39$ to $-0.75$,
+  \item \textbf{Panel E (direction vs mortality):} stronger still and negative, $\rho = -0.39$ to $-0.75$,
         all $p<0.001$ (GPP$_{sat}$ $-0.74$, NEP$_{max}$ $-0.73$, WUE $-0.68$, ET$_{max}$ $-0.43$ at 12\,m).
-        More disturbance, lower predicted carbon uptake --- the more direct version of Panel D.
+        More mortality, lower predicted carbon uptake --- the more direct version of Panel D.
   \item \textbf{Panel B by class} (median net signed SHAP, GPP$_{sat}$, 12\,m): OSH $-3.57$ ($n$=3), WET $-2.98$ (8),
         CSH $-2.35$ (3), ENF $-0.77$ (50), MF $+0.58$ (7), EBF $+0.86$ (3), DBF $+1.80$ (30).
         Unlike V10, ENF is now slightly negative.
   \item \textbf{So:} the \emph{magnitude} of the benefit does not depend on tree cover or ecosystem type; the
-        \emph{direction} does, and it tracks disturbance more closely than vegetation class.
+        \emph{direction} does, and it tracks mortality more closely than vegetation class.
   \item \textbf{Caveats.} OSH, CSH and EBF have only 3 sites each and WET 8; the correlations use all 104 sites.
   \item \decide{does this change the framing from "functional, not ecosystem-specific" to a
         direction-vs-magnitude distinction?}
@@ -175,11 +175,11 @@ coloured by relative disturbance (mean of the five buffers).}
 
 \begin{center}
 \includegraphics[width=0.82\linewidth]{figures/fig5_igbp_board_12m.png}\\[2pt]
-{\small \textbf{Fig.\ 5a} --- XGBoost--Optuna, M4, \textbf{12\,m} window}
+{\small \textbf{Fig.\ 5a} --- XGBoost--Optuna, C+T+M model, \textbf{12\,m} window}
 \end{center}
 \begin{center}
 \includegraphics[width=0.82\linewidth]{figures/fig5_igbp_board_24m.png}\\[2pt]
-{\small \textbf{Fig.\ 5b} --- XGBoost--Optuna, M4, \textbf{24\,m} window}
+{\small \textbf{Fig.\ 5b} --- XGBoost--Optuna, C+T+M model, \textbf{24\,m} window}
 \end{center}
 
 
@@ -193,18 +193,18 @@ coloured by relative disturbance (mean of the five buffers).}
         repeated leave-one-site-out CV; AutoGluon is rerun inside every fold, so model selection never sees the
         held-out site.
   \item \textbf{Skill:} AutoGluon is best in 15 of 16 tasks; mean $R^2$ 0.471 vs 0.434 (XGBoost) and 0.438
-        (LightGBM) for C+T+D, 12\,m (Table~\ref{tab:automl_r2}). The gain is largest for GPP$_{sat}$ and NEP$_{max}$
+        (LightGBM) for C+T+M, 12\,m (Table~\ref{tab:automl_r2}). The gain is largest for GPP$_{sat}$ and NEP$_{max}$
         ($\approx$+0.05); ET$_{max}$ is a tie.
   \item \textbf{What it chooses:} mainly the two neural networks (mean ensemble weight 0.48 and 0.30); tree models
         get little weight.
-  \item \textbf{Same conclusion on disturbance} (Fig.~6a): median per-site change in RMSE $-3.1$ to $-4.9$\,\%
+  \item \textbf{Same conclusion on mortality} (Fig.~6a): median per-site change in RMSE $-3.1$ to $-4.9$\,\%
         (GPP$_{sat}$), $-8.8$ to $-11.3$\,\% (NEP$_{max}$), $-0.8$ to $-1.7$\,\% (ET$_{max}$), $-2.1$ to $-5.6$\,\% (WUE);
         smaller per site than for the tree learners, although overall RMSE drops by 7--13\,\% for the carbon fluxes.
-  \item \textbf{But a weaker high-disturbance signal} (Fig.~6b): at the 21 high-disturbance sites only NEP$_{max}$ stays
+  \item \textbf{But a weaker high-mortality signal} (Fig.~6b): at the 21 high-mortality sites only NEP$_{max}$ stays
         significant for AutoGluon ($-17$ to $-18$\,\%); the tree learners capture the high-mortality sites better.
   \item \textbf{SHAP:} only permutation SHAP is possible for a neural-network ensemble (approximate, different
-        baseline). It gives disturbance a larger share (23--38\,\%) and traits a smaller one; its mean signed
-        disturbance contribution has the opposite sign for GPP$_{sat}$/NEP$_{max}$, which is most likely the
+        baseline). It gives mortality a larger share (23--38\,\%) and traits a smaller one; its mean signed
+        mortality contribution has the opposite sign for GPP$_{sat}$/NEP$_{max}$, which is most likely the
         baseline definition and still needs checking.
   \item 12 vs 24\,months: no meaningful difference for any learner.
   \item \decide{XGBoost/LightGBM as main model (exact TreeSHAP) and AutoGluon as robustness check?}
@@ -212,7 +212,7 @@ coloured by relative disturbance (mean of the five buffers).}
 
 \begin{table}[htbp]
 \centering
-\caption{Skill of the C+T+D model under repeated leave-one-site-out CV ($R^2$). XGBoost and LightGBM are Optuna-tuned;
+\caption{Skill of the C+T+M model under repeated leave-one-site-out CV ($R^2$). XGBoost and LightGBM are Optuna-tuned;
 AutoGluon is the weighted ensemble rebuilt inside every fold. Bottom rows: mean over the four EFPs for both models.}
 \label{tab:automl_r2}
 \footnotesize
@@ -227,7 +227,7 @@ NEP$_\mathrm{max}$ & 0.531 & 0.528 & \textbf{0.583} & 0.524 & 0.534 & \textbf{0.
 ET$_\mathrm{max}$ & 0.446 & \textbf{0.451} & 0.443 & 0.433 & 0.449 & \textbf{0.453} \\
 WUE & 0.355 & 0.359 & \textbf{0.390} & 0.393 & 0.377 & \textbf{0.411} \\
 \midrule
-Mean, C+T+D & 0.434 & 0.438 & \textbf{0.471} & 0.443 & 0.445 & \textbf{0.479} \\
+Mean, C+T+M & 0.434 & 0.438 & \textbf{0.471} & 0.443 & 0.445 & \textbf{0.479} \\
 Mean, C+T & 0.358 & 0.359 & \textbf{0.395} & 0.361 & 0.374 & \textbf{0.404} \\
 \bottomrule
 \end{tabular}
@@ -236,7 +236,7 @@ Mean, C+T & 0.358 & 0.359 & \textbf{0.395} & 0.361 & 0.374 & \textbf{0.404} \\
 \begin{center}\includegraphics[width=\linewidth]{figures/ag_fig2_disturbance_effect_M3M4.png}\\[2pt]
 {\small \textbf{Fig.\ 6a} --- Figure 2 with AutoGluon as third learner, all sites}\end{center}
 \begin{center}\includegraphics[width=\linewidth]{figures/ag_fig2_high_reldist_disturbance_effect_M3M4.png}\\[2pt]
-{\small \textbf{Fig.\ 6b} --- the same, high relative-disturbance sites only (21 sites)}\end{center}
+{\small \textbf{Fig.\ 6b} --- the same, high total-mortality sites only (21 sites)}\end{center}
 
 \section*{Discussions}
 
@@ -254,31 +254,31 @@ Mean, C+T & 0.358 & 0.359 & \textbf{0.395} & 0.361 & 0.374 & \textbf{0.404} \\
         Migliavacca et al.\ 2021, ET$_{max}$, WUE), Lusk et al.\ 2025 trait maps (1\,km). Tree cover $\geq$30\,\%
         (500\,m, site mean), EFPs in runs of $\geq$2 consecutive years, 2016 excluded, CN-Sb1/2 removed by QC:
         \textbf{104 sites, 381 site-years}.
-  \item \textbf{Models shown:} \textbf{climate + traits} vs \textbf{climate + traits + disturbance} only.
-        The pair differs solely by the disturbance block, so it isolates its contribution.
+  \item \textbf{Models shown:} \textbf{climate + traits} vs \textbf{climate + traits + mortality} only.
+        The pair differs solely by the mortality block, so it isolates its contribution.
   \item \textbf{Learners:} XGBoost and LightGBM, \textbf{both tuned with Optuna} (TPE, 50 trials per response and
         window, grouped 5-fold CV on disjoint site groups). AutoGluon-Tabular 1.6 as an AutoML check (default model
         zoo, 5-fold site-grouped bagging, weighted ensemble, no stacking).
   \item \textbf{Windows:} climate strictly before the growing season --- 12 months (lag 1) or 24 months (lag 1 + lag 2)
         ending the month before season start; mortality of the current year plus lag 1 (12\,m) or lag 1 + lag 2 (24\,m).
   \item \textbf{Cross-validation:} repeated leave-one-site-out (3 $\times$ 80\,\% of the remaining sites per held-out site).
-  \item \textbf{Disturbance predictors:} all metrics at all five buffers (100--500\,m). \textbf{Site classes} in the figures
+  \item \textbf{Mortality predictors:} all metrics at all five buffers (100--500\,m). \textbf{Site classes} in the figures
         use the mean of the five buffers (site maximum across years; breaks mean $\pm$ 0.5\,SD).
-  \item \textbf{disturbance metrics}: For visualisation and thresholding we define three disturbance metrics, each computed within five buffers (100, 200, 300, 400, 500\,m) around the tower from the deadtrees v4.1 deadwood / tree-cover maps; the models use all buffers, the figures classify sites by the mean of the five:
+  \item \textbf{Mortality metrics}: For visualisation and thresholding we define three mortality metrics, each computed within five buffers (100, 200, 300, 400, 500\,m) around the tower from the deadtrees v4.1 deadwood / tree-cover maps; the models use all buffers, the figures classify sites by the mean of the five:
 
-\textbf{Absolute mortality}
+\textbf{Total standing deadwood}
 Standing deadwood cover as a percentage of the total buffer area — the absolute amount of dead canopy.
-absolute mortality = deadwood / area × 100 (\%)
+total standing deadwood = deadwood / area × 100 (\%)
 \\
 \textbf{Relative mortality}
 Deadwood relative to tree cover, what \% of the standing trees are currently dead (defined where tree cover $\geq$ 10 \%, capped at 100 \%).
 
 relative mortality = deadwood / tree cover × 100 (\%)
 \\
-\textbf{Relative disturbance}
+\textbf{Total mortality}
 Combines standing deadwood and tree-cover loss relative to forest plus loss — captures both dead-standing and removed/lost canopy.
 
-relative disturbance = (deadwood + loss×100) / (forest + loss×100) × 100 (\%)
+total mortality = (deadwood + loss×100) / (forest + loss×100) × 100 (\%)
  
 \end{itemize}
 
@@ -311,19 +311,19 @@ relative disturbance = (deadwood + loss×100) / (forest + loss×100) × 100 (\%)
 
 \section*{Appendix: Figure 3, 12-month window and XGBoost--Optuna}
 \begin{itemize}
-  \item Same design as Figure 3 (C+T+D model, net signed disturbance SHAP per site, sites sorted by relative
-        disturbance, all four EFPs): LightGBM--Optuna with the 12-month window (A0) and XGBoost--Optuna with both
+  \item Same design as Figure 3 (C+T+M model, net signed mortality SHAP per site, sites sorted by total
+        mortality, all four EFPs): LightGBM--Optuna with the 12-month window (A0) and XGBoost--Optuna with both
         windows (A1, A2).
 \end{itemize}
 
 \begin{center}
 \includegraphics[width=\linewidth]{figures/fig3b_signed_rel_dist_12m_LGB.png}\\[2pt]
-{\small \textbf{Fig.\ A0} --- Relative disturbance, C+T+D model, 12\,m, LightGBM--Optuna.}
+{\small \textbf{Fig.\ A0} --- Total mortality, C+T+M model, 12\,m, LightGBM--Optuna.}
 \end{center}
 
 \begin{center}
 \includegraphics[width=\linewidth]{figures/fig3b_signed_rel_dist_12m_XGB.png}\\[2pt]
-{\small \textbf{Fig.\ A1} --- Relative disturbance, C+T+D model, 12\,m, XGBoost--Optuna.}
+{\small \textbf{Fig.\ A1} --- Total mortality, C+T+M model, 12\,m, XGBoost--Optuna.}
 \end{center}
 \begin{center}
 \includegraphics[width=\linewidth]{figures/fig3b_signed_rel_dist_24m_XGB.png}\\[2pt]

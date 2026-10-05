@@ -37,13 +37,13 @@ stopifnot(SUBSET %in% c("all", "high_reldist", "high_relmort"))
 KEEP_SITES <- NULL; SUB_TXT <- ""; FILE_TAG <- ""
 if (SUBSET != "all") {
   mcol <- c(high_reldist = "relative_disturbance_cls", high_relmort = "relative_mortality_cls")[[SUBSET]]
-  mlab <- c(high_reldist = "relative disturbance", high_relmort = "relative mortality")[[SUBSET]]
+  mlab <- c(high_reldist = "total mortality", high_relmort = "relative mortality")[[SUBSET]]
   sm <- paper_class_data()[, c("SITE_ID", mcol), with = FALSE]
   setnames(sm, mcol, "v")
   sm <- sm[, .(v = suppressWarnings(max(v, na.rm = TRUE))), by = SITE_ID][is.finite(v)]
   nb <- mean(sm$v) + 0.5 * sd(sm$v)
   KEEP_SITES <- sm[v > nb, SITE_ID]
-  SUB_TXT <- sprintf("HIGH-disturbance sites only: %d of %d sites (site-maximum %s, %s, > %.1f %% = mean + 0.5 SD); models trained on all sites\n",
+  SUB_TXT <- sprintf("HIGH-mortality sites only: %d of %d sites (site-maximum %s, %s, > %.1f %% = mean + 0.5 SD); models trained on all sites\n",
                      length(KEEP_SITES), PN[["sites"]], mlab, CLASS_LAB, nb)
   FILE_TAG <- paste0("_", SUBSET, CLASS_TAG)
 }
@@ -74,9 +74,9 @@ for (L in LEARNERS) {
         if (!nrow(pw)) next
         grp <- w
         rows[[k]] <- data.table(response = resp, learner = L$lab, grp = grp,
-                                model_type = "Without D", rmse = pw$wo); k <- k + 1
+                                model_type = "Without mortality", rmse = pw$wo); k <- k + 1
         rows[[k]] <- data.table(response = resp, learner = L$lab, grp = grp,
-                                model_type = "With D",    rmse = pw$wd); k <- k + 1
+                                model_type = "With mortality",    rmse = pw$wd); k <- k + 1
         pct  <- median((pw$wd - pw$wo) / pw$wo * 100)
         pval <- wilcox.test(pw$wd, pw$wo, paired = TRUE, alternative = "less", exact = FALSE)$p.value
         labs[[lk]] <- data.table(response = resp, learner = L$lab, grp = grp,
@@ -99,7 +99,7 @@ LEV <- c("12m", "24m")
 dt[, grp := factor(grp, levels = LEV)]; labs[, grp := factor(grp, levels = LEV)]
 dt[, learner := factor(learner, levels = sapply(LEARNERS, `[[`, "lab"))]
 labs[, learner := factor(learner, levels = sapply(LEARNERS, `[[`, "lab"))]
-dt[, model_type := factor(model_type, levels = c("Without D", "With D"))]
+dt[, model_type := factor(model_type, levels = c("Without mortality", "With mortality"))]
 
 # view limit: p95 per EFP row, applied as a ZOOM (oob_keep) so densities and all
 # statistics are still computed on every site
@@ -132,7 +132,7 @@ p <- ggplot(dt, aes(x = grp, y = rmse, fill = model_type)) +
                outlier.shape = NA, colour = "#222222", fill = NA, linewidth = 0.3) +
   geom_text(data = labs, aes(x = grp, y = ylab, label = label, colour = lcol),
             inherit.aes = FALSE, size = 2.5, fontface = "bold") +
-  scale_fill_manual(values = setNames(c(COL_WO, COL_W), c("Without D", "With D"))) +
+  scale_fill_manual(values = setNames(c(COL_WO, COL_W), c("Without mortality", "With mortality"))) +
   scale_colour_identity() +
   facet_grid(response ~ learner, scales = "free_y",
              labeller = labeller(response = EFP_LABELS), switch = "y") +
@@ -142,8 +142,8 @@ p <- ggplot(dt, aes(x = grp, y = rmse, fill = model_type)) +
                          oob = scales::oob_keep))) +
   coord_cartesian(clip = "on") +
   labs(x = NULL, y = NULL,
-       title = paste0("Effect of adding disturbance predictors on per-site RMSE", if (SUBSET != "all") " — high-disturbance sites" else ""),
-       subtitle = paste0(SUB_TXT, "Tree cover ≥30 % (", PN[["sites"]], " sites, ", PN[["sy"]], " site-years) · ", PAPER_MAPS, " · repeated CV (3×80 %) · C+T vs C+T+D · cyan = without D, pink = with D\n",
+       title = paste0("Effect of adding mortality predictors on per-site RMSE", if (SUBSET != "all") " — high-mortality sites" else ""),
+       subtitle = paste0(SUB_TXT, "Tree cover ≥30 % (", PN[["sites"]], " sites, ", PN[["sy"]], " site-years) · ", PAPER_MAPS, " · repeated CV (3×80 %) · C+T vs C+T+M · cyan = without mortality, pink = with mortality\n",
                          "% = median PAIRED change in per-site RMSE (negative = less error) · ",
                          "stars = one-sided paired Wilcoxon, BH-FDR across the figure (*** q<0.001, ** q<0.01, * q<0.05)\n",
                          "%↓ = share of sites whose RMSE improved · y axis zoomed to the 95th percentile (no data removed)")) +

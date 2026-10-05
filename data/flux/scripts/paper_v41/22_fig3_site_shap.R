@@ -51,9 +51,9 @@ NB <- list(abs_mort = nb_high(site_dist$abs_mort), rel_mort = nb_high(site_dist$
           rel_dist = nb_high(site_dist$rel_dist))
 
 DIST_META <- list(
-  abs_mort = list(col = "abs_mort", label = sprintf("Absolute Mortality\n(%s, %%)  NB=%.1f", CLASS_LAB, NB$abs_mort), mid_v = NB$abs_mort),
+  abs_mort = list(col = "abs_mort", label = sprintf("Total Standing Deadwood\n(%s, %%)  NB=%.1f", CLASS_LAB, NB$abs_mort), mid_v = NB$abs_mort),
   rel_mort = list(col = "rel_mort", label = sprintf("Relative Mortality\n(%s, %%)  NB=%.1f", CLASS_LAB, NB$rel_mort), mid_v = NB$rel_mort),
-  rel_dist = list(col = "rel_dist", label = sprintf("Relative Disturbance\n(%s, %%)  NB=%.1f", CLASS_LAB, NB$rel_dist), mid_v = NB$rel_dist)
+  rel_dist = list(col = "rel_dist", label = sprintf("Total Mortality\n(%s, %%)  NB=%.1f", CLASS_LAB, NB$rel_dist), mid_v = NB$rel_dist)
 )
 
 shap_grp <- merge(shap_grp, site_dist, by.x = "test_site", by.y = "SITE_ID", all.x = TRUE)
@@ -76,7 +76,7 @@ make_one_panel <- function(dt_sub, site_order, metric_key, igbp_vec, efp_label,
   ggplot() +
     geom_col(data = dt_plot, aes(x = rel_shap, y = test_site, fill = group), position = "stack", width = 0.75) +
     geom_point(data = dot_dt, aes(x = -0.05, y = test_site, colour = metric_val, size = metric_val)) +
-    scale_fill_manual(values = GROUP_COLOURS, name = "Driver group", drop = TRUE) +
+    scale_fill_manual(values = GROUP_COLOURS, labels = c(Climate = "Climate", Traits = "Traits", Disturbance = "Mortality", Memory = "Memory"), name = "Driver group", drop = TRUE) +
     scale_colour_gradient2(low = "#1B4965", mid = "#F5F5F5", high = "#C41E3A",
                            midpoint = meta$mid_v, limits = c(0, max_val), na.value = "grey80", name = meta$label) +
     scale_size_continuous(name = meta$label, range = c(0.5, 4.5), limits = c(0, max_val)) +
@@ -123,8 +123,8 @@ make_combined_plot <- function(dt_model, metric_key, model_label) {
     plot_layout(guides = "collect") & theme(legend.position = "right")
 }
 
-MODEL_LABELS <- list(M4_12m = sprintf("M4 (C+T+D), 12m window, %s", LEARNER_LAB),
-                     M4_24m = sprintf("M4 (C+T+D), 24m window, %s", LEARNER_LAB))
+MODEL_LABELS <- list(M4_12m = sprintf("C+T+M, 12m window, %s", LEARNER_LAB),
+                     M4_24m = sprintf("C+T+M, 24m window, %s", LEARNER_LAB))
 
 cat(sprintf("Generating metric-keyed Fig 3 panels (M4, %s, both windows):\n", LEARNER_LAB))
 for (metric_key in names(DIST_META)) {

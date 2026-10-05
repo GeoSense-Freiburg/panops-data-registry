@@ -43,7 +43,7 @@ nb <- function(v){m<-mean(v,na.rm=TRUE); s<-sd(v,na.rm=TRUE)
   factor(cut(v, c(-Inf, m-0.5*s, m+0.5*s, Inf), c("Low","Mid","High")), levels=c("Low","Mid","High"))}
 METRICS <- list(
   list(key="relmort", col="relative_mortality_cls",   lab="relative mortality"),
-  list(key="reldist", col="relative_disturbance_cls", lab="relative disturbance"))
+  list(key="reldist", col="relative_disturbance_cls", lab="total mortality"))
 
 th <- theme_bw(base_size=11) + theme(
   plot.background=element_rect(fill=BG,colour=NA), panel.background=element_rect(fill=PANEL,colour=NA),
@@ -89,9 +89,9 @@ for (M in METRICS) {
     scale_fill_manual(values=CAT_COLS) +
     ggh4x::facet_grid2(response ~ learner, scales="free_y", independent="y",
                        labeller=labeller(response=EFP_LAB), switch="y") +
-    labs(x=NULL, y="Net signed disturbance SHAP\n(effect on the PREDICTED value, response units)",
-         title=sprintf("Direction of the disturbance effect — by %s", M$lab),
-         subtitle=paste0("Tree cover ≥30 % (", PN[["sites"]], " sites) · ", PAPER_MAPS, " · M4 · natural-breaks split (site max > mean + 0.5 SD) on ", M$lab, " (", CLASS_LAB, ")",
+    labs(x=NULL, y="Net signed mortality SHAP\n(effect on the PREDICTED value, response units)",
+         title=sprintf("Direction of the mortality effect — by %s", M$lab),
+         subtitle=paste0("Tree cover ≥30 % (", PN[["sites"]], " sites) · ", PAPER_MAPS, " · C+T+M · natural-breaks split (site max > mean + 0.5 SD) on ", M$lab, " (", CLASS_LAB, ")",
                          " · below zero = the model predicts a LOWER value of the ", RESP_WORD, " (not worse accuracy)\n",
                          "stars = Mann-Whitney U between Low+Mid and High (unequal n), BH-FDR across the figure ",
                          "(*** q<0.001, ** q<0.01, * q<0.05)")) +

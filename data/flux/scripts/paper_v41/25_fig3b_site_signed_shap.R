@@ -45,9 +45,9 @@ site_dist <- dt_raw[, .(IGBP = IGBP[1],
 
 SCALE_COLS <- c("#004D4D", "#F0E442", "#EE6FA8")   # dark teal -> yellow -> pink
 DIST_META <- list(
-  abs_mort = list(label = paste0("Absolute Mortality\n(", CLASS_LAB, ", %)")),
+  abs_mort = list(label = paste0("Total Standing Deadwood\n(", CLASS_LAB, ", %)")),
   rel_mort = list(label = paste0("Relative Mortality\n(", CLASS_LAB, ", %)")),
-  rel_dist = list(label = paste0("Relative Disturbance\n(", CLASS_LAB, ", %)")))
+  rel_dist = list(label = paste0("Total Mortality\n(", CLASS_LAB, ", %)")))
 DIST_META <- DIST_META[intersect(names(DIST_META), strsplit(Sys.getenv("FIG3B_METRICS", "abs_mort,rel_mort,rel_dist"), ",")[[1]])]
 for (k in names(DIST_META)) {     # natural breaks: Low < mean - 0.5 SD <= Mid <= mean + 0.5 SD < High
   x <- site_dist[[k]]
@@ -87,7 +87,7 @@ make_one_panel <- function(dt_sub, site_order, metric_key, igbp_vec, efp_label, 
     (if (PAPER_LAYOUT)   # few, compact x ticks (ETmax ticks overlapped); one shared x title (plot_layout below)
        scale_x_continuous(breaks = scales::breaks_pretty(n = 4), labels = scales::label_number(drop0trailing = TRUE),
                           guide = guide_axis(check.overlap = TRUE))) +
-    labs(x = if (PAPER_LAYOUT) "Mortality SHAP (response units)" else "Net signed disturbance SHAP\n(response units)",
+    labs(x = if (PAPER_LAYOUT) "Mortality SHAP (response units)" else "Net signed mortality SHAP\n(response units)",
          y = NULL, title = efp_label) +
     (if (PAPER_LAYOUT) list(theme_bw(base_size = 7),
       theme(
@@ -114,8 +114,8 @@ make_one_panel <- function(dt_sub, site_order, metric_key, igbp_vec, efp_label, 
       guides(fill = guide_colourbar(barheight = unit(2.5, "cm")))))
 }
 
-MODEL_LABELS <- list(M4_12m = sprintf("C+T+D, 12m window, %s", LEARNER_LAB),
-                     M4_24m = sprintf("C+T+D, 24m window, %s", LEARNER_LAB))
+MODEL_LABELS <- list(M4_12m = sprintf("C+T+M, 12m window, %s", LEARNER_LAB),
+                     M4_24m = sprintf("C+T+M, 24m window, %s", LEARNER_LAB))
 
 cat(sprintf("Fig 3b signed disturbance SHAP (%s):\n", LEARNER_LAB))
 for (metric_key in names(DIST_META)) {

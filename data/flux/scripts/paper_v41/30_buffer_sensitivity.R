@@ -18,9 +18,9 @@ OUT <- file.path(PAPER_FIG, "buffer_sensitivity"); dir.create(OUT, showWarnings 
 PN <- paper_n()
 BUFS <- c(100, 200, 300, 400, 500)
 METRICS <- c(tree_cover_mean_pct = "Tree cover (%)",
-             absolute_mortality = "Absolute mortality (%)",
+             absolute_mortality = "Total standing deadwood (%)",
              relative_mortality = "Relative mortality (%)",
-             relative_disturbance = "Relative disturbance (%)",
+             relative_disturbance = "Total mortality (%)",
              new_deadwood_gain_pp = "New deadwood gain (pp)",
              relative_tree_loss_pct = "Relative tree loss (%)")
 BUF_COLS <- setNames(c("#B2DFDB", "#66B2A9", "#2E8C83", "#0F6660", "#004D4D"), paste0(BUFS, " m"))  # one hue, light -> dark

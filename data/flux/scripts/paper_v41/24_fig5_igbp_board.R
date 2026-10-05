@@ -101,8 +101,8 @@ if (!is.null(signed))
 
 # ── model sets (with-D model drives both) ────────────────────
 sets <- list(
-  list(wd="M4_12m",      wo="M3_12m",      label="M4 (C+T+D)",       win="12m"),
-  list(wd="M4_24m",      wo="M3_24m",      label="M4 (C+T+D)",       win="24m"),
+  list(wd="M4_12m",      wo="M3_12m",      label="C+T+M",       win="12m"),
+  list(wd="M4_24m",      wo="M3_24m",      label="C+T+M",       win="24m"),
   list(wd="M6_raw_12m",  wo="M5_raw_12m",  label="M6 raw (C+D+Mem)", win="12m"),
   list(wd="M6_raw_24m",  wo="M5_raw_24m",  label="M6 raw (C+D+Mem)", win="24m"),
   list(wd="M6_anom_12m", wo="M5_anom_12m", label="M6 anom (C+D+Mem)",win="12m"),
@@ -191,12 +191,12 @@ for (s in sets) {
 
   if (nrow(dR) == 0 || nrow(sh) == 0) { cat("  skip:", s$wd, "\n"); next }
 
-  pA <- violin_igbp(dR, "delta_rmse", expression(Delta*"RMSE (with D - without D)"),
+  pA <- violin_igbp(dR, "delta_rmse", expression(Delta*"RMSE (with M - without M)"),
                     "A · ΔRMSE by IGBP class",
                     "White dot = median | Yellow diamond = mean | negative = D improved", TRUE)
-  pB <- violin_igbp(sh, "dist_signed", "Net signed disturbance SHAP\n(effect on PREDICTED value)",
-                    "B · Direction of the disturbance effect by IGBP class",
-                    paste0("Net signed SHAP of the disturbance block | below zero = model predicts a LOWER ", RESP_WORD, " value (not worse accuracy)"), TRUE)
+  pB <- violin_igbp(sh, "dist_signed", "Net signed mortality SHAP\n(effect on PREDICTED value)",
+                    "B · Direction of the mortality effect by IGBP class",
+                    paste0("Net signed SHAP of the mortality block | below zero = model predicts a LOWER ", RESP_WORD, " value (not worse accuracy)"), TRUE)
   # Spearman correlation, one test per EFP panel; BH-FDR across all 12 tests
   # in this board (4 EFPs x panels C+D+E), same convention as the other
   # figures' significance tests. E is D repeated with relative_disturbance
@@ -212,18 +212,18 @@ for (s in sets) {
   labC <- stat_all[panel == "C"]; labD <- stat_all[panel == "D"]; labE <- stat_all[panel == "E"]
 
   pC <- scatter_tc(dR, "tree_cover", paste0("Tree cover — ", PAPER_MAPS, ", 500 m, site mean (%)"),
-                   "delta_rmse", expression(Delta*"RMSE (with D - without D)"),
-                   "C · Tree cover vs. disturbance benefit",
+                   "delta_rmse", expression(Delta*"RMSE (with M - without M)"),
+                   "C · Tree cover vs. mortality benefit",
                    "Each point = one site | Linear fit with 95% CI | Spearman rho, BH-FDR within this board (*** q<0.001, ** q<0.01, * q<0.05)",
                    TRUE, FALSE, labC)
   pD <- scatter_tc(sh, "tree_cover", paste0("Tree cover — ", PAPER_MAPS, ", 500 m, site mean (%)"),
-                   "dist_signed", "Net signed disturbance SHAP\n(effect on PREDICTED value)",
-                   "D · Tree cover vs. direction of the disturbance effect",
+                   "dist_signed", "Net signed mortality SHAP\n(effect on PREDICTED value)",
+                   "D · Tree cover vs. direction of the mortality effect",
                    paste0("Each point = one site | Linear fit with 95% CI | below zero = model predicts a LOWER ", RESP_WORD, " value"),
                    TRUE, TRUE, labD)
-  pE <- scatter_tc(sh, "rel_disturbance", paste0("Relative disturbance (", CLASS_LAB, ", %, max across years)"),
-                   "dist_signed", "Net signed disturbance SHAP\n(effect on PREDICTED value)",
-                   "E · Relative disturbance vs. direction of the disturbance effect",
+  pE <- scatter_tc(sh, "rel_disturbance", paste0("Total mortality (", CLASS_LAB, ", %, max across years)"),
+                   "dist_signed", "Net signed mortality SHAP\n(effect on PREDICTED value)",
+                   "E · Total mortality vs. direction of the mortality effect",
                    paste0("Each point = one site | Linear fit with 95% CI | below zero = model predicts a LOWER ", RESP_WORD, " value"),
                    TRUE, TRUE, labE)
 

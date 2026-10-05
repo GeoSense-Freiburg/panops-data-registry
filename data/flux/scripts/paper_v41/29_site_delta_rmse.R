@@ -24,7 +24,7 @@ PN <- paper_n()
 CLASS_COLS <- c(Low = "#004D4D", Mid = "#F0E442", High = "#EE6FA8")   # dark teal / yellow / pink (as Fig 3b)
 GRID <- "#D9D9D9"; TXT <- "#111111"; AX <- "#444444"
 LEARNERS <- c(XGB = "XGBoost (Optuna)", LGB = "LightGBM (Optuna)")
-METRICS <- list(reldist = list(col = "relative_disturbance_cls", lab = "Relative disturbance"),
+METRICS <- list(reldist = list(col = "relative_disturbance_cls", lab = "Total mortality"),
                 relmort = list(col = "relative_mortality_cls",   lab = "Relative mortality"))
 
 # per-site RMSE of M3 and M4 -> dRMSE
@@ -86,9 +86,9 @@ for (k in names(METRICS)) {
     scale_fill_manual(values = CLASS_COLS, labels = cls_lab, drop = FALSE, na.value = "grey80",
                       name = sprintf("%s\nsite maximum, %s\n(breaks: mean \u00b1 0.5 SD)", M$lab, CLASS_LAB)) +
     facet_grid(response ~ col, scales = "free_y", switch = "y", labeller = labeller(response = RESP_UNITS)) +
-    labs(x = "Sites (sorted by ΔRMSE within each panel)", y = "ΔRMSE  =  RMSE(with D) − RMSE(without D)",
-         title = "Per-site ΔRMSE from adding disturbance — M3 (C+T) vs M4 (C+T+D)",
-         subtitle = sprintf("Below 0 = D reduces the site's RMSE | bars coloured by %s class (site maximum) | repeated CV (3×80 %%) | tree cover ≥30 %% (%d sites, %d site-years) · %s",
+    labs(x = "Sites (sorted by ΔRMSE within each panel)", y = "ΔRMSE  =  RMSE(with M) − RMSE(without M)",
+         title = "Per-site ΔRMSE from adding mortality — C+T vs C+T+M",
+         subtitle = sprintf("Below 0 = mortality reduces the site's RMSE | bars coloured by %s class (site maximum) | repeated CV (3×80 %%) | tree cover ≥30 %% (%d sites, %d site-years) · %s",
                             tolower(M$lab), PN[["sites"]], PN[["sy"]], PAPER_MAPS)) +
     th
   stem <- file.path(OUT, sprintf("fig_site_dRMSE_%s%s", k, CLASS_TAG))

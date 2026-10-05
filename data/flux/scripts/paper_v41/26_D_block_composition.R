@@ -27,7 +27,7 @@ LEARNERS <- list(list(lab = "XGBoost (Optuna)",  fam = "XGB"),
 # of this dataset (500 m), used in the legend label
 dd <- fread(PAPER_DATA, select = c("relative_disturbance_500m", "relative_mortality_500m"))
 RHO <- cor(dd$relative_disturbance_500m, dd$relative_mortality_500m, method = "spearman", use = "complete.obs")
-CMB <- sprintf("Combined index (rho = %.2f with rel. mortality)", RHO)
+CMB <- sprintf("Total mortality (rho = %.2f with rel. mortality)", RHO)
 PD  <- fread(PAPER_DATA, select = "SITE_ID"); N_SITES <- uniqueN(PD$SITE_ID); N_SY <- nrow(PD)
 # family = drop the buffer and lag suffix, keep the _thresh distinction
 famof <- function(v) sub("_[0-9]+00m(_lag[12])?$", "", v)
@@ -110,11 +110,11 @@ for (L in LEARNERS) {
     facet_grid(norm ~ window, scales = "free_y", switch = "y") +
     scale_fill_manual(values = CC_COLS) +
     scale_y_continuous(expand = expansion(mult = c(0, 0.14))) +
-    labs(title = "What kind of disturbance information does the model use?",
-         subtitle = sprintf("%s · M4 (C+T+D) · %s, %s · tree cover >= 30%% (%d sites, %d site-years)\nDisturbance block renormalised to 100%%; mean over the %d sites",
+    labs(title = "What kind of mortality information does the model use?",
+         subtitle = sprintf("%s · C+T+M · %s, %s · tree cover >= 30%% (%d sites, %d site-years)\nMortality block renormalised to 100%%; mean over the %d sites",
                             L$lab, .sub, PAPER_MAPS, N_SITES, N_SY, N_SITES),
          x = NULL, y = NULL,
-         caption = sprintf(paste0("Top row: total share of the disturbance signal. Variables per sub-block: 12m %s; 24m %s.
+         caption = sprintf(paste0("Top row: total share of the mortality signal. Variables per sub-block: 12m %s; 24m %s.
 ",
                           "Bottom row divides by the number of variables. Every metric enters at 5 buffers x current + lag1 (12m) or + lag2 (24m).
 ",
@@ -144,10 +144,10 @@ for (L in LEARNERS) {
     facet_grid(response ~ window) +
     scale_fill_manual(values = CC_COLS) +
     scale_y_continuous(expand = expansion(mult = c(0, 0.30))) +
-    labs(title = "Disturbance block, metric by metric",
-         subtitle = sprintf("%s · M4 · %s (%d sites) · share of the disturbance-block |SHAP| (%%)\nn = variables contributed by that metric (5 buffers x current + lag1 at 12m, + lag2 at 24m)",
+    labs(title = "Mortality block, metric by metric",
+         subtitle = sprintf("%s · C+T+M · %s (%d sites) · share of the mortality-block |SHAP| (%%)\nn = variables contributed by that metric (5 buffers x current + lag1 at 12m, + lag2 at 24m)",
                             L$lab, .sub, N_SITES),
-         x = NULL, y = "% of disturbance-block |SHAP|") +
+         x = NULL, y = "% of mortality-block |SHAP|") +
     th
   ggsave(sprintf("%s/D_composition_family_%s.png", OUT, L$fam), p2,
          width = 11, height = 8, dpi = 320, bg = BG)
