@@ -31,6 +31,8 @@ harm_file <- PAPER_DATA   # site-level metric values (max across a site's years)
 GROUP_COLOURS <- c(Climate = "#4A90D9", Traits = "#3DBDAA", Disturbance = "#D4A017", Memory = "#9B5DE5")
 GROUP_LEVELS  <- c("Climate", "Traits", "Disturbance", "Memory")
 EFP_UNITS <- RESP_UNITS   # active response set (paper_common.R)
+# env FIG3_LAYOUT = paper (default, 2026-10-05: 7 x 10 in print size, alternating site labels, as Fig 3b) | wide (old 20 in)
+PAPER_LAYOUT <- Sys.getenv("FIG3_LAYOUT", "paper") == "paper"
 
 shap_raw <- fread(shap_file)
 shap_grp <- shap_raw[group %in% GROUP_LEVELS & model %in% c("M4_12m", "M4_24m") & response %in% EFP_ORDER,
@@ -71,7 +73,13 @@ make_one_panel <- function(dt_sub, site_order, metric_key, igbp_vec, efp_label,
   setnames(dot_dt, col_var, "metric_val")
   max_val <- ceiling(max(dot_dt$metric_val, na.rm = TRUE) / 5) * 5
   max_val <- max(max_val, meta$mid_v * 2)
-  y_scale <- if (show_igbp) scale_y_discrete(sec.axis = dup_axis(labels = igbp_vec, name = "IGBP")) else scale_y_discrete()
+  if (PAPER_LAYOUT) {   # print size: site labels alternate left / right as "SITE (IGBP)" (as Fig 3b)
+    lab <- sprintf("%s (%s)", site_order, igbp_vec); odd <- seq_along(site_order) %% 2 == 1
+    y_scale <- if (show_igbp) scale_y_discrete(labels = NULL, sec.axis = dup_axis(labels = ifelse(odd, "", lab), name = NULL))
+               else if (show_y) scale_y_discrete(labels = ifelse(odd, lab, "")) else scale_y_discrete(labels = NULL)
+  } else {
+    y_scale <- if (show_igbp) scale_y_discrete(sec.axis = dup_axis(labels = igbp_vec, name = "IGBP")) else scale_y_discrete()
+  }
 
   ggplot() +
     geom_col(data = dt_plot, aes(x = rel_shap, y = test_site, fill = group), position = "stack", width = 0.75) +
@@ -79,13 +87,23 @@ make_one_panel <- function(dt_sub, site_order, metric_key, igbp_vec, efp_label,
     scale_fill_manual(values = GROUP_COLOURS, labels = c(Climate = "Climate", Traits = "Traits", Disturbance = "Mortality", Memory = "Memory"), name = "Driver group", drop = TRUE) +
     scale_colour_gradient2(low = "#1B4965", mid = "#F5F5F5", high = "#C41E3A",
                            midpoint = meta$mid_v, limits = c(0, max_val), na.value = "grey80", name = meta$label) +
-    scale_size_continuous(name = meta$label, range = c(0.5, 4.5), limits = c(0, max_val)) +
+    scale_size_continuous(name = meta$label, range = if (PAPER_LAYOUT) c(0.3, 2.2) else c(0.5, 4.5), limits = c(0, max_val)) +
     y_scale +
-    scale_x_continuous(limits = c(-0.09, 1.02), breaks = seq(0, 1, 0.25),
-                       labels = c("0", "0.25", "0.50", "0.75", "1.00"), expand = expansion(0)) +
+    scale_x_continuous(limits = c(-0.09, 1.02), breaks = if (PAPER_LAYOUT) c(0, 0.5, 1) else seq(0, 1, 0.25),
+                       labels = if (PAPER_LAYOUT) c("0", "0.5", "1") else c("0", "0.25", "0.50", "0.75", "1.00"),
+                       expand = expansion(0)) +
     labs(x = "Relative mean |SHAP|", y = NULL, title = efp_label) +
-    theme_bw(base_size = 9) +
-    theme(
+    (if (PAPER_LAYOUT) list(theme_bw(base_size = 7), theme(
+      plot.title = element_text(size = 7, face = "bold", hjust = 0.5),
+      axis.text.y.left = if (show_y) element_text(size = 7, colour = "grey15") else element_blank(),
+      axis.text.y.right = if (show_igbp) element_text(size = 7, colour = "grey15") else element_blank(),
+      axis.ticks.y = element_blank(), axis.text.x = element_text(size = 6), axis.title.x = element_text(size = 6.5),
+      legend.title = element_text(size = 6), legend.text = element_text(size = 5.5), legend.key.size = unit(0.3, "cm"),
+      panel.grid.major.y = element_blank(), panel.grid.minor = element_blank(), plot.margin = margin(2, 2, 2, 2)),
+      guides(fill = guide_legend(order = 1, override.aes = list(size = 2.5)),
+             colour = guide_colourbar(order = 2, barwidth = unit(3.5, "cm"), barheight = unit(0.25, "cm"), title.position = "top"),
+             size = "none"))
+     else list(theme_bw(base_size = 9), theme(
       plot.title = element_text(size = 9, face = "bold", hjust = 0.5),
       axis.text.y = if (show_y) element_text(size = 6.5) else element_blank(),
       axis.ticks.y = if (show_y) element_line() else element_blank(),
@@ -93,9 +111,9 @@ make_one_panel <- function(dt_sub, site_order, metric_key, igbp_vec, efp_label,
       legend.position = "right", legend.key.size = unit(0.4, "cm"),
       legend.title = element_text(size = 7.5), legend.text = element_text(size = 7),
       panel.grid.major.y = element_blank(), panel.grid.minor = element_blank()
-    ) +
+    ),
     guides(fill = guide_legend(order = 1, override.aes = list(size = 3.5)),
-          colour = guide_colourbar(order = 2, barheight = unit(2.5, "cm")), size = "none")
+          colour = guide_colourbar(order = 2, barheight = unit(2.5, "cm")), size = "none")))
 }
 
 make_combined_plot <- function(dt_model, metric_key, model_label) {
@@ -119,8 +137,9 @@ make_combined_plot <- function(dt_model, metric_key, model_label) {
 
   Reduce(`|`, panels) +
     plot_annotation(title = title_str,
-                    theme = theme(plot.title = element_text(face = "bold", size = 11, hjust = 0.5))) +
-    plot_layout(guides = "collect") & theme(legend.position = "right")
+                    theme = theme(plot.title = element_text(face = "bold", size = if (PAPER_LAYOUT) 8 else 11, hjust = 0.5))) +
+    plot_layout(guides = "collect", axis_titles = if (PAPER_LAYOUT) "collect_x" else "keep") &
+    theme(legend.position = if (PAPER_LAYOUT) "bottom" else "right")
 }
 
 MODEL_LABELS <- list(M4_12m = sprintf("C+T+M, 12m window, %s", LEARNER_LAB),
@@ -135,11 +154,16 @@ for (metric_key in names(DIST_META)) {
 
     p <- make_combined_plot(dt_model, metric_key, MODEL_LABELS[[this_model]])
     n_sites <- uniqueN(dt_model$test_site)
-    h <- max(6, n_sites * 0.17 + 2)
-
     stem <- file.path(OUT, sprintf("fig3_%s_%s_%s%s", metric_key, win, LEARNER, CLASS_TAG))
-    ggsave(paste0(stem, ".png"), p, width = 20, height = h, dpi = 150, limitsize = FALSE)
-    ggsave(paste0(stem, ".pdf"), p, width = 20, height = h, limitsize = FALSE)
+    if (PAPER_LAYOUT) {
+      h <- min(10, max(6, n_sites * 0.082 + 1.4))
+      ggsave(paste0(stem, ".png"), p, width = 7, height = h, dpi = 300)
+      ggsave(paste0(stem, ".pdf"), p, width = 7, height = h, device = cairo_pdf)
+    } else {
+      h <- max(6, n_sites * 0.17 + 2)
+      ggsave(paste0(stem, ".png"), p, width = 20, height = h, dpi = 150, limitsize = FALSE)
+      ggsave(paste0(stem, ".pdf"), p, width = 20, height = h, limitsize = FALSE)
+    }
     cat(sprintf("  OK %s (%d sites)\n", basename(stem), n_sites))
   }
 }
