@@ -50,6 +50,10 @@ if (PAPER_RESP_SET %in% c("efp", "v10efp", "efp_v5")) {
   RESP_WORD  <- "flux"
 }
 PAPER_MAPS <- if (PAPER_RESP_SET %in% c("v10flux", "v10efp")) "deadtrees v2-2" else if (PAPER_RESP_SET == "efp_v5") "deadtrees v5" else "deadtrees v4.1"
+# Variant without the thresholded mortality metrics (env PAPER_NO_THRESH=1, user 2026-10-06): drops
+# new_deadwood_gain_pp_thresh and relative_tree_loss_pct_thresh from the mortality block; outputs go to <sub>_nothresh.
+PAPER_NO_THRESH <- Sys.getenv("PAPER_NO_THRESH", "0") == "1"
+if (PAPER_NO_THRESH) .sub <- paste0(.sub, "_nothresh")
 PAPER_OUT  <- Sys.getenv("PAPER_OUT_DIR", file.path(PAPER_ROOT, "derived_tables", .sub, "models"))
 PAPER_FIG  <- Sys.getenv("PAPER_FIG_DIR", file.path(PAPER_ROOT, "plots", .sub))
 PAPER_TUNE <- Sys.getenv("PAPER_TUNE_DIR", file.path(PAPER_ROOT, "plots", .sub, "Optuna"))
@@ -69,6 +73,7 @@ if (PAPER_RESP_SET %in% c("v10flux", "v10efp")) {
               "LeafThickness", "LeafN_area", "LeafDryMass", "RootingDepth", "LeafDelta15N",
               "gsmax", "P12", "P50", "P88", "rdmax", "WUE_trait")
   MORT_RE <- "^(absolute_mortality|relative_mortality|new_deadwood_gain_pp(_thresh)?|relative_tree_loss_pct(_thresh)?|relative_disturbance)_[0-9]+m"
+  if (PAPER_NO_THRESH) MORT_RE <- "^(absolute_mortality|relative_mortality|new_deadwood_gain_pp|relative_tree_loss_pct|relative_disturbance)_[0-9]+m"
 }
 
 paper_load <- function() as.data.frame(fread(PAPER_DATA))

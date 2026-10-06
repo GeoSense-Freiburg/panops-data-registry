@@ -1,0 +1,15 @@
+{
+  "learner": "XGB",
+  "response": "ETmax",
+  "best_value": 0.75653455,
+  "n_trials": 50,
+  "params": {
+    "learning_rate": 0.015041466943602378,
+    "nrounds": 200,
+    "max_depth": 4,
+    "min_child_weight": 12.067838686811125,
+    "subsample": 0.6701648176991435,
+    "colsample_bytree": 0.26455685425873393,
+    "reg_lambda": 0.007305810756713681
+  }
+}

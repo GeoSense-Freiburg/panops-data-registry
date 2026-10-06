@@ -17,6 +17,7 @@ setwd("/mnt/gsdata/projects/panops/panops-data-registry/data/flux")
 source("scripts/paper_v41/paper_common.R")
 PN <- paper_n()
 VTAG <- c(efp = "v41", efp_v5 = "v5", v10efp = "v22", flux = "v41_flux", v10flux = "v22_flux")[[PAPER_RESP_SET]]   # file / label tag
+if (PAPER_NO_THRESH) VTAG <- paste0(VTAG, "_nothresh")   # never overwrite the main tables
 LEARNERS <- list(XGB = list(lab = "XGBoost", f = file.path(PAPER_OUT, "XGB_predictions_repCV.csv")),
                  LGB = list(lab = "LightGBM", f = file.path(PAPER_OUT, "LGB_predictions_repCV.csv")),
                  AG  = list(lab = "AutoGluon", f = file.path(PAPER_ROOT, "AutoGluon/outputs", PAPER_RESP_SET, "AG_predictions_repCV.csv")))

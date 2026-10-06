@@ -1,0 +1,15 @@
+{
+  "learner": "XGB",
+  "response": "NEPmax",
+  "best_value": 0.77582926,
+  "n_trials": 50,
+  "params": {
+    "learning_rate": 0.03610849854247483,
+    "nrounds": 300,
+    "max_depth": 1,
+    "min_child_weight": 12.06215747986144,
+    "subsample": 0.8228095683554083,
+    "colsample_bytree": 0.20168419591997264,
+    "reg_lambda": 0.013037496507546823
+  }
+}
