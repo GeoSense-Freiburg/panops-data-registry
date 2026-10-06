@@ -16,6 +16,7 @@ suppressMessages(library(data.table))
 setwd("/mnt/gsdata/projects/panops/panops-data-registry/data/flux")
 source("scripts/paper_v41/paper_common.R")
 PN <- paper_n()
+VTAG <- c(efp = "v41", efp_v5 = "v5", v10efp = "v22", flux = "v41_flux", v10flux = "v22_flux")[[PAPER_RESP_SET]]   # file / label tag
 LEARNERS <- list(XGB = list(lab = "XGBoost", f = file.path(PAPER_OUT, "XGB_predictions_repCV.csv")),
                  LGB = list(lab = "LightGBM", f = file.path(PAPER_OUT, "LGB_predictions_repCV.csv")),
                  AG  = list(lab = "AutoGluon", f = file.path(PAPER_ROOT, "AutoGluon/outputs", PAPER_RESP_SET, "AG_predictions_repCV.csv")))
@@ -63,12 +64,12 @@ tex <- c(
     "mortality (C+T), both evaluated by repeated leave-one-site-out cross-validation (3 $\\times$ 80\\%%). ",
     "$\\Delta$RMSE = median over sites of the paired relative change, (RMSE$_\\mathrm{C+T+M}$ $-$ RMSE$_\\mathrm{C+T}$) / RMSE$_\\mathrm{C+T}$ $\\times$ 100; ",
     "negative values mean that mortality reduces the error. Improved = share of sites whose RMSE decreased. ",
-    "Sites are grouped by their maximum total mortality across years, averaged over the five buffers (100--500\\,m); ",
+    sprintf("Sites are grouped by their maximum total mortality across years (%s); ", if (CLASS_BUF == "avg") "averaged over the five buffers, 100--500\\,m" else paste0(CLASS_BUF, "\\,m buffer")),
     "High $>$ mean $+$ 0.5\\,SD (%.1f\\%%), Low $<$ mean $-$ 0.5\\,SD (%.1f\\%%), Mid in between. ",
     "Stars: one-sided paired Wilcoxon signed-rank test (C+T+M $<$ C+T), Benjamini--Hochberg corrected across all %d tests in the table ",
-    "($^{*}$\\,$q<0.05$, $^{**}$\\,$q<0.01$, $^{***}$\\,$q<0.001$). Tree cover $\\geq$ 30\\%%, %d sites, %d site-years, deadtrees v4.1.}"),
-    b_hi, b_lo, nrow(st), PN[["sites"]], PN[["sy"]]),
-  "\\label{tab:fig2_dRMSE_total_mort_v41}",
+    "($^{*}$\\,$q<0.05$, $^{**}$\\,$q<0.01$, $^{***}$\\,$q<0.001$). Tree cover $\\geq$ 30\\%%, %d sites, %d site-years, %s.}"),
+    b_hi, b_lo, nrow(st), PN[["sites"]], PN[["sy"]], PAPER_MAPS),
+  sprintf("\\label{tab:fig2_dRMSE_total_mort_%s}", VTAG),
   "\\scriptsize",
   "\\setlength{\\tabcolsep}{4pt}",
   "\\renewcommand{\\arraystretch}{0.92}",
@@ -93,7 +94,7 @@ for (L in L_ok) for (wn in WINDOWS) {
   }
 }
 tex <- c(tex, "\\bottomrule", "\\end{tabular}", "\\end{table}")
-out <- file.path(PAPER_ROOT, "manuscript/tables", sprintf("table_fig2_dRMSE_total_mort_v41%s.tex", if (PAPER_RESP_SET == "efp") "" else paste0("_", PAPER_RESP_SET)))
+out <- file.path(PAPER_ROOT, "manuscript/tables", sprintf("table_fig2_dRMSE_total_mort_%s.tex", VTAG))
 writeLines(tex, out)
 cat("wrote", out, "\n")
 print(dcast(st, learner + window + response ~ subset, value.var = "median_pct", fun.aggregate = function(v) round(v, 1)))

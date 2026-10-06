@@ -81,7 +81,9 @@ ggsave(paste0(stemA, ".png"), pA, width = 10, height = 6.6, dpi = 300)
 ggsave(paste0(stemA, ".pdf"), pA, width = 10, height = 6.6, device = cairo_pdf)
 
 # ---- B. |SHAP| composition (as Fig 3) ---------------------------------------------------
-sh <- fread(file.path(PAPER_OUT, sprintf("%s_site_shap_M4.csv", LEARNER)))[
+shap_f <- file.path(PAPER_OUT, sprintf("%s_site_shap_M4.csv", LEARNER))
+if (file.exists(shap_f)) {   # variable-level SHAP is not available for every dataset (e.g. V2.2 paper figures)
+sh <- fread(shap_f)[
   group %in% names(GROUP_COLOURS) & model == MODEL & response %in% EFP_ORDER,
   .(g = sum(mean_abs_shap, na.rm = TRUE)), by = .(response, test_site, group)]
 sh[, rel := g / sum(g), by = .(response, test_site)]
@@ -110,5 +112,6 @@ pB <- (pB_bars / pB_strip) + plot_layout(heights = c(1, 0.035), guides = "collec
 stemB <- file.path(OUT, sprintf("fig3_%s_%s_%s%s_landscape", FILE_KEY[[MKEY]], WIN, LEARNER, CLASS_TAG))
 ggsave(paste0(stemB, ".png"), pB, width = 10, height = 6.6, dpi = 300)
 ggsave(paste0(stemB, ".pdf"), pB, width = 10, height = 6.6, device = cairo_pdf)
+} else stemB <- "(no composition: variable-level SHAP missing)"
 cat("written:", basename(stemA), basename(stemB), "\n")
 }
