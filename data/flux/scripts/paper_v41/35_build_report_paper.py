@@ -20,15 +20,18 @@ import numpy as np, pandas as pd
 ROOT = "/mnt/gsdata/projects/panops/panops-data-registry/data/flux"
 SITE = f"{ROOT}/fluxVSmortality/v10"
 EFP = ["GPPsat", "NEPmax", "ETmax", "WUE"]
+# V4.1 and V5 are shown WITHOUT the thresholded mortality metrics (user, 2026-10-06; runs <sub>_nothresh).
+# Set REPORT_SUFFIX="" to show the earlier runs with thresholds.
+SFX = os.environ.get("REPORT_SUFFIX", "_nothresh")
 EFPH = {"GPPsat": "GPP<sub>sat</sub>", "NEPmax": "NEP<sub>max</sub>", "ETmax": "ET<sub>max</sub>", "WUE": "WUE"}
 DS = {
-    "v41": dict(label="V4.1", maps="deadtrees v4.1", plots=f"{ROOT}/plots/paper_v41", models=f"{ROOT}/derived_tables/paper_v41/models",
+    "v41": dict(label="V4.1", maps="deadtrees v4.1", plots=f"{ROOT}/plots/paper_v41{SFX}", models=f"{ROOT}/derived_tables/paper_v41{SFX}/models",
                 data=f"{ROOT}/derived_tables/paper_v41/paper_dataset_full_lags_monthly_tc30_minrun2_buf100-200-300-400-500.csv",
-                tag="", cls="mean of the five buffers (100-500 m)", tex="table_fig2_dRMSE_total_mort_v41.tex",
+                tag="", cls="mean of the five buffers (100-500 m)", tex=f"table_fig2_dRMSE_total_mort_v41{SFX}.tex",
                 note="The paper dataset."),
-    "v5": dict(label="V5", maps="deadtrees v5", plots=f"{ROOT}/plots/paper_v5", models=f"{ROOT}/derived_tables/paper_v5/models",
+    "v5": dict(label="V5", maps="deadtrees v5", plots=f"{ROOT}/plots/paper_v5{SFX}", models=f"{ROOT}/derived_tables/paper_v5{SFX}/models",
                data=f"{ROOT}/derived_tables/paper_v5/paper_dataset_full_lags_monthly_tc30_minrun2_buf100-200-300-400-500.csv",
-               tag="", cls="mean of the five buffers (100-500 m)", tex="table_fig2_dRMSE_total_mort_v5.tex",
+               tag="", cls="mean of the five buffers (100-500 m)", tex=f"table_fig2_dRMSE_total_mort_v5{SFX}.tex",
                note="Newest maps (delivered 2026-10-06), built and analysed with exactly the V4.1 rules."),
     "v22": dict(label="V2.2", maps="deadtrees v2-2", plots=f"{ROOT}/plots/paper_v10_efp", models=f"{ROOT}/derived_tables/paper_v10_efp/models",
                 data=f"{ROOT}/derived_tables/paper_v10_efp/paper_dataset_v10_efp.csv",
@@ -145,7 +148,7 @@ GPP<sub>sat</sub>, NEP<sub>max</sub>, ET<sub>max</sub> and WUE are predicted fro
 <table class="tbl gl"><tr><th>Name</th><th>Definition</th></tr>
 <tr><td>Total mortality</td><td>(standing deadwood + tree-cover loss) / (tree cover + tree-cover loss) × 100 - dead and lost canopy relative to the canopy present</td></tr>
 <tr><td>Relative deadwood</td><td>standing deadwood / tree cover × 100 (where tree cover ≥ 10 %, capped at 100)</td></tr>
-<tr><td>Mortality block (M)</td><td>all mortality predictors (deadwood, deadwood gain, tree-cover loss, total mortality) at all buffers and lags</td></tr>
+<tr><td>Mortality block (M)</td><td>standing deadwood (cover and relative to tree cover), deadwood gain, relative tree-cover loss and total mortality, at all five buffers and lags (V4.1 / V5: no thresholded gain or loss metrics)</td></tr>
 <tr><td>Low / Mid / High</td><td>site maximum of the metric across years; breaks mean − 0.5 SD and mean + 0.5 SD over sites</td></tr>
 </table>
 <h3>Datasets</h3>
@@ -199,7 +202,7 @@ sections.append(("igbp", "6. Ecosystem type and tree cover (Fig 5)",
                         + fig(k, "mortality_split/mortality_composition_concept_LGB.png", f"{DS[k]['label']}: what kind of mortality information the model uses (LightGBM)."))))
 
 # V4.1 vs V5 comparison (always visible)
-C = f"{ROOT}/plots/paper_v5/comparison_v41_v5"
+C = f"{ROOT}/plots/paper_v5{SFX}/comparison_v41_v5"
 agree = pd.read_csv(f"{C}/1_metric_agreement.csv", index_col=0).drop(index="absolute deadwood", errors="ignore").round(3)
 hi = pd.read_csv(f"{C}/1_high_mortality_sites.csv", index_col=0)
 r2c = pd.read_csv(f"{C}/2_r2_all_sites.csv", header=[0, 1], index_col=[0, 1]).mean()
@@ -215,8 +218,8 @@ cmp = f"""<p>V5 rebuilds the paper dataset from the newest maps with identical r
 {table_html(hi, "High-mortality sites in each version.")}
 {table_html(r2m, "Mean R² over the 16 tasks: each version on its own sites, and on the 357 site-years present in both.")}
 {table_html(dr, "Change in overall RMSE when mortality is added (%), negative = mortality helps.")}
-<ul><li><b>Robust:</b> the NEP<sub>max</sub> effect (about −10 % overall, −15 to −21 % at high-mortality sites) and the direction of the effect (Fig 4).</li>
-<li><b>Map-dependent:</b> the GPP<sub>sat</sub> effect is weaker with V5 (−3 to −4 % instead of −6 to −8 %), and at high-mortality sites no longer significant.</li></ul>"""
+<ul><li><b>Robust:</b> the NEP<sub>max</sub> effect (−9 to −11 % overall in V4.1, −7 to −10 % in V5; −11 to −22 % at high-mortality sites, significant in both) and the direction of the effect (Fig 4).</li>
+<li><b>Map-dependent:</b> the GPP<sub>sat</sub> effect is weaker with V5 (about −3 % instead of −7 % overall) and at high-mortality sites no longer significant; WUE is also weaker overall.</li></ul>"""
 sections.append(("compare", "7. V4.1 vs V5", cmp))
 
 css = """

@@ -15,10 +15,13 @@ import os
 import numpy as np, pandas as pd
 
 ROOT = "/mnt/gsdata/projects/panops/panops-data-registry/data/flux"
-DS = {"v4.1": f"{ROOT}/derived_tables/paper_v41", "v5": f"{ROOT}/derived_tables/paper_v5"}
-FIG = {"v4.1": f"{ROOT}/plots/paper_v41", "v5": f"{ROOT}/plots/paper_v5"}
+# env COMPARE_SUFFIX="_nothresh" compares the runs without the thresholded mortality metrics (datasets are the same)
+SFX = os.environ.get("COMPARE_SUFFIX", "")
+DS = {"v4.1": f"{ROOT}/derived_tables/paper_v41", "v5": f"{ROOT}/derived_tables/paper_v5"}       # datasets
+MOD = {v: f"{p}{SFX}/models" for v, p in DS.items()}                                              # model outputs
+FIG = {"v4.1": f"{ROOT}/plots/paper_v41{SFX}", "v5": f"{ROOT}/plots/paper_v5{SFX}"}
 DATA = "paper_dataset_full_lags_monthly_tc30_minrun2_buf100-200-300-400-500.csv"
-OUT = f"{ROOT}/plots/paper_v5/comparison_v41_v5"
+OUT = f"{ROOT}/plots/paper_v5{SFX}/comparison_v41_v5"
 os.makedirs(OUT, exist_ok=True)
 EFP = ["GPPsat", "NEPmax", "ETmax", "WUE"]
 B = [100, 200, 300, 400, 500]
@@ -73,8 +76,8 @@ md += ["High-mortality sites (site maximum > mean + 0.5 SD, mean of the five buf
 met, pr = [], []
 for v in DS:
     for L in ("XGB", "LGB"):
-        x = pd.read_csv(f"{DS[v]}/models/{L}_metrics_repCV.csv"); x["maps"] = v; met.append(x)
-        p = pd.read_csv(f"{DS[v]}/models/{L}_predictions_repCV.csv"); p["maps"] = v; p["learner"] = L; pr.append(p)
+        x = pd.read_csv(f"{MOD[v]}/{L}_metrics_repCV.csv"); x["maps"] = v; met.append(x)
+        p = pd.read_csv(f"{MOD[v]}/{L}_predictions_repCV.csv"); p["maps"] = v; p["learner"] = L; pr.append(p)
 met, pr = pd.concat(met), pd.concat(pr)
 r2 = met.pivot_table(index=["response", "model"], columns=["learner", "maps"], values="R2")
 r2 = r2.reindex([(r, m) for r in EFP for m in ["M3_12m", "M4_12m", "M3_24m", "M4_24m"]])
