@@ -80,6 +80,31 @@ stemA <- file.path(OUT, sprintf("fig3b_signed_%s_%s_%s%s_landscape", FILE_KEY[[M
 ggsave(paste0(stemA, ".png"), pA, width = 10, height = 6.6, dpi = 300)
 ggsave(paste0(stemA, ".pdf"), pA, width = 10, height = 6.6, device = cairo_pdf)
 
+# ---- A2. compact variant (2026-10-06): no site names, narrower bars, page-width figure; the three classes
+#          are named above the first row instead.
+cls_x <- c(High = (n_high + 1) / 2, Mid = (n_high + length(ord) - n_low + 1) / 2, Low = length(ord) - (n_low - 1) / 2)
+cls_lab <- data.table(response = factor(EFP_ORDER[1], levels = EFP_ORDER), x = cls_x,
+                      lab = sprintf("%s (%d)", names(cls_x), c(n_high, length(ord) - n_high - n_low, n_low)))
+ytop <- sg[response == EFP_ORDER[1], max(val)]
+pC <- ggplot(sg, aes(test_site, val, fill = v)) +
+  geom_hline(yintercept = 0, colour = "grey40", linewidth = 0.25) +
+  geom_vline(xintercept = brk, linetype = "dashed", colour = "grey30", linewidth = 0.3) +
+  geom_col(width = 0.55, colour = NA) +
+  geom_text(data = cls_lab, aes(x = x, y = ytop * 1.12, label = lab), inherit.aes = FALSE, size = 2.4, colour = "grey25", fontface = "bold") +
+  fill_scale("fill") +
+  scale_x_discrete(labels = NULL, expand = expansion(add = 0.8)) +
+  scale_y_continuous(breaks = scales::breaks_pretty(n = 3), labels = scales::label_number(drop0trailing = TRUE),
+                     expand = expansion(mult = c(0.05, 0.18))) +
+  facet_grid(response ~ ., scales = "free_y", labeller = labeller(response = EFP_LAB)) +
+  labs(x = sprintf("Sites, sorted by site-maximum %s (highest left)", tolower(METRIC_LAB)), y = "Mortality SHAP (response units)",
+       title = sprintf("C+T+M, %s window, %s  |  %s", WIN, LEARNER_LAB, METRIC_LAB)) +
+  th + theme(axis.text.x = element_blank(), panel.grid.major.y = element_line(colour = "grey92", linewidth = 0.15),
+             panel.spacing.y = unit(2, "pt")) +
+  guides(fill = guide_colourbar(barwidth = unit(5, "cm"), barheight = unit(0.25, "cm"), title.position = "top"))
+stemC <- paste0(stemA, "_compact")
+ggsave(paste0(stemC, ".png"), pC, width = 7, height = 5.2, dpi = 300)
+ggsave(paste0(stemC, ".pdf"), pC, width = 7, height = 5.2, device = cairo_pdf)
+
 # ---- B. |SHAP| composition (as Fig 3) ---------------------------------------------------
 shap_f <- file.path(PAPER_OUT, sprintf("%s_site_shap_M4.csv", LEARNER))
 if (file.exists(shap_f)) {   # variable-level SHAP is not available for every dataset (e.g. V2.2 paper figures)
