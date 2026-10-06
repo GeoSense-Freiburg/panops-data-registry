@@ -16,7 +16,11 @@
 # ============================================================================
 suppressMessages(library(data.table))
 setwd("/mnt/gsdata/projects/panops/panops-data-registry/data/flux")
-D <- "derived_tables/paper_v41"
+D <- "derived_tables/paper_v41"          # shared inputs: EFPs/NEPmax, climate, traits
+# mortality maps (env PAPER_MAPS_VERSION): v41 (default) or v5 -> mortality table and outputs in derived_tables/paper_v5/
+MAPS_V <- Sys.getenv("PAPER_MAPS_VERSION", "v41")
+D_OUT <- if (MAPS_V == "v41") D else file.path("derived_tables", paste0("paper_", MAPS_V))
+dir.create(D_OUT, showWarnings = FALSE, recursive = TRUE)
 # scenario switches (defaults = the agreed design). COUNTS_ONLY=1 prints counts and writes nothing.
 MIN_RUN <- as.integer(Sys.getenv("PAPER_MIN_RUN", "4"))            # min continuous EFP years
 BUFS <- as.integer(strsplit(Sys.getenv("PAPER_BUFFERS", "100,200,300,400,500"), ",")[[1]])
@@ -55,7 +59,7 @@ efp4 <- runs4(copy(efp))
 count(efp4, sprintf("EFPs: in a run of >= %d continuous years", MIN_RUN))
 
 # ---- 2. mortality (current year) + climate availability ------------------------
-mort <- fread(file.path(D, "mortality_v41_multibuffer.csv"))
+mort <- fread(file.path(D_OUT, sprintf("mortality_%s_multibuffer.csv", MAPS_V)))
 MVARS <- c("absolute_mortality", "relative_mortality", "new_deadwood_gain_pp", "new_deadwood_gain_pp_thresh",
            "relative_tree_loss_pct", "relative_tree_loss_pct_thresh", "relative_disturbance")
 mcols <- as.vector(outer(MVARS, paste0("_", BUFS, "m"), paste0))
@@ -66,7 +70,7 @@ met[, midx := YEAR * 12L + MONTH - 1L]
 
 base <- merge(efp4, gs, by = c("SITE_ID", "YEAR"))
 base <- merge(base, mort[, c("SITE_ID", "YEAR", "tree_cover_mean_pct_500m", mcols), with = FALSE], by = c("SITE_ID", "YEAR"))
-count(base, "+ v4.1 mortality exists for the site-year (current year)")
+count(base, sprintf("+ %s mortality exists for the site-year (current year)", MAPS_V))
 base <- base[is.finite(gs_start_doy)]
 count(base, "+ growing-season start known")
 
@@ -128,7 +132,7 @@ count(runs4(copy(clean_stock[, .(SITE_ID, YEAR)])), sprintf("   ... of which in 
 # ---- 5. tree cover >= 30 % (500 m, site mean over 2017-2025, v4.1) ---------------
 tcm <- mort[, .(tc_site_mean_500m = mean(tree_cover_mean_pct_500m, na.rm = TRUE)), by = SITE_ID]
 say("")
-say("== Tree cover >= 30 %% (500 m buffer, site mean of v4.1 tree cover) ==")
+say(sprintf("== Tree cover >= 30 %%%% (500 m buffer, site mean of %s tree cover) ==", MAPS_V))
 for (nm in c("clean_full", "clean_stock")) {
   x <- merge(get(nm), tcm, by = "SITE_ID")
   count(x[tc_site_mean_500m >= 30], sprintf("%s, tree cover >= 30 %%", nm))
@@ -156,10 +160,10 @@ for (variant in c("full", "stock")) {
     all_sites[, (intersect(drop, names(all_sites))) := NULL]
     tc30 <- all_sites[tc_site_mean_500m >= 30]
     tc30_tr <- tc30[complete.cases(tc30[, ..trait_cols])]
-    fwrite(tc30, file.path(D, sprintf("paper_dataset_%s_lags_%s_tc30%s.csv", variant, climate, SUF)))
+    fwrite(tc30, file.path(D_OUT, sprintf("paper_dataset_%s_lags_%s_tc30%s.csv", variant, climate, SUF)))
     if (climate == "monthly")
       count(tc30_tr, sprintf("%s lags, tc >= 30, all %d traits non-NA", variant, length(trait_cols)))
   }
 }
-writeLines(log_lines, file.path(D, sprintf("paper_dataset_counts%s.txt", SUF)))
+writeLines(log_lines, file.path(D_OUT, sprintf("paper_dataset_counts%s.txt", SUF)))
 cat("STEP03_DONE\n")

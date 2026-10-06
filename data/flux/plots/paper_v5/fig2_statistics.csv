@@ -1,0 +1,17 @@
+learner,response,grp,median_pct,sites_improved,p,q,sig
+XGBoost (Optuna),GPPsat,12m,-3.96,57.4,0.00384,0.0123,*
+XGBoost (Optuna),GPPsat,24m,-3.85,58.4,0.021,0.0329,*
+LightGBM (Optuna),GPPsat,12m,-2.81,56.4,0.0105,0.0249,*
+LightGBM (Optuna),GPPsat,24m,-5.19,55.4,0.0166,0.0329,*
+XGBoost (Optuna),NEPmax,12m,-15.26,68.3,8.77e-07,7.01e-06,***
+XGBoost (Optuna),NEPmax,24m,-11.95,70.3,4.01e-06,1.65e-05,***
+LightGBM (Optuna),NEPmax,12m,-9.5,74.3,5.93e-07,7.01e-06,***
+LightGBM (Optuna),NEPmax,24m,-9.4,68.3,4.13e-06,1.65e-05,***
+XGBoost (Optuna),ETmax,12m,-2,58.4,0.295,0.295,ns
+XGBoost (Optuna),ETmax,24m,-2.6,64.4,0.0226,0.0329,*
+LightGBM (Optuna),ETmax,12m,-1.31,58.4,0.133,0.142,ns
+LightGBM (Optuna),ETmax,24m,-3.12,57.4,0.0109,0.0249,*
+XGBoost (Optuna),WUE,12m,-1.86,53.5,0.123,0.142,ns
+XGBoost (Optuna),WUE,24m,-3.92,58.4,0.0212,0.0329,*
+LightGBM (Optuna),WUE,12m,-1.32,53.5,0.0342,0.0456,*
+LightGBM (Optuna),WUE,24m,-0.97,51.5,0.133,0.142,ns

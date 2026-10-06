@@ -20,12 +20,14 @@ PAPER_ROOT <- "/mnt/gsdata/projects/panops/panops-data-registry/data/flux"
 # RESP_UNITS = text labels (Figs 2-4), RESP_EXPR = plotmath labels (Fig 1), RESP_WORD = noun in captions,
 # PAPER_MAPS = mortality map product named in figure subtitles.
 PAPER_RESP_SET <- Sys.getenv("PAPER_RESP_SET", "efp")
-stopifnot(PAPER_RESP_SET %in% c("efp", "flux", "v10flux", "v10efp"))
-if (PAPER_RESP_SET %in% c("efp", "v10efp")) {
-  PAPER_DATA <- file.path(PAPER_ROOT, if (PAPER_RESP_SET == "efp")
-    "derived_tables/paper_v41/paper_dataset_full_lags_monthly_tc30_minrun2_buf100-200-300-400-500.csv" else
-    "derived_tables/paper_v10_efp/paper_dataset_v10_efp.csv")
-  .sub <- if (PAPER_RESP_SET == "efp") "paper_v41" else "paper_v10_efp"
+#   "efp_v5"   same EFP design built from deadtrees v5 maps (2026-10-06), outputs in paper_v5 - for the v4.1 vs v5 comparison
+stopifnot(PAPER_RESP_SET %in% c("efp", "flux", "v10flux", "v10efp", "efp_v5"))
+if (PAPER_RESP_SET %in% c("efp", "v10efp", "efp_v5")) {
+  PAPER_DATA <- file.path(PAPER_ROOT, switch(PAPER_RESP_SET,
+    efp    = "derived_tables/paper_v41/paper_dataset_full_lags_monthly_tc30_minrun2_buf100-200-300-400-500.csv",
+    efp_v5 = "derived_tables/paper_v5/paper_dataset_full_lags_monthly_tc30_minrun2_buf100-200-300-400-500.csv",
+    v10efp = "derived_tables/paper_v10_efp/paper_dataset_v10_efp.csv"))
+  .sub <- switch(PAPER_RESP_SET, efp = "paper_v41", efp_v5 = "paper_v5", v10efp = "paper_v10_efp")
   EFP_ORDER  <- c("GPPsat", "NEPmax", "ETmax", "WUE")
   RESP_UNITS <- c(GPPsat = "GPPsat  (µmol m⁻² s⁻¹)", NEPmax = "NEPmax  (µmol m⁻² s⁻¹)",
                   ETmax  = "ETmax  (mm d⁻¹)",         WUE    = "WUE  (g C mm⁻¹)")
@@ -47,7 +49,7 @@ if (PAPER_RESP_SET %in% c("efp", "v10efp")) {
                   WUE_gs = expression(WUE~~(g~C~mm^{-1})))
   RESP_WORD  <- "flux"
 }
-PAPER_MAPS <- if (PAPER_RESP_SET %in% c("v10flux", "v10efp")) "deadtrees v2-2" else "deadtrees v4.1"
+PAPER_MAPS <- if (PAPER_RESP_SET %in% c("v10flux", "v10efp")) "deadtrees v2-2" else if (PAPER_RESP_SET == "efp_v5") "deadtrees v5" else "deadtrees v4.1"
 PAPER_OUT  <- Sys.getenv("PAPER_OUT_DIR", file.path(PAPER_ROOT, "derived_tables", .sub, "models"))
 PAPER_FIG  <- Sys.getenv("PAPER_FIG_DIR", file.path(PAPER_ROOT, "plots", .sub))
 PAPER_TUNE <- Sys.getenv("PAPER_TUNE_DIR", file.path(PAPER_ROOT, "plots", .sub, "Optuna"))
@@ -77,7 +79,7 @@ paper_load <- function() as.data.frame(fread(PAPER_DATA))
 # the area nearest the tower most (it lies inside all five), like a flux footprint (user, 2026-10-05;
 # default for the v4.1 sets) | "100" ... "500" = one buffer (default "500" for the V10 sets, as before).
 # paper_class_data() returns SITE_ID, YEAR, `extra` and <metric>_cls for the three class metrics.
-CLASS_BUF <- Sys.getenv("PAPER_CLASS_BUFFER", if (PAPER_RESP_SET %in% c("efp", "flux")) "avg" else "500")
+CLASS_BUF <- Sys.getenv("PAPER_CLASS_BUFFER", if (PAPER_RESP_SET %in% c("efp", "flux", "efp_v5")) "avg" else "500")
 CLASS_LAB <- if (CLASS_BUF == "avg") "mean of 100-500 m buffers" else paste0(CLASS_BUF, " m")
 CLASS_TAG <- if (CLASS_BUF == "avg") "" else paste0("_cls", CLASS_BUF, "m")   # file-name tag; none for the default
 # Figure FILE names use the paper's metric names (user, 2026-10-05); the short keys inside the scripts stay:

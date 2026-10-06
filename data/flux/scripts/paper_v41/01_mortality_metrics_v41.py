@@ -27,8 +27,12 @@ from concurrent.futures import ThreadPoolExecutor
 import numpy as np, pandas as pd, zarr
 
 ROOT = "/mnt/gsdata/projects/panops/panops-data-registry/data/flux"
-ZDIR = f"{ROOT}/deadtree/deadtrees_maps_v4.1"
-OUT = f"{ROOT}/derived_tables/paper_v41/mortality_v41_multibuffer.csv"
+# map version (env DEADTREE_VERSION): v4.1 (default, the paper) or v5 (delivered 2026-10-06, parallel paper_v5 set)
+VERSION = os.environ.get("DEADTREE_VERSION", "v4.1")
+SUB, TAG = {"v4.1": ("paper_v41", "v41"), "v5": ("paper_v5", "v5")}[VERSION]
+ZDIR = f"{ROOT}/deadtree/deadtrees_maps_{VERSION}"
+OUT = f"{ROOT}/derived_tables/{SUB}/mortality_{TAG}_multibuffer.csv"
+os.makedirs(os.path.dirname(OUT), exist_ok=True)
 BUFFERS = [100, 200, 300, 400, 500]
 TC_MIN, THRESH_PP, MIN_COVER, FIRST_YEAR = 10.0, 20.0, 0.90, 2017
 SCALE = 100.0 / 255.0
