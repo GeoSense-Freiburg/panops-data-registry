@@ -89,7 +89,7 @@ ytop <- sg[response == EFP_ORDER[1], max(val)]
 pC <- ggplot(sg, aes(test_site, val, fill = v)) +
   geom_hline(yintercept = 0, colour = "grey40", linewidth = 0.25) +
   geom_vline(xintercept = brk, linetype = "dashed", colour = "grey30", linewidth = 0.3) +
-  geom_col(width = 0.45, colour = NA) +
+  geom_col(width = 0.65, colour = NA) +   # bar share of each site slot (smaller gaps, user 2026-10-06)
   geom_text(data = cls_lab, aes(x = x, y = ytop * 1.12, label = lab), inherit.aes = FALSE, size = 2.1, colour = "grey25", fontface = "bold") +
   fill_scale("fill") +
   scale_x_discrete(labels = NULL, expand = expansion(add = 0.8)) +
