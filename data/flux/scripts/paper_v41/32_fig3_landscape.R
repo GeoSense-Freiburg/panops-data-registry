@@ -52,6 +52,12 @@ th <- theme_bw(base_size = 7) + theme(
   legend.title = element_text(size = 7.5), legend.text = element_text(size = 7),
   plot.title = element_text(size = 9, face = "bold", hjust = 0.5),
   plot.subtitle = element_text(size = 6.5, hjust = 0.5), plot.margin = margin(4, 4, 4, 4))
+# y ticks: ggplot evaluates the breaks function on the expanded axis range, where "nice" ticks (e.g. +-5) can fall
+# outside the panel and leave a row with only the 0 tick; ask for more until >= 3 ticks lie inside
+in_breaks <- function(lims) {
+  for (n in 4:8) { b <- scales::breaks_extended(n = n)(lims); b <- b[b >= lims[1] & b <= lims[2]]; if (length(b) >= 3) return(b) }
+  b
+}
 lab_of <- function(ids) setNames(ids, ids)   # site code only (user, 2026-10-05: no IGBP)
 EFP_LAB <- setNames(sub("  ", "\n", RESP_UNITS[EFP_ORDER]), EFP_ORDER)
 
@@ -69,7 +75,7 @@ pA <- ggplot(sg, aes(test_site, val, fill = v)) +
   geom_col(width = 0.78, colour = NA) +
   fill_scale("fill") +
   scale_x_discrete(labels = lab_of(ord)) +
-  scale_y_continuous(breaks = scales::breaks_pretty(n = 3), labels = scales::label_number(drop0trailing = TRUE)) +
+  scale_y_continuous(breaks = in_breaks, labels = scales::label_number(drop0trailing = TRUE)) +
   facet_grid(response ~ ., scales = "free_y", labeller = labeller(response = EFP_LAB)) +   # EFP names on the right, SHAP axis title on the left
   labs(x = NULL, y = "Mortality SHAP (response units)",
        title = sprintf("C+T+M, %s window, %s  |  %s", WIN, LEARNER_LAB, METRIC_LAB),
@@ -93,7 +99,7 @@ pC <- ggplot(sg, aes(test_site, val, fill = v)) +
   geom_text(data = cls_lab, aes(x = x, y = ytop * 1.12, label = lab), inherit.aes = FALSE, size = 2.1, colour = "grey25", fontface = "bold") +
   fill_scale("fill") +
   scale_x_discrete(labels = NULL, expand = expansion(add = 0.8)) +
-  scale_y_continuous(breaks = scales::breaks_pretty(n = 3), labels = scales::label_number(drop0trailing = TRUE),
+  scale_y_continuous(breaks = in_breaks, labels = scales::label_number(drop0trailing = TRUE),
                      expand = expansion(mult = c(0.05, 0.18))) +
   facet_grid(response ~ ., scales = "free_y", labeller = labeller(response = EFP_LAB)) +
   labs(x = sprintf("Sites, sorted by site-maximum %s (highest left)", tolower(METRIC_LAB)), y = "Mortality SHAP (response units)",
