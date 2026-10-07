@@ -104,8 +104,8 @@ def r2_table(ds):
     return t.round(3)
 
 
-def fig2_table(ds):
-    f = f"{DS[ds]['plots']}/table_fig2_dRMSE_total_mort_statistics.csv"
+def fig2_table(ds, plots=None):
+    f = f"{plots or DS[ds]['plots']}/table_fig2_dRMSE_total_mort_statistics.csv"
     st = pd.read_csv(f)
     lab = {"XGB": "XGBoost", "LGB": "LightGBM", "AG": "AutoGluon"}
     st["cell"] = [f"{m:+.1f}{'<sup>' + s + '</sup>' if isinstance(s, str) and s else ''} <span class='muted'>({i:.0f}%)</span>"
@@ -275,7 +275,22 @@ def ag_block(k):
                f"<li><b>Mortality share of |SHAP|</b> in C+T+M: AutoGluon {ms['AutoGluon'].min():.0f}-{ms['AutoGluon'].max():.0f} %, "
                f"XGBoost {ms['XGBoost'].min():.0f}-{ms['XGBoost'].max():.0f} %, LightGBM {ms['LightGBM'].min():.0f}-{ms['LightGBM'].max():.0f} % "
                "(AutoGluon SHAP is permutation-based, so compare shares and signs rather than magnitudes).</li></ul>")
+    # Table 1 with AutoGluon: from the run that matches the AutoGluon results (with / without thresholded metrics)
+    t1_dir = f"{ROOT}/plots/{'paper_v41' if k == 'v41' else 'paper_v5'}{AG_SFX}"
+    t1_tex = f"table_fig2_dRMSE_total_mort_{k}{AG_SFX}.tex"
+    t1 = ""
+    if os.path.exists(f"{t1_dir}/table_fig2_dRMSE_total_mort_statistics.csv"):
+        os.makedirs(f"{SITE}/tables", exist_ok=True)
+        shutil.copyfile(f"{ROOT}/manuscript/tables/{t1_tex}", f"{SITE}/tables/{t1_tex}")
+        t1 = ("<h3>Table 1 with AutoGluon</h3>"
+              + table_html(fig2_table(k, t1_dir),
+                           f"As Table 1 (Section 3), with AutoGluon added ({lab}"
+                           + (", runs including the thresholded mortality metrics" if AG_SFX == "" else "")
+                           + "): median per-site change in RMSE when mortality is added (%), stars = one-sided paired Wilcoxon, "
+                           f"BH-corrected across the table; (share of sites improved). Classes by total mortality, {DS[k]['cls']}. "
+                           f"LaTeX: <a href='tables/{t1_tex}'>{t1_tex}</a>."))
     return (bullets
+            + t1
             + table_html(r2.round(3), f"R² under repeated leave-one-site-out ({lab}); AutoGluon = weighted ensemble rebuilt inside every fold.")
             + table_html(dr.round(2), f"Change in overall RMSE when mortality is added (%), negative = mortality helps ({lab}).")
             + table_html(ms.round(1), f"Mortality share of mean |SHAP| in C+T+M (%) ({lab}).")

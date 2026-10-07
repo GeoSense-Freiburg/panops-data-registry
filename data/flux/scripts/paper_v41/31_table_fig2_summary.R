@@ -20,7 +20,9 @@ VTAG <- c(efp = "v41", efp_v5 = "v5", v10efp = "v22", flux = "v41_flux", v10flux
 if (PAPER_NO_THRESH) VTAG <- paste0(VTAG, "_nothresh")   # never overwrite the main tables
 LEARNERS <- list(XGB = list(lab = "XGBoost", f = file.path(PAPER_OUT, "XGB_predictions_repCV.csv")),
                  LGB = list(lab = "LightGBM", f = file.path(PAPER_OUT, "LGB_predictions_repCV.csv")),
-                 AG  = list(lab = "AutoGluon", f = file.path(PAPER_ROOT, "AutoGluon/outputs", PAPER_RESP_SET, "AG_predictions_repCV.csv")))
+                 # AutoGluon from the matching run: outputs/<set>_nothresh for the no-threshold variant (skipped until it exists)
+                 AG  = list(lab = "AutoGluon", f = file.path(PAPER_ROOT, "AutoGluon/outputs",
+                                                         paste0(PAPER_RESP_SET, if (PAPER_NO_THRESH) "_nothresh" else ""), "AG_predictions_repCV.csv")))
 EFP_TEX <- c(GPPsat = "GPP$_\\mathrm{sat}$", NEPmax = "NEP$_\\mathrm{max}$", ETmax = "ET$_\\mathrm{max}$", WUE = "WUE",
              GPP_gs = "GPP", NEP_gs = "NEP", ET_gs = "ET", WUE_gs = "WUE")
 
