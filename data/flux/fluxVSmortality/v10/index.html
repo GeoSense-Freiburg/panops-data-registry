@@ -19,10 +19,10 @@ img{max-width:100%;height:auto;border:1px solid var(--line);border-radius:4px;ba
 details{margin:8px 0 18px;border:1px solid var(--line);border-radius:6px;padding:6px 12px;background:var(--card)}summary{cursor:pointer;color:var(--accent)}
 .ds{display:none}body[data-ds="v41"] .ds-v41,body[data-ds="v5"] .ds-v5,body[data-ds="v22"] .ds-v22{display:block}
 </style></head><body data-ds="v41">
-<header><div class="bar"><nav><a href="#about">About this report</a><a href="#sites">Sites and EFP distributions</a><a href="#skill">Model skill</a><a href="#effect">Does mortality reduce prediction error?</a><a href="#shap">Direction of the mortality effect at each site (Fig 3)</a><a href="#direction">High vs Low+Mid mortality sites (Fig 4)</a><a href="#igbp">Ecosystem type and tree cover (Fig 5)</a><a href="#compare">V4.1 vs V5</a></nav>
+<header><div class="bar"><nav><a href="#about">About this report</a><a href="#sites">Sites and EFP distributions</a><a href="#skill">Model skill</a><a href="#effect">Does mortality reduce prediction error?</a><a href="#shap">Direction of the mortality effect at each site (Fig 3)</a><a href="#direction">High vs Low+Mid mortality sites (Fig 4)</a><a href="#igbp">Ecosystem type and tree cover (Fig 5)</a><a href="#compare">V4.1 vs V5</a><a href="#autogluon">AutoGluon (AutoML) check</a></nav>
 <div class="toggle" role="group" aria-label="Dataset"><button data-k="v41">V4.1</button><button data-k="v5">V5</button><button data-k="v22">V2.2</button></div></div></header>
 <main><h1>Tree mortality and ecosystem functional properties</h1>
-<p class="muted">Updated 2026-10-06 · switch the dataset at the top right (V4.1 = paper, V5 = newest maps, V2.2 = earlier analysis) ·
+<p class="muted">Updated 2026-10-07 · switch the dataset at the top right (V4.1 = paper, V5 = newest maps, V2.2 = earlier analysis) ·
 built by scripts/paper_v41/35_build_report_paper.py</p>
 <section id="about"><h2>About this report</h2>
 <p>How does tree mortality shape ecosystem functional properties (EFPs)? For every flux site-year the EFPs
@@ -827,7 +827,505 @@ GPP<sub>sat</sub>, NEP<sub>max</sub>, ET<sub>max</sub> and WUE are predicted fro
   </tbody>
 </table><figcaption>Change in overall RMSE when mortality is added (%), negative = mortality helps.</figcaption></figure>
 <ul><li><b>Robust:</b> the NEP<sub>max</sub> effect (−9 to −11 % overall in V4.1, −7 to −10 % in V5; −11 to −22 % at high-mortality sites, significant in both) and the direction of the effect (Fig 4).</li>
-<li><b>Map-dependent:</b> the GPP<sub>sat</sub> effect is weaker with V5 (about −3 % instead of −7 % overall) and at high-mortality sites no longer significant; WUE is also weaker overall.</li></ul></section>
+<li><b>Map-dependent:</b> the GPP<sub>sat</sub> effect is weaker with V5 (about −3 % instead of −7 % overall) and at high-mortality sites no longer significant; WUE is also weaker overall.</li></ul></section><section id="autogluon"><h2>8. AutoGluon (AutoML) check</h2><p>AutoGluon-Tabular (AutoML) chooses the learner itself: in every fit it trains LightGBM (3 variants), CatBoost, XGBoost, random forest, extra trees and two neural networks, each bagged over site-disjoint folds, and builds a weighted ensemble. It is rerun from scratch inside every leave-one-site-out fit, so model choice never sees the held-out site. Datasets, predictors, windows and the repeated leave-one-site-out evaluation are those of the XGBoost / LightGBM runs. The ensembles are dominated by the neural networks.</p><p class='muted'><b>Note:</b> these AutoGluon runs use the full mortality block <b>including</b> the thresholded gain and loss metrics (C+T+M with 213 / 368 predictors), unlike Sections 1-7, so they are compared here with the XGBoost / LightGBM runs that also included them. A rerun without the thresholded metrics is in progress.</p><div class="ds ds-v41"><ul><li><b>Skill:</b> mean R² 0.437 (AutoGluon) vs 0.399 (XGBoost) and 0.404 (LightGBM); AutoGluon is best in 15 of 16 tasks.</li><li><b>Effect of mortality:</b> overall RMSE change when mortality is added, AutoGluon -12.7 to -0.2 % (XGBoost -10.0 to -1.2 %, LightGBM -9.8 to -2.1 %).</li><li><b>Mortality share of |SHAP|</b> in C+T+M: AutoGluon 23-38 %, XGBoost 15-30 %, LightGBM 17-29 % (AutoGluon SHAP is permutation-based, so compare shares and signs rather than magnitudes).</li></ul><figure class="tw"><table class="dataframe tbl">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>XGBoost</th>
+      <th>LightGBM</th>
+      <th>AutoGluon</th>
+    </tr>
+    <tr>
+      <th>task</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>GPP<sub>sat</sub> · 12 months · C+T</th>
+      <td>0.298</td>
+      <td>0.320</td>
+      <td>0.373</td>
+    </tr>
+    <tr>
+      <th>GPP<sub>sat</sub> · 12 months · C+T+M</th>
+      <td>0.403</td>
+      <td>0.415</td>
+      <td>0.469</td>
+    </tr>
+    <tr>
+      <th>GPP<sub>sat</sub> · 24 months · C+T</th>
+      <td>0.336</td>
+      <td>0.341</td>
+      <td>0.383</td>
+    </tr>
+    <tr>
+      <th>GPP<sub>sat</sub> · 24 months · C+T+M</th>
+      <td>0.421</td>
+      <td>0.420</td>
+      <td>0.465</td>
+    </tr>
+    <tr>
+      <th>NEP<sub>max</sub> · 12 months · C+T</th>
+      <td>0.421</td>
+      <td>0.420</td>
+      <td>0.464</td>
+    </tr>
+    <tr>
+      <th>NEP<sub>max</sub> · 12 months · C+T+M</th>
+      <td>0.531</td>
+      <td>0.528</td>
+      <td>0.583</td>
+    </tr>
+    <tr>
+      <th>NEP<sub>max</sub> · 24 months · C+T</th>
+      <td>0.412</td>
+      <td>0.428</td>
+      <td>0.460</td>
+    </tr>
+    <tr>
+      <th>NEP<sub>max</sub> · 24 months · C+T+M</th>
+      <td>0.524</td>
+      <td>0.534</td>
+      <td>0.588</td>
+    </tr>
+    <tr>
+      <th>ET<sub>max</sub> · 12 months · C+T</th>
+      <td>0.428</td>
+      <td>0.419</td>
+      <td>0.441</td>
+    </tr>
+    <tr>
+      <th>ET<sub>max</sub> · 12 months · C+T+M</th>
+      <td>0.446</td>
+      <td>0.451</td>
+      <td>0.443</td>
+    </tr>
+    <tr>
+      <th>ET<sub>max</sub> · 24 months · C+T</th>
+      <td>0.419</td>
+      <td>0.426</td>
+      <td>0.446</td>
+    </tr>
+    <tr>
+      <th>ET<sub>max</sub> · 24 months · C+T+M</th>
+      <td>0.433</td>
+      <td>0.449</td>
+      <td>0.453</td>
+    </tr>
+    <tr>
+      <th>WUE · 12 months · C+T</th>
+      <td>0.285</td>
+      <td>0.278</td>
+      <td>0.303</td>
+    </tr>
+    <tr>
+      <th>WUE · 12 months · C+T+M</th>
+      <td>0.355</td>
+      <td>0.359</td>
+      <td>0.390</td>
+    </tr>
+    <tr>
+      <th>WUE · 24 months · C+T</th>
+      <td>0.278</td>
+      <td>0.302</td>
+      <td>0.328</td>
+    </tr>
+    <tr>
+      <th>WUE · 24 months · C+T+M</th>
+      <td>0.393</td>
+      <td>0.377</td>
+      <td>0.411</td>
+    </tr>
+    <tr>
+      <th>mean</th>
+      <td>0.399</td>
+      <td>0.404</td>
+      <td>0.437</td>
+    </tr>
+  </tbody>
+</table><figcaption>R² under repeated leave-one-site-out (V4.1); AutoGluon = weighted ensemble rebuilt inside every fold.</figcaption></figure><figure class="tw"><table class="dataframe tbl">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>XGBoost</th>
+      <th>LightGBM</th>
+      <th>AutoGluon</th>
+    </tr>
+    <tr>
+      <th>task</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>GPP<sub>sat</sub> · 12 months</th>
+      <td>-7.78</td>
+      <td>-7.27</td>
+      <td>-8.00</td>
+    </tr>
+    <tr>
+      <th>GPP<sub>sat</sub> · 24 months</th>
+      <td>-6.62</td>
+      <td>-6.24</td>
+      <td>-6.92</td>
+    </tr>
+    <tr>
+      <th>NEP<sub>max</sub> · 12 months</th>
+      <td>-9.97</td>
+      <td>-9.81</td>
+      <td>-11.80</td>
+    </tr>
+    <tr>
+      <th>NEP<sub>max</sub> · 24 months</th>
+      <td>-10.03</td>
+      <td>-9.76</td>
+      <td>-12.72</td>
+    </tr>
+    <tr>
+      <th>ET<sub>max</sub> · 12 months</th>
+      <td>-1.59</td>
+      <td>-2.78</td>
+      <td>-0.18</td>
+    </tr>
+    <tr>
+      <th>ET<sub>max</sub> · 24 months</th>
+      <td>-1.21</td>
+      <td>-2.07</td>
+      <td>-0.70</td>
+    </tr>
+    <tr>
+      <th>WUE · 12 months</th>
+      <td>-5.01</td>
+      <td>-5.79</td>
+      <td>-6.41</td>
+    </tr>
+    <tr>
+      <th>WUE · 24 months</th>
+      <td>-8.27</td>
+      <td>-5.50</td>
+      <td>-6.38</td>
+    </tr>
+  </tbody>
+</table><figcaption>Change in overall RMSE when mortality is added (%), negative = mortality helps (V4.1).</figcaption></figure><figure class="tw"><table class="dataframe tbl">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>XGBoost</th>
+      <th>LightGBM</th>
+      <th>AutoGluon</th>
+    </tr>
+    <tr>
+      <th>task</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>GPP<sub>sat</sub> · 12 months</th>
+      <td>26.8</td>
+      <td>28.4</td>
+      <td>34.9</td>
+    </tr>
+    <tr>
+      <th>GPP<sub>sat</sub> · 24 months</th>
+      <td>24.7</td>
+      <td>26.8</td>
+      <td>31.3</td>
+    </tr>
+    <tr>
+      <th>NEP<sub>max</sub> · 12 months</th>
+      <td>30.0</td>
+      <td>27.4</td>
+      <td>38.3</td>
+    </tr>
+    <tr>
+      <th>NEP<sub>max</sub> · 24 months</th>
+      <td>29.9</td>
+      <td>28.5</td>
+      <td>36.7</td>
+    </tr>
+    <tr>
+      <th>ET<sub>max</sub> · 12 months</th>
+      <td>14.6</td>
+      <td>18.4</td>
+      <td>23.5</td>
+    </tr>
+    <tr>
+      <th>ET<sub>max</sub> · 24 months</th>
+      <td>15.8</td>
+      <td>16.7</td>
+      <td>24.8</td>
+    </tr>
+    <tr>
+      <th>WUE · 12 months</th>
+      <td>26.6</td>
+      <td>29.1</td>
+      <td>31.7</td>
+    </tr>
+    <tr>
+      <th>WUE · 24 months</th>
+      <td>30.4</td>
+      <td>27.5</td>
+      <td>31.6</td>
+    </tr>
+  </tbody>
+</table><figcaption>Mortality share of mean |SHAP| in C+T+M (%) (V4.1).</figcaption></figure><figure><a href="fig_v41/autogluon/fig2_mortality_effect.png"><img src="fig_v41/autogluon/fig2_mortality_effect.png" loading="lazy" alt="Fig 2 with AutoGluon (V4.1): per-site RMSE without and with mortality, XGBoost, LightGBM and AutoGluon."></a><figcaption>Fig 2 with AutoGluon (V4.1): per-site RMSE without and with mortality, XGBoost, LightGBM and AutoGluon.</figcaption></figure><figure><a href="fig_v41/autogluon/fig3b_signed_total_mort_24m_AG_landscape.png"><img src="fig_v41/autogluon/fig3b_signed_total_mort_24m_AG_landscape.png" loading="lazy" alt="Fig 3 with AutoGluon (V4.1): net signed mortality SHAP per site, C+T+M, 24 months."></a><figcaption>Fig 3 with AutoGluon (V4.1): net signed mortality SHAP per site, C+T+M, 24 months.</figcaption></figure><figure><a href="fig_v41/autogluon/fig4_signed_shap_total_mort.png"><img src="fig_v41/autogluon/fig4_signed_shap_total_mort.png" loading="lazy" alt="Fig 4 with AutoGluon (V4.1): net signed mortality SHAP, High vs Low+Mid total-mortality sites."></a><figcaption>Fig 4 with AutoGluon (V4.1): net signed mortality SHAP, High vs Low+Mid total-mortality sites.</figcaption></figure></div><div class="ds ds-v5"><ul><li><b>Skill:</b> mean R² 0.381 (AutoGluon) vs 0.378 (XGBoost) and 0.378 (LightGBM); AutoGluon is best in 6 of 16 tasks.</li><li><b>Effect of mortality:</b> overall RMSE change when mortality is added, AutoGluon -10.6 to -0.5 % (XGBoost -10.5 to -0.7 %, LightGBM -10.2 to -0.5 %).</li><li><b>Mortality share of |SHAP|</b> in C+T+M: AutoGluon 27-40 %, XGBoost 15-34 %, LightGBM 13-34 % (AutoGluon SHAP is permutation-based, so compare shares and signs rather than magnitudes).</li></ul><figure class="tw"><table class="dataframe tbl">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>XGBoost</th>
+      <th>LightGBM</th>
+      <th>AutoGluon</th>
+    </tr>
+    <tr>
+      <th>task</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>GPP<sub>sat</sub> · 12 months · C+T</th>
+      <td>0.326</td>
+      <td>0.310</td>
+      <td>0.330</td>
+    </tr>
+    <tr>
+      <th>GPP<sub>sat</sub> · 12 months · C+T+M</th>
+      <td>0.372</td>
+      <td>0.352</td>
+      <td>0.374</td>
+    </tr>
+    <tr>
+      <th>GPP<sub>sat</sub> · 24 months · C+T</th>
+      <td>0.324</td>
+      <td>0.327</td>
+      <td>0.317</td>
+    </tr>
+    <tr>
+      <th>GPP<sub>sat</sub> · 24 months · C+T+M</th>
+      <td>0.358</td>
+      <td>0.374</td>
+      <td>0.362</td>
+    </tr>
+    <tr>
+      <th>NEP<sub>max</sub> · 12 months · C+T</th>
+      <td>0.410</td>
+      <td>0.400</td>
+      <td>0.391</td>
+    </tr>
+    <tr>
+      <th>NEP<sub>max</sub> · 12 months · C+T+M</th>
+      <td>0.526</td>
+      <td>0.517</td>
+      <td>0.514</td>
+    </tr>
+    <tr>
+      <th>NEP<sub>max</sub> · 24 months · C+T</th>
+      <td>0.394</td>
+      <td>0.434</td>
+      <td>0.394</td>
+    </tr>
+    <tr>
+      <th>NEP<sub>max</sub> · 24 months · C+T+M</th>
+      <td>0.514</td>
+      <td>0.541</td>
+      <td>0.502</td>
+    </tr>
+    <tr>
+      <th>ET<sub>max</sub> · 12 months · C+T</th>
+      <td>0.434</td>
+      <td>0.437</td>
+      <td>0.423</td>
+    </tr>
+    <tr>
+      <th>ET<sub>max</sub> · 12 months · C+T+M</th>
+      <td>0.442</td>
+      <td>0.442</td>
+      <td>0.429</td>
+    </tr>
+    <tr>
+      <th>ET<sub>max</sub> · 24 months · C+T</th>
+      <td>0.440</td>
+      <td>0.432</td>
+      <td>0.429</td>
+    </tr>
+    <tr>
+      <th>ET<sub>max</sub> · 24 months · C+T+M</th>
+      <td>0.449</td>
+      <td>0.457</td>
+      <td>0.448</td>
+    </tr>
+    <tr>
+      <th>WUE · 12 months · C+T</th>
+      <td>0.239</td>
+      <td>0.226</td>
+      <td>0.252</td>
+    </tr>
+    <tr>
+      <th>WUE · 12 months · C+T+M</th>
+      <td>0.300</td>
+      <td>0.309</td>
+      <td>0.339</td>
+    </tr>
+    <tr>
+      <th>WUE · 24 months · C+T</th>
+      <td>0.227</td>
+      <td>0.217</td>
+      <td>0.264</td>
+    </tr>
+    <tr>
+      <th>WUE · 24 months · C+T+M</th>
+      <td>0.294</td>
+      <td>0.276</td>
+      <td>0.332</td>
+    </tr>
+    <tr>
+      <th>mean</th>
+      <td>0.378</td>
+      <td>0.378</td>
+      <td>0.381</td>
+    </tr>
+  </tbody>
+</table><figcaption>R² under repeated leave-one-site-out (V5); AutoGluon = weighted ensemble rebuilt inside every fold.</figcaption></figure><figure class="tw"><table class="dataframe tbl">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>XGBoost</th>
+      <th>LightGBM</th>
+      <th>AutoGluon</th>
+    </tr>
+    <tr>
+      <th>task</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>GPP<sub>sat</sub> · 12 months</th>
+      <td>-3.48</td>
+      <td>-3.05</td>
+      <td>-3.33</td>
+    </tr>
+    <tr>
+      <th>GPP<sub>sat</sub> · 24 months</th>
+      <td>-2.54</td>
+      <td>-3.53</td>
+      <td>-3.33</td>
+    </tr>
+    <tr>
+      <th>NEP<sub>max</sub> · 12 months</th>
+      <td>-10.36</td>
+      <td>-10.21</td>
+      <td>-10.62</td>
+    </tr>
+    <tr>
+      <th>NEP<sub>max</sub> · 24 months</th>
+      <td>-10.48</td>
+      <td>-9.97</td>
+      <td>-9.39</td>
+    </tr>
+    <tr>
+      <th>ET<sub>max</sub> · 12 months</th>
+      <td>-0.73</td>
+      <td>-0.45</td>
+      <td>-0.50</td>
+    </tr>
+    <tr>
+      <th>ET<sub>max</sub> · 24 months</th>
+      <td>-0.88</td>
+      <td>-2.19</td>
+      <td>-1.65</td>
+    </tr>
+    <tr>
+      <th>WUE · 12 months</th>
+      <td>-4.10</td>
+      <td>-5.56</td>
+      <td>-5.99</td>
+    </tr>
+    <tr>
+      <th>WUE · 24 months</th>
+      <td>-4.44</td>
+      <td>-3.87</td>
+      <td>-4.69</td>
+    </tr>
+  </tbody>
+</table><figcaption>Change in overall RMSE when mortality is added (%), negative = mortality helps (V5).</figcaption></figure><figure class="tw"><table class="dataframe tbl">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>XGBoost</th>
+      <th>LightGBM</th>
+      <th>AutoGluon</th>
+    </tr>
+    <tr>
+      <th>task</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>GPP<sub>sat</sub> · 12 months</th>
+      <td>31.1</td>
+      <td>30.0</td>
+      <td>36.6</td>
+    </tr>
+    <tr>
+      <th>GPP<sub>sat</sub> · 24 months</th>
+      <td>27.8</td>
+      <td>25.6</td>
+      <td>33.1</td>
+    </tr>
+    <tr>
+      <th>NEP<sub>max</sub> · 12 months</th>
+      <td>34.4</td>
+      <td>32.8</td>
+      <td>39.5</td>
+    </tr>
+    <tr>
+      <th>NEP<sub>max</sub> · 24 months</th>
+      <td>31.9</td>
+      <td>33.9</td>
+      <td>38.1</td>
+    </tr>
+    <tr>
+      <th>ET<sub>max</sub> · 12 months</th>
+      <td>14.5</td>
+      <td>12.5</td>
+      <td>28.2</td>
+    </tr>
+    <tr>
+      <th>ET<sub>max</sub> · 24 months</th>
+      <td>15.9</td>
+      <td>16.3</td>
+      <td>26.8</td>
+    </tr>
+    <tr>
+      <th>WUE · 12 months</th>
+      <td>25.9</td>
+      <td>26.6</td>
+      <td>37.1</td>
+    </tr>
+    <tr>
+      <th>WUE · 24 months</th>
+      <td>25.3</td>
+      <td>23.7</td>
+      <td>32.7</td>
+    </tr>
+  </tbody>
+</table><figcaption>Mortality share of mean |SHAP| in C+T+M (%) (V5).</figcaption></figure><figure><a href="fig_v5/autogluon/fig2_mortality_effect.png"><img src="fig_v5/autogluon/fig2_mortality_effect.png" loading="lazy" alt="Fig 2 with AutoGluon (V5): per-site RMSE without and with mortality, XGBoost, LightGBM and AutoGluon."></a><figcaption>Fig 2 with AutoGluon (V5): per-site RMSE without and with mortality, XGBoost, LightGBM and AutoGluon.</figcaption></figure><figure><a href="fig_v5/autogluon/fig3b_signed_total_mort_24m_AG_landscape.png"><img src="fig_v5/autogluon/fig3b_signed_total_mort_24m_AG_landscape.png" loading="lazy" alt="Fig 3 with AutoGluon (V5): net signed mortality SHAP per site, C+T+M, 24 months."></a><figcaption>Fig 3 with AutoGluon (V5): net signed mortality SHAP per site, C+T+M, 24 months.</figcaption></figure><figure><a href="fig_v5/autogluon/fig4_signed_shap_total_mort.png"><img src="fig_v5/autogluon/fig4_signed_shap_total_mort.png" loading="lazy" alt="Fig 4 with AutoGluon (V5): net signed mortality SHAP, High vs Low+Mid total-mortality sites."></a><figcaption>Fig 4 with AutoGluon (V5): net signed mortality SHAP, High vs Low+Mid total-mortality sites.</figcaption></figure></div><div class="ds ds-v22"><p class="na">Not available for V2.2: this figure was not produced in the same form.</p></div></section>
 </main><script>
 const KEY='fvm-ds';function setDs(k){document.body.dataset.ds=k;document.querySelectorAll('.toggle button').forEach(b=>b.classList.toggle('on',b.dataset.k===k));try{localStorage.setItem(KEY,k)}catch(e){}}
 document.querySelectorAll('.toggle button').forEach(b=>b.addEventListener('click',()=>setDs(b.dataset.k)));

@@ -14,7 +14,9 @@ import numpy as np
 import pandas as pd
 
 ROOT = "/mnt/gsdata/projects/panops/panops-data-registry/data/flux"
-AG_ROOT = os.path.join(ROOT, "AutoGluon")
+# everything the runs write (models, cache, outputs, RESULTS_*.md) goes under AG_ROOT; set AG_WORK to a local
+# disk for long runs (the network drive is slow for many small files), then copy the results back
+AG_ROOT = os.environ.get("AG_WORK", os.path.join(ROOT, "AutoGluon"))
 SEED = 42
 N_BAG = 5            # site-grouped folds inside every AutoGluon fit (as the Optuna objective)
 N_REPS = 3           # repeated LOSO: reps per held-out site (as 11_train_repcv.R)
@@ -26,6 +28,18 @@ SETS = {
     "efp": dict(
         data=f"{ROOT}/derived_tables/paper_v41/paper_dataset_full_lags_monthly_tc30_minrun2_buf100-200-300-400-500.csv",
         responses=["GPPsat", "NEPmax", "ETmax", "WUE"], ref=f"{ROOT}/derived_tables/paper_v41/models"),
+    "efp_v5": dict(   # same EFP design on the deadtrees v5 maps (2026-10-06)
+        data=f"{ROOT}/derived_tables/paper_v5/paper_dataset_full_lags_monthly_tc30_minrun2_buf100-200-300-400-500.csv",
+        responses=["GPPsat", "NEPmax", "ETmax", "WUE"], ref=f"{ROOT}/derived_tables/paper_v5/models"),
+    # without the thresholded mortality metrics (user 2026-10-07; as PAPER_NO_THRESH=1 in paper_common.R):
+    # load() drops new_deadwood_gain_pp_thresh and relative_tree_loss_pct_thresh, so M4 has 193 / 338
+    # predictors instead of 213 / 368; compared against the XGB / LGB runs in paper_*_nothresh
+    "efp_nothresh": dict(
+        data=f"{ROOT}/derived_tables/paper_v41/paper_dataset_full_lags_monthly_tc30_minrun2_buf100-200-300-400-500.csv",
+        responses=["GPPsat", "NEPmax", "ETmax", "WUE"], ref=f"{ROOT}/derived_tables/paper_v41_nothresh/models", nothresh=True),
+    "efp_v5_nothresh": dict(
+        data=f"{ROOT}/derived_tables/paper_v5/paper_dataset_full_lags_monthly_tc30_minrun2_buf100-200-300-400-500.csv",
+        responses=["GPPsat", "NEPmax", "ETmax", "WUE"], ref=f"{ROOT}/derived_tables/paper_v5_nothresh/models", nothresh=True),
     "flux": dict(
         data=f"{ROOT}/derived_tables/paper_v41_fluxes/paper_dataset_fluxes.csv",
         responses=["GPP_gs", "NEP_gs", "ET_gs", "WUE_gs"], ref=f"{ROOT}/derived_tables/paper_v41_fluxes/models"),
@@ -46,7 +60,10 @@ def out_dir(resp_set):
 
 
 def load(resp_set):
-    return pd.read_csv(SETS[resp_set]["data"])
+    df = pd.read_csv(SETS[resp_set]["data"])
+    if SETS[resp_set].get("nothresh"):
+        df = df.drop(columns=[c for c in df.columns if re.search(r"_thresh_[0-9]+m(_lag[12])?$", c)])
+    return df
 
 
 def paper_cols(df, window, spec):

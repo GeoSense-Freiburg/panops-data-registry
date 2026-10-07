@@ -222,6 +222,79 @@ cmp = f"""<p>V5 rebuilds the paper dataset from the newest maps with identical r
 <li><b>Map-dependent:</b> the GPP<sub>sat</sub> effect is weaker with V5 (about −3 % instead of −7 % overall) and at high-mortality sites no longer significant; WUE is also weaker overall.</li></ul>"""
 sections.append(("compare", "7. V4.1 vs V5", cmp))
 
+# AutoGluon (AutoML) check - AutoGluon/ ; same datasets, predictors, windows and repeated LOSO as XGB / LGB
+AGD = f"{ROOT}/AutoGluon"
+AG_SET = {"v41": "efp", "v5": "efp_v5"}                       # V2.2 was not run with AutoGluon
+AG_SFX = os.environ.get("AG_SUFFIX", "")   # "" = runs WITH the thresholded metrics; "_nothresh" once those reruns are done
+AGL = {"XGB": "XGBoost", "LGB": "LightGBM", "AutoGluon": "AutoGluon"}
+
+
+def ag_fig(k, name, caption):
+    src = f"{AGD}/plots/{AG_SET[k]}{AG_SFX}/{name}"
+    if not os.path.exists(src):
+        return ""
+    rel = f"fig_{k}/autogluon/{name}"
+    os.makedirs(os.path.dirname(f"{SITE}/{rel}"), exist_ok=True)
+    shutil.copyfile(src, f"{SITE}/{rel}")
+    return (f'<figure><a href="{rel}"><img src="{rel}" loading="lazy" alt="{html.escape(caption)}"></a>'
+            f'<figcaption>{caption}</figcaption></figure>')
+
+
+def ag_block(k):
+    if k not in AG_SET:
+        return ""
+    o = f"{AGD}/outputs/{AG_SET[k]}{AG_SFX}"
+    if not os.path.exists(f"{o}/comparison_repCV.csv"):
+        return ""
+    lab = DS[k]["label"]
+    rep = pd.read_csv(f"{o}/comparison_repCV.csv")
+    rep = rep[rep.learner.isin(AGL)]
+    rep["task"] = [f"{EFPH[r]} · {m[3:].replace('m', ' months')} · {'C+T+M' if m[:2] == 'M4' else 'C+T'}" for r, m in zip(rep.response, rep.model)]
+    order = [f"{EFPH[e]} · {w} · {c}" for e in EFP for w in ("12 months", "24 months") for c in ("C+T", "C+T+M")]
+    r2 = rep.pivot_table(index="task", columns="learner", values="R2").reindex(order)[list(AGL)]
+    r2.loc["mean"] = r2.mean()
+    r2.columns = [AGL[c] for c in r2.columns]
+    dist = pd.read_csv(f"{o}/comparison_disturbance.csv")
+    dist = dist[dist.learner.isin(AGL)]
+    dist["task"] = [f"{EFPH[r]} · {w.replace('m', ' months')}" for r, w in zip(dist.response, dist.window)]
+    dr = dist.pivot_table(index="task", columns="learner", values="dRMSE_pct").reindex(
+        [f"{EFPH[e]} · {w}" for e in EFP for w in ("12 months", "24 months")])[list(AGL)]
+    dr.columns = [AGL[c] for c in dr.columns]
+    sh = pd.read_csv(f"{o}/comparison_shap_groups.csv")
+    sh = sh[(sh.group == "Disturbance") & sh.learner.isin(AGL)]
+    sh["task"] = [f"{EFPH[r]} · {m[3:].replace('m', ' months')}" for r, m in zip(sh.response, sh.model)]
+    ms = sh.pivot_table(index="task", columns="learner", values="share_pct").reindex(dr.index)[list(AGL)]
+    ms.columns = [AGL[c] for c in ms.columns]
+    n_best = (r2.drop(index="mean").idxmax(axis=1) == "AutoGluon").sum()
+    m = r2.loc["mean"]
+    bullets = (f"<ul><li><b>Skill:</b> mean R² {m['AutoGluon']:.3f} (AutoGluon) vs {m['XGBoost']:.3f} (XGBoost) and {m['LightGBM']:.3f} "
+               f"(LightGBM); AutoGluon is best in {n_best} of 16 tasks.</li>"
+               f"<li><b>Effect of mortality:</b> overall RMSE change when mortality is added, AutoGluon "
+               f"{dr['AutoGluon'].min():+.1f} to {dr['AutoGluon'].max():+.1f} % (XGBoost {dr['XGBoost'].min():+.1f} to {dr['XGBoost'].max():+.1f} %, "
+               f"LightGBM {dr['LightGBM'].min():+.1f} to {dr['LightGBM'].max():+.1f} %).</li>"
+               f"<li><b>Mortality share of |SHAP|</b> in C+T+M: AutoGluon {ms['AutoGluon'].min():.0f}-{ms['AutoGluon'].max():.0f} %, "
+               f"XGBoost {ms['XGBoost'].min():.0f}-{ms['XGBoost'].max():.0f} %, LightGBM {ms['LightGBM'].min():.0f}-{ms['LightGBM'].max():.0f} % "
+               "(AutoGluon SHAP is permutation-based, so compare shares and signs rather than magnitudes).</li></ul>")
+    return (bullets
+            + table_html(r2.round(3), f"R² under repeated leave-one-site-out ({lab}); AutoGluon = weighted ensemble rebuilt inside every fold.")
+            + table_html(dr.round(2), f"Change in overall RMSE when mortality is added (%), negative = mortality helps ({lab}).")
+            + table_html(ms.round(1), f"Mortality share of mean |SHAP| in C+T+M (%) ({lab}).")
+            + ag_fig(k, "fig2_mortality_effect.png", f"Fig 2 with AutoGluon ({lab}): per-site RMSE without and with mortality, XGBoost, LightGBM and AutoGluon.")
+            + ag_fig(k, "fig3b_signed_total_mort_24m_AG_landscape.png", f"Fig 3 with AutoGluon ({lab}): net signed mortality SHAP per site, C+T+M, 24 months.")
+            + ag_fig(k, "fig4_signed_shap_total_mort.png", f"Fig 4 with AutoGluon ({lab}): net signed mortality SHAP, High vs Low+Mid total-mortality sites."))
+
+
+ag_intro = ("<p>AutoGluon-Tabular (AutoML) chooses the learner itself: in every fit it trains LightGBM (3 variants), CatBoost, XGBoost, "
+            "random forest, extra trees and two neural networks, each bagged over site-disjoint folds, and builds a weighted ensemble. "
+            "It is rerun from scratch inside every leave-one-site-out fit, so model choice never sees the held-out site. Datasets, "
+            "predictors, windows and the repeated leave-one-site-out evaluation are those of the XGBoost / LightGBM runs. "
+            "The ensembles are dominated by the neural networks.</p>"
+            + ("<p class='muted'><b>Note:</b> these AutoGluon runs use the full mortality block <b>including</b> the thresholded gain and "
+               "loss metrics (C+T+M with 213 / 368 predictors), unlike Sections 1-7, so they are compared here with the XGBoost / LightGBM "
+               "runs that also included them. A rerun without the thresholded metrics is in progress.</p>" if AG_SFX == "" else
+               "<p class='muted'>Without the thresholded mortality metrics, as in Sections 1-7.</p>"))
+sections.append(("autogluon", "8. AutoGluon (AutoML) check", ag_intro + per_ds(ag_block)))
+
 css = """
 :root{--bg:#ffffff;--fg:#1b1f24;--muted:#5b6470;--line:#d9dde3;--card:#f6f7f9;--accent:#0f6660;--on:#ffffff}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15181c;--fg:#e8eaed;--muted:#a3abb5;--line:#343a42;--card:#1e2227;--accent:#5fc4b8;--on:#10302d}}

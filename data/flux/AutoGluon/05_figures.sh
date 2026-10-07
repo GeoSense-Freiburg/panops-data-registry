@@ -10,7 +10,11 @@ ROOT=/mnt/gsdata/projects/panops/panops-data-registry/data/flux
 AG=${AG_DIR:-$ROOT/AutoGluon}
 R=/home/nk1125/miniconda3/envs/clean_r_env/bin/Rscript
 SRC=$ROOT/scripts/paper_v41
-[ "$SET" = flux ] && REF=$ROOT/derived_tables/paper_v41_fluxes/models || REF=$ROOT/derived_tables/paper_v41/models
+case $SET in flux) REF=$ROOT/derived_tables/paper_v41_fluxes/models ;; efp_v5) REF=$ROOT/derived_tables/paper_v5/models ;;
+  efp_nothresh) REF=$ROOT/derived_tables/paper_v41_nothresh/models ;; efp_v5_nothresh) REF=$ROOT/derived_tables/paper_v5_nothresh/models ;;
+  *) REF=$ROOT/derived_tables/paper_v41/models ;; esac
+# R side: <set>_nothresh = the base set with PAPER_NO_THRESH=1 (paper_common.R)
+RSET=${SET%_nothresh}; [ "$RSET" != "$SET" ] && export PAPER_NO_THRESH=1
 OUT=$AG/outputs/$SET; STAGE=$OUT/fig_inputs; FS=$AG/fig_scripts
 mkdir -p $STAGE $FS $AG/plots/$SET $AG/logs
 for f in $REF/XGB_*.csv $REF/LGB_*.csv $OUT/AG_predictions_repCV.csv $OUT/AG_metrics_repCV.csv $OUT/AG_site_shap_M4.csv $OUT/AG_site_signed_shap_M4.csv; do
@@ -23,7 +27,7 @@ for s in 21_fig2_M3M4.R 22_fig3_site_shap.R 23_fig4_signed_shap.R 25_fig3b_site_
          -e 's/c\("XGB", "LGB"\)\)/c("XGB", "LGB", "AG"))/' \
          -e 's/LGB = "LightGBM--Optuna"\)/LGB = "LightGBM--Optuna", AG = "AutoGluon ensemble")/' $SRC/$s > $FS/$s
 done
-export PAPER_RESP_SET=$SET PAPER_OUT_DIR=$STAGE PAPER_FIG_DIR=$AG/plots/$SET
+export PAPER_RESP_SET=$RSET PAPER_OUT_DIR=$STAGE PAPER_FIG_DIR=$AG/plots/$SET
 run() { local n=$1; shift; if $R "$@" > $AG/logs/05_${SET}_$n.log 2>&1; then echo "OK   $n"; else echo "FAIL $n (logs/05_${SET}_$n.log)"; fi; }
 if [ -f $STAGE/AG_predictions_repCV.csv ]; then
   run fig2 $FS/21_fig2_M3M4.R
@@ -36,5 +40,6 @@ if [ -f $STAGE/AG_site_shap_M4.csv ]; then
   run fig3b_AG $FS/25_fig3b_site_signed_shap.R AG
   run fig4 $FS/23_fig4_signed_shap.R
   run fig5_AG $ROOT/scripts/paper_v41/24_fig5_igbp_board.R filtered AG
+  run fig3_landscape_AG $ROOT/scripts/paper_v41/32_fig3_landscape.R AG all all
 fi
 ls $AG/plots/$SET | grep -c png
