@@ -230,6 +230,51 @@ s3 += per_ds(lambda k: fig(k, f"fig2_high_total_mort{T(k)}_mortality_effect.png"
              + fig(k, f"fig2_high_rel_deadwood{T(k)}_mortality_effect.png", f"Fig 2b ({DS[k]['label']}): high relative-deadwood sites only."))
 s3 += "<h3>Per-site ΔRMSE</h3>"
 s3 += per_ds(lambda k: fig(k, f"fig_site_dRMSE_total_mort{T(k)}.png", f"Per-site ΔRMSE ({DS[k]['label']}), bars coloured by total-mortality class."))
+
+
+# paired bootstrap + block permutation (2026-10-08, advisor): V5 only, from 39_paired_bootstrap.R
+def boot_table(metric, level, subsets):
+    st = pd.read_csv(f"{DS['v5']['plots']}/paired_bootstrap_statistics.csv")
+    st = st[(st.metric == metric) & (st.level == level) & st.subset.isin(subsets)].copy()
+    lab = {"XGB": "XGBoost", "LGB": "LightGBM", "AG": "AutoGluon"}
+    st["cell"] = [f"{p:+.1f} <span class='muted'>[{lo:+.1f}, {hi:+.1f}]</span>{'<sup>' + g + '</sup>' if isinstance(g, str) and g else ''}"
+                  f"<br><span class='muted'>Δ {d:+.3f}</span>" for p, lo, hi, g, d in zip(st.pct, st.pct_lo, st.pct_hi, st.sig, st["diff"])]
+    t = st.pivot_table(index=["learner", "window", "response"], columns="subset", values="cell", aggfunc="first")[subsets]
+    nu = st.groupby("subset").n_units.max(); no = st.groupby("subset").n_obs.max()
+    name = {"all": "All sites", "midhigh": "Mid + High sites", "high": "High sites",
+            "yr_midhigh": "Years with Mid + High mortality", "yr_high": "Years with High mortality"}
+    t.columns = [f"{name[c]} ({nu[c]} sites" + (f", {no[c]} site-years)" if level == "siteyear" else ")") for c in subsets]
+    order = [(L, w, e) for L in ("AG", "XGB", "LGB") for w in ("12m", "24m") for e in EFP if (L, w, e) in t.index]
+    t = t.reindex(order)
+    t.index = [f"{lab[L]} · {w.replace('m', ' months')} · {EFPH[e]}" for L, w, e in t.index]
+    return t
+
+
+if os.path.exists(f"{DS['v5']['plots']}/paired_bootstrap_statistics.csv"):
+    _b = pd.read_csv(f"{DS['v5']['plots']}/paired_bootstrap_statistics.csv")
+    _cnt = _b.assign(s=_b.q < 0.05).groupby(["metric", "level"]).agg(significant=("s", "sum"), tests=("s", "size"))
+    s3 += ("<h3>Paired bootstrap and block permutation (V5)</h3>"
+           "<p>Suggested by the advisor (via Codex): instead of averaging per-site ratios, compare the errors directly. "
+           "<b>Site level</b>: one MAE per site and model over its years, Δ = mean over sites of "
+           "MAE<sub>C+T+M</sub> − MAE<sub>C+T</sub> (EFP units), % = 100 × (mean MAE<sub>C+T+M</sub> / mean MAE<sub>C+T</sub> − 1). "
+           "<b>Site-year level</b>: every site-year is an observation (no averaging over years, so years without mortality do "
+           "not dilute years with mortality): pooled MAE over the site-years. Years of one site are not independent, so at both "
+           "levels <b>whole sites</b> are resampled (bootstrap, 10 000 draws, 95 % percentile interval in brackets) and the "
+           "C+T / C+T+M labels are swapped per site (paired permutation, 10 000 draws, one-sided, stars = BH-corrected per table). "
+           "The site-year level also selects site-years by their <b>own</b> total mortality (above the Mid or High break), "
+           "which tests the effect in the years when mortality happened.</p>"
+           + table_html(_cnt.reset_index().set_index(["metric", "level"]), "Significant cells (permutation q &lt; 0.05). Every significant cell also has a bootstrap interval entirely below 0.")
+           + "<h4>Table 3a - MAE, site level</h4>"
+           + table_html(boot_table("MAE", "site", ["all", "midhigh", "high"]),
+                        "% change of the mean site MAE when mortality is added [95 % bootstrap interval], stars = paired permutation (sites); Δ = mean site MAE difference in EFP units. Sites classed by their maximum total mortality.")
+           + "<h4>Table 3b - MAE, site-year level</h4>"
+           + table_html(boot_table("MAE", "siteyear", ["all", "midhigh", "high", "yr_midhigh", "yr_high"]),
+                        "% change of the pooled site-year MAE [95 % bootstrap interval over sites], stars = paired permutation with whole sites swapped; Δ = pooled MAE difference in EFP units. Last two columns: only site-years whose own total mortality is above the Mid or High break.")
+           + "<details><summary>Same with RMSE (Tables 3c, 3d)</summary>"
+           + table_html(boot_table("RMSE", "site", ["all", "midhigh", "high"]), "Table 3c - RMSE, site level.")
+           + table_html(boot_table("RMSE", "siteyear", ["all", "midhigh", "high", "yr_midhigh", "yr_high"]), "Table 3d - RMSE, site-year level (pooled RMSE).")
+           + "</details>")
+
 sections.append(("effect", "3. Does mortality reduce prediction error?", s3))
 
 
