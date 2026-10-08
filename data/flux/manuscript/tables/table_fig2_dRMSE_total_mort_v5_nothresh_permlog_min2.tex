@@ -1,0 +1,86 @@
+\begin{table}[p]
+\centering
+\caption{Effect of adding mortality predictors on per-site prediction error (summary of Fig.~2). For every site, RMSE of the model with climate, traits and mortality (C+T+M) is compared with the model without mortality (C+T), both evaluated by repeated leave-one-site-out cross-validation (3 $\times$ 80\%). $\Delta$RMSE = geometric mean over sites of the paired error ratio, (exp(mean$_\mathrm{sites}$ ln(RMSE$_\mathrm{C+T+M}$ / RMSE$_\mathrm{C+T}$)) $-$ 1) $\times$ 100; negative values mean that mortality reduces the error. Improved = share of sites whose RMSE decreased. Sensitivity: only sites with at least 2 site-years. Sites are grouped by their maximum total mortality across years (averaged over the five buffers, 100--500\,m); High $>$ mean $+$ 0.5\,SD (24.0\%), Low $<$ mean $-$ 0.5\,SD (10.6\%), Mid in between. Stars: one-sided paired permutation test on the per-site log error ratios (100\,000 random sign flips; C+T+M $<$ C+T), Benjamini--Hochberg corrected across all 72 tests in the table ($^{*}$\,$q<0.05$, $^{**}$\,$q<0.01$, $^{***}$\,$q<0.001$). Tree cover $\geq$ 30\%, 101 sites, 361 site-years, deadtrees v5.}
+\label{tab:fig2_dRMSE_total_mort_v5_nothresh_permlog_min2}
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{0.92}
+\begin{tabular}{lllccc}
+\toprule
+Model & EFP & & All sites & Mid + High & High \\
+ & & & ($n$ = 84) & ($n$ = 53) & ($n$ = 20) \\
+\midrule
+\multirow{8}{*}{\shortstack[l]{XGBoost\\12\,months}} & \multirow{2}{*}{GPP$_\mathrm{sat}$} & $\Delta$RMSE (\%) & $-0.5$ & $-0.9$ & $-4.5$ \\
+ & & Improved (\%) & 51 & 57 & 65 \\
+\cmidrule(l){2-6}
+ & \multirow{2}{*}{NEP$_\mathrm{max}$} & $\Delta$RMSE (\%) & $-12.0$$^{**}$ & $-13.8$$^{**}$ & $-20.8$$^{**}$ \\
+ & & Improved (\%) & 74 & 74 & 80 \\
+\cmidrule(l){2-6}
+ & \multirow{2}{*}{ET$_\mathrm{max}$} & $\Delta$RMSE (\%) & $-3.4$ & $-4.1$ & $-2.4$ \\
+ & & Improved (\%) & 65 & 66 & 70 \\
+\cmidrule(l){2-6}
+ & \multirow{2}{*}{WUE} & $\Delta$RMSE (\%) & $+0.8$ & $-3.0$ & $-8.7$$^{*}$ \\
+ & & Improved (\%) & 51 & 55 & 70 \\
+\midrule
+\multirow{8}{*}{\shortstack[l]{XGBoost\\24\,months}} & \multirow{2}{*}{GPP$_\mathrm{sat}$} & $\Delta$RMSE (\%) & $-2.1$ & $-5.6$ & $-5.1$ \\
+ & & Improved (\%) & 57 & 62 & 60 \\
+\cmidrule(l){2-6}
+ & \multirow{2}{*}{NEP$_\mathrm{max}$} & $\Delta$RMSE (\%) & $-12.3$$^{**}$ & $-12.2$$^{**}$ & $-23.4$$^{**}$ \\
+ & & Improved (\%) & 68 & 66 & 80 \\
+\cmidrule(l){2-6}
+ & \multirow{2}{*}{ET$_\mathrm{max}$} & $\Delta$RMSE (\%) & $-2.0$ & $-3.0$ & $-4.0$ \\
+ & & Improved (\%) & 56 & 62 & 60 \\
+\cmidrule(l){2-6}
+ & \multirow{2}{*}{WUE} & $\Delta$RMSE (\%) & $-0.5$ & $-4.7$ & $-8.2$ \\
+ & & Improved (\%) & 56 & 60 & 80 \\
+\midrule
+\multirow{8}{*}{\shortstack[l]{LightGBM\\12\,months}} & \multirow{2}{*}{GPP$_\mathrm{sat}$} & $\Delta$RMSE (\%) & $+1.1$ & $-1.0$ & $-5.2$ \\
+ & & Improved (\%) & 54 & 60 & 70 \\
+\cmidrule(l){2-6}
+ & \multirow{2}{*}{NEP$_\mathrm{max}$} & $\Delta$RMSE (\%) & $-8.7$$^{*}$ & $-8.5$$^{*}$ & $-17.3$$^{*}$ \\
+ & & Improved (\%) & 67 & 66 & 70 \\
+\cmidrule(l){2-6}
+ & \multirow{2}{*}{ET$_\mathrm{max}$} & $\Delta$RMSE (\%) & $-4.4$ & $-5.3$ & $-3.2$ \\
+ & & Improved (\%) & 60 & 60 & 50 \\
+\cmidrule(l){2-6}
+ & \multirow{2}{*}{WUE} & $\Delta$RMSE (\%) & $-1.5$ & $-4.5$$^{*}$ & $-4.9$ \\
+ & & Improved (\%) & 56 & 64 & 65 \\
+\midrule
+\multirow{8}{*}{\shortstack[l]{LightGBM\\24\,months}} & \multirow{2}{*}{GPP$_\mathrm{sat}$} & $\Delta$RMSE (\%) & $-1.5$ & $-4.9$ & $-4.9$ \\
+ & & Improved (\%) & 55 & 60 & 65 \\
+\cmidrule(l){2-6}
+ & \multirow{2}{*}{NEP$_\mathrm{max}$} & $\Delta$RMSE (\%) & $-12.2$$^{**}$ & $-11.2$$^{*}$ & $-16.9$$^{**}$ \\
+ & & Improved (\%) & 69 & 66 & 70 \\
+\cmidrule(l){2-6}
+ & \multirow{2}{*}{ET$_\mathrm{max}$} & $\Delta$RMSE (\%) & $-0.9$ & $-1.6$ & $-2.9$ \\
+ & & Improved (\%) & 60 & 62 & 65 \\
+\cmidrule(l){2-6}
+ & \multirow{2}{*}{WUE} & $\Delta$RMSE (\%) & $+1.0$ & $-0.5$ & $-6.4$ \\
+ & & Improved (\%) & 51 & 53 & 70 \\
+\midrule
+\multirow{8}{*}{\shortstack[l]{AutoGluon\\12\,months}} & \multirow{2}{*}{GPP$_\mathrm{sat}$} & $\Delta$RMSE (\%) & $-4.4$ & $-5.5$ & $-7.5$ \\
+ & & Improved (\%) & 60 & 60 & 55 \\
+\cmidrule(l){2-6}
+ & \multirow{2}{*}{NEP$_\mathrm{max}$} & $\Delta$RMSE (\%) & $-12.8$$^{**}$ & $-12.2$$^{*}$ & $-25.3$$^{**}$ \\
+ & & Improved (\%) & 64 & 60 & 75 \\
+\cmidrule(l){2-6}
+ & \multirow{2}{*}{ET$_\mathrm{max}$} & $\Delta$RMSE (\%) & $-2.4$ & $-4.7$ & $-4.5$ \\
+ & & Improved (\%) & 56 & 62 & 70 \\
+\cmidrule(l){2-6}
+ & \multirow{2}{*}{WUE} & $\Delta$RMSE (\%) & $-0.4$ & $-5.9$ & $-13.7$$^{**}$ \\
+ & & Improved (\%) & 54 & 64 & 80 \\
+\midrule
+\multirow{8}{*}{\shortstack[l]{AutoGluon\\24\,months}} & \multirow{2}{*}{GPP$_\mathrm{sat}$} & $\Delta$RMSE (\%) & $-4.7$ & $-8.7$$^{**}$ & $-6.3$ \\
+ & & Improved (\%) & 64 & 74 & 70 \\
+\cmidrule(l){2-6}
+ & \multirow{2}{*}{NEP$_\mathrm{max}$} & $\Delta$RMSE (\%) & $-9.4$$^{*}$ & $-8.3$ & $-18.6$ \\
+ & & Improved (\%) & 65 & 60 & 65 \\
+\cmidrule(l){2-6}
+ & \multirow{2}{*}{ET$_\mathrm{max}$} & $\Delta$RMSE (\%) & $-2.1$ & $-4.0$ & $-6.3$ \\
+ & & Improved (\%) & 58 & 64 & 70 \\
+\cmidrule(l){2-6}
+ & \multirow{2}{*}{WUE} & $\Delta$RMSE (\%) & $-4.8$ & $-9.4$$^{*}$ & $-22.6$$^{**}$ \\
+ & & Improved (\%) & 58 & 62 & 80 \\
+\bottomrule
+\end{tabular}
+\end{table}

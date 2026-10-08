@@ -26,10 +26,18 @@ MET <- toupper(Sys.getenv("TABLE1_METRIC", "RMSE")); stopifnot(MET %in% c("RMSE"
 # the table shows the geometric-mean change 100 * (exp(mean log ratio) - 1); suffix _permlog
 TEST <- tolower(Sys.getenv("TABLE1_TEST", "wilcoxon")); stopifnot(TEST %in% c("wilcoxon", "perm", "permlog"))
 N_PERM <- 100000L; TSFX <- if (TEST == "wilcoxon") "" else paste0("_", TEST)
-perm_p <- function(d) {   # P(mean of randomly sign-flipped differences <= observed mean), +1 correction
-  set.seed(42); n <- length(d)
+# sensitivity to the unequal number of site-years (2026-10-08): env TABLE1_MINYEARS (keep sites with >= k site-years)
+# and TABLE1_WEIGHT (none | n | sqrt: weight each site's value by its site-years); signs are still flipped per site.
+# Class breaks stay those of all sites; n in the header = sites kept. Suffix e.g. _permlog_min3, _permlog_wsqrt
+MINY <- as.integer(Sys.getenv("TABLE1_MINYEARS", "1")); WT <- tolower(Sys.getenv("TABLE1_WEIGHT", "none"))
+stopifnot(WT %in% c("none", "n", "sqrt"), WT == "none" || TEST != "wilcoxon")
+if (MINY > 1) TSFX <- paste0(TSFX, "_min", MINY)
+if (WT != "none") TSFX <- paste0(TSFX, "_w", WT)
+wfun <- function(n) switch(WT, none = rep(1, length(n)), n = n, sqrt = sqrt(n))
+perm_p <- function(d, w = rep(1, length(d))) {   # P(weighted mean of randomly sign-flipped values <= observed), +1 correction
+  set.seed(42); n <- length(d); w <- w / sum(w)
   s <- matrix(sample(c(-1, 1), N_PERM * n, replace = TRUE), N_PERM, n)
-  (1 + sum(as.vector(s %*% d) / n <= mean(d))) / (N_PERM + 1)
+  (1 + sum(as.vector(s %*% (w * d)) <= sum(w * d))) / (N_PERM + 1)
 }
 LEARNERS <- list(XGB = list(lab = "XGBoost", f = file.path(PAPER_OUT, "XGB_predictions_repCV.csv")),
                  LGB = list(lab = "LightGBM", f = file.path(PAPER_OUT, "LGB_predictions_repCV.csv")),
@@ -50,16 +58,16 @@ rows <- list()
 for (L in names(LEARNERS)) {
   if (!file.exists(LEARNERS[[L]]$f)) { message("missing ", LEARNERS[[L]]$f); next }
   p <- fread(LEARNERS[[L]]$f)[response %in% EFP_ORDER & grepl("^M[34]_(12m|24m)$", model)]
-  r <- p[, .(rmse = if (MET == "RMSE") sqrt(mean((observed - predicted)^2)) else mean(abs(observed - predicted))), by = .(model, response, SITE_ID)]
+  r <- p[, .(rmse = if (MET == "RMSE") sqrt(mean((observed - predicted)^2)) else mean(abs(observed - predicted)), n_sy = .N), by = .(model, response, SITE_ID)]
   r[, c("mod", "win") := tstrsplit(model, "_")]
-  w <- dcast(r, response + win + SITE_ID ~ mod, value.var = "rmse")[is.finite(M3) & is.finite(M4)]
+  w <- dcast(r, response + win + SITE_ID + n_sy ~ mod, value.var = "rmse")[is.finite(M3) & is.finite(M4) & n_sy >= MINY]
   for (k in names(SUBSETS)) {
     x <- w[SITE_ID %in% SUBSETS[[k]]]
     rows[[length(rows) + 1]] <- x[, .(learner = L, n = .N, median_pct = median((M4 - M3) / M3 * 100),
                                       mean_pct = mean((M4 - M3) / M3 * 100),
-                                      geomean_pct = 100 * (exp(mean(log(M4 / M3))) - 1),
+                                      geomean_pct = 100 * (exp(weighted.mean(log(M4 / M3), wfun(n_sy))) - 1),
                                       improved_pct = 100 * mean(M4 < M3),
-                                      p = if (TEST == "perm") perm_p((M4 - M3) / M3 * 100) else if (TEST == "permlog") perm_p(log(M4 / M3)) else
+                                      p = if (TEST == "perm") perm_p((M4 - M3) / M3 * 100, wfun(n_sy)) else if (TEST == "permlog") perm_p(log(M4 / M3), wfun(n_sy)) else
                                         wilcox.test(M4, M3, paired = TRUE, alternative = "less", exact = FALSE)$p.value),
                                   by = .(response, window = win)][, subset := k]
   }
@@ -68,7 +76,7 @@ st <- rbindlist(rows)
 st[, q := p.adjust(p, method = "BH")]
 st[, sig := fifelse(q < 0.001, "***", fifelse(q < 0.01, "**", fifelse(q < 0.05, "*", "")))]
 fwrite(st, file.path(PAPER_FIG, sprintf("table_fig2_d%s_total_mort%s_statistics.csv", MET, TSFX)))
-n_sub <- sapply(SUBSETS, length)
+n_sub <- if (MINY > 1) st[, max(n), by = subset][, setNames(V1, subset)] else sapply(SUBSETS, length)
 
 # ---- LaTeX ---------------------------------------------------------------------------
 SHOW <- switch(TEST, perm = "mean_pct", permlog = "geomean_pct", "median_pct")
@@ -85,6 +93,9 @@ tex <- c(
     if (TEST == "permlog") sprintf("$\\Delta$%s = geometric mean over sites of the paired error ratio, (exp(mean$_\\mathrm{sites}$ ln(%s$_\\mathrm{C+T+M}$ / %s$_\\mathrm{C+T}$)) $-$ 1) $\\times$ 100; ", MET, MET, MET) else
     sprintf(paste0("$\\Delta$%s = ", if (TEST == "perm") "mean" else "median", " over sites of the paired relative change, (%s$_\\mathrm{C+T+M}$ $-$ %s$_\\mathrm{C+T}$) / %s$_\\mathrm{C+T}$ $\\times$ 100; "), MET, MET, MET, MET),
     sprintf("negative values mean that mortality reduces the error. Improved = share of sites whose %s decreased. ", MET),
+    if (MINY > 1) sprintf("Sensitivity: only sites with at least %d site-years. ", MINY) else "",
+    switch(WT, n = "Sensitivity: sites weighted by their number of site-years (signs flipped per site). ",
+           sqrt = "Sensitivity: sites weighted by the square root of their number of site-years (signs flipped per site). ", ""),
     sprintf("Sites are grouped by their maximum total mortality across years (%s); ", if (CLASS_BUF == "avg") "averaged over the five buffers, 100--500\\,m" else paste0(CLASS_BUF, "\\,m buffer")),
     "High $>$ mean $+$ 0.5\\,SD (%.1f\\%%), Low $<$ mean $-$ 0.5\\,SD (%.1f\\%%), Mid in between. ",
     if (TEST == "permlog") "Stars: one-sided paired permutation test on the per-site log error ratios (100\\,000 random sign flips; C+T+M $<$ C+T), Benjamini--Hochberg corrected across all %d tests in the table " else
