@@ -3,7 +3,8 @@
 Report for https://negin-katal.github.io/fluxVSmortality/v10/  (fluxVSmortality/v10/index.html), rebuilt 2026-10-06.
 
 Replaces the earlier V10/V4.1 report (27_build_report_v10_v41.py). Three datasets, switchable at the top:
-  V4.1  deadtrees v4.1 maps - the paper dataset (104 sites / 381 site-years)
+  V5    deadtrees v5 maps - the paper dataset from 2026-10-07 (101 sites / 361 site-years)
+  V4.1  deadtrees v4.1 maps - the previous paper dataset, now a comparison (104 sites / 381 site-years)
   V5    deadtrees v5 maps, same build rules (101 / 361)
   V2.2  deadtrees v2-2 maps (the analysis earlier called V10; 93 / 395) - only the figures that exist in the
         same form as for V4.1 / V5
@@ -25,14 +26,14 @@ EFP = ["GPPsat", "NEPmax", "ETmax", "WUE"]
 SFX = os.environ.get("REPORT_SUFFIX", "_nothresh")
 EFPH = {"GPPsat": "GPP<sub>sat</sub>", "NEPmax": "NEP<sub>max</sub>", "ETmax": "ET<sub>max</sub>", "WUE": "WUE"}
 DS = {
-    "v41": dict(label="V4.1", maps="deadtrees v4.1", plots=f"{ROOT}/plots/paper_v41{SFX}", models=f"{ROOT}/derived_tables/paper_v41{SFX}/models",
-                data=f"{ROOT}/derived_tables/paper_v41/paper_dataset_full_lags_monthly_tc30_minrun2_buf100-200-300-400-500.csv",
-                tag="", cls="mean of the five buffers (100-500 m)", tex=f"table_fig2_dRMSE_total_mort_v41{SFX}.tex",
-                note="The paper dataset."),
     "v5": dict(label="V5", maps="deadtrees v5", plots=f"{ROOT}/plots/paper_v5{SFX}", models=f"{ROOT}/derived_tables/paper_v5{SFX}/models",
                data=f"{ROOT}/derived_tables/paper_v5/paper_dataset_full_lags_monthly_tc30_minrun2_buf100-200-300-400-500.csv",
                tag="", cls="mean of the five buffers (100-500 m)", tex=f"table_fig2_dRMSE_total_mort_v5{SFX}.tex",
-               note="Newest maps (delivered 2026-10-06), built and analysed with exactly the V4.1 rules."),
+               note="The paper dataset (from 2026-10-07): newest deadtrees maps (delivered 2026-10-06), mortality block without thresholded metrics."),
+    "v41": dict(label="V4.1", maps="deadtrees v4.1", plots=f"{ROOT}/plots/paper_v41{SFX}", models=f"{ROOT}/derived_tables/paper_v41{SFX}/models",
+                data=f"{ROOT}/derived_tables/paper_v41/paper_dataset_full_lags_monthly_tc30_minrun2_buf100-200-300-400-500.csv",
+                tag="", cls="mean of the five buffers (100-500 m)", tex=f"table_fig2_dRMSE_total_mort_v41{SFX}.tex",
+                note="Previous paper dataset (deadtrees v4.1); kept for comparison."),
     "v22": dict(label="V2.2", maps="deadtrees v2-2", plots=f"{ROOT}/plots/paper_v10_efp", models=f"{ROOT}/derived_tables/paper_v10_efp/models",
                 data=f"{ROOT}/derived_tables/paper_v10_efp/paper_dataset_v10_efp.csv",
                 tag="_cls500m", cls="500 m buffer (the only buffer stored for V2.2)", tex="table_fig2_dRMSE_total_mort_v22.tex",
@@ -212,7 +213,7 @@ r2m.columns = [f"{'XGBoost' if a == 'XGB' else 'LightGBM'} {b.replace('v4.1', 'V
 dr = pd.read_csv(f"{C}/3_dRMSE_pct.csv", header=[0, 1], index_col=[0, 1]).round(2)
 dr.columns = [f"{'XGBoost' if a == 'XGB' else 'LightGBM'} {b.replace('v4.1', 'V4.1').replace('v5', 'V5')}" for a, b in dr.columns]
 dr.index = [f"{EFPH[e]} · {w.replace('m', ' months')}" for e, w in dr.index]
-cmp = f"""<p>V5 rebuilds the paper dataset from the newest maps with identical rules. It keeps 101 of the 104 V4.1 sites
+cmp = f"""<p>V5 (the paper dataset) was built from the newest maps with the same rules as V4.1. It keeps 101 of the 104 V4.1 sites
 (loses CA-DB2, CA-LU1, FI-Var, US-BZB through the tree-cover filter, gains AU-How).</p>
 {table_html(agree, "Mortality metrics (mean of the five buffers; tree cover at 500 m) on the site-years present in both datasets.")}
 {table_html(hi, "High-mortality sites in each version.")}
@@ -225,7 +226,7 @@ sections.append(("compare", "7. V4.1 vs V5", cmp))
 # AutoGluon (AutoML) check - AutoGluon/ ; same datasets, predictors, windows and repeated LOSO as XGB / LGB
 AGD = f"{ROOT}/AutoGluon"
 AG_SET = {"v41": "efp", "v5": "efp_v5"}                       # V2.2 was not run with AutoGluon
-AG_SFX = os.environ.get("AG_SUFFIX", "")   # "" = runs WITH the thresholded metrics; "_nothresh" once those reruns are done
+AG_SFX = os.environ.get("AG_SUFFIX", "_nothresh")   # "_nothresh" (default, 2026-10-08) = without the thresholded metrics, as Sections 1-7; "" = earlier runs with them
 AGL = {"XGB": "XGBoost", "LGB": "LightGBM", "AutoGluon": "AutoGluon"}
 
 
@@ -307,7 +308,11 @@ ag_intro = ("<p>AutoGluon-Tabular (AutoML) chooses the learner itself: in every 
             + ("<p class='muted'><b>Note:</b> these AutoGluon runs use the full mortality block <b>including</b> the thresholded gain and "
                "loss metrics (C+T+M with 213 / 368 predictors), unlike Sections 1-7, so they are compared here with the XGBoost / LightGBM "
                "runs that also included them. A rerun without the thresholded metrics is in progress.</p>" if AG_SFX == "" else
-               "<p class='muted'>Without the thresholded mortality metrics, as in Sections 1-7.</p>"))
+               "<p class='muted'>All runs here are without the thresholded mortality metrics (C+T+M with 193 / 338 predictors), "
+               "exactly as the XGBoost / LightGBM results in Sections 1-7, and use the same folds.</p>")
+            + "<p><b>TabPFN v2</b> was also tested (V5, all 16 tasks, site-grouped 5-fold CV, inside AutoGluon and on its own with "
+              "default settings and a 32-member ensemble). It never beat the other learners: median normalised RMSE 0.87 against 0.77 "
+              "for the best learner, ensemble weight ≤ 0.13 and zero in 12 of 16 tasks. It was therefore not used further.</p>")
 sections.append(("autogluon", "8. AutoGluon (AutoML) check", ag_intro + per_ds(ag_block)))
 
 css = """
@@ -331,16 +336,16 @@ details{margin:8px 0 18px;border:1px solid var(--line);border-radius:6px;padding
 .ds{display:none}body[data-ds="v41"] .ds-v41,body[data-ds="v5"] .ds-v5,body[data-ds="v22"] .ds-v22{display:block}
 """
 js = """
-const KEY='fvm-ds';function setDs(k){document.body.dataset.ds=k;document.querySelectorAll('.toggle button').forEach(b=>b.classList.toggle('on',b.dataset.k===k));try{localStorage.setItem(KEY,k)}catch(e){}}
+const KEY='fvm-ds2';function setDs(k){document.body.dataset.ds=k;document.querySelectorAll('.toggle button').forEach(b=>b.classList.toggle('on',b.dataset.k===k));try{localStorage.setItem(KEY,k)}catch(e){}}
 document.querySelectorAll('.toggle button').forEach(b=>b.addEventListener('click',()=>setDs(b.dataset.k)));
-let s='v41';try{s=localStorage.getItem(KEY)||s}catch(e){}if(!['v41','v5','v22'].includes(s))s='v41';setDs(s);
+let s='v5';try{s=localStorage.getItem('fvm-ds2')||s}catch(e){}if(!['v41','v5','v22'].includes(s))s='v5';setDs(s);
 """
 page = f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Mortality and EFPs</title><style>{css}</style></head><body data-ds="v41">
+<title>Mortality and EFPs</title><style>{css}</style></head><body data-ds="v5">
 <header><div class="bar"><nav>{''.join(f'<a href="#{k}">{t.split(". ", 1)[-1]}</a>' for k, t, _ in sections)}</nav>
 <div class="toggle" role="group" aria-label="Dataset">{''.join(f'<button data-k="{k}">{d["label"]}</button>' for k, d in DS.items())}</div></div></header>
 <main><h1>Tree mortality and ecosystem functional properties</h1>
-<p class="muted">Updated {datetime.date.today().isoformat()} · switch the dataset at the top right (V4.1 = paper, V5 = newest maps, V2.2 = earlier analysis) ·
+<p class="muted">Updated {datetime.date.today().isoformat()} · switch the dataset at the top right (V5 = paper dataset, V4.1 = previous maps, V2.2 = earlier analysis) ·
 built by scripts/paper_v41/35_build_report_paper.py</p>
 {''.join(f'<section id="{k}"><h2>{t}</h2>{b}</section>' for k, t, b in sections)}
 </main><script>{js}</script></body></html>"""
