@@ -15,7 +15,7 @@ Figures are copied into fluxVSmortality/v10/fig_<ds>/ so the page is self-contai
 Publish afterwards with:  bash scripts/push_fluxVSmortality.sh "message" v10
     python 35_build_report_paper.py
 """
-import os, shutil, html, datetime
+import os, re, shutil, html, datetime
 import numpy as np, pandas as pd
 
 ROOT = "/mnt/gsdata/projects/panops/panops-data-registry/data/flux"
@@ -140,7 +140,7 @@ about = f"""
 GPP<sub>sat</sub>, NEP<sub>max</sub>, ET<sub>max</sub> and WUE are predicted from <b>climate + traits (C+T)</b> and from
 <b>climate + traits + mortality (C+T+M)</b>. The difference between the two models isolates what mortality adds.</p>
 <ul>
-<li><b>Learners:</b> XGBoost and LightGBM, tuned with Optuna (TPE, 50 trials, grouped 5-fold CV on disjoint sites).</li>
+<li><b>Learners:</b> AutoGluon (AutoML ensemble, Section 1; planned for the paper) and, for comparison, XGBoost and LightGBM tuned with Optuna (TPE, 50 trials, grouped 5-fold CV on disjoint sites; Sections 2-8).</li>
 <li><b>Evaluation:</b> repeated leave-one-site-out (3 × 80 % of the remaining sites per held-out site).</li>
 <li><b>Windows:</b> climate in the 12 or 24 months before the growing season; mortality of the current year plus lag 1 (12 months) or lags 1-2 (24 months).</li>
 <li><b>Sites:</b> tree cover ≥ 30 %.</li>
@@ -285,7 +285,7 @@ def ag_block(k):
         shutil.copyfile(f"{ROOT}/manuscript/tables/{t1_tex}", f"{SITE}/tables/{t1_tex}")
         t1 = ("<h3>Table 1 with AutoGluon</h3>"
               + table_html(fig2_table(k, t1_dir),
-                           f"As Table 1 (Section 3), with AutoGluon added ({lab}"
+                           f"As Table 1 (Section 4), with AutoGluon added ({lab}"
                            + (", runs including the thresholded mortality metrics" if AG_SFX == "" else "")
                            + "): median per-site change in RMSE when mortality is added (%), stars = one-sided paired Wilcoxon, "
                            f"BH-corrected across the table; (share of sites improved). Classes by total mortality, {DS[k]['cls']}. "
@@ -309,11 +309,16 @@ ag_intro = ("<p>AutoGluon-Tabular (AutoML) chooses the learner itself: in every 
                "loss metrics (C+T+M with 213 / 368 predictors), unlike Sections 1-7, so they are compared here with the XGBoost / LightGBM "
                "runs that also included them. A rerun without the thresholded metrics is in progress.</p>" if AG_SFX == "" else
                "<p class='muted'>All runs here are without the thresholded mortality metrics (C+T+M with 193 / 338 predictors), "
-               "exactly as the XGBoost / LightGBM results in Sections 1-7, and use the same folds.</p>")
+               "exactly as the XGBoost / LightGBM results in Sections 2-8, and use the same folds.</p>")
             + "<p><b>TabPFN v2</b> was also tested (V5, all 16 tasks, site-grouped 5-fold CV, inside AutoGluon and on its own with "
               "default settings and a 32-member ensemble). It never beat the other learners: median normalised RMSE 0.87 against 0.77 "
               "for the best learner, ensemble weight ≤ 0.13 and zero in 12 of 16 tasks. It was therefore not used further.</p>")
-sections.append(("autogluon", "8. AutoGluon (AutoML) check", ag_intro + per_ds(ag_block)))
+sections.append(("autogluon", "AutoGluon (AutoML) results", ag_intro + per_ds(ag_block)))
+# order (user, 2026-10-08): About, then AutoGluon first (the learner planned for the paper), then the XGBoost / LightGBM sections;
+# section numbers are assigned here so the order can change without editing titles
+_ag = [x for x in sections if x[0] == "autogluon"]
+sections = [x for x in sections if x[0] == "about"] + _ag + [x for x in sections if x[0] not in ("about", "autogluon")]
+sections = [(k, t if k == "about" else f"{i}. {re.sub(r'^[0-9]+[.] ', '', t)}", b) for i, (k, t, b) in enumerate(sections)]
 
 css = """
 :root{--bg:#ffffff;--fg:#1b1f24;--muted:#5b6470;--line:#d9dde3;--card:#f6f7f9;--accent:#0f6660;--on:#ffffff}
