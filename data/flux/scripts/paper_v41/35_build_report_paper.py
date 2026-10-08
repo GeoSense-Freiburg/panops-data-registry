@@ -105,9 +105,20 @@ def r2_table(ds):
     return t.round(3)
 
 
-def fig2_table(ds, plots=None, metric="RMSE"):
-    f = f"{plots or DS[ds]['plots']}/table_fig2_d{metric}_total_mort_statistics.csv"
-    st = pd.read_csv(f)
+# statistical test of Tables 1-2 (2026-10-08, advisor): "permlog" = paired sign-flip permutation test on the per-site
+# log error ratio log(err C+T+M / err C+T), cell = geometric-mean change (main); "wilcoxon" = one-sided paired Wilcoxon,
+# cell = median change (robustness); "perm" = permutation test on the mean % change (only counted in the comparison)
+TSUF = {"permlog": "_permlog", "wilcoxon": "", "perm": "_perm"}
+TCOL = {"permlog": "geomean_pct", "wilcoxon": "median_pct", "perm": "mean_pct"}
+
+
+def fig2_stats(ds, plots=None, metric="RMSE", test="permlog"):
+    return pd.read_csv(f"{plots or DS[ds]['plots']}/table_fig2_d{metric}_total_mort{TSUF[test]}_statistics.csv")
+
+
+def fig2_table(ds, plots=None, metric="RMSE", test="permlog"):
+    st = fig2_stats(ds, plots, metric, test)
+    st["median_pct"] = st[TCOL[test]]
     lab = {"XGB": "XGBoost", "LGB": "LightGBM", "AG": "AutoGluon"}
     st["cell"] = [f"{m:+.1f}{'<sup>' + s + '</sup>' if isinstance(s, str) and s else ''} <span class='muted'>({i:.0f}%)</span>"
                   for m, s, i in zip(st.median_pct, st.sig, st.improved_pct)]
@@ -121,11 +132,27 @@ def fig2_table(ds, plots=None, metric="RMSE"):
     return t
 
 
-def copy_tex(ds):
-    src = f"{ROOT}/manuscript/tables/{DS[ds]['tex']}"
+def tex_link(name):
     os.makedirs(f"{SITE}/tables", exist_ok=True)
-    shutil.copyfile(src, f"{SITE}/tables/{DS[ds]['tex']}")
-    return f"tables/{DS[ds]['tex']}"
+    shutil.copyfile(f"{ROOT}/manuscript/tables/{name}", f"{SITE}/tables/{name}")
+    return f"<a href='tables/{name}'>{name}</a>"
+
+
+def tex_name(ds, metric="RMSE", test="permlog"):
+    return DS[ds]["tex"].replace("_dRMSE_", f"_d{metric}_").replace(".tex", f"{TSUF[test]}.tex")
+
+
+def test_counts(ds):   # significant cells (q < 0.05) per test and metric
+    rows = []
+    for t, lab in (("permlog", "Permutation, log ratio (main)"), ("wilcoxon", "Wilcoxon signed-rank"), ("perm", "Permutation, mean % change")):
+        r = {"Test": lab}
+        for m in ("RMSE", "MAE"):
+            try:
+                st = fig2_stats(ds, metric=m, test=t); r[m] = f"{(st.q < 0.05).sum()} / {len(st)}"
+            except FileNotFoundError:
+                r[m] = "-"
+        rows.append(r)
+    return pd.DataFrame(rows).set_index("Test")
 
 
 T = lambda ds: DS[ds]["tag"]
@@ -167,25 +194,37 @@ sections.append(("skill", "2. Model skill",
 s3 = per_ds(lambda k: fig(k, "fig2_mortality_effect.png",
             f"Fig 2 ({DS[k]['label']}): per-site RMSE without (C+T) and with mortality (C+T+M); % = median paired change, "
             "stars = one-sided paired Wilcoxon, BH-corrected; %↓ = share of sites improved."))
-s3 += "<h3>Table 1 - summary of Fig 2 by total-mortality class</h3>"
+TEST_NOTE = ("<p><b>Statistical test.</b> Tables 1 and 2 use a paired sign-flip permutation test on the per-site log error ratio, "
+             "log(error C+T+M / error C+T): the signs of the site ratios are flipped at random 100 000 times, one-sided (C+T+M better), "
+             "Benjamini-Hochberg corrected across the table. Cells show the geometric-mean change "
+             "(exp(mean log ratio) − 1) × 100. The log ratio treats &lsquo;error halved&rsquo; and &lsquo;error doubled&rsquo; alike, "
+             "so a few sites cannot dominate. A permutation test on the plain mean % change was tried first, but sites with "
+             "only one site-year and an almost perfect C+T prediction get huge % changes from tiny differences (e.g. KR-Kw1 +275 %), "
+             "which dominate the mean. The Wilcoxon signed-rank test (Tables 1b, 2b) asks whether most sites improve "
+             "consistently, regardless of how much; it catches small but consistent gains (e.g. ET<sub>max</sub>, WUE) and is kept "
+             "as a robustness check.</p>")
+s3 += "<h3>Statistical tests compared</h3>" + TEST_NOTE
+s3 += per_ds(lambda k: table_html(test_counts(k), f"Significant cells (q < 0.05) per test, all learners, windows, EFPs and site classes ({DS[k]['label']})."))
+s3 += "<h3>Table 1 - summary of Fig 2 by total-mortality class (RMSE, permutation test on log ratios)</h3>"
 s3 += per_ds(lambda k: table_html(fig2_table(k),
-             f"Median per-site change in RMSE when mortality is added (%), stars = one-sided paired Wilcoxon, BH-corrected across the table; "
-             f"(share of sites improved). Classes by total mortality, {DS[k]['cls']}. "
-             f"LaTeX: <a href='{copy_tex(k)}'>{DS[k]['tex']}</a>."))
+             f"Geometric-mean per-site change in RMSE when mortality is added (%), stars = one-sided paired permutation test on the "
+             f"log RMSE ratios, BH-corrected across the table; (share of sites improved). Classes by total mortality, {DS[k]['cls']}. "
+             f"LaTeX: {tex_link(tex_name(k))}."))
 s3 += "<h3>Table 2 - as Table 1, with MAE instead of RMSE</h3>"
-
-
-def mae_tex(k):
-    name = DS[k]["tex"].replace("_dRMSE_", "_dMAE_")
-    os.makedirs(f"{SITE}/tables", exist_ok=True)
-    shutil.copyfile(f"{ROOT}/manuscript/tables/{name}", f"{SITE}/tables/{name}")
-    return f"<a href='tables/{name}'>{name}</a>"
-
-
 s3 += per_ds(lambda k: table_html(fig2_table(k, metric="MAE"),
-             f"Median per-site change in MAE (mean absolute error) when mortality is added (%), stars = one-sided paired Wilcoxon, "
-             f"BH-corrected across the table; (share of sites improved). Same models, folds and classes as Table 1; MAE weighs large "
-             f"errors less than RMSE. Classes by total mortality, {DS[k]['cls']}. LaTeX: {mae_tex(k)}."))
+             f"Geometric-mean per-site change in MAE (mean absolute error) when mortality is added (%), stars = one-sided paired "
+             f"permutation test on the log MAE ratios, BH-corrected across the table; (share of sites improved). MAE weighs large "
+             f"errors less than RMSE. Classes by total mortality, {DS[k]['cls']}. LaTeX: {tex_link(tex_name(k, 'MAE'))}."))
+s3 += "<h3>Table 1b - as Table 1, Wilcoxon test (robustness)</h3>"
+s3 += per_ds(lambda k: table_html(fig2_table(k, test="wilcoxon"),
+             f"Median per-site change in RMSE when mortality is added (%), stars = one-sided paired Wilcoxon signed-rank test, "
+             f"BH-corrected across the table; (share of sites improved). Classes by total mortality, {DS[k]['cls']}. "
+             f"LaTeX: {tex_link(tex_name(k, test='wilcoxon'))}."))
+s3 += "<h3>Table 2b - as Table 2, Wilcoxon test (robustness)</h3>"
+s3 += per_ds(lambda k: table_html(fig2_table(k, metric="MAE", test="wilcoxon"),
+             f"Median per-site change in MAE when mortality is added (%), stars = one-sided paired Wilcoxon signed-rank test, "
+             f"BH-corrected across the table; (share of sites improved). Classes by total mortality, {DS[k]['cls']}. "
+             f"LaTeX: {tex_link(tex_name(k, 'MAE', 'wilcoxon'))}."))
 s3 += "<h3>High-mortality sites</h3>"
 s3 += per_ds(lambda k: fig(k, f"fig2_high_total_mort{T(k)}_mortality_effect.png", f"Fig 2b ({DS[k]['label']}): high total-mortality sites only (models trained on all sites).")
              + fig(k, f"fig2_high_rel_deadwood{T(k)}_mortality_effect.png", f"Fig 2b ({DS[k]['label']}): high relative-deadwood sites only."))
@@ -292,18 +331,16 @@ def ag_block(k):
                "(AutoGluon SHAP is permutation-based, so compare shares and signs rather than magnitudes).</li></ul>")
     # Table 1 with AutoGluon: from the run that matches the AutoGluon results (with / without thresholded metrics)
     t1_dir = f"{ROOT}/plots/{'paper_v41' if k == 'v41' else 'paper_v5'}{AG_SFX}"
-    t1_tex = f"table_fig2_dRMSE_total_mort_{k}{AG_SFX}.tex"
+    t1_tex = f"table_fig2_dRMSE_total_mort_{k}{AG_SFX}_permlog.tex"
     t1 = ""
-    if os.path.exists(f"{t1_dir}/table_fig2_dRMSE_total_mort_statistics.csv"):
-        os.makedirs(f"{SITE}/tables", exist_ok=True)
-        shutil.copyfile(f"{ROOT}/manuscript/tables/{t1_tex}", f"{SITE}/tables/{t1_tex}")
+    if os.path.exists(f"{t1_dir}/table_fig2_dRMSE_total_mort_permlog_statistics.csv"):
         t1 = ("<h3>Table 1 with AutoGluon</h3>"
               + table_html(fig2_table(k, t1_dir),
                            f"As Table 1 (Section 4), with AutoGluon added ({lab}"
                            + (", runs including the thresholded mortality metrics" if AG_SFX == "" else "")
-                           + "): median per-site change in RMSE when mortality is added (%), stars = one-sided paired Wilcoxon, "
-                           f"BH-corrected across the table; (share of sites improved). Classes by total mortality, {DS[k]['cls']}. "
-                           f"LaTeX: <a href='tables/{t1_tex}'>{t1_tex}</a>."))
+                           + "): geometric-mean per-site change in RMSE when mortality is added (%), stars = one-sided paired "
+                           "permutation test on the log RMSE ratios, BH-corrected across the table; (share of sites improved). "
+                           f"Classes by total mortality, {DS[k]['cls']}. Wilcoxon version: Table 1b. LaTeX: {tex_link(t1_tex)}."))
     return (bullets
             + t1
             + table_html(r2.round(3), f"R² under repeated leave-one-site-out ({lab}); AutoGluon = weighted ensemble rebuilt inside every fold.")

@@ -1,0 +1,62 @@
+\begin{table}[p]
+\centering
+\caption{Effect of adding mortality predictors on per-site prediction error (summary of Fig.~2). For every site, MAE of the model with climate, traits and mortality (C+T+M) is compared with the model without mortality (C+T), both evaluated by repeated leave-one-site-out cross-validation (3 $\times$ 80\%). $\Delta$MAE = geometric mean over sites of the paired error ratio, (exp(mean$_\mathrm{sites}$ ln(MAE$_\mathrm{C+T+M}$ / MAE$_\mathrm{C+T}$)) $-$ 1) $\times$ 100; negative values mean that mortality reduces the error. Improved = share of sites whose MAE decreased. Sites are grouped by their maximum total mortality across years (500\,m buffer); High $>$ mean $+$ 0.5\,SD (34.5\%), Low $<$ mean $-$ 0.5\,SD (21.6\%), Mid in between. Stars: one-sided paired permutation test on the per-site log error ratios (100\,000 random sign flips; C+T+M $<$ C+T), Benjamini--Hochberg corrected across all 48 tests in the table ($^{*}$\,$q<0.05$, $^{**}$\,$q<0.01$, $^{***}$\,$q<0.001$). Tree cover $\geq$ 30\%, 93 sites, 395 site-years, deadtrees v2-2.}
+\label{tab:fig2_dMAE_total_mort_v22_permlog}
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{0.92}
+\begin{tabular}{lllccc}
+\toprule
+Model & EFP & & All sites & Mid + High & High \\
+ & & & ($n$ = 93) & ($n$ = 58) & ($n$ = 23) \\
+\midrule
+\multirow{8}{*}{\shortstack[l]{XGBoost\\12\,months}} & \multirow{2}{*}{GPP$_\mathrm{sat}$} & $\Delta$MAE (\%) & $-10.9$$^{*}$ & $-10.9$$^{*}$ & $-13.4$$^{*}$ \\
+ & & Improved (\%) & 68 & 71 & 74 \\
+\cmidrule(l){2-6}
+ & \multirow{2}{*}{NEP$_\mathrm{max}$} & $\Delta$MAE (\%) & $-17.6$$^{***}$ & $-16.1$$^{**}$ & $-16.3$$^{*}$ \\
+ & & Improved (\%) & 73 & 72 & 83 \\
+\cmidrule(l){2-6}
+ & \multirow{2}{*}{ET$_\mathrm{max}$} & $\Delta$MAE (\%) & $+0.7$ & $+0.7$ & $+3.0$ \\
+ & & Improved (\%) & 43 & 45 & 39 \\
+\cmidrule(l){2-6}
+ & \multirow{2}{*}{WUE} & $\Delta$MAE (\%) & $-4.9$ & $-3.8$ & $-3.4$ \\
+ & & Improved (\%) & 57 & 55 & 52 \\
+\midrule
+\multirow{8}{*}{\shortstack[l]{XGBoost\\24\,months}} & \multirow{2}{*}{GPP$_\mathrm{sat}$} & $\Delta$MAE (\%) & $-10.9$$^{*}$ & $-12.6$$^{*}$ & $-17.2$$^{*}$ \\
+ & & Improved (\%) & 67 & 67 & 70 \\
+\cmidrule(l){2-6}
+ & \multirow{2}{*}{NEP$_\mathrm{max}$} & $\Delta$MAE (\%) & $-3.4$ & $-3.9$ & $+1.9$ \\
+ & & Improved (\%) & 60 & 62 & 65 \\
+\cmidrule(l){2-6}
+ & \multirow{2}{*}{ET$_\mathrm{max}$} & $\Delta$MAE (\%) & $+3.1$ & $+1.1$ & $+3.2$ \\
+ & & Improved (\%) & 38 & 40 & 39 \\
+\cmidrule(l){2-6}
+ & \multirow{2}{*}{WUE} & $\Delta$MAE (\%) & $-5.2$ & $-4.8$ & $+0.0$ \\
+ & & Improved (\%) & 58 & 52 & 43 \\
+\midrule
+\multirow{8}{*}{\shortstack[l]{LightGBM\\12\,months}} & \multirow{2}{*}{GPP$_\mathrm{sat}$} & $\Delta$MAE (\%) & $-13.0$$^{**}$ & $-15.7$$^{**}$ & $-16.7$$^{*}$ \\
+ & & Improved (\%) & 73 & 74 & 78 \\
+\cmidrule(l){2-6}
+ & \multirow{2}{*}{NEP$_\mathrm{max}$} & $\Delta$MAE (\%) & $-15.8$$^{**}$ & $-18.0$$^{*}$ & $-21.0$$^{**}$ \\
+ & & Improved (\%) & 76 & 78 & 83 \\
+\cmidrule(l){2-6}
+ & \multirow{2}{*}{ET$_\mathrm{max}$} & $\Delta$MAE (\%) & $-0.1$ & $+1.3$ & $+9.2$ \\
+ & & Improved (\%) & 48 & 48 & 26 \\
+\cmidrule(l){2-6}
+ & \multirow{2}{*}{WUE} & $\Delta$MAE (\%) & $-8.4$ & $-9.5$ & $-4.5$ \\
+ & & Improved (\%) & 56 & 52 & 39 \\
+\midrule
+\multirow{8}{*}{\shortstack[l]{LightGBM\\24\,months}} & \multirow{2}{*}{GPP$_\mathrm{sat}$} & $\Delta$MAE (\%) & $-9.4$$^{*}$ & $-10.7$$^{*}$ & $-14.5$$^{*}$ \\
+ & & Improved (\%) & 66 & 71 & 78 \\
+\cmidrule(l){2-6}
+ & \multirow{2}{*}{NEP$_\mathrm{max}$} & $\Delta$MAE (\%) & $-12.1$$^{*}$ & $-14.3$$^{*}$ & $-18.3$$^{*}$ \\
+ & & Improved (\%) & 73 & 76 & 83 \\
+\cmidrule(l){2-6}
+ & \multirow{2}{*}{ET$_\mathrm{max}$} & $\Delta$MAE (\%) & $+0.6$ & $-0.2$ & $+1.6$ \\
+ & & Improved (\%) & 41 & 43 & 35 \\
+\cmidrule(l){2-6}
+ & \multirow{2}{*}{WUE} & $\Delta$MAE (\%) & $-8.4$ & $-7.3$ & $-16.9$ \\
+ & & Improved (\%) & 60 & 57 & 61 \\
+\bottomrule
+\end{tabular}
+\end{table}

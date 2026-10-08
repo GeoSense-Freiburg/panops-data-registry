@@ -20,6 +20,17 @@ VTAG <- c(efp = "v41", efp_v5 = "v5", v10efp = "v22", flux = "v41_flux", v10flux
 if (PAPER_NO_THRESH) VTAG <- paste0(VTAG, "_nothresh")   # never overwrite the main tables
 # error metric (env TABLE1_METRIC): RMSE (default) or MAE (2026-10-08) - file names, caption and row labels follow it
 MET <- toupper(Sys.getenv("TABLE1_METRIC", "RMSE")); stopifnot(MET %in% c("RMSE", "MAE"))
+# test (env TABLE1_TEST): wilcoxon (default; median shown) or perm (2026-10-08, advisor): paired sign-flip permutation test
+# of the MEAN per-site relative change, one-sided (C+T+M < C+T), N_PERM random sign flips; files get the suffix _perm
+# or permlog: the same sign-flip test on the per-site log ratio log(M4/M3) - robust to sites with a tiny C+T error;
+# the table shows the geometric-mean change 100 * (exp(mean log ratio) - 1); suffix _permlog
+TEST <- tolower(Sys.getenv("TABLE1_TEST", "wilcoxon")); stopifnot(TEST %in% c("wilcoxon", "perm", "permlog"))
+N_PERM <- 100000L; TSFX <- if (TEST == "wilcoxon") "" else paste0("_", TEST)
+perm_p <- function(d) {   # P(mean of randomly sign-flipped differences <= observed mean), +1 correction
+  set.seed(42); n <- length(d)
+  s <- matrix(sample(c(-1, 1), N_PERM * n, replace = TRUE), N_PERM, n)
+  (1 + sum(as.vector(s %*% d) / n <= mean(d))) / (N_PERM + 1)
+}
 LEARNERS <- list(XGB = list(lab = "XGBoost", f = file.path(PAPER_OUT, "XGB_predictions_repCV.csv")),
                  LGB = list(lab = "LightGBM", f = file.path(PAPER_OUT, "LGB_predictions_repCV.csv")),
                  # AutoGluon from the matching run: outputs/<set>_nothresh for the no-threshold variant (skipped until it exists)
@@ -45,19 +56,23 @@ for (L in names(LEARNERS)) {
   for (k in names(SUBSETS)) {
     x <- w[SITE_ID %in% SUBSETS[[k]]]
     rows[[length(rows) + 1]] <- x[, .(learner = L, n = .N, median_pct = median((M4 - M3) / M3 * 100),
+                                      mean_pct = mean((M4 - M3) / M3 * 100),
+                                      geomean_pct = 100 * (exp(mean(log(M4 / M3))) - 1),
                                       improved_pct = 100 * mean(M4 < M3),
-                                      p = wilcox.test(M4, M3, paired = TRUE, alternative = "less", exact = FALSE)$p.value),
+                                      p = if (TEST == "perm") perm_p((M4 - M3) / M3 * 100) else if (TEST == "permlog") perm_p(log(M4 / M3)) else
+                                        wilcox.test(M4, M3, paired = TRUE, alternative = "less", exact = FALSE)$p.value),
                                   by = .(response, window = win)][, subset := k]
   }
 }
 st <- rbindlist(rows)
 st[, q := p.adjust(p, method = "BH")]
 st[, sig := fifelse(q < 0.001, "***", fifelse(q < 0.01, "**", fifelse(q < 0.05, "*", "")))]
-fwrite(st, file.path(PAPER_FIG, sprintf("table_fig2_d%s_total_mort_statistics.csv", MET)))
+fwrite(st, file.path(PAPER_FIG, sprintf("table_fig2_d%s_total_mort%s_statistics.csv", MET, TSFX)))
 n_sub <- sapply(SUBSETS, length)
 
 # ---- LaTeX ---------------------------------------------------------------------------
-cell_d <- function(x) sprintf("$%s%.1f$%s", ifelse(x$median_pct < 0, "-", "+"), abs(x$median_pct),
+SHOW <- switch(TEST, perm = "mean_pct", permlog = "geomean_pct", "median_pct")
+cell_d <- function(x) sprintf("$%s%.1f$%s", ifelse(x[[SHOW]] < 0, "-", "+"), abs(x[[SHOW]]),
                               ifelse(x$sig == "", "", sprintf("$^{%s}$", x$sig)))
 cell_i <- function(x) sprintf("%.0f", x$improved_pct)
 L_ok <- intersect(names(LEARNERS), unique(st$learner))
@@ -67,14 +82,16 @@ tex <- c(
   sprintf(paste0("\\caption{Effect of adding mortality predictors on per-site prediction error (summary of Fig.~2). ",
     "For every site, ", MET, " of the model with climate, traits and mortality (C+T+M) is compared with the model without ",
     "mortality (C+T), both evaluated by repeated leave-one-site-out cross-validation (3 $\\times$ 80\\%%). ",
-    sprintf("$\\Delta$%s = median over sites of the paired relative change, (%s$_\\mathrm{C+T+M}$ $-$ %s$_\\mathrm{C+T}$) / %s$_\\mathrm{C+T}$ $\\times$ 100; ", MET, MET, MET, MET),
+    if (TEST == "permlog") sprintf("$\\Delta$%s = geometric mean over sites of the paired error ratio, (exp(mean$_\\mathrm{sites}$ ln(%s$_\\mathrm{C+T+M}$ / %s$_\\mathrm{C+T}$)) $-$ 1) $\\times$ 100; ", MET, MET, MET) else
+    sprintf(paste0("$\\Delta$%s = ", if (TEST == "perm") "mean" else "median", " over sites of the paired relative change, (%s$_\\mathrm{C+T+M}$ $-$ %s$_\\mathrm{C+T}$) / %s$_\\mathrm{C+T}$ $\\times$ 100; "), MET, MET, MET, MET),
     sprintf("negative values mean that mortality reduces the error. Improved = share of sites whose %s decreased. ", MET),
     sprintf("Sites are grouped by their maximum total mortality across years (%s); ", if (CLASS_BUF == "avg") "averaged over the five buffers, 100--500\\,m" else paste0(CLASS_BUF, "\\,m buffer")),
     "High $>$ mean $+$ 0.5\\,SD (%.1f\\%%), Low $<$ mean $-$ 0.5\\,SD (%.1f\\%%), Mid in between. ",
-    "Stars: one-sided paired Wilcoxon signed-rank test (C+T+M $<$ C+T), Benjamini--Hochberg corrected across all %d tests in the table ",
+    if (TEST == "permlog") "Stars: one-sided paired permutation test on the per-site log error ratios (100\\,000 random sign flips; C+T+M $<$ C+T), Benjamini--Hochberg corrected across all %d tests in the table " else
+    if (TEST == "perm") "Stars: one-sided paired permutation test (100\\,000 random sign flips of the per-site changes; C+T+M $<$ C+T), Benjamini--Hochberg corrected across all %d tests in the table " else "Stars: one-sided paired Wilcoxon signed-rank test (C+T+M $<$ C+T), Benjamini--Hochberg corrected across all %d tests in the table ",
     "($^{*}$\\,$q<0.05$, $^{**}$\\,$q<0.01$, $^{***}$\\,$q<0.001$). Tree cover $\\geq$ 30\\%%, %d sites, %d site-years, %s.}"),
     b_hi, b_lo, nrow(st), PN[["sites"]], PN[["sy"]], PAPER_MAPS),
-  sprintf("\\label{tab:fig2_d%s_total_mort_%s}", MET, VTAG),
+  sprintf("\\label{tab:fig2_d%s_total_mort_%s%s}", MET, VTAG, TSFX),
   "\\scriptsize",
   "\\setlength{\\tabcolsep}{4pt}",
   "\\renewcommand{\\arraystretch}{0.92}",
@@ -99,7 +116,7 @@ for (L in L_ok) for (wn in WINDOWS) {
   }
 }
 tex <- c(tex, "\\bottomrule", "\\end{tabular}", "\\end{table}")
-out <- file.path(PAPER_ROOT, "manuscript/tables", sprintf("table_fig2_d%s_total_mort_%s.tex", MET, VTAG))
+out <- file.path(PAPER_ROOT, "manuscript/tables", sprintf("table_fig2_d%s_total_mort_%s%s.tex", MET, VTAG, TSFX))
 writeLines(tex, out)
 cat("wrote", out, "\n")
 print(dcast(st, learner + window + response ~ subset, value.var = "median_pct", fun.aggregate = function(v) round(v, 1)))
