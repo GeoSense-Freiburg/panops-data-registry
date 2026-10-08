@@ -20,8 +20,16 @@ OUT <- file.path(PAPER_FIG, "mortality_split")
 dir.create(OUT, showWarnings = FALSE, recursive = TRUE)
 
 BG <- "white"; GRID <- "#D9D9D9"; TXT <- "#111111"; AX <- "#444444"
+# AutoGluon (2026-10-08): permutation SHAP of the matching AutoGluon run, same file layout
+AG_SHAP <- file.path(PAPER_ROOT, "AutoGluon/outputs", paste0(if (PAPER_RESP_SET == "efp_v5") "efp_v5" else "efp",
+                                                          if (PAPER_NO_THRESH) "_nothresh" else ""), "AG_site_shap_M4.csv")
 LEARNERS <- list(list(lab = "XGBoost (Optuna)",  fam = "XGB"),
-                 list(lab = "LightGBM (Optuna)", fam = "LGB"))
+                 list(lab = "LightGBM (Optuna)", fam = "LGB"),
+                 list(lab = "AutoGluon (permutation SHAP)", fam = "AG", f = AG_SHAP))
+FAM_LAB <- c(absolute_mortality = "Absolute deadwood", relative_mortality = "Relative deadwood",
+             new_deadwood_gain_pp = "Deadwood gain", new_deadwood_gain_pp_thresh = "Deadwood gain (thresholded)",
+             relative_tree_loss_pct = "Relative tree-cover loss", relative_tree_loss_pct_thresh = "Relative tree-cover loss (thresholded)",
+             relative_disturbance = "Total mortality")
 
 # Spearman rho between the combined index and relative mortality, site-years
 # of this dataset (500 m), used in the legend label
@@ -62,7 +70,7 @@ th <- theme_bw(base_size = 11) + theme(
 
 tables <- list()
 for (L in LEARNERS) {
-  f <- file.path(PAPER_OUT, sprintf("%s_site_shap_M4.csv", L$fam))
+  f <- if (!is.null(L[["f", exact = TRUE]])) L[["f"]] else file.path(PAPER_OUT, sprintf("%s_site_shap_M4.csv", L$fam))
   if (!file.exists(f)) { message("missing: ", f); next }
   s <- fread(f)[model %in% c("M4_12m", "M4_24m") & response %in% EFP_ORDER]
   s <- s[group == "Disturbance"]
@@ -141,6 +149,7 @@ for (L in LEARNERS) {
     geom_text(aes(label = sprintf("%.1f  (n=%d)", share, n_vars)), hjust = -0.1,
               size = 2.3, colour = AX) +
     coord_flip() +
+    scale_x_discrete(labels = function(x) ifelse(x %in% names(FAM_LAB), FAM_LAB[x], x)) +
     facet_grid(response ~ window) +
     scale_fill_manual(values = CC_COLS) +
     scale_y_continuous(expand = expansion(mult = c(0, 0.30))) +

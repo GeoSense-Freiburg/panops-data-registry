@@ -255,6 +255,16 @@ sections.append(("igbp", "6. Ecosystem type and tree cover (Fig 5)",
                             "".join(fig(k, f"fig5_igbp_board_{w}_{L}.png", f"{DS[k]['label']}: {L}, {w}.") for L in ("XGB", "LGB") for w in ("12m", "24m") if not (L == "XGB" and w == "24m")))
                         + fig(k, "mortality_split/mortality_composition_concept_LGB.png", f"{DS[k]['label']}: what kind of mortality information the model uses (LightGBM)."))))
 
+# mortality block split by metric, V5 only (2026-10-08): AutoGluon first, then XGBoost and LightGBM
+sections.append(("msplit", "7. Mortality block, metric by metric (V5)",
+                 "<p>Share of the mortality-block |SHAP| per metric (C+T+M, V5 without thresholds, mean over the 101 sites, "
+                 "bars ± SE). Grey = total mortality, red = deadwood metrics, green = tree-cover loss. The metrics are strongly "
+                 "correlated (total mortality vs relative deadwood ρ = 0.91), so SHAP shares show which variables the model "
+                 "uses, not what each metric adds on its own. AutoGluon SHAP is permutation-based: compare shares, not magnitudes.</p>"
+                 + fig("v5", "mortality_split/mortality_composition_family_AG.png", "V5: mortality block by metric, AutoGluon.")
+                 + fig("v5", "mortality_split/mortality_composition_family_XGB.png", "V5: mortality block by metric, XGBoost.")
+                 + fig("v5", "mortality_split/mortality_composition_family_LGB.png", "V5: mortality block by metric, LightGBM.")))
+
 # V4.1 vs V5 comparison (always visible)
 C = f"{ROOT}/plots/paper_v5{SFX}/comparison_v41_v5"
 agree = pd.read_csv(f"{C}/1_metric_agreement.csv", index_col=0).drop(index="absolute deadwood", errors="ignore").round(3)
