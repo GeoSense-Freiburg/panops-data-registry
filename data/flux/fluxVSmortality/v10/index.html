@@ -1500,7 +1500,424 @@ GPP<sub>sat</sub>, NEP<sub>max</sub>, ET<sub>max</sub> and WUE are predicted fro
       <td>-9.8<sup>*</sup> <span class='muted'>(65%)</span></td>
     </tr>
   </tbody>
-</table><figcaption>Median per-site change in RMSE when mortality is added (%), stars = one-sided paired Wilcoxon, BH-corrected across the table; (share of sites improved). Classes by total mortality, 500 m buffer (the only buffer stored for V2.2). LaTeX: <a href='tables/table_fig2_dRMSE_total_mort_v22.tex'>table_fig2_dRMSE_total_mort_v22.tex</a>.</figcaption></figure></div><h3>High-mortality sites</h3><div class="ds ds-v5"><figure><a href="fig_v5/fig2_high_total_mort_mortality_effect.png"><img src="fig_v5/fig2_high_total_mort_mortality_effect.png" loading="lazy" alt="Fig 2b (V5): high total-mortality sites only (models trained on all sites)."></a><figcaption>Fig 2b (V5): high total-mortality sites only (models trained on all sites).</figcaption></figure><figure><a href="fig_v5/fig2_high_rel_deadwood_mortality_effect.png"><img src="fig_v5/fig2_high_rel_deadwood_mortality_effect.png" loading="lazy" alt="Fig 2b (V5): high relative-deadwood sites only."></a><figcaption>Fig 2b (V5): high relative-deadwood sites only.</figcaption></figure></div><div class="ds ds-v41"><figure><a href="fig_v41/fig2_high_total_mort_mortality_effect.png"><img src="fig_v41/fig2_high_total_mort_mortality_effect.png" loading="lazy" alt="Fig 2b (V4.1): high total-mortality sites only (models trained on all sites)."></a><figcaption>Fig 2b (V4.1): high total-mortality sites only (models trained on all sites).</figcaption></figure><figure><a href="fig_v41/fig2_high_rel_deadwood_mortality_effect.png"><img src="fig_v41/fig2_high_rel_deadwood_mortality_effect.png" loading="lazy" alt="Fig 2b (V4.1): high relative-deadwood sites only."></a><figcaption>Fig 2b (V4.1): high relative-deadwood sites only.</figcaption></figure></div><div class="ds ds-v22"><figure><a href="fig_v22/fig2_high_total_mort_cls500m_mortality_effect.png"><img src="fig_v22/fig2_high_total_mort_cls500m_mortality_effect.png" loading="lazy" alt="Fig 2b (V2.2): high total-mortality sites only (models trained on all sites)."></a><figcaption>Fig 2b (V2.2): high total-mortality sites only (models trained on all sites).</figcaption></figure><figure><a href="fig_v22/fig2_high_rel_deadwood_cls500m_mortality_effect.png"><img src="fig_v22/fig2_high_rel_deadwood_cls500m_mortality_effect.png" loading="lazy" alt="Fig 2b (V2.2): high relative-deadwood sites only."></a><figcaption>Fig 2b (V2.2): high relative-deadwood sites only.</figcaption></figure></div><h3>Per-site ΔRMSE</h3><div class="ds ds-v5"><figure><a href="fig_v5/fig_site_dRMSE_total_mort.png"><img src="fig_v5/fig_site_dRMSE_total_mort.png" loading="lazy" alt="Per-site ΔRMSE (V5), bars coloured by total-mortality class."></a><figcaption>Per-site ΔRMSE (V5), bars coloured by total-mortality class.</figcaption></figure></div><div class="ds ds-v41"><figure><a href="fig_v41/fig_site_dRMSE_total_mort.png"><img src="fig_v41/fig_site_dRMSE_total_mort.png" loading="lazy" alt="Per-site ΔRMSE (V4.1), bars coloured by total-mortality class."></a><figcaption>Per-site ΔRMSE (V4.1), bars coloured by total-mortality class.</figcaption></figure></div><div class="ds ds-v22"><figure><a href="fig_v22/fig_site_dRMSE_total_mort_cls500m.png"><img src="fig_v22/fig_site_dRMSE_total_mort_cls500m.png" loading="lazy" alt="Per-site ΔRMSE (V2.2), bars coloured by total-mortality class."></a><figcaption>Per-site ΔRMSE (V2.2), bars coloured by total-mortality class.</figcaption></figure></div></section><section id="shap"><h2>5. Direction of the mortality effect at each site (Fig 3)</h2><div class="ds ds-v5"><figure><a href="fig_v5/fig3b_signed_total_mort_24m_LGB_landscape.png"><img src="fig_v5/fig3b_signed_total_mort_24m_LGB_landscape.png" loading="lazy" alt="Fig 3 (V5): net signed mortality SHAP per site, C+T+M, LightGBM, 24 months. Sites sorted by total mortality (highest left); below zero = mortality lowers the predicted EFP."></a><figcaption>Fig 3 (V5): net signed mortality SHAP per site, C+T+M, LightGBM, 24 months. Sites sorted by total mortality (highest left); below zero = mortality lowers the predicted EFP.</figcaption></figure><details><summary>LightGBM 12 months, XGBoost 12 and 24 months, driver composition</summary><figure><a href="fig_v5/fig3b_signed_total_mort_12m_LGB_landscape.png"><img src="fig_v5/fig3b_signed_total_mort_12m_LGB_landscape.png" loading="lazy" alt="V5: LightGBM, 12 months."></a><figcaption>V5: LightGBM, 12 months.</figcaption></figure><figure><a href="fig_v5/fig3b_signed_total_mort_12m_XGB_landscape.png"><img src="fig_v5/fig3b_signed_total_mort_12m_XGB_landscape.png" loading="lazy" alt="V5: XGBoost, 12 months."></a><figcaption>V5: XGBoost, 12 months.</figcaption></figure><figure><a href="fig_v5/fig3b_signed_total_mort_24m_XGB_landscape.png"><img src="fig_v5/fig3b_signed_total_mort_24m_XGB_landscape.png" loading="lazy" alt="V5: XGBoost, 24 months."></a><figcaption>V5: XGBoost, 24 months.</figcaption></figure><figure><a href="fig_v5/fig3_total_mort_24m_LGB_landscape.png"><img src="fig_v5/fig3_total_mort_24m_LGB_landscape.png" loading="lazy" alt="V5: driver composition (relative |SHAP|), LightGBM, 24 months."></a><figcaption>V5: driver composition (relative |SHAP|), LightGBM, 24 months.</figcaption></figure></details></div><div class="ds ds-v41"><figure><a href="fig_v41/fig3b_signed_total_mort_24m_LGB_landscape.png"><img src="fig_v41/fig3b_signed_total_mort_24m_LGB_landscape.png" loading="lazy" alt="Fig 3 (V4.1): net signed mortality SHAP per site, C+T+M, LightGBM, 24 months. Sites sorted by total mortality (highest left); below zero = mortality lowers the predicted EFP."></a><figcaption>Fig 3 (V4.1): net signed mortality SHAP per site, C+T+M, LightGBM, 24 months. Sites sorted by total mortality (highest left); below zero = mortality lowers the predicted EFP.</figcaption></figure><details><summary>LightGBM 12 months, XGBoost 12 and 24 months, driver composition</summary><figure><a href="fig_v41/fig3b_signed_total_mort_12m_LGB_landscape.png"><img src="fig_v41/fig3b_signed_total_mort_12m_LGB_landscape.png" loading="lazy" alt="V4.1: LightGBM, 12 months."></a><figcaption>V4.1: LightGBM, 12 months.</figcaption></figure><figure><a href="fig_v41/fig3b_signed_total_mort_12m_XGB_landscape.png"><img src="fig_v41/fig3b_signed_total_mort_12m_XGB_landscape.png" loading="lazy" alt="V4.1: XGBoost, 12 months."></a><figcaption>V4.1: XGBoost, 12 months.</figcaption></figure><figure><a href="fig_v41/fig3b_signed_total_mort_24m_XGB_landscape.png"><img src="fig_v41/fig3b_signed_total_mort_24m_XGB_landscape.png" loading="lazy" alt="V4.1: XGBoost, 24 months."></a><figcaption>V4.1: XGBoost, 24 months.</figcaption></figure><figure><a href="fig_v41/fig3_total_mort_24m_LGB_landscape.png"><img src="fig_v41/fig3_total_mort_24m_LGB_landscape.png" loading="lazy" alt="V4.1: driver composition (relative |SHAP|), LightGBM, 24 months."></a><figcaption>V4.1: driver composition (relative |SHAP|), LightGBM, 24 months.</figcaption></figure></details></div><div class="ds ds-v22"><figure><a href="fig_v22/fig3b_signed_total_mort_24m_LGB_cls500m_landscape.png"><img src="fig_v22/fig3b_signed_total_mort_24m_LGB_cls500m_landscape.png" loading="lazy" alt="Fig 3 (V2.2): net signed mortality SHAP per site, C+T+M, LightGBM, 24 months. Sites sorted by total mortality (highest left); below zero = mortality lowers the predicted EFP."></a><figcaption>Fig 3 (V2.2): net signed mortality SHAP per site, C+T+M, LightGBM, 24 months. Sites sorted by total mortality (highest left); below zero = mortality lowers the predicted EFP.</figcaption></figure><details><summary>LightGBM 12 months, XGBoost 12 and 24 months</summary><figure><a href="fig_v22/fig3b_signed_total_mort_12m_LGB_cls500m_landscape.png"><img src="fig_v22/fig3b_signed_total_mort_12m_LGB_cls500m_landscape.png" loading="lazy" alt="V2.2: LightGBM, 12 months."></a><figcaption>V2.2: LightGBM, 12 months.</figcaption></figure><figure><a href="fig_v22/fig3b_signed_total_mort_12m_XGB_cls500m_landscape.png"><img src="fig_v22/fig3b_signed_total_mort_12m_XGB_cls500m_landscape.png" loading="lazy" alt="V2.2: XGBoost, 12 months."></a><figcaption>V2.2: XGBoost, 12 months.</figcaption></figure><figure><a href="fig_v22/fig3b_signed_total_mort_24m_XGB_cls500m_landscape.png"><img src="fig_v22/fig3b_signed_total_mort_24m_XGB_cls500m_landscape.png" loading="lazy" alt="V2.2: XGBoost, 24 months."></a><figcaption>V2.2: XGBoost, 24 months.</figcaption></figure></details></div></section><section id="direction"><h2>6. High vs Low+Mid mortality sites (Fig 4)</h2><div class="ds ds-v5"><figure><a href="fig_v5/fig4_signed_shap_total_mort.png"><img src="fig_v5/fig4_signed_shap_total_mort.png" loading="lazy" alt="Fig 4 (V5): net signed mortality SHAP, High vs Low+Mid total-mortality sites; Mann-Whitney U, BH-corrected."></a><figcaption>Fig 4 (V5): net signed mortality SHAP, High vs Low+Mid total-mortality sites; Mann-Whitney U, BH-corrected.</figcaption></figure><figure><a href="fig_v5/fig4_signed_shap_rel_deadwood.png"><img src="fig_v5/fig4_signed_shap_rel_deadwood.png" loading="lazy" alt="Fig 4 (V5): split by relative deadwood."></a><figcaption>Fig 4 (V5): split by relative deadwood.</figcaption></figure></div><div class="ds ds-v41"><figure><a href="fig_v41/fig4_signed_shap_total_mort.png"><img src="fig_v41/fig4_signed_shap_total_mort.png" loading="lazy" alt="Fig 4 (V4.1): net signed mortality SHAP, High vs Low+Mid total-mortality sites; Mann-Whitney U, BH-corrected."></a><figcaption>Fig 4 (V4.1): net signed mortality SHAP, High vs Low+Mid total-mortality sites; Mann-Whitney U, BH-corrected.</figcaption></figure><figure><a href="fig_v41/fig4_signed_shap_rel_deadwood.png"><img src="fig_v41/fig4_signed_shap_rel_deadwood.png" loading="lazy" alt="Fig 4 (V4.1): split by relative deadwood."></a><figcaption>Fig 4 (V4.1): split by relative deadwood.</figcaption></figure></div><div class="ds ds-v22"><figure><a href="fig_v22/fig4_signed_shap_total_mort_cls500m.png"><img src="fig_v22/fig4_signed_shap_total_mort_cls500m.png" loading="lazy" alt="Fig 4 (V2.2): net signed mortality SHAP, High vs Low+Mid total-mortality sites; Mann-Whitney U, BH-corrected."></a><figcaption>Fig 4 (V2.2): net signed mortality SHAP, High vs Low+Mid total-mortality sites; Mann-Whitney U, BH-corrected.</figcaption></figure><figure><a href="fig_v22/fig4_signed_shap_rel_deadwood_cls500m.png"><img src="fig_v22/fig4_signed_shap_rel_deadwood_cls500m.png" loading="lazy" alt="Fig 4 (V2.2): split by relative deadwood."></a><figcaption>Fig 4 (V2.2): split by relative deadwood.</figcaption></figure></div></section><section id="igbp"><h2>7. Ecosystem type and tree cover (Fig 5)</h2><div class="ds ds-v5"><figure><a href="fig_v5/fig5_igbp_board_24m_XGB.png"><img src="fig_v5/fig5_igbp_board_24m_XGB.png" loading="lazy" alt="Fig 5 (V5): benefit and direction by IGBP class, tree cover and total mortality; XGBoost, 24 months."></a><figcaption>Fig 5 (V5): benefit and direction by IGBP class, tree cover and total mortality; XGBoost, 24 months.</figcaption></figure><details><summary>12 months and LightGBM</summary><figure><a href="fig_v5/fig5_igbp_board_12m_XGB.png"><img src="fig_v5/fig5_igbp_board_12m_XGB.png" loading="lazy" alt="V5: XGB, 12m."></a><figcaption>V5: XGB, 12m.</figcaption></figure><figure><a href="fig_v5/fig5_igbp_board_12m_LGB.png"><img src="fig_v5/fig5_igbp_board_12m_LGB.png" loading="lazy" alt="V5: LGB, 12m."></a><figcaption>V5: LGB, 12m.</figcaption></figure><figure><a href="fig_v5/fig5_igbp_board_24m_LGB.png"><img src="fig_v5/fig5_igbp_board_24m_LGB.png" loading="lazy" alt="V5: LGB, 24m."></a><figcaption>V5: LGB, 24m.</figcaption></figure></details><figure><a href="fig_v5/mortality_split/mortality_composition_concept_LGB.png"><img src="fig_v5/mortality_split/mortality_composition_concept_LGB.png" loading="lazy" alt="V5: what kind of mortality information the model uses (LightGBM)."></a><figcaption>V5: what kind of mortality information the model uses (LightGBM).</figcaption></figure></div><div class="ds ds-v41"><figure><a href="fig_v41/fig5_igbp_board_24m_XGB.png"><img src="fig_v41/fig5_igbp_board_24m_XGB.png" loading="lazy" alt="Fig 5 (V4.1): benefit and direction by IGBP class, tree cover and total mortality; XGBoost, 24 months."></a><figcaption>Fig 5 (V4.1): benefit and direction by IGBP class, tree cover and total mortality; XGBoost, 24 months.</figcaption></figure><details><summary>12 months and LightGBM</summary><figure><a href="fig_v41/fig5_igbp_board_12m_XGB.png"><img src="fig_v41/fig5_igbp_board_12m_XGB.png" loading="lazy" alt="V4.1: XGB, 12m."></a><figcaption>V4.1: XGB, 12m.</figcaption></figure><figure><a href="fig_v41/fig5_igbp_board_12m_LGB.png"><img src="fig_v41/fig5_igbp_board_12m_LGB.png" loading="lazy" alt="V4.1: LGB, 12m."></a><figcaption>V4.1: LGB, 12m.</figcaption></figure><figure><a href="fig_v41/fig5_igbp_board_24m_LGB.png"><img src="fig_v41/fig5_igbp_board_24m_LGB.png" loading="lazy" alt="V4.1: LGB, 24m."></a><figcaption>V4.1: LGB, 24m.</figcaption></figure></details><figure><a href="fig_v41/mortality_split/mortality_composition_concept_LGB.png"><img src="fig_v41/mortality_split/mortality_composition_concept_LGB.png" loading="lazy" alt="V4.1: what kind of mortality information the model uses (LightGBM)."></a><figcaption>V4.1: what kind of mortality information the model uses (LightGBM).</figcaption></figure></div><div class="ds ds-v22"><p class="na">Not available for V2.2: this figure was not produced in the same form.</p></div></section><section id="compare"><h2>8. V4.1 vs V5</h2><p>V5 (the paper dataset) was built from the newest maps with the same rules as V4.1. It keeps 101 of the 104 V4.1 sites
+</table><figcaption>Median per-site change in RMSE when mortality is added (%), stars = one-sided paired Wilcoxon, BH-corrected across the table; (share of sites improved). Classes by total mortality, 500 m buffer (the only buffer stored for V2.2). LaTeX: <a href='tables/table_fig2_dRMSE_total_mort_v22.tex'>table_fig2_dRMSE_total_mort_v22.tex</a>.</figcaption></figure></div><h3>Table 2 - as Table 1, with MAE instead of RMSE</h3><div class="ds ds-v5"><figure class="tw"><table class="dataframe tbl">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>All sites (n = 101)</th>
+      <th>Mid + High (n = 60)</th>
+      <th>High (n = 22)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>XGBoost · 12 months · GPP<sub>sat</sub></th>
+      <td>-2.2<sup>*</sup> <span class='muted'>(54%)</span></td>
+      <td>-1.9 <span class='muted'>(57%)</span></td>
+      <td>-5.1 <span class='muted'>(59%)</span></td>
+    </tr>
+    <tr>
+      <th>XGBoost · 12 months · NEP<sub>max</sub></th>
+      <td>-8.3<sup>***</sup> <span class='muted'>(70%)</span></td>
+      <td>-7.5<sup>**</sup> <span class='muted'>(68%)</span></td>
+      <td>-11.1<sup>*</sup> <span class='muted'>(73%)</span></td>
+    </tr>
+    <tr>
+      <th>XGBoost · 12 months · ET<sub>max</sub></th>
+      <td>-1.8 <span class='muted'>(59%)</span></td>
+      <td>-2.6<sup>*</sup> <span class='muted'>(63%)</span></td>
+      <td>-1.4 <span class='muted'>(64%)</span></td>
+    </tr>
+    <tr>
+      <th>XGBoost · 12 months · WUE</th>
+      <td>-0.3 <span class='muted'>(52%)</span></td>
+      <td>-1.6 <span class='muted'>(53%)</span></td>
+      <td>-11.0<sup>*</sup> <span class='muted'>(68%)</span></td>
+    </tr>
+    <tr>
+      <th>XGBoost · 24 months · GPP<sub>sat</sub></th>
+      <td>-4.9<sup>*</sup> <span class='muted'>(61%)</span></td>
+      <td>-6.1<sup>*</sup> <span class='muted'>(65%)</span></td>
+      <td>-4.3 <span class='muted'>(68%)</span></td>
+    </tr>
+    <tr>
+      <th>XGBoost · 24 months · NEP<sub>max</sub></th>
+      <td>-9.6<sup>***</sup> <span class='muted'>(68%)</span></td>
+      <td>-8.7<sup>**</sup> <span class='muted'>(63%)</span></td>
+      <td>-14.0<sup>**</sup> <span class='muted'>(73%)</span></td>
+    </tr>
+    <tr>
+      <th>XGBoost · 24 months · ET<sub>max</sub></th>
+      <td>-1.3 <span class='muted'>(54%)</span></td>
+      <td>-2.0 <span class='muted'>(63%)</span></td>
+      <td>-4.1 <span class='muted'>(68%)</span></td>
+    </tr>
+    <tr>
+      <th>XGBoost · 24 months · WUE</th>
+      <td>-1.6 <span class='muted'>(54%)</span></td>
+      <td>-3.1 <span class='muted'>(57%)</span></td>
+      <td>-9.2<sup>*</sup> <span class='muted'>(68%)</span></td>
+    </tr>
+    <tr>
+      <th>LightGBM · 12 months · GPP<sub>sat</sub></th>
+      <td>-1.7<sup>*</sup> <span class='muted'>(54%)</span></td>
+      <td>-1.8<sup>*</sup> <span class='muted'>(58%)</span></td>
+      <td>-4.1<sup>*</sup> <span class='muted'>(68%)</span></td>
+    </tr>
+    <tr>
+      <th>LightGBM · 12 months · NEP<sub>max</sub></th>
+      <td>-8.6<sup>***</sup> <span class='muted'>(70%)</span></td>
+      <td>-7.8<sup>**</sup> <span class='muted'>(70%)</span></td>
+      <td>-13.2<sup>*</sup> <span class='muted'>(77%)</span></td>
+    </tr>
+    <tr>
+      <th>LightGBM · 12 months · ET<sub>max</sub></th>
+      <td>-2.6 <span class='muted'>(56%)</span></td>
+      <td>-3.4<sup>*</sup> <span class='muted'>(62%)</span></td>
+      <td>-0.3 <span class='muted'>(50%)</span></td>
+    </tr>
+    <tr>
+      <th>LightGBM · 12 months · WUE</th>
+      <td>-1.0 <span class='muted'>(52%)</span></td>
+      <td>-2.4 <span class='muted'>(62%)</span></td>
+      <td>-2.6 <span class='muted'>(55%)</span></td>
+    </tr>
+    <tr>
+      <th>LightGBM · 24 months · GPP<sub>sat</sub></th>
+      <td>-2.1<sup>*</sup> <span class='muted'>(58%)</span></td>
+      <td>-3.9<sup>*</sup> <span class='muted'>(62%)</span></td>
+      <td>-3.9 <span class='muted'>(64%)</span></td>
+    </tr>
+    <tr>
+      <th>LightGBM · 24 months · NEP<sub>max</sub></th>
+      <td>-13.0<sup>***</sup> <span class='muted'>(65%)</span></td>
+      <td>-10.9<sup>**</sup> <span class='muted'>(63%)</span></td>
+      <td>-13.2<sup>*</sup> <span class='muted'>(68%)</span></td>
+    </tr>
+    <tr>
+      <th>LightGBM · 24 months · ET<sub>max</sub></th>
+      <td>-1.6 <span class='muted'>(56%)</span></td>
+      <td>-2.5 <span class='muted'>(58%)</span></td>
+      <td>-2.5 <span class='muted'>(59%)</span></td>
+    </tr>
+    <tr>
+      <th>LightGBM · 24 months · WUE</th>
+      <td>-0.3 <span class='muted'>(50%)</span></td>
+      <td>+0.5 <span class='muted'>(48%)</span></td>
+      <td>-5.1<sup>*</sup> <span class='muted'>(64%)</span></td>
+    </tr>
+    <tr>
+      <th>AutoGluon · 12 months · GPP<sub>sat</sub></th>
+      <td>-4.6<sup>*</sup> <span class='muted'>(59%)</span></td>
+      <td>-5.2<sup>*</sup> <span class='muted'>(62%)</span></td>
+      <td>-7.8 <span class='muted'>(59%)</span></td>
+    </tr>
+    <tr>
+      <th>AutoGluon · 12 months · NEP<sub>max</sub></th>
+      <td>-8.4<sup>**</sup> <span class='muted'>(63%)</span></td>
+      <td>-5.7<sup>*</sup> <span class='muted'>(62%)</span></td>
+      <td>-16.4<sup>**</sup> <span class='muted'>(77%)</span></td>
+    </tr>
+    <tr>
+      <th>AutoGluon · 12 months · ET<sub>max</sub></th>
+      <td>-1.0 <span class='muted'>(52%)</span></td>
+      <td>-3.0 <span class='muted'>(58%)</span></td>
+      <td>-5.1 <span class='muted'>(68%)</span></td>
+    </tr>
+    <tr>
+      <th>AutoGluon · 12 months · WUE</th>
+      <td>-1.4 <span class='muted'>(52%)</span></td>
+      <td>-7.6<sup>*</sup> <span class='muted'>(60%)</span></td>
+      <td>-9.1<sup>*</sup> <span class='muted'>(73%)</span></td>
+    </tr>
+    <tr>
+      <th>AutoGluon · 24 months · GPP<sub>sat</sub></th>
+      <td>-4.5<sup>*</sup> <span class='muted'>(61%)</span></td>
+      <td>-5.3<sup>**</sup> <span class='muted'>(72%)</span></td>
+      <td>-3.2 <span class='muted'>(59%)</span></td>
+    </tr>
+    <tr>
+      <th>AutoGluon · 24 months · NEP<sub>max</sub></th>
+      <td>-9.0<sup>**</sup> <span class='muted'>(62%)</span></td>
+      <td>-5.1<sup>*</sup> <span class='muted'>(57%)</span></td>
+      <td>-8.2 <span class='muted'>(64%)</span></td>
+    </tr>
+    <tr>
+      <th>AutoGluon · 24 months · ET<sub>max</sub></th>
+      <td>-4.9<sup>*</sup> <span class='muted'>(64%)</span></td>
+      <td>-6.6<sup>*</sup> <span class='muted'>(72%)</span></td>
+      <td>-11.9<sup>*</sup> <span class='muted'>(73%)</span></td>
+    </tr>
+    <tr>
+      <th>AutoGluon · 24 months · WUE</th>
+      <td>-3.4 <span class='muted'>(56%)</span></td>
+      <td>-6.6<sup>*</sup> <span class='muted'>(63%)</span></td>
+      <td>-14.9<sup>*</sup> <span class='muted'>(77%)</span></td>
+    </tr>
+  </tbody>
+</table><figcaption>Median per-site change in MAE (mean absolute error) when mortality is added (%), stars = one-sided paired Wilcoxon, BH-corrected across the table; (share of sites improved). Same models, folds and classes as Table 1; MAE weighs large errors less than RMSE. Classes by total mortality, mean of the five buffers (100-500 m). LaTeX: <a href='tables/table_fig2_dMAE_total_mort_v5_nothresh.tex'>table_fig2_dMAE_total_mort_v5_nothresh.tex</a>.</figcaption></figure></div><div class="ds ds-v41"><figure class="tw"><table class="dataframe tbl">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>All sites (n = 104)</th>
+      <th>Mid + High (n = 64)</th>
+      <th>High (n = 21)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>XGBoost · 12 months · GPP<sub>sat</sub></th>
+      <td>-8.0<sup>***</sup> <span class='muted'>(64%)</span></td>
+      <td>-7.6<sup>**</sup> <span class='muted'>(67%)</span></td>
+      <td>-13.6<sup>**</sup> <span class='muted'>(86%)</span></td>
+    </tr>
+    <tr>
+      <th>XGBoost · 12 months · NEP<sub>max</sub></th>
+      <td>-13.7<sup>***</sup> <span class='muted'>(76%)</span></td>
+      <td>-13.7<sup>***</sup> <span class='muted'>(75%)</span></td>
+      <td>-25.3<sup>***</sup> <span class='muted'>(95%)</span></td>
+    </tr>
+    <tr>
+      <th>XGBoost · 12 months · ET<sub>max</sub></th>
+      <td>-1.3 <span class='muted'>(54%)</span></td>
+      <td>-3.6 <span class='muted'>(56%)</span></td>
+      <td>-3.8 <span class='muted'>(57%)</span></td>
+    </tr>
+    <tr>
+      <th>XGBoost · 12 months · WUE</th>
+      <td>-4.4<sup>*</sup> <span class='muted'>(55%)</span></td>
+      <td>-3.0 <span class='muted'>(53%)</span></td>
+      <td>-6.5<sup>*</sup> <span class='muted'>(67%)</span></td>
+    </tr>
+    <tr>
+      <th>XGBoost · 24 months · GPP<sub>sat</sub></th>
+      <td>-4.8<sup>*</sup> <span class='muted'>(54%)</span></td>
+      <td>-7.0<sup>*</sup> <span class='muted'>(59%)</span></td>
+      <td>-16.7<sup>*</sup> <span class='muted'>(71%)</span></td>
+    </tr>
+    <tr>
+      <th>XGBoost · 24 months · NEP<sub>max</sub></th>
+      <td>-10.3<sup>***</sup> <span class='muted'>(74%)</span></td>
+      <td>-10.0<sup>***</sup> <span class='muted'>(72%)</span></td>
+      <td>-13.6<sup>***</sup> <span class='muted'>(95%)</span></td>
+    </tr>
+    <tr>
+      <th>XGBoost · 24 months · ET<sub>max</sub></th>
+      <td>-3.5<sup>*</sup> <span class='muted'>(61%)</span></td>
+      <td>-3.8<sup>*</sup> <span class='muted'>(64%)</span></td>
+      <td>-7.4 <span class='muted'>(57%)</span></td>
+    </tr>
+    <tr>
+      <th>XGBoost · 24 months · WUE</th>
+      <td>-2.7 <span class='muted'>(54%)</span></td>
+      <td>-6.1 <span class='muted'>(56%)</span></td>
+      <td>-10.4 <span class='muted'>(71%)</span></td>
+    </tr>
+    <tr>
+      <th>LightGBM · 12 months · GPP<sub>sat</sub></th>
+      <td>-7.1<sup>**</sup> <span class='muted'>(62%)</span></td>
+      <td>-7.5<sup>**</sup> <span class='muted'>(67%)</span></td>
+      <td>-18.6<sup>**</sup> <span class='muted'>(81%)</span></td>
+    </tr>
+    <tr>
+      <th>LightGBM · 12 months · NEP<sub>max</sub></th>
+      <td>-12.7<sup>***</sup> <span class='muted'>(72%)</span></td>
+      <td>-12.8<sup>***</sup> <span class='muted'>(72%)</span></td>
+      <td>-19.0<sup>***</sup> <span class='muted'>(90%)</span></td>
+    </tr>
+    <tr>
+      <th>LightGBM · 12 months · ET<sub>max</sub></th>
+      <td>-1.2 <span class='muted'>(53%)</span></td>
+      <td>-2.1 <span class='muted'>(55%)</span></td>
+      <td>-7.6 <span class='muted'>(62%)</span></td>
+    </tr>
+    <tr>
+      <th>LightGBM · 12 months · WUE</th>
+      <td>-3.2<sup>*</sup> <span class='muted'>(56%)</span></td>
+      <td>-3.3 <span class='muted'>(56%)</span></td>
+      <td>-3.2 <span class='muted'>(57%)</span></td>
+    </tr>
+    <tr>
+      <th>LightGBM · 24 months · GPP<sub>sat</sub></th>
+      <td>-6.8<sup>**</sup> <span class='muted'>(62%)</span></td>
+      <td>-8.3<sup>**</sup> <span class='muted'>(66%)</span></td>
+      <td>-16.1<sup>**</sup> <span class='muted'>(76%)</span></td>
+    </tr>
+    <tr>
+      <th>LightGBM · 24 months · NEP<sub>max</sub></th>
+      <td>-14.9<sup>***</sup> <span class='muted'>(75%)</span></td>
+      <td>-16.2<sup>***</sup> <span class='muted'>(72%)</span></td>
+      <td>-19.7<sup>***</sup> <span class='muted'>(86%)</span></td>
+    </tr>
+    <tr>
+      <th>LightGBM · 24 months · ET<sub>max</sub></th>
+      <td>-1.6 <span class='muted'>(55%)</span></td>
+      <td>-2.8 <span class='muted'>(56%)</span></td>
+      <td>-5.3 <span class='muted'>(57%)</span></td>
+    </tr>
+    <tr>
+      <th>LightGBM · 24 months · WUE</th>
+      <td>-4.3<sup>*</sup> <span class='muted'>(57%)</span></td>
+      <td>-2.5 <span class='muted'>(56%)</span></td>
+      <td>-3.4 <span class='muted'>(57%)</span></td>
+    </tr>
+    <tr>
+      <th>AutoGluon · 12 months · GPP<sub>sat</sub></th>
+      <td>-5.1<sup>*</sup> <span class='muted'>(60%)</span></td>
+      <td>-4.9<sup>*</sup> <span class='muted'>(59%)</span></td>
+      <td>-19.0<sup>*</sup> <span class='muted'>(71%)</span></td>
+    </tr>
+    <tr>
+      <th>AutoGluon · 12 months · NEP<sub>max</sub></th>
+      <td>-8.8<sup>***</sup> <span class='muted'>(66%)</span></td>
+      <td>-6.9<sup>**</sup> <span class='muted'>(64%)</span></td>
+      <td>-21.1<sup>**</sup> <span class='muted'>(81%)</span></td>
+    </tr>
+    <tr>
+      <th>AutoGluon · 12 months · ET<sub>max</sub></th>
+      <td>-0.3 <span class='muted'>(51%)</span></td>
+      <td>-0.3 <span class='muted'>(52%)</span></td>
+      <td>-3.9 <span class='muted'>(57%)</span></td>
+    </tr>
+    <tr>
+      <th>AutoGluon · 12 months · WUE</th>
+      <td>-6.2<sup>*</sup> <span class='muted'>(59%)</span></td>
+      <td>-3.2 <span class='muted'>(55%)</span></td>
+      <td>-2.0 <span class='muted'>(52%)</span></td>
+    </tr>
+    <tr>
+      <th>AutoGluon · 24 months · GPP<sub>sat</sub></th>
+      <td>-3.8 <span class='muted'>(59%)</span></td>
+      <td>-4.1 <span class='muted'>(56%)</span></td>
+      <td>-3.9 <span class='muted'>(57%)</span></td>
+    </tr>
+    <tr>
+      <th>AutoGluon · 24 months · NEP<sub>max</sub></th>
+      <td>-9.7<sup>**</sup> <span class='muted'>(62%)</span></td>
+      <td>-8.4<sup>*</sup> <span class='muted'>(58%)</span></td>
+      <td>-18.5<sup>*</sup> <span class='muted'>(67%)</span></td>
+    </tr>
+    <tr>
+      <th>AutoGluon · 24 months · ET<sub>max</sub></th>
+      <td>-3.6<sup>**</sup> <span class='muted'>(62%)</span></td>
+      <td>-3.2<sup>*</sup> <span class='muted'>(62%)</span></td>
+      <td>-3.5<sup>*</sup> <span class='muted'>(71%)</span></td>
+    </tr>
+    <tr>
+      <th>AutoGluon · 24 months · WUE</th>
+      <td>-5.7 <span class='muted'>(58%)</span></td>
+      <td>-3.6 <span class='muted'>(56%)</span></td>
+      <td>-8.5 <span class='muted'>(62%)</span></td>
+    </tr>
+  </tbody>
+</table><figcaption>Median per-site change in MAE (mean absolute error) when mortality is added (%), stars = one-sided paired Wilcoxon, BH-corrected across the table; (share of sites improved). Same models, folds and classes as Table 1; MAE weighs large errors less than RMSE. Classes by total mortality, mean of the five buffers (100-500 m). LaTeX: <a href='tables/table_fig2_dMAE_total_mort_v41_nothresh.tex'>table_fig2_dMAE_total_mort_v41_nothresh.tex</a>.</figcaption></figure></div><div class="ds ds-v22"><figure class="tw"><table class="dataframe tbl">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>All sites (n = 93)</th>
+      <th>Mid + High (n = 58)</th>
+      <th>High (n = 23)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>XGBoost · 12 months · GPP<sub>sat</sub></th>
+      <td>-9.4<sup>***</sup> <span class='muted'>(68%)</span></td>
+      <td>-10.3<sup>**</sup> <span class='muted'>(71%)</span></td>
+      <td>-13.6<sup>*</sup> <span class='muted'>(74%)</span></td>
+    </tr>
+    <tr>
+      <th>XGBoost · 12 months · NEP<sub>max</sub></th>
+      <td>-15.5<sup>***</sup> <span class='muted'>(73%)</span></td>
+      <td>-15.0<sup>***</sup> <span class='muted'>(72%)</span></td>
+      <td>-15.6<sup>**</sup> <span class='muted'>(83%)</span></td>
+    </tr>
+    <tr>
+      <th>XGBoost · 12 months · ET<sub>max</sub></th>
+      <td>+2.2 <span class='muted'>(43%)</span></td>
+      <td>+1.5 <span class='muted'>(45%)</span></td>
+      <td>+2.8 <span class='muted'>(39%)</span></td>
+    </tr>
+    <tr>
+      <th>XGBoost · 12 months · WUE</th>
+      <td>-2.0<sup>*</sup> <span class='muted'>(57%)</span></td>
+      <td>-0.6 <span class='muted'>(55%)</span></td>
+      <td>-0.4 <span class='muted'>(52%)</span></td>
+    </tr>
+    <tr>
+      <th>XGBoost · 24 months · GPP<sub>sat</sub></th>
+      <td>-10.2<sup>**</sup> <span class='muted'>(67%)</span></td>
+      <td>-11.2<sup>**</sup> <span class='muted'>(67%)</span></td>
+      <td>-21.2<sup>*</sup> <span class='muted'>(70%)</span></td>
+    </tr>
+    <tr>
+      <th>XGBoost · 24 months · NEP<sub>max</sub></th>
+      <td>-5.3<sup>*</sup> <span class='muted'>(60%)</span></td>
+      <td>-4.1<sup>*</sup> <span class='muted'>(62%)</span></td>
+      <td>-12.6<sup>*</sup> <span class='muted'>(65%)</span></td>
+    </tr>
+    <tr>
+      <th>XGBoost · 24 months · ET<sub>max</sub></th>
+      <td>+2.9 <span class='muted'>(38%)</span></td>
+      <td>+2.8 <span class='muted'>(40%)</span></td>
+      <td>+4.1 <span class='muted'>(39%)</span></td>
+    </tr>
+    <tr>
+      <th>XGBoost · 24 months · WUE</th>
+      <td>-7.6<sup>*</sup> <span class='muted'>(58%)</span></td>
+      <td>-4.0 <span class='muted'>(52%)</span></td>
+      <td>+7.0 <span class='muted'>(43%)</span></td>
+    </tr>
+    <tr>
+      <th>LightGBM · 12 months · GPP<sub>sat</sub></th>
+      <td>-7.8<sup>***</sup> <span class='muted'>(73%)</span></td>
+      <td>-7.9<sup>***</sup> <span class='muted'>(74%)</span></td>
+      <td>-17.8<sup>**</sup> <span class='muted'>(78%)</span></td>
+    </tr>
+    <tr>
+      <th>LightGBM · 12 months · NEP<sub>max</sub></th>
+      <td>-14.1<sup>***</sup> <span class='muted'>(76%)</span></td>
+      <td>-14.4<sup>***</sup> <span class='muted'>(78%)</span></td>
+      <td>-20.3<sup>**</sup> <span class='muted'>(83%)</span></td>
+    </tr>
+    <tr>
+      <th>LightGBM · 12 months · ET<sub>max</sub></th>
+      <td>+0.8 <span class='muted'>(48%)</span></td>
+      <td>+0.8 <span class='muted'>(48%)</span></td>
+      <td>+5.1 <span class='muted'>(26%)</span></td>
+    </tr>
+    <tr>
+      <th>LightGBM · 12 months · WUE</th>
+      <td>-3.8 <span class='muted'>(56%)</span></td>
+      <td>-2.0 <span class='muted'>(52%)</span></td>
+      <td>+2.4 <span class='muted'>(39%)</span></td>
+    </tr>
+    <tr>
+      <th>LightGBM · 24 months · GPP<sub>sat</sub></th>
+      <td>-9.4<sup>**</sup> <span class='muted'>(66%)</span></td>
+      <td>-9.4<sup>**</sup> <span class='muted'>(71%)</span></td>
+      <td>-16.5<sup>*</sup> <span class='muted'>(78%)</span></td>
+    </tr>
+    <tr>
+      <th>LightGBM · 24 months · NEP<sub>max</sub></th>
+      <td>-17.2<sup>***</sup> <span class='muted'>(73%)</span></td>
+      <td>-17.0<sup>***</sup> <span class='muted'>(76%)</span></td>
+      <td>-23.0<sup>**</sup> <span class='muted'>(83%)</span></td>
+    </tr>
+    <tr>
+      <th>LightGBM · 24 months · ET<sub>max</sub></th>
+      <td>+1.8 <span class='muted'>(41%)</span></td>
+      <td>+0.8 <span class='muted'>(43%)</span></td>
+      <td>+1.8 <span class='muted'>(35%)</span></td>
+    </tr>
+    <tr>
+      <th>LightGBM · 24 months · WUE</th>
+      <td>-8.9<sup>*</sup> <span class='muted'>(60%)</span></td>
+      <td>-10.0 <span class='muted'>(57%)</span></td>
+      <td>-12.4 <span class='muted'>(61%)</span></td>
+    </tr>
+  </tbody>
+</table><figcaption>Median per-site change in MAE (mean absolute error) when mortality is added (%), stars = one-sided paired Wilcoxon, BH-corrected across the table; (share of sites improved). Same models, folds and classes as Table 1; MAE weighs large errors less than RMSE. Classes by total mortality, 500 m buffer (the only buffer stored for V2.2). LaTeX: <a href='tables/table_fig2_dMAE_total_mort_v22.tex'>table_fig2_dMAE_total_mort_v22.tex</a>.</figcaption></figure></div><h3>High-mortality sites</h3><div class="ds ds-v5"><figure><a href="fig_v5/fig2_high_total_mort_mortality_effect.png"><img src="fig_v5/fig2_high_total_mort_mortality_effect.png" loading="lazy" alt="Fig 2b (V5): high total-mortality sites only (models trained on all sites)."></a><figcaption>Fig 2b (V5): high total-mortality sites only (models trained on all sites).</figcaption></figure><figure><a href="fig_v5/fig2_high_rel_deadwood_mortality_effect.png"><img src="fig_v5/fig2_high_rel_deadwood_mortality_effect.png" loading="lazy" alt="Fig 2b (V5): high relative-deadwood sites only."></a><figcaption>Fig 2b (V5): high relative-deadwood sites only.</figcaption></figure></div><div class="ds ds-v41"><figure><a href="fig_v41/fig2_high_total_mort_mortality_effect.png"><img src="fig_v41/fig2_high_total_mort_mortality_effect.png" loading="lazy" alt="Fig 2b (V4.1): high total-mortality sites only (models trained on all sites)."></a><figcaption>Fig 2b (V4.1): high total-mortality sites only (models trained on all sites).</figcaption></figure><figure><a href="fig_v41/fig2_high_rel_deadwood_mortality_effect.png"><img src="fig_v41/fig2_high_rel_deadwood_mortality_effect.png" loading="lazy" alt="Fig 2b (V4.1): high relative-deadwood sites only."></a><figcaption>Fig 2b (V4.1): high relative-deadwood sites only.</figcaption></figure></div><div class="ds ds-v22"><figure><a href="fig_v22/fig2_high_total_mort_cls500m_mortality_effect.png"><img src="fig_v22/fig2_high_total_mort_cls500m_mortality_effect.png" loading="lazy" alt="Fig 2b (V2.2): high total-mortality sites only (models trained on all sites)."></a><figcaption>Fig 2b (V2.2): high total-mortality sites only (models trained on all sites).</figcaption></figure><figure><a href="fig_v22/fig2_high_rel_deadwood_cls500m_mortality_effect.png"><img src="fig_v22/fig2_high_rel_deadwood_cls500m_mortality_effect.png" loading="lazy" alt="Fig 2b (V2.2): high relative-deadwood sites only."></a><figcaption>Fig 2b (V2.2): high relative-deadwood sites only.</figcaption></figure></div><h3>Per-site ΔRMSE</h3><div class="ds ds-v5"><figure><a href="fig_v5/fig_site_dRMSE_total_mort.png"><img src="fig_v5/fig_site_dRMSE_total_mort.png" loading="lazy" alt="Per-site ΔRMSE (V5), bars coloured by total-mortality class."></a><figcaption>Per-site ΔRMSE (V5), bars coloured by total-mortality class.</figcaption></figure></div><div class="ds ds-v41"><figure><a href="fig_v41/fig_site_dRMSE_total_mort.png"><img src="fig_v41/fig_site_dRMSE_total_mort.png" loading="lazy" alt="Per-site ΔRMSE (V4.1), bars coloured by total-mortality class."></a><figcaption>Per-site ΔRMSE (V4.1), bars coloured by total-mortality class.</figcaption></figure></div><div class="ds ds-v22"><figure><a href="fig_v22/fig_site_dRMSE_total_mort_cls500m.png"><img src="fig_v22/fig_site_dRMSE_total_mort_cls500m.png" loading="lazy" alt="Per-site ΔRMSE (V2.2), bars coloured by total-mortality class."></a><figcaption>Per-site ΔRMSE (V2.2), bars coloured by total-mortality class.</figcaption></figure></div></section><section id="shap"><h2>5. Direction of the mortality effect at each site (Fig 3)</h2><div class="ds ds-v5"><figure><a href="fig_v5/fig3b_signed_total_mort_24m_LGB_landscape.png"><img src="fig_v5/fig3b_signed_total_mort_24m_LGB_landscape.png" loading="lazy" alt="Fig 3 (V5): net signed mortality SHAP per site, C+T+M, LightGBM, 24 months. Sites sorted by total mortality (highest left); below zero = mortality lowers the predicted EFP."></a><figcaption>Fig 3 (V5): net signed mortality SHAP per site, C+T+M, LightGBM, 24 months. Sites sorted by total mortality (highest left); below zero = mortality lowers the predicted EFP.</figcaption></figure><details><summary>LightGBM 12 months, XGBoost 12 and 24 months, driver composition</summary><figure><a href="fig_v5/fig3b_signed_total_mort_12m_LGB_landscape.png"><img src="fig_v5/fig3b_signed_total_mort_12m_LGB_landscape.png" loading="lazy" alt="V5: LightGBM, 12 months."></a><figcaption>V5: LightGBM, 12 months.</figcaption></figure><figure><a href="fig_v5/fig3b_signed_total_mort_12m_XGB_landscape.png"><img src="fig_v5/fig3b_signed_total_mort_12m_XGB_landscape.png" loading="lazy" alt="V5: XGBoost, 12 months."></a><figcaption>V5: XGBoost, 12 months.</figcaption></figure><figure><a href="fig_v5/fig3b_signed_total_mort_24m_XGB_landscape.png"><img src="fig_v5/fig3b_signed_total_mort_24m_XGB_landscape.png" loading="lazy" alt="V5: XGBoost, 24 months."></a><figcaption>V5: XGBoost, 24 months.</figcaption></figure><figure><a href="fig_v5/fig3_total_mort_24m_LGB_landscape.png"><img src="fig_v5/fig3_total_mort_24m_LGB_landscape.png" loading="lazy" alt="V5: driver composition (relative |SHAP|), LightGBM, 24 months."></a><figcaption>V5: driver composition (relative |SHAP|), LightGBM, 24 months.</figcaption></figure></details></div><div class="ds ds-v41"><figure><a href="fig_v41/fig3b_signed_total_mort_24m_LGB_landscape.png"><img src="fig_v41/fig3b_signed_total_mort_24m_LGB_landscape.png" loading="lazy" alt="Fig 3 (V4.1): net signed mortality SHAP per site, C+T+M, LightGBM, 24 months. Sites sorted by total mortality (highest left); below zero = mortality lowers the predicted EFP."></a><figcaption>Fig 3 (V4.1): net signed mortality SHAP per site, C+T+M, LightGBM, 24 months. Sites sorted by total mortality (highest left); below zero = mortality lowers the predicted EFP.</figcaption></figure><details><summary>LightGBM 12 months, XGBoost 12 and 24 months, driver composition</summary><figure><a href="fig_v41/fig3b_signed_total_mort_12m_LGB_landscape.png"><img src="fig_v41/fig3b_signed_total_mort_12m_LGB_landscape.png" loading="lazy" alt="V4.1: LightGBM, 12 months."></a><figcaption>V4.1: LightGBM, 12 months.</figcaption></figure><figure><a href="fig_v41/fig3b_signed_total_mort_12m_XGB_landscape.png"><img src="fig_v41/fig3b_signed_total_mort_12m_XGB_landscape.png" loading="lazy" alt="V4.1: XGBoost, 12 months."></a><figcaption>V4.1: XGBoost, 12 months.</figcaption></figure><figure><a href="fig_v41/fig3b_signed_total_mort_24m_XGB_landscape.png"><img src="fig_v41/fig3b_signed_total_mort_24m_XGB_landscape.png" loading="lazy" alt="V4.1: XGBoost, 24 months."></a><figcaption>V4.1: XGBoost, 24 months.</figcaption></figure><figure><a href="fig_v41/fig3_total_mort_24m_LGB_landscape.png"><img src="fig_v41/fig3_total_mort_24m_LGB_landscape.png" loading="lazy" alt="V4.1: driver composition (relative |SHAP|), LightGBM, 24 months."></a><figcaption>V4.1: driver composition (relative |SHAP|), LightGBM, 24 months.</figcaption></figure></details></div><div class="ds ds-v22"><figure><a href="fig_v22/fig3b_signed_total_mort_24m_LGB_cls500m_landscape.png"><img src="fig_v22/fig3b_signed_total_mort_24m_LGB_cls500m_landscape.png" loading="lazy" alt="Fig 3 (V2.2): net signed mortality SHAP per site, C+T+M, LightGBM, 24 months. Sites sorted by total mortality (highest left); below zero = mortality lowers the predicted EFP."></a><figcaption>Fig 3 (V2.2): net signed mortality SHAP per site, C+T+M, LightGBM, 24 months. Sites sorted by total mortality (highest left); below zero = mortality lowers the predicted EFP.</figcaption></figure><details><summary>LightGBM 12 months, XGBoost 12 and 24 months</summary><figure><a href="fig_v22/fig3b_signed_total_mort_12m_LGB_cls500m_landscape.png"><img src="fig_v22/fig3b_signed_total_mort_12m_LGB_cls500m_landscape.png" loading="lazy" alt="V2.2: LightGBM, 12 months."></a><figcaption>V2.2: LightGBM, 12 months.</figcaption></figure><figure><a href="fig_v22/fig3b_signed_total_mort_12m_XGB_cls500m_landscape.png"><img src="fig_v22/fig3b_signed_total_mort_12m_XGB_cls500m_landscape.png" loading="lazy" alt="V2.2: XGBoost, 12 months."></a><figcaption>V2.2: XGBoost, 12 months.</figcaption></figure><figure><a href="fig_v22/fig3b_signed_total_mort_24m_XGB_cls500m_landscape.png"><img src="fig_v22/fig3b_signed_total_mort_24m_XGB_cls500m_landscape.png" loading="lazy" alt="V2.2: XGBoost, 24 months."></a><figcaption>V2.2: XGBoost, 24 months.</figcaption></figure></details></div></section><section id="direction"><h2>6. High vs Low+Mid mortality sites (Fig 4)</h2><div class="ds ds-v5"><figure><a href="fig_v5/fig4_signed_shap_total_mort.png"><img src="fig_v5/fig4_signed_shap_total_mort.png" loading="lazy" alt="Fig 4 (V5): net signed mortality SHAP, High vs Low+Mid total-mortality sites; Mann-Whitney U, BH-corrected."></a><figcaption>Fig 4 (V5): net signed mortality SHAP, High vs Low+Mid total-mortality sites; Mann-Whitney U, BH-corrected.</figcaption></figure><figure><a href="fig_v5/fig4_signed_shap_rel_deadwood.png"><img src="fig_v5/fig4_signed_shap_rel_deadwood.png" loading="lazy" alt="Fig 4 (V5): split by relative deadwood."></a><figcaption>Fig 4 (V5): split by relative deadwood.</figcaption></figure></div><div class="ds ds-v41"><figure><a href="fig_v41/fig4_signed_shap_total_mort.png"><img src="fig_v41/fig4_signed_shap_total_mort.png" loading="lazy" alt="Fig 4 (V4.1): net signed mortality SHAP, High vs Low+Mid total-mortality sites; Mann-Whitney U, BH-corrected."></a><figcaption>Fig 4 (V4.1): net signed mortality SHAP, High vs Low+Mid total-mortality sites; Mann-Whitney U, BH-corrected.</figcaption></figure><figure><a href="fig_v41/fig4_signed_shap_rel_deadwood.png"><img src="fig_v41/fig4_signed_shap_rel_deadwood.png" loading="lazy" alt="Fig 4 (V4.1): split by relative deadwood."></a><figcaption>Fig 4 (V4.1): split by relative deadwood.</figcaption></figure></div><div class="ds ds-v22"><figure><a href="fig_v22/fig4_signed_shap_total_mort_cls500m.png"><img src="fig_v22/fig4_signed_shap_total_mort_cls500m.png" loading="lazy" alt="Fig 4 (V2.2): net signed mortality SHAP, High vs Low+Mid total-mortality sites; Mann-Whitney U, BH-corrected."></a><figcaption>Fig 4 (V2.2): net signed mortality SHAP, High vs Low+Mid total-mortality sites; Mann-Whitney U, BH-corrected.</figcaption></figure><figure><a href="fig_v22/fig4_signed_shap_rel_deadwood_cls500m.png"><img src="fig_v22/fig4_signed_shap_rel_deadwood_cls500m.png" loading="lazy" alt="Fig 4 (V2.2): split by relative deadwood."></a><figcaption>Fig 4 (V2.2): split by relative deadwood.</figcaption></figure></div></section><section id="igbp"><h2>7. Ecosystem type and tree cover (Fig 5)</h2><div class="ds ds-v5"><figure><a href="fig_v5/fig5_igbp_board_24m_XGB.png"><img src="fig_v5/fig5_igbp_board_24m_XGB.png" loading="lazy" alt="Fig 5 (V5): benefit and direction by IGBP class, tree cover and total mortality; XGBoost, 24 months."></a><figcaption>Fig 5 (V5): benefit and direction by IGBP class, tree cover and total mortality; XGBoost, 24 months.</figcaption></figure><details><summary>12 months and LightGBM</summary><figure><a href="fig_v5/fig5_igbp_board_12m_XGB.png"><img src="fig_v5/fig5_igbp_board_12m_XGB.png" loading="lazy" alt="V5: XGB, 12m."></a><figcaption>V5: XGB, 12m.</figcaption></figure><figure><a href="fig_v5/fig5_igbp_board_12m_LGB.png"><img src="fig_v5/fig5_igbp_board_12m_LGB.png" loading="lazy" alt="V5: LGB, 12m."></a><figcaption>V5: LGB, 12m.</figcaption></figure><figure><a href="fig_v5/fig5_igbp_board_24m_LGB.png"><img src="fig_v5/fig5_igbp_board_24m_LGB.png" loading="lazy" alt="V5: LGB, 24m."></a><figcaption>V5: LGB, 24m.</figcaption></figure></details><figure><a href="fig_v5/mortality_split/mortality_composition_concept_LGB.png"><img src="fig_v5/mortality_split/mortality_composition_concept_LGB.png" loading="lazy" alt="V5: what kind of mortality information the model uses (LightGBM)."></a><figcaption>V5: what kind of mortality information the model uses (LightGBM).</figcaption></figure></div><div class="ds ds-v41"><figure><a href="fig_v41/fig5_igbp_board_24m_XGB.png"><img src="fig_v41/fig5_igbp_board_24m_XGB.png" loading="lazy" alt="Fig 5 (V4.1): benefit and direction by IGBP class, tree cover and total mortality; XGBoost, 24 months."></a><figcaption>Fig 5 (V4.1): benefit and direction by IGBP class, tree cover and total mortality; XGBoost, 24 months.</figcaption></figure><details><summary>12 months and LightGBM</summary><figure><a href="fig_v41/fig5_igbp_board_12m_XGB.png"><img src="fig_v41/fig5_igbp_board_12m_XGB.png" loading="lazy" alt="V4.1: XGB, 12m."></a><figcaption>V4.1: XGB, 12m.</figcaption></figure><figure><a href="fig_v41/fig5_igbp_board_12m_LGB.png"><img src="fig_v41/fig5_igbp_board_12m_LGB.png" loading="lazy" alt="V4.1: LGB, 12m."></a><figcaption>V4.1: LGB, 12m.</figcaption></figure><figure><a href="fig_v41/fig5_igbp_board_24m_LGB.png"><img src="fig_v41/fig5_igbp_board_24m_LGB.png" loading="lazy" alt="V4.1: LGB, 24m."></a><figcaption>V4.1: LGB, 24m.</figcaption></figure></details><figure><a href="fig_v41/mortality_split/mortality_composition_concept_LGB.png"><img src="fig_v41/mortality_split/mortality_composition_concept_LGB.png" loading="lazy" alt="V4.1: what kind of mortality information the model uses (LightGBM)."></a><figcaption>V4.1: what kind of mortality information the model uses (LightGBM).</figcaption></figure></div><div class="ds ds-v22"><p class="na">Not available for V2.2: this figure was not produced in the same form.</p></div></section><section id="compare"><h2>8. V4.1 vs V5</h2><p>V5 (the paper dataset) was built from the newest maps with the same rules as V4.1. It keeps 101 of the 104 V4.1 sites
 (loses CA-DB2, CA-LU1, FI-Var, US-BZB through the tree-cover filter, gains AU-How).</p>
 <figure class="tw"><table class="dataframe tbl">
   <thead>

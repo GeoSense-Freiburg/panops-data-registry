@@ -105,8 +105,8 @@ def r2_table(ds):
     return t.round(3)
 
 
-def fig2_table(ds, plots=None):
-    f = f"{plots or DS[ds]['plots']}/table_fig2_dRMSE_total_mort_statistics.csv"
+def fig2_table(ds, plots=None, metric="RMSE"):
+    f = f"{plots or DS[ds]['plots']}/table_fig2_d{metric}_total_mort_statistics.csv"
     st = pd.read_csv(f)
     lab = {"XGB": "XGBoost", "LGB": "LightGBM", "AG": "AutoGluon"}
     st["cell"] = [f"{m:+.1f}{'<sup>' + s + '</sup>' if isinstance(s, str) and s else ''} <span class='muted'>({i:.0f}%)</span>"
@@ -172,6 +172,20 @@ s3 += per_ds(lambda k: table_html(fig2_table(k),
              f"Median per-site change in RMSE when mortality is added (%), stars = one-sided paired Wilcoxon, BH-corrected across the table; "
              f"(share of sites improved). Classes by total mortality, {DS[k]['cls']}. "
              f"LaTeX: <a href='{copy_tex(k)}'>{DS[k]['tex']}</a>."))
+s3 += "<h3>Table 2 - as Table 1, with MAE instead of RMSE</h3>"
+
+
+def mae_tex(k):
+    name = DS[k]["tex"].replace("_dRMSE_", "_dMAE_")
+    os.makedirs(f"{SITE}/tables", exist_ok=True)
+    shutil.copyfile(f"{ROOT}/manuscript/tables/{name}", f"{SITE}/tables/{name}")
+    return f"<a href='tables/{name}'>{name}</a>"
+
+
+s3 += per_ds(lambda k: table_html(fig2_table(k, metric="MAE"),
+             f"Median per-site change in MAE (mean absolute error) when mortality is added (%), stars = one-sided paired Wilcoxon, "
+             f"BH-corrected across the table; (share of sites improved). Same models, folds and classes as Table 1; MAE weighs large "
+             f"errors less than RMSE. Classes by total mortality, {DS[k]['cls']}. LaTeX: {mae_tex(k)}."))
 s3 += "<h3>High-mortality sites</h3>"
 s3 += per_ds(lambda k: fig(k, f"fig2_high_total_mort{T(k)}_mortality_effect.png", f"Fig 2b ({DS[k]['label']}): high total-mortality sites only (models trained on all sites).")
              + fig(k, f"fig2_high_rel_deadwood{T(k)}_mortality_effect.png", f"Fig 2b ({DS[k]['label']}): high relative-deadwood sites only."))
