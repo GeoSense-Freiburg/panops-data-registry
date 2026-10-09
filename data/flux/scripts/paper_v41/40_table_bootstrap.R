@@ -19,6 +19,9 @@ st <- fread(file.path(PAPER_FIG, "paired_bootstrap_statistics.csv"))[metric == M
 LAB <- c(XGB = "XGBoost", LGB = "LightGBM", AG = "AutoGluon")
 EFP_TEX <- c(GPPsat = "GPP$_\\mathrm{sat}$", NEPmax = "NEP$_\\mathrm{max}$", ETmax = "ET$_\\mathrm{max}$", WUE = "WUE")
 COLS <- list(c("site", "all"), c("siteyear", "all"), c("siteyear", "high"), c("siteyear", "yr_midhigh"), c("siteyear", "yr_high"))
+# env TABLE_COLS = all (default) | siteyear (2026-10-09, draft main text: site-year columns only); suffix _siteyear
+SY_ONLY <- Sys.getenv("TABLE_COLS", "all") == "siteyear"
+if (SY_ONLY) COLS <- COLS[-1]
 num <- function(x) sprintf("$%s%.1f$", ifelse(x < 0, "-", "+"), abs(x))
 cell <- function(x) if (!nrow(x)) "--" else
   sprintf("%s {\\tiny[%s, %s]}%s", num(x$pct), num(x$pct_lo), num(x$pct_hi), ifelse(x$sig == "", "", sprintf("$^{%s}$", x$sig)))
@@ -28,20 +31,23 @@ b <- unique(st[, .(b_lo, b_hi)])
 tex <- c("\\begin{table}[htbp]", "\\centering",
   sprintf(paste0("\\caption{Paired bootstrap of the change in %s when mortality is added (C+T $\\rightarrow$ C+T+M), %s. ",
     "Cells: \\%% change of the error, 100\\,(%s$_\\mathrm{C+T+M}$ / %s$_\\mathrm{C+T}$ $-$ 1), with the 95\\,\\%% bootstrap interval in brackets. ",
-    "\\emph{Site level}: one %s per site and model over its years, ratio of the mean site errors. ",
+    if (SY_ONLY) "%s" else "\\emph{Site level}: one %s per site and model over its years, ratio of the mean site errors. ",
     "\\emph{Site-year level}: every site-year is an observation (pooled %s; no averaging over years). ",
-    "Years of one site are not independent, so at both levels whole sites are resampled (10\\,000 bootstrap draws) and ",
+    "Years of one site are not independent, so whole sites are resampled (10\\,000 bootstrap draws) and ",
     "the C+T / C+T+M labels are swapped per site for the paired permutation test (10\\,000 draws, one-sided; stars, ",
     "Benjamini--Hochberg corrected across all three learners: $^{*}$\\,$q<0.05$, $^{**}$\\,$q<0.01$, $^{***}$\\,$q<0.001$). ",
     "High sites: site maximum of total mortality $>$ %.1f\\,\\%%; the last two columns keep only the site-years whose own ",
     "total mortality exceeds %.1f\\,\\%% (Mid + High) or %.1f\\,\\%% (High). Column heads: sites / site-years. ",
     "%d sites, %d site-years, deadtrees v5.}"),
-    MET, paste(LAB[SHOW], collapse = " and "), MET, MET, MET, MET, b$b_hi, b$b_lo, b$b_hi, max(st$n_units), max(st$n_obs)),
+    MET, paste(LAB[SHOW], collapse = " and "), MET, MET, if (SY_ONLY) "" else MET, MET, b$b_hi, b$b_lo, b$b_hi, max(st$n_units), max(st$n_obs)),
   sprintf("\\label{tab:bootstrap_d%s_%s}", MET, paste(SHOW, collapse = "")),
   "\\scriptsize", "\\setlength{\\tabcolsep}{3pt}",
-  "\\resizebox{\\linewidth}{!}{%", "\\begin{tabular}{llccccc}", "\\toprule",
-  " & & Site level & \\multicolumn{4}{c}{Site-year level} \\\\", "\\cmidrule(lr){3-3}\\cmidrule(lr){4-7}",
-  " & & All sites & All sites & High sites & Mid + High years & High years \\\\",
+  "\\resizebox{\\linewidth}{!}{%",
+  if (SY_ONLY) c("\\begin{tabular}{llcccc}", "\\toprule",
+    " & & All sites & High sites & Mid + High years & High years \\\\") else
+  c("\\begin{tabular}{llccccc}", "\\toprule",
+    " & & Site level & \\multicolumn{4}{c}{Site-year level} \\\\", "\\cmidrule(lr){3-3}\\cmidrule(lr){4-7}",
+    " & & All sites & All sites & High sites & Mid + High years & High years \\\\"),
   sprintf(" & & (%s) \\\\", paste(hdr_n, collapse = ") & (")), "\\midrule")
 first <- TRUE
 for (L in SHOW) for (w in WINDOWS) {
@@ -54,5 +60,5 @@ for (L in SHOW) for (w in WINDOWS) {
   }
 }
 tex <- c(tex, "\\bottomrule", "\\end{tabular}}", "\\end{table}")
-out <- file.path(PAPER_ROOT, "manuscript/tables", sprintf("table_bootstrap_d%s_%s_%s.tex", MET, VTAG, paste(SHOW, collapse = "")))
+out <- file.path(PAPER_ROOT, "manuscript/tables", sprintf("table_bootstrap_d%s_%s_%s%s.tex", MET, VTAG, paste(SHOW, collapse = ""), if (SY_ONLY) "_siteyear" else ""))
 writeLines(tex, out); cat("wrote", out, "\n")

@@ -11,7 +11,7 @@ NOTITLE='s/, p, (width ?=)/, p + labs(title = NULL, subtitle = NULL), \1/'
 sed -E -e '/fam = "XGB"\),$/d' -e '/fam = "LGB"\),$/d' -e 's/width = 15, height = 12/width = 7.5, height = 12/g' \
        -e 's/"AutoGluon \(ensemble\)"/"AutoGluon"/' -e "$NOTITLE" $FS/21_fig2_M3M4.R > $FA/21_fig2_M3M4.R
 sed -E -e 's/^LEARNERS <- list\(list\(lab="XGBoost \(Optuna\)",  fam="XGB"\),$/LEARNERS <- list(/' \
-       -e '/list\(lab = "LightGBM \(Optuna\)", fam = "LGB"\),$/d' -e 's/width=11, height=11/width=5.5, height=11/g' \
+       -e '/list\(lab = "LightGBM \(Optuna\)", fam = "LGB"\),$/d' -e 's/FW <- if \(WIDE\) 12 else 11/FW <- if (WIDE) 12 else 5.5/' \
        -e 's/"AutoGluon \(ensemble\)"/"AutoGluon"/' -e "$NOTITLE" $FS/23_fig4_signed_shap.R > $FA/23_fig4_signed_shap.R
 sed -E -e 's/^LEARNERS <- c\(XGB = .*$/LEARNERS <- c(AG = "AutoGluon")/' -e 's/width = 15, height = 11/width = 8, height = 11/g' \
        -e "$NOTITLE" $FS/29_site_delta_rmse.R > $FA/29_site_delta_rmse.R
@@ -21,3 +21,8 @@ for a in "21_fig2_M3M4.R" "21_fig2_M3M4.R high_reldist" "29_site_delta_rmse.R" "
   set -- $a
   if $R $FA/$1 $2 > $AG/logs/05b_${SET}_$1$2.log 2>&1; then echo "OK   $a"; else echo "FAIL $a (logs/05b_${SET}_$1$2.log)"; fi
 done
+# coauthor draft 2026-10-09: Fig 2 with MAE + permutation test, Fig 4 with the EFPs as columns on top
+run2() { local tag=$1; shift; if env "$@" > $AG/logs/05b_${SET}_$tag.log 2>&1; then echo "OK   $tag"; else echo "FAIL $tag (logs/05b_${SET}_$tag.log)"; fi; }
+run2 fig2_mae_perm FIG2_STAT=mae_perm $R $FA/21_fig2_M3M4.R
+run2 fig2_high_mae_perm FIG2_STAT=mae_perm $R $FA/21_fig2_M3M4.R high_reldist
+run2 fig4_wide FIG4_LAYOUT=wide $R $FA/23_fig4_signed_shap.R

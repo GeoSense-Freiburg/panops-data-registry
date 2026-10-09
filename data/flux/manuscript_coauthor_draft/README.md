@@ -13,7 +13,7 @@ Bullet points and figures only — no prose. Built to support decisions, not to 
 | Cross-validation | repeated leave-one-site-out (3 x 80 %) |
 | Responses | GPPsat, NEPmax, ETmax, WUE |
 | Site classes | mean of the five buffers 100-500 m (site maximum, mean +/- 0.5 SD) |
-| Statistics | MAE: site-level log-ratio permutation test (Table 2), paired bootstrap incl. site-year level (Table 3); RMSE and XGB/LGB versions in the Appendix |
+| Statistics | main: paired bootstrap of MAE at the site-year level (Table 2); site-level tests, RMSE and XGB/LGB versions in the Appendix |
 
 Sources: AutoGluon-only figures from `AutoGluon/plots/efp_v5_nothresh/ag_only/` (made by the copies in
 `AutoGluon/fig_scripts/ag_only/`), three-learner figures from `AutoGluon/plots/efp_v5_nothresh/`, XGB/LGB figures

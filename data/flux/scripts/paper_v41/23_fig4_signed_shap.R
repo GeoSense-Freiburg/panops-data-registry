@@ -57,6 +57,15 @@ th <- theme_bw(base_size=11) + theme(
   plot.title=element_text(colour=TXT,size=14,face="bold"),
   plot.subtitle=element_text(colour=AX,size=9))
 
+# env FIG4_LAYOUT (2026-10-09, coauthor draft): "tall" (default: EFPs as rows, learners as columns) or "wide"
+# (EFPs as columns on top, learners as rows); wide files get the suffix _wide
+FIG4_LAYOUT <- Sys.getenv("FIG4_LAYOUT", "tall"); stopifnot(FIG4_LAYOUT %in% c("tall", "wide"))
+WIDE <- FIG4_LAYOUT == "wide"
+FACET <- if (WIDE) ggh4x::facet_grid2(learner ~ response, scales="free_y", independent="y", labeller=labeller(response=EFP_LAB)) else
+  ggh4x::facet_grid2(response ~ learner, scales="free_y", independent="y", labeller=labeller(response=EFP_LAB), switch="y")
+LSFX <- if (WIDE) "_wide" else ""
+FW <- if (WIDE) 12 else 11; FH <- if (WIDE) 1.6 + 3.2 * length(LEARNERS) else 11
+
 all_stats <- list()
 for (M in METRICS) {
   smax <- as.data.table(h)[, .(v = max(get(M$col), na.rm = TRUE)), by = SITE_ID]   # site value = max across years (as Figs 3, 5)
@@ -87,8 +96,7 @@ for (M in METRICS) {
     geom_text(data=st, aes(x=window, y=hi*1.12, label=sig), inherit.aes=FALSE,
               colour=TXT, size=3.4, fontface="bold") +
     scale_fill_manual(values=CAT_COLS) +
-    ggh4x::facet_grid2(response ~ learner, scales="free_y", independent="y",
-                       labeller=labeller(response=EFP_LAB), switch="y") +
+    FACET +
     labs(x=NULL, y="Net signed mortality SHAP\n(effect on the PREDICTED value, response units)",
          title=sprintf("Direction of the mortality effect — by %s", M$lab),
          subtitle=paste0("Tree cover ≥30 % (", PN[["sites"]], " sites) · ", PAPER_MAPS, " · C+T+M · natural-breaks split (site max > mean + 0.5 SD) on ", M$lab, " (", CLASS_LAB, ")",
@@ -97,8 +105,8 @@ for (M in METRICS) {
                          "(*** q<0.001, ** q<0.01, * q<0.05)")) +
     th + theme(strip.placement="outside")
 
-  ggsave(file.path(OUT, sprintf("fig4_signed_shap_%s%s.png", FILE_KEY[[M$key]], CLASS_TAG)), p, width=11, height=11, dpi=300, bg=BG)
-  ggsave(file.path(OUT, sprintf("fig4_signed_shap_%s%s.pdf", FILE_KEY[[M$key]], CLASS_TAG)), p, width=11, height=11, bg=BG)
+  ggsave(file.path(OUT, sprintf("fig4_signed_shap_%s%s%s.png", FILE_KEY[[M$key]], CLASS_TAG, LSFX)), p, width=FW, height=FH, dpi=300, bg=BG)
+  ggsave(file.path(OUT, sprintf("fig4_signed_shap_%s%s%s.pdf", FILE_KEY[[M$key]], CLASS_TAG, LSFX)), p, width=FW, height=FH, bg=BG)
   cat(sprintf("  saved fig4_signed_shap_%s (%d tests)\n", M$key, nrow(st)))
 }
 fwrite(rbindlist(all_stats)[, .(metric, learner, response, window, n_low, n_high,

@@ -237,6 +237,11 @@ for (s in sets) {
   stem <- file.path(out_dir, sprintf("fig5_igbp_board_%s_%s%s", sub("^M4_", "", s$wd), FAM, CLASS_TAG))
   ggsave(paste0(stem, ".png"), board, width = 14, height = 25, dpi = 190, bg = DARK_BG, limitsize = FALSE)
   ggsave(paste0(stem, ".pdf"), board, width = 14, height = 25, bg = DARK_BG, limitsize = FALSE)
+  # panel E on its own (2026-10-09, coauthor draft main text): total mortality vs direction, no panel title
+  stemE <- file.path(out_dir, sprintf("fig5E_total_mort_direction_%s_%s%s", sub("^M4_", "", s$wd), FAM, CLASS_TAG))
+  pE1 <- pE + labs(title = NULL)
+  ggsave(paste0(stemE, ".png"), pE1, width = 12, height = 4.4, dpi = 300, bg = DARK_BG)
+  ggsave(paste0(stemE, ".pdf"), pE1, width = 12, height = 4.4, bg = DARK_BG)
   cat(sprintf("  ✓ %s\n", basename(stem)))
 }
 cat("\n✅ V10 IGBP BOARDS COMPLETE\n")

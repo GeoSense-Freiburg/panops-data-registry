@@ -48,6 +48,18 @@ if (SUBSET != "all") {
   FILE_TAG <- paste0("_", FILE_KEY[[SUBSET]], CLASS_TAG)
 }
 
+# env FIG2_STAT (2026-10-09, coauthor draft): "wilcoxon" (default: per-site RMSE, median change, paired Wilcoxon) or
+# "mae_perm": per-site MAE, geometric-mean change and a one-sided paired sign-flip permutation test on the per-site
+# log error ratios (100 000 flips), as Table 2 of the draft; file names get the suffix _MAE_perm
+FIG2_STAT <- Sys.getenv("FIG2_STAT", "wilcoxon"); stopifnot(FIG2_STAT %in% c("wilcoxon", "mae_perm"))
+MET <- if (FIG2_STAT == "mae_perm") "MAE" else "RMSE"
+if (FIG2_STAT == "mae_perm") FILE_TAG <- paste0(FILE_TAG, "_MAE_perm")
+perm_p <- function(d, n_perm = 100000L) {   # P(mean of sign-flipped values <= observed mean), +1 correction
+  set.seed(42); n <- length(d)
+  s <- matrix(sample(c(-1, 1), n_perm * n, replace = TRUE), n_perm, n)
+  (1 + sum(as.vector(s %*% d) / n <= mean(d))) / (n_perm + 1)
+}
+
 LEARNERS <- list(   # random forest dropped at the user's request
   # 2026-09-09: repointed to the lag2-corrected 24m data (true_24m/*) - the
   # production dirs' 24m branch lacked disturbance lag2 entirely. 12m rows in
@@ -57,6 +69,7 @@ LEARNERS <- list(   # random forest dropped at the user's request
 
 site_rmse <- function(f) {
   p <- fread(f)
+  if (MET == "MAE") return(p[, .(rmse = mean(abs(observed - predicted))), by = .(model, response, SITE_ID)])
   p[, .(rmse = sqrt(mean((observed - predicted)^2))), by = .(model, response, SITE_ID)]
 }
 
@@ -77,8 +90,13 @@ for (L in LEARNERS) {
                                 model_type = "Without mortality", rmse = pw$wo); k <- k + 1
         rows[[k]] <- data.table(response = resp, learner = L$lab, grp = grp,
                                 model_type = "With mortality",    rmse = pw$wd); k <- k + 1
-        pct  <- median((pw$wd - pw$wo) / pw$wo * 100)
-        pval <- wilcox.test(pw$wd, pw$wo, paired = TRUE, alternative = "less", exact = FALSE)$p.value
+        if (FIG2_STAT == "mae_perm") {
+          pct  <- 100 * (exp(mean(log(pw$wd / pw$wo))) - 1)
+          pval <- perm_p(log(pw$wd / pw$wo))
+        } else {
+          pct  <- median((pw$wd - pw$wo) / pw$wo * 100)
+          pval <- wilcox.test(pw$wd, pw$wo, paired = TRUE, alternative = "less", exact = FALSE)$p.value
+        }
         labs[[lk]] <- data.table(response = resp, learner = L$lab, grp = grp,
                                  pct = pct, p = pval,
                                  imp = mean(pw$wd < pw$wo) * 100); lk <- lk + 1
@@ -142,11 +160,11 @@ p <- ggplot(dt, aes(x = grp, y = rmse, fill = model_type)) +
                          oob = scales::oob_keep))) +
   coord_cartesian(clip = "on") +
   labs(x = NULL, y = NULL,
-       title = paste0("Effect of adding mortality predictors on per-site RMSE", if (SUBSET != "all") " — high-mortality sites" else ""),
+       title = paste0("Effect of adding mortality predictors on per-site ", MET, if (SUBSET != "all") " — high-mortality sites" else ""),
        subtitle = paste0(SUB_TXT, "Tree cover ≥30 % (", PN[["sites"]], " sites, ", PN[["sy"]], " site-years) · ", PAPER_MAPS, " · repeated CV (3×80 %) · C+T vs C+T+M · cyan = without mortality, pink = with mortality\n",
-                         "% = median PAIRED change in per-site RMSE (negative = less error) · ",
-                         "stars = one-sided paired Wilcoxon, BH-FDR across the figure (*** q<0.001, ** q<0.01, * q<0.05)\n",
-                         "%↓ = share of sites whose RMSE improved · y axis zoomed to the 95th percentile (no data removed)")) +
+                         if (FIG2_STAT == "mae_perm") "% = geometric-mean PAIRED change in per-site MAE (negative = less error) · stars = one-sided paired permutation test on the log MAE ratios, BH-FDR across the figure (*** q<0.001, ** q<0.01, * q<0.05)\n"
+                         else "% = median PAIRED change in per-site RMSE (negative = less error) · stars = one-sided paired Wilcoxon, BH-FDR across the figure (*** q<0.001, ** q<0.01, * q<0.05)\n",
+                         sprintf("%%↓ = share of sites whose %s improved · y axis zoomed to the 95th percentile (no data removed)", MET))) +
   th + theme(strip.placement = "outside") +
   guides(colour = "none", fill = guide_legend(override.aes = list(alpha = 0.9)))
 
