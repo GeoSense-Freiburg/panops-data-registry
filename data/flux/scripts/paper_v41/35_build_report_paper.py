@@ -300,6 +300,54 @@ sections.append(("igbp", "6. Ecosystem type and tree cover (Fig 5)",
                             "".join(fig(k, f"fig5_igbp_board_{w}_{L}.png", f"{DS[k]['label']}: {L}, {w}.") for L in ("XGB", "LGB") for w in ("12m", "24m") if not (L == "XGB" and w == "24m")))
                         + fig(k, "mortality_split/mortality_composition_concept_LGB.png", f"{DS[k]['label']}: what kind of mortality information the model uses (LightGBM)."))))
 
+# dose-response with mortality as a continuous variable (2026-10-09): V5 only, scripts 41 / 42
+def dose_table():
+    rows = []
+    lab = {"AG": "AutoGluon", "XGB": "XGBoost", "LGB": "LightGBM"}
+    for L in ("AG", "XGB", "LGB"):
+        f = f"{DS['v5']['plots']}/dose_response/dose_response_robustness_{L}.csv"
+        if not os.path.exists(f):
+            continue
+        R = pd.read_csv(f)
+        for _, r in R[R.test != "t1a"].iterrows():
+            st = lambda q: "*" if q < 0.05 else ""
+            rows.append({"learner": lab[L], "EFP": EFPH[r.response], "window": r.window.replace("m", " months"),
+                         "model": "without mortality (C+T)" if r.test == "t2a_CT" else "with mortality (C+T+M)",
+                         "cell": f"{r.slope:+.3f}{st(r.q_boot)} <span class='muted'>[{r.boot_lo:+.3f}, {r.boot_hi:+.3f}]</span>"})
+    t = pd.DataFrame(rows).pivot_table(index=["learner", "window", "EFP"], columns="model", values="cell", aggfunc="first")
+    order = [(l, w, EFPH[e]) for l in ("AutoGluon", "XGBoost", "LightGBM") for w in ("12 months", "24 months") for e in EFP if (l, w, EFPH[e]) in t.index]
+    t = t.reindex(order)[["without mortality (C+T)", "with mortality (C+T+M)"]]
+    t.index = [f"{a} · {b} · {c}" for a, b, c in t.index]
+    return t
+
+
+if os.path.exists(f"{DS['v5']['plots']}/dose_response/dose_response_robustness_AG.csv"):
+    dose = ("<p>The Low / Mid / High comparison loses power because the High group is small (22 sites). Here total mortality is a "
+            "<b>continuous</b> variable and <b>every site-year</b> is an observation (361), with a mixed model "
+            "(random intercept per site, for the repeated years of a site). Two questions:</p><ul>"
+            "<li><b>2a: is the model without mortality wrong where mortality is high?</b> Residual (observed − predicted) of C+T "
+            "~ total mortality of that year. A negative slope means the model over-predicts the EFP in high-mortality years. "
+            "If mortality is the missing information, the slope should vanish for C+T+M.</li>"
+            "<li><b>1a: does the error reduction grow with mortality?</b> |error C+T+M| − |error C+T| ~ total mortality.</li></ul>"
+            "<p><b>Result:</b> without mortality all three learners over-predict NEP<sub>max</sub> and WUE more and more as "
+            "mortality rises (about −0.7 to −0.8 µmol m<sup>−2</sup> s<sup>−1</sup> and −0.18 g C mm<sup>−1</sup> per +10 % total "
+            "mortality), and GPP<sub>sat</sub> in the same direction; with mortality in the model the slopes are close to 0 and "
+            "never significant in the bootstrap. For NEP<sub>max</sub> and WUE this holds with a site-block bootstrap (no normality assumption), when leaving out "
+            "any single site, and without the three most extreme sites (FI-Hyy, US-GLE, US-NC2, &gt; 50 % total mortality); GPP<sub>sat</sub> is significant in the bootstrap for 1 to 2 of its 2 windows depending on the learner but depends more on single sites. "
+            "Test 1a goes the same way but its significance depends on the few extreme sites (bootstrap intervals cross 0), so it "
+            "is supporting evidence only. ET<sub>max</sub> shows no effect.</p>"
+            + table_html(dose_table(), "Test 2a, slope of the residual per +10 % total mortality of the site-year (EFP units) "
+                         "[95 % site-block bootstrap interval]; * = BH q &lt; 0.05 (bootstrap, across the 8 EFP × window tests).")
+            + "".join(fig("v5", f"dose_response/{n}_AG.png", c) for n, c in (
+                ("dose_response_siteyear", "AutoGluon: every site-year; 1a error change and 2a residuals without (cyan) and with mortality (pink); line = mixed-model slope."),
+                ("dose_response_robustness", "AutoGluon: the slopes under each check (mixed model, site-block bootstrap, leave one site out, without the three extreme sites); filled = significant."),
+                ("dose_response", "AutoGluon: the same at site level (one point per site, site maximum of total mortality); weaker because each site averages over years with and without mortality.")))
+            + "<details><summary>XGBoost and LightGBM</summary>"
+            + "".join(fig("v5", f"dose_response/{n}_{L}.png", f"{lab}: {c}") for L, lab in (("XGB", "XGBoost"), ("LGB", "LightGBM"))
+                      for n, c in (("dose_response_siteyear", "every site-year (1a, 2a)."), ("dose_response_robustness", "robustness of the slopes.")))
+            + "</details>")
+    sections.append(("dose", "Mortality as a continuous variable: dose-response (V5)", dose))
+
 # mortality block split by metric, V5 only (2026-10-08): AutoGluon first, then XGBoost and LightGBM
 sections.append(("msplit", "7. Mortality block, metric by metric (V5)",
                  "<p>Share of the mortality-block |SHAP| per metric (C+T+M, V5 without thresholds, mean over the 101 sites, "
