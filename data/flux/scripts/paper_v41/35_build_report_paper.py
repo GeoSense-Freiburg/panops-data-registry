@@ -328,7 +328,7 @@ if os.path.exists(f"{DS['v5']['plots']}/dose_response/dose_response_robustness_A
             + fig("v5", "dose_response/residual_by_mortality_AG_24m.png",
                   "AutoGluon, 24 months: mean residual (observed − predicted) per class of the site-year's total mortality; "
                   "below 0 = the model predicts too high. Cyan = without mortality (C+T), pink = with mortality (C+T+M); bars = 95 % "
-                  "site-block bootstrap interval; numbers = site-years (sites).")
+                  "site-block bootstrap interval; numbers = site-years (sites); stars at the top = adding mortality lowers the prediction significantly in that class (paired permutation, BH-FDR).")
             + "<p><b>Result:</b> without mortality the model predicts the EFPs <b>too high in high-mortality years</b>: in the "
             "&gt; 30 % class (21 site-years, 10 sites) NEP<sub>max</sub> by about 4 µmol m<sup>−2</sup> s<sup>−1</sup>, "
             "GPP<sub>sat</sub> by 3.4–4.4 and WUE by 0.75–0.9 g C mm<sup>−1</sup> (all learners, intervals below 0). Adding "

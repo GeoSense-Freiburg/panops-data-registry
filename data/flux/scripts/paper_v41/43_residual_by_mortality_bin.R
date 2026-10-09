@@ -35,11 +35,11 @@ S <- long[, boot_ci(res, SITE_ID), by = .(response, model, bin)]
 S[, response := factor(response, EFP_ORDER)]
 fwrite(S, file.path(OUT, sprintf("residual_by_mortality_%s_%s.csv", L, WIN)))
 # ---- is the correction significant? corr = residual(C+T+M) - residual(C+T) = prediction lowered by adding mortality.
-# Per class: mean correction, 95 % site-block bootstrap interval, one-sided paired permutation (labels swapped per site,
+# Per class: mean correction, 95 % site-block bootstrap interval, one-sided paired permutation (100 000 draws; labels swapped per site,
 # i.e. the site's corrections sign-flipped together; H1: correction > 0 = predictions lowered); BH across the 16 tests.
 # Trend: mixed model corr ~ total mortality (per 10 %) + (1 | site), slope with site-block bootstrap.
 w[, corr := (observed - M4) - (observed - M3)]
-perm_p <- function(v, site, n = 10000L) {
+perm_p <- function(v, site, n = 100000L) {
   ss <- rowsum(v, site)[, 1]; obs <- sum(ss); k <- length(ss)
   sg <- matrix(sample(c(-1, 1), n * k, replace = TRUE), n, k)
   (1 + sum(as.vector(sg %*% ss) >= obs)) / (n + 1)
@@ -63,6 +63,7 @@ print(C[order(response, bin), .(response, bin, corr = round(mean, 3), lo = round
 cat("\n== trend: correction per +10 % total mortality (mixed model, site-block bootstrap) ==\n")
 print(TR[, .(response, slope = round(slope, 3), lo = round(lo, 3), hi = round(hi, 3), q_boot = signif(q_boot, 2))])
 
+SIG <- C[, .(response = factor(response, EFP_ORDER), bin, lab = fifelse(q_perm < 0.001, "***", fifelse(q_perm < 0.01, "**", fifelse(q_perm < 0.05, "*", ""))))]
 N <- S[model == "Without mortality (C+T)", .(response, bin, txt = sprintf("%d\n(%d)", n_sy, n_sites))]
 MC <- c("Without mortality (C+T)" = "#22C4E0", "With mortality (C+T+M)" = "#E8257A")
 pd <- position_dodge(width = 0.5)
@@ -71,13 +72,15 @@ g <- ggplot(S, aes(bin, mean, colour = model, group = model)) +
   geom_line(position = pd, linewidth = 0.6, alpha = 0.6) +
   geom_errorbar(aes(ymin = lo, ymax = hi), width = 0, position = pd, linewidth = 0.8) +
   geom_point(position = pd, size = 2.6) +
+  geom_text(data = SIG, aes(x = bin, y = Inf, label = lab), inherit.aes = FALSE, vjust = 1.3, size = 3.6, fontface = "bold", colour = "grey15") +
   geom_text(data = N, aes(x = bin, y = -Inf, label = txt), inherit.aes = FALSE, vjust = -0.3, size = 2.4, colour = "grey35", lineheight = 0.85) +
   scale_colour_manual(values = MC, breaks = names(MC), name = NULL) +
-  scale_y_continuous(expand = expansion(mult = c(0.22, 0.08))) +
+  scale_y_continuous(expand = expansion(mult = c(0.22, 0.16))) +
   facet_wrap(~ response, nrow = 1, scales = "free_y", labeller = labeller(response = RESP_UNITS)) +
   labs(x = "Total mortality of the site-year", y = "Mean residual (observed - predicted)\nbelow 0 = model over-predicts",
        title = sprintf("Without mortality the model over-predicts in high-mortality years; with mortality the bias is much smaller (%s, %s)", LAB, WIN),
-       subtitle = "Points = mean residual of all site-years in the class; bars = 95 % site-block bootstrap interval. Numbers at the bottom: site-years (sites).") +
+       subtitle = paste0("Points = mean residual of all site-years in the class; bars = 95 % site-block bootstrap interval. Numbers at the bottom: site-years (sites).\n",
+                         "Stars at the top: adding mortality lowers the prediction significantly in that class (one-sided paired permutation, models swapped per site, BH-FDR; * q<0.05, ** q<0.01, *** q<0.001)")) +
   theme_bw(base_size = 10) + theme(panel.grid.minor = element_blank(), panel.grid.major.x = element_blank(), legend.position = "bottom",
     strip.background = element_rect(fill = "#EFEFEF", colour = "grey80"), strip.text = element_text(face = "bold"),
     plot.title = element_text(face = "bold", size = 11), plot.subtitle = element_text(size = 8, colour = "grey30"))

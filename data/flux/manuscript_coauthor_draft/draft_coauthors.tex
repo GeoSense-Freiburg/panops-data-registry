@@ -193,7 +193,8 @@ points coloured by IGBP class.}
 \begin{center}
 \includegraphics[width=\linewidth]{figures/fig5_residual_by_mortality_AG_24m.png}\\[2pt]
 {\small \textbf{Fig.\ 5} --- mean residual per class of the site-year's total mortality, without (cyan) and with mortality
-(pink), AutoGluon, 24\,months; bars = 95\,\% site-block bootstrap interval; numbers = site-years (sites).}
+(pink), AutoGluon, 24\,months; bars = 95\,\% site-block bootstrap interval; numbers = site-years (sites); stars = adding mortality lowers the prediction significantly in that class
+(paired permutation, BH-FDR).}
 \end{center}
 
 \textbf{Mortality metrics}
@@ -258,7 +259,7 @@ points coloured by IGBP class.}
                 sign-flip permutation test on the per-site log error ratios (100\,000 flips; geometric-mean change).
           \item \emph{Dose--response} (Fig.~5): mean residual per class of the site-year's total mortality with a site-block
                 bootstrap (2000 draws); correction = residual(C+T+M) $-$ residual(C+T), one-sided paired permutation with
-                the two models swapped per site (10\,000 draws); mixed models (nlme) residual or correction $\sim$ total
+                the two models swapped per site (100\,000 draws); mixed models (nlme) residual or correction $\sim$ total
                 mortality + (1\,|\,site), slopes checked with a site-block bootstrap, leave-one-site-out and without sites
                 $>$50\,\% total mortality.
           \item Fig.~3: Mann--Whitney U. Fig.~4: Spearman. Benjamini--Hochberg FDR within each table / figure
