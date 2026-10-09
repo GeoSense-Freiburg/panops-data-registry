@@ -322,29 +322,43 @@ def dose_table():
 
 
 if os.path.exists(f"{DS['v5']['plots']}/dose_response/dose_response_robustness_AG.csv"):
-    dose = ("<p>The Low / Mid / High comparison loses power because the High group is small (22 sites). Here total mortality is a "
-            "<b>continuous</b> variable and <b>every site-year</b> is an observation (361), with a mixed model "
-            "(random intercept per site, for the repeated years of a site). Two questions:</p><ul>"
-            "<li><b>2a: is the model without mortality wrong where mortality is high?</b> Residual (observed − predicted) of C+T "
-            "~ total mortality of that year. A negative slope means the model over-predicts the EFP in high-mortality years. "
-            "If mortality is the missing information, the slope should vanish for C+T+M.</li>"
-            "<li><b>1a: does the error reduction grow with mortality?</b> |error C+T+M| − |error C+T| ~ total mortality.</li></ul>"
-            "<p><b>Result:</b> without mortality all three learners over-predict NEP<sub>max</sub> and WUE more and more as "
-            "mortality rises (about −0.7 to −0.8 µmol m<sup>−2</sup> s<sup>−1</sup> and −0.18 g C mm<sup>−1</sup> per +10 % total "
-            "mortality), and GPP<sub>sat</sub> in the same direction; with mortality in the model the slopes are close to 0 and "
-            "never significant in the bootstrap. For NEP<sub>max</sub> and WUE this holds with a site-block bootstrap (no normality assumption), when leaving out "
-            "any single site, and without the three most extreme sites (FI-Hyy, US-GLE, US-NC2, &gt; 50 % total mortality); GPP<sub>sat</sub> is significant in the bootstrap for 1 to 2 of its 2 windows depending on the learner but depends more on single sites. "
-            "Test 1a goes the same way but its significance depends on the few extreme sites (bootstrap intervals cross 0), so it "
-            "is supporting evidence only. ET<sub>max</sub> shows no effect.</p>"
-            + table_html(dose_table(), "Test 2a, slope of the residual per +10 % total mortality of the site-year (EFP units) "
+    dose = ("<p>The Low / Mid / High comparison loses power because the High group is small (22 sites). Here every "
+            "<b>site-year</b> is an observation (361) and total mortality of that year is used directly. The question: "
+            "<b>is the model without mortality wrong in the years with high mortality, and does adding mortality fix it?</b></p>"
+            + fig("v5", "dose_response/residual_by_mortality_AG_24m.png",
+                  "AutoGluon, 24 months: mean residual (observed − predicted) per class of the site-year's total mortality; "
+                  "below 0 = the model predicts too high. Cyan = without mortality (C+T), pink = with mortality (C+T+M); bars = 95 % "
+                  "site-block bootstrap interval; numbers = site-years (sites).")
+            + "<p><b>Result:</b> without mortality the model predicts the EFPs <b>too high in high-mortality years</b>: in the "
+            "&gt; 30 % class (21 site-years, 10 sites) NEP<sub>max</sub> by about 4 µmol m<sup>−2</sup> s<sup>−1</sup>, "
+            "GPP<sub>sat</sub> by 3.4–4.4 and WUE by 0.75–0.9 g C mm<sup>−1</sup> (all learners, intervals below 0). Adding "
+            "mortality <b>reduces</b> this bias: AutoGluon by about two-thirds (NEP<sub>max</sub> −4.0 → −1.3), XGBoost and "
+            "LightGBM by about a third to a half (−3.6 to −4.0 → −1.8 to −2.4, still below 0). ET<sub>max</sub> shows no pattern.</p>"
+            "<p><b>Is the correction significant?</b> Per site-year, correction = residual with − residual without mortality "
+            "(= how much adding mortality lowers the prediction); one-sided paired permutation with the two models swapped per site. "
+            "In the &gt; 30 % class the correction is significant for GPP<sub>sat</sub>, NEP<sub>max</sub> and WUE with every "
+            "learner and window (AutoGluon 24 months: +3.2, +2.7 and +0.34; XGBoost / LightGBM about half of that; all q &lt; 0.05). "
+            "In the 0–10 % class mortality slightly <i>raises</i> the predictions. The correction grows with total mortality "
+            "(mixed model, site-block bootstrap; AutoGluon +0.96, +0.75 and +0.10 per +10 %, all q &lt; 0.001).</p>"
+            "<p>The same with a <b>mixed model</b> (residual ~ total mortality of the year, random intercept per site): the slope "
+            "without mortality is about −0.7 to −0.8 µmol m<sup>−2</sup> s<sup>−1</sup> (NEP<sub>max</sub>) and −0.18 g C "
+            "mm<sup>−1</sup> (WUE) per +10 % total mortality; it holds with a site-block bootstrap, when leaving out any single "
+            "site and without the three most extreme sites (FI-Hyy, US-GLE, US-NC2, &gt; 50 %). With mortality the linear trend "
+            "is no longer significant for any learner. GPP<sub>sat</sub> goes the same way but depends more on single sites. "
+            "Whether the error <i>reduction</i> itself grows with mortality (test 1a) is the same direction but not robust in the "
+            "bootstrap.</p>"
+            + table_html(dose_table(), "Mixed model, slope of the residual per +10 % total mortality of the site-year (EFP units) "
                          "[95 % site-block bootstrap interval]; * = BH q &lt; 0.05 (bootstrap, across the 8 EFP × window tests).")
-            + "".join(fig("v5", f"dose_response/{n}_AG.png", c) for n, c in (
-                ("dose_response_siteyear", "AutoGluon: every site-year; 1a error change and 2a residuals without (cyan) and with mortality (pink); line = mixed-model slope."),
-                ("dose_response_robustness", "AutoGluon: the slopes under each check (mixed model, site-block bootstrap, leave one site out, without the three extreme sites); filled = significant."),
-                ("dose_response", "AutoGluon: the same at site level (one point per site, site maximum of total mortality); weaker because each site averages over years with and without mortality.")))
-            + "<details><summary>XGBoost and LightGBM</summary>"
-            + "".join(fig("v5", f"dose_response/{n}_{L}.png", f"{lab}: {c}") for L, lab in (("XGB", "XGBoost"), ("LGB", "LightGBM"))
-                      for n, c in (("dose_response_siteyear", "every site-year (1a, 2a)."), ("dose_response_robustness", "robustness of the slopes.")))
+            + "<details><summary>12 months, XGBoost and LightGBM</summary>"
+            + "".join(fig("v5", f"dose_response/residual_by_mortality_{L}_{W}.png", f"{lab}, {W.replace('m', ' months')}.")
+                      for L, lab in (("AG", "AutoGluon"), ("XGB", "XGBoost"), ("LGB", "LightGBM")) for W in ("24m", "12m")
+                      if not (L == "AG" and W == "24m"))
+            + "</details><details><summary>Supplement: mixed-model plots and robustness checks</summary>"
+            + "".join(fig("v5", f"dose_response/{n}_{L}.png", f"{lab}: {c}")
+                      for L, lab in (("AG", "AutoGluon"), ("XGB", "XGBoost"), ("LGB", "LightGBM"))
+                      for n, c in (("dose_response_siteyear", "every site-year; 1a error change and 2a residuals without (cyan) and with mortality (pink); line = mixed-model slope."),
+                                   ("dose_response_robustness", "slopes under each check (mixed model, site-block bootstrap, leave one site out, without the three extreme sites); filled = significant.")))
+            + fig("v5", "dose_response/dose_response_AG.png", "AutoGluon: the same at site level (one point per site); weaker because each site averages over years with and without mortality.")
             + "</details>")
     sections.append(("dose", "Mortality as a continuous variable: dose-response (V5)", dose))
 
