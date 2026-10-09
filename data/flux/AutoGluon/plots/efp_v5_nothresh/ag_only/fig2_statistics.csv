@@ -1,0 +1,9 @@
+learner,response,grp,median_pct,sites_improved,p,q,sig
+AutoGluon,GPPsat,12m,-2.66,58.4,0.0363,0.0473,*
+AutoGluon,GPPsat,24m,-4.01,60.4,0.00497,0.0133,*
+AutoGluon,NEPmax,12m,-7.19,61.4,0.00023,0.00163,**
+AutoGluon,NEPmax,24m,-7.17,63.4,0.000408,0.00163,**
+AutoGluon,ETmax,12m,-1.05,57.4,0.0414,0.0473,*
+AutoGluon,ETmax,24m,-4.4,59.4,0.00903,0.0181,*
+AutoGluon,WUE,12m,-0.09,50.5,0.123,0.123,ns
+AutoGluon,WUE,24m,-3.27,56.4,0.0303,0.0473,*

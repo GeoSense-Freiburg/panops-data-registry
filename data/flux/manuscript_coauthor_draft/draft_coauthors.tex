@@ -22,229 +22,209 @@
 \section*{Introduction}
     \begin{itemize}
     \item Terrestrial ecosystems regulate global \textbf{carbon, water, and energy balances}; forest functioning is closely linked to vegetation structure and functional traits.
-    
+
     \item Increasing \textbf{drought, heat, and biotic disturbances} are causing widespread tree mortality, with potentially large consequences for ecosystem functioning.
-    
+
     \item Mortality alters \textbf{canopy structure and leaf area}, affecting carbon uptake, evapotranspiration, and energy partitioning, with cascading effects on soils, nutrients, and vegetation recovery.
-    
+
     \item The magnitude and trajectory of these impacts likely depend on \textbf{vegetation type and functional trait composition}.
-    
+
     \item However, quantitative understanding of mortality impacts across ecosystems remains limited due to \textbf{spatial and temporal constraints of field observations} and limited integration of mortality and trait data.
-    
+
     \item Advances in \textbf{remote sensing, machine learning, citizen science, and trait databases} now enable large-scale assessments of mortality and ecosystem responses.
-    
+
     \item This creates an opportunity to quantify how mortality affects ecosystem functioning and identify \textbf{vegetation types that are more sensitive or resilient}.
 \end{itemize}
 
-\textbf{Figure 1: Sites and EFP distributions}
+\textbf{What changed in this version}
 \begin{itemize}
-  \item \textbf{Dataset v4.1} (deadtrees v4.1 mortality maps): 104 sites, 381 site-years, 2020--2025:
-        ENF 50, DBF 30, WET 8, MF 7, CSH 3, OSH 3, EBF 3. Median 4 years per site; 17 sites have a single year.
-  \item Quality control: CN-Sb1 and CN-Sb2 (two Saihanba plantations with WUE of 12--34 against a median near 3.5,
-        78\,\% of all WUE variance) and one negative-WUE site-year are excluded, as in the June QC.
+  \item \textbf{Dataset:} deadtrees v5 mortality maps (delivered 2026-10-06).
+  \item \textbf{Main learner: AutoGluon} (AutoML ensemble). XGBoost and LightGBM (Optuna-tuned) are in the Appendix as a check.
+  \item \textbf{Statistics:} the effect of mortality is now tested on \textbf{MAE} with paired permutation tests and a
+        paired bootstrap that also uses every site-year as an observation (Tables~\ref{tab:t1}, \ref{tab:t2}).
 \end{itemize}
 
 \section*{Results}
+
+\textbf{Figure 1: Sites and EFP distributions}
+\begin{itemize}
+  \item \textbf{101 sites, 361 site-years}, 2020--2025, tree cover $\geq$ 30\,\%:
+        ENF 49, DBF 30, MF 7, WET 6, EBF 3, CSH 3, OSH 2, WSA 1. Median 4 years per site; 17 sites have a single year.
+  \item Quality control: CN-Sb1 and CN-Sb2 (two Saihanba plantations with extreme WUE) and one negative-WUE
+        site-year are excluded.
+\end{itemize}
 \begin{center}\includegraphics[width=\linewidth]{figures/fig1_site_map.png}\end{center}
 
-\textbf{Figure 2: Does mortality reduce error? (climate + traits $\rightarrow$ climate + traits + mortality)}
+\textbf{Model skill (AutoGluon)}
 \begin{itemize}
-  \item Four configurations per EFP (XGBoost and LightGBM, both Optuna-tuned; 12- and 24-month windows),
-        repeated leave-one-site-out CV.
-  \item \textbf{Carbon fluxes: yes, consistently.} GPP$_{sat}$ significant in \textbf{4 of 4} configurations
-        (median $-6.0$\,\%, range $-7.7$ to $-5.2$, 60--64\,\% of sites improve); NEP$_{max}$ \textbf{4 of 4}
-        (median $-11.5$\,\%, range $-12.8$ to $-10.2$, 70--74\,\% of sites improve).
-  \item \textbf{ET$_{max}$: small.} $-1.2$ to $-3.0$\,\%, significant only for LightGBM 12\,m (1 of 4).
-  \item \textbf{WUE: small and variable.} $-2.5$ to $-8.2$\,\%, significant only for XGBoost 24\,m (1 of 4).
-  \item \textbf{Both learners agree} within about 2 percentage points; 12 vs 24\,months makes no systematic difference.
-  \item \textbf{High-mortality sites} (Fig.~2b; 21 sites whose maximum total mortality, averaged over the
-        five buffers 100--500\,m, exceeds 25.0\,\% = mean + 0.5\,SD): the gain roughly doubles ---
-        GPP$_{sat}$ $-10.3$ to $-15.5$\,\% (76--86\,\% of sites improve), NEP$_{max}$ $-16.5$ to $-19.7$\,\%
-        (86--95\,\%), ET$_{max}$ $-2.9$ to $-5.3$\,\%, WUE significant only for XGBoost 12\,m ($-8.3$\,\%).
-  \item Table~\ref{tab:fig2_dRMSE_total_mort_v41} summarises all sites, Mid + High and High sites in one place,
-        including AutoGluon.
-  \item Site classes now use the \textbf{mean of the five nested buffers} rather than 500\,m only: the 100\,m
-        circle lies inside all five, so the mean weights the area nearest the tower most, like a flux footprint.
-        With 500\,m alone and 100\,m alone, about a third of the high-mortality sites differ.
-  \item \decide{site classes from the buffer mean (main) with 500\,m and 100\,m versions in the supplement?}
-\end{itemize}
-
-\begin{center}\includegraphics[width=\linewidth]{figures/fig2_mortality_effect.png}\\[2pt]
-{\small \textbf{Fig.\ 2a} --- all 104 sites}\end{center}
-\begin{center}\includegraphics[width=\linewidth]{figures/fig2_high_total_mort_mortality_effect.png}\\[2pt]
-{\small \textbf{Fig.\ 2b} --- high total-mortality sites only (21 sites; models trained on all sites)}\end{center}
-\begin{center}\includegraphics[width=\linewidth]{figures/fig_site_dRMSE_total_mort.png}\\[2pt]
-{\small \textbf{Fig.\ 2c} --- per-site $\Delta$RMSE, bars coloured by total-mortality class (Low / Mid / High)}\end{center}
-
-\input{tables/table_fig2_dRMSE_total_mort_v41}
-
-\section*{Figure 3: Direction of the mortality effect at each site (signed SHAP)}
-\begin{itemize}
-  \item C+T+M model, per site the \textbf{net signed SHAP of the mortality block} (sum over the mortality predictors,
-        averaged over the site's years, response units). Landscape layout: sites along the horizontal axis (highest
-        total mortality on the left), the four EFPs stacked as rows, each site code written once at the bottom. Sites sorted by their
-        maximum \textbf{total mortality} (mean of the five buffers), bars coloured by it; dashed lines =
-        the Low / Mid / High breaks (12.4\,\% and 25.0\,\%). Below zero = the model predicts a \emph{lower} EFP
-        at that site because of its mortality values.
-  \item Shown for \textbf{LightGBM--Optuna}, 24-month window; the 12-month window and the XGBoost--Optuna version
-        are in the Appendix.
-        Only total mortality is shown; absolute deadwood and relative deadwood are dropped from the draft.
-  \item \textbf{The sign follows the mortality class.} Share of sites with a negative contribution
-        (LightGBM, 24\,m): GPP$_{sat}$ 15\,\% of Low, 70\,\% of Mid, 81\,\% of High sites; NEP$_{max}$ 18 / 70 / 81\,\%;
-        WUE 12 / 56 / 81\,\%; ET$_{max}$ 22 / 53 / 81\,\%. XGBoost and the 12\,m window give the same picture
-        (High 71--86\,\% negative, Low 10--30\,\%).
-  \item \textbf{Size:} for the carbon fluxes the push reaches $-2$ to $-6$\,$\mu$mol\,m$^{-2}$\,s$^{-1}$ at the most
-        sites with the highest mortality and $+2$ to $+4$ at sites with little mortality; ET$_{max}$ contributions are tiny
-        ($\pm$0.02\,mm\,d$^{-1}$).
-  \item For reference, the overall importance (share of mean $|$SHAP$|$, XGBoost and LightGBM): mortality
-        27\,\% (GPP$_{sat}$), 29\,\% (NEP$_{max}$), 16\,\% (ET$_{max}$), 28\,\% (WUE); climate dominates ET$_{max}$
-        (56\,\%) and WUE (59\,\%), traits NEP$_{max}$ (39\,\%).
-  \item \decide{show one learner or both?}
-\end{itemize}
-
-\begin{sidewaysfigure}
-\centering
-\includegraphics[width=\linewidth]{figures/fig3b_signed_total_mort_24m_LGB_landscape.png}\\[2pt]
-{\small \textbf{Fig.\ 3} --- Net signed mortality SHAP per site, C+T+M model, 24\,m, LightGBM--Optuna; sites sorted and
-coloured by total mortality (mean of the five buffers).}
-\end{sidewaysfigure}
-
-\textbf{Figure 4: Does the direction differ between High and Low+Mid sites?} (signed SHAP)
-\begin{itemize}
-  \item Earlier versions of this figure used $|$SHAP$|$, which says how much the mortality block
-        matters but not which way it acts. Here SHAP is recomputed keeping the \textbf{sign}: per
-        site-year we sum the signed SHAP across the mortality predictors (70 for 12\,m, 105 for 24\,m) --- the block's net push
-        on the prediction, in response units --- and average over the site's years.
-        \textbf{Below zero means the model predicts a LOWER value of the EFP at that site} --- not
-        that it predicts less accurately. Accuracy is Figure 2, where negative $\Delta$RMSE means
-        \emph{less error}; here negative means \emph{lower predicted carbon uptake}. C+T+M model, natural-breaks thresholds,
-        Low+Mid vs High, both Optuna learners, both windows.
-  \item Classes: site maximum of the metric, mean of the five buffers; High $>$ mean + 0.5\,SD
-        (total mortality: 21 High vs 83 Low+Mid; relative deadwood: 23 vs 81). Mann--Whitney U between
-        the two groups, BH-FDR across the figure.
-  \item \textbf{A clear dose--response.} At \textbf{High}-mortality sites the block pushes predicted
-        carbon uptake \emph{down}; at \textbf{Low+Mid} sites it pushes it slightly \emph{up}
-        (relative to the average site).
-  \item GPP$_{sat}$ (total mortality): High $-1.76$ to $-2.32$, Low+Mid $+0.28$ to $+0.60$
-        $\mu$mol\,m$^{-2}$\,s$^{-1}$, $q<0.001$ in all four configurations.
-  \item NEP$_{max}$: High $-1.35$ to $-1.59$, Low+Mid $+0.15$ to $+0.44$; WUE: High $-0.20$ to $-0.31$,
-        Low+Mid $+0.11$ g\,C\,mm$^{-1}$; all $q<0.001$.
-  \item \textbf{ET$_{max}$:} the shift is tiny ($-0.003$ to $-0.006$\,mm\,d$^{-1}$) but significant for total
-        mortality in all four configurations; for relative deadwood only in 1 of 4.
-  \item Overall 16 of 16 tests significant for total mortality, 13 of 16 for relative deadwood, and the sign
-        never disagrees between learners or windows.
-  \item \textbf{Read with Figure 2:} mortality improves accuracy (Figure 2) by lowering predictions at
-        damaged sites. Note that sites are grouped by the same variables whose contribution is measured, so
-        the test confirms that the learned relationship is consistent; the direction and size are the
-        informative part.
-  \item The V10 check against \emph{observed} GPP$_{sat}$ (sites pushed down have lower observed
-        productivity) has not been redone for v4.1 yet.
-  \item \decide{one window in the main text and the other in the supplement?}
-\end{itemize}
-
-\begin{center}
-\includegraphics[width=\linewidth]{figures/fig4_signed_shap_rel_deadwood.png}\\[2pt]
-{\small \textbf{Fig.\ 4a} --- split by \textbf{relative deadwood}}
-\end{center}
-\begin{center}
-\includegraphics[width=\linewidth]{figures/fig4_signed_shap_total_mort.png}\\[2pt]
-{\small \textbf{Fig.\ 4b} --- split by \textbf{total mortality}}
-\end{center}
-
-\textbf{Does it depend on ecosystem type or tree cover?}
-\begin{itemize}
-  \item XGBoost--Optuna, C+T+M model, both windows. \textbf{A} $\Delta$RMSE by IGBP, \textbf{B} net signed mortality
-        SHAP by IGBP, \textbf{C} tree cover vs benefit, \textbf{D} tree cover vs direction,
-        \textbf{E} total mortality (mean of the five buffers) vs direction. C/D/E: linear fit with a
-        Spearman test per panel, BH-FDR across the board.
-  \item \textbf{Panel C (benefit):} no relationship with tree cover ($\rho$ = 0.05--0.20).
-  \item \textbf{Panel D (direction vs tree cover):} strong and positive for every EFP and window,
-        $\rho$ = +0.46 to +0.71, all $p<0.001$ --- at low tree cover mortality pulls predicted carbon uptake
-        \emph{down}, at high tree cover it pushes it \emph{up}; the linear fit crosses zero near 68\,\% cover
-        (GPP$_{sat}$, 12\,m).
-  \item \textbf{Panel E (direction vs mortality):} stronger still and negative, $\rho = -0.39$ to $-0.75$,
-        all $p<0.001$ (GPP$_{sat}$ $-0.74$, NEP$_{max}$ $-0.73$, WUE $-0.68$, ET$_{max}$ $-0.43$ at 12\,m).
-        More mortality, lower predicted carbon uptake --- the more direct version of Panel D.
-  \item \textbf{Panel B by class} (median net signed SHAP, GPP$_{sat}$, 12\,m): OSH $-3.57$ ($n$=3), WET $-2.98$ (8),
-        CSH $-2.35$ (3), ENF $-0.77$ (50), MF $+0.58$ (7), EBF $+0.86$ (3), DBF $+1.80$ (30).
-        Unlike V10, ENF is now slightly negative.
-  \item \textbf{So:} the \emph{magnitude} of the benefit does not depend on tree cover or ecosystem type; the
-        \emph{direction} does, and it tracks mortality more closely than vegetation class.
-  \item \textbf{Caveats.} OSH, CSH and EBF have only 3 sites each and WET 8; the correlations use all 104 sites.
-  \item \decide{does this change the framing from "functional, not ecosystem-specific" to a
-        direction-vs-magnitude distinction?}
-  \item \decide{drop the $n\leq3$ IGBP classes from panels A and B, or keep them with a caveat?}
-\end{itemize}
-
-\begin{center}
-\includegraphics[width=0.82\linewidth]{figures/fig5_igbp_board_12m.png}\\[2pt]
-{\small \textbf{Fig.\ 5a} --- XGBoost--Optuna, C+T+M model, \textbf{12\,m} window}
-\end{center}
-\begin{center}
-\includegraphics[width=0.82\linewidth]{figures/fig5_igbp_board_24m.png}\\[2pt]
-{\small \textbf{Fig.\ 5b} --- XGBoost--Optuna, C+T+M model, \textbf{24\,m} window}
-\end{center}
-
-
-
-
-\section*{AutoML check: does an automated model search change the picture? (AutoGluon)}
-\begin{itemize}
-  \item Suggested by the supervisor: instead of choosing the learner by hand, AutoGluon-Tabular trains nine model
-        families (LightGBM, CatBoost, XGBoost, random forest, extra trees, two neural networks) and combines them in a
-        weighted ensemble, with all choices made on site-disjoint folds. Same data, predictors, windows and
-        repeated leave-one-site-out CV; AutoGluon is rerun inside every fold, so model selection never sees the
-        held-out site.
-  \item \textbf{Skill:} AutoGluon is best in 15 of 16 tasks; mean $R^2$ 0.471 vs 0.434 (XGBoost) and 0.438
-        (LightGBM) for C+T+M, 12\,m (Table~\ref{tab:automl_r2}). The gain is largest for GPP$_{sat}$ and NEP$_{max}$
-        ($\approx$+0.05); ET$_{max}$ is a tie.
-  \item \textbf{What it chooses:} mainly the two neural networks (mean ensemble weight 0.48 and 0.30); tree models
-        get little weight.
-  \item \textbf{Same conclusion on mortality} (Fig.~6a): median per-site change in RMSE $-3.1$ to $-4.9$\,\%
-        (GPP$_{sat}$), $-8.8$ to $-11.3$\,\% (NEP$_{max}$), $-0.8$ to $-1.7$\,\% (ET$_{max}$), $-2.1$ to $-5.6$\,\% (WUE);
-        smaller per site than for the tree learners, although overall RMSE drops by 7--13\,\% for the carbon fluxes.
-  \item \textbf{But a weaker high-mortality signal} (Fig.~6b): at the 21 high-mortality sites only NEP$_{max}$ stays
-        significant for AutoGluon ($-17$ to $-18$\,\%); the tree learners capture the high-mortality sites better.
-  \item \textbf{SHAP:} only permutation SHAP is possible for a neural-network ensemble (approximate, different
-        baseline). It gives mortality a larger share (23--38\,\%) and traits a smaller one; its mean signed
-        mortality contribution has the opposite sign for GPP$_{sat}$/NEP$_{max}$, which is most likely the
-        baseline definition and still needs checking.
-  \item 12 vs 24\,months: no meaningful difference for any learner.
-  \item \decide{XGBoost/LightGBM as main model (exact TreeSHAP) and AutoGluon as robustness check?}
+  \item Repeated leave-one-site-out CV, $R^2$ of climate + traits (C+T) and climate + traits + mortality (C+T+M):
+        adding mortality raises the mean $R^2$ from \textbf{0.349 to 0.402} (12\,months) and from \textbf{0.351 to 0.408}
+        (24\,months) (Table~\ref{tab:r2}).
+  \item Largest gain for NEP$_{max}$ (+0.11), then WUE (+0.06) and GPP$_{sat}$ (+0.04--0.05); ET$_{max}$ unchanged.
+  \item Overall error change when mortality is added: MAE $-11.8$ / $-10.8$\,\% (NEP$_{max}$, 12 / 24\,m),
+        $-4.1$ / $-5.7$\,\% (GPP$_{sat}$), $-4.3$ / $-4.7$\,\% (WUE), $-1.3$ / $-2.0$\,\% (ET$_{max}$).
+  \item AutoGluon is slightly better than XGBoost and LightGBM on average (best in 7 of 16 tasks; Table~\ref{tab:a_r2}).
 \end{itemize}
 
 \begin{table}[htbp]
 \centering
-\caption{Skill of the C+T+M model under repeated leave-one-site-out CV ($R^2$). XGBoost and LightGBM are Optuna-tuned;
-AutoGluon is the weighted ensemble rebuilt inside every fold. Bottom rows: mean over the four EFPs for both models.}
-\label{tab:automl_r2}
+\caption{AutoGluon skill under repeated leave-one-site-out CV ($R^2$), without (C+T) and with mortality (C+T+M).}
+\label{tab:r2}
 \footnotesize
 \begin{tabular}{lcccccc}
 \toprule
  & \multicolumn{3}{c}{12 months} & \multicolumn{3}{c}{24 months} \\
 \cmidrule(lr){2-4}\cmidrule(lr){5-7}
-EFP & XGBoost & LightGBM & AutoGluon & XGBoost & LightGBM & AutoGluon \\
+EFP & C+T & C+T+M & $\Delta$ & C+T & C+T+M & $\Delta$ \\
 \midrule
-GPP$_\mathrm{sat}$ & 0.403 & 0.415 & \textbf{0.469} & 0.421 & 0.420 & \textbf{0.465} \\
-NEP$_\mathrm{max}$ & 0.531 & 0.528 & \textbf{0.583} & 0.524 & 0.534 & \textbf{0.588} \\
-ET$_\mathrm{max}$ & 0.446 & \textbf{0.451} & 0.443 & 0.433 & 0.449 & \textbf{0.453} \\
-WUE & 0.355 & 0.359 & \textbf{0.390} & 0.393 & 0.377 & \textbf{0.411} \\
+GPP$_\mathrm{sat}$ & 0.330 & 0.367 & +0.037 & 0.317 & 0.370 & +0.053 \\
+NEP$_\mathrm{max}$ & 0.391 & 0.503 & +0.112 & 0.394 & 0.502 & +0.108 \\
+ET$_\mathrm{max}$  & 0.423 & 0.425 & +0.002 & 0.429 & 0.433 & +0.004 \\
+WUE                & 0.252 & 0.312 & +0.060 & 0.264 & 0.326 & +0.062 \\
 \midrule
-Mean, C+T+M & 0.434 & 0.438 & \textbf{0.471} & 0.443 & 0.445 & \textbf{0.479} \\
-Mean, C+T & 0.358 & 0.359 & \textbf{0.395} & 0.361 & 0.374 & \textbf{0.404} \\
+Mean               & 0.349 & 0.402 & +0.053 & 0.351 & 0.408 & +0.057 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\begin{center}\includegraphics[width=\linewidth]{figures/ag_fig2_mortality_effect.png}\\[2pt]
-{\small \textbf{Fig.\ 6a} --- Figure 2 with AutoGluon as third learner, all sites}\end{center}
-\begin{center}\includegraphics[width=\linewidth]{figures/ag_fig2_high_total_mort_mortality_effect.png}\\[2pt]
-{\small \textbf{Fig.\ 6b} --- the same, high total-mortality sites only (21 sites)}\end{center}
+\textbf{Figure 2 and Tables~\ref{tab:t1}--\ref{tab:t2}: Does mortality reduce the prediction error?}
+\begin{itemize}
+  \item \textbf{NEP$_{max}$: yes, robustly.} Mortality lowers the MAE by about 8--12\,\% across all sites and by
+        17--32\,\% at high-mortality sites and years. Significant in all bootstrap columns at 12\,m and in all but
+        the High-site column at 24\,m; in the log-ratio test significant at 12\,m only (24\,m: same direction, $-8$ to $-17$\,\%).
+  \item \textbf{GPP$_{sat}$: smaller} ($-4$ to $-9$\,\%), significant at the Mid + High sites and at site level.
+  \item \textbf{WUE: only where mortality happened.} Across all sites $\pm$0--5\,\%; at high-mortality sites and in
+        high-mortality years $-11$ to $-22$\,\%, significant in the bootstrap (Table~\ref{tab:t2}).
+  \item \textbf{ET$_{max}$: small} ($-1$ to $-6$\,\% across all sites, up to $-12$\,\% at High sites and in high-mortality
+        years), significant only in a few 24\,m cells.
+  \item \textbf{Table~\ref{tab:t1}} (site level): per-site MAE ratio, paired sign-flip permutation test on the log ratios.
+        The log ratio stops sites with an almost perfect C+T prediction from dominating, which happened with the
+        mean of per-site \% changes (one-year sites, e.g.\ +275\,\% at KR-Kw1 from a tiny absolute change).
+  \item \textbf{Table~\ref{tab:t2}} (paired bootstrap): at the \textbf{site-year level} every year is its own
+        observation, so years without mortality do not dilute the years with mortality. Whole sites are resampled and
+        permuted, because the years of one site are not independent.
+  \item \textbf{The effect is largest in the years when mortality happened:} NEP$_{max}$ MAE $-29$ to $-32$\,\% in
+        high-mortality years vs $-11$ to $-12$\,\% over all site-years; WUE $-17$ to $-22$\,\% vs $-4$ to $-5$\,\%.
+  \item The bootstrap intervals and the permutation tests agree: every significant cell has its 95\,\% interval
+        entirely below zero.
+  \item Robustness: the same picture with RMSE (Tables~\ref{tab:a1}, \ref{tab:a2}), with XGBoost and LightGBM
+        (Tables~\ref{tab:a3}, \ref{tab:a4}), when weighting sites by their number of years, and when dropping the
+        one-year sites. Keeping only sites with $\geq$3 years removes about a quarter of the High sites (22 $\rightarrow$ 16); NEP$_{max}$ still
+        improves but fewer cells stay significant.
+  \item Fig.~2 shows the per-site RMSE distributions with the median change and a paired Wilcoxon test (Wilcoxon asks
+        whether most sites improve; it is more liberal than the permutation test).
+  \item \decide{Fig.~2: switch to MAE and the permutation test, so the figure matches Tables~\ref{tab:t1}--\ref{tab:t2}?}
+  \item \decide{main statistic: site-level log-ratio permutation (Table~\ref{tab:t1}) or site-year bootstrap (Table~\ref{tab:t2})?}
+\end{itemize}
+
+\begin{center}\includegraphics[width=0.62\linewidth]{figures/fig2_AG.png}\\[2pt]
+{\small \textbf{Fig.\ 2a} --- per-site RMSE without (cyan) and with mortality (pink), AutoGluon, all 101 sites;
+\% = median paired change, stars = one-sided paired Wilcoxon (BH-FDR), \%$\downarrow$ = share of sites improved.}\end{center}
+
+\begin{center}\includegraphics[width=0.62\linewidth]{figures/fig2b_high_AG.png}\\[2pt]
+{\small \textbf{Fig.\ 2b} --- the same, high total-mortality sites only (22 sites; models trained on all sites).
+NEP$_{max}$ $-20$ / $-12$\,\%, WUE $-8$ / $-9$\,\%, ET$_{max}$ $-6$ / $-9$\,\% (12 / 24\,m).}\end{center}
+
+\begin{center}\includegraphics[width=0.7\linewidth]{figures/fig2c_site_dRMSE_AG.png}\\[2pt]
+{\small \textbf{Fig.\ 2c} --- per-site $\Delta$RMSE, AutoGluon, bars coloured by total-mortality class.
+The largest improvements are at High sites (pink) for GPP$_{sat}$ and NEP$_{max}$.}\end{center}
+
+\input{tables/table1_dMAE_AG}
+\input{tables/table2_bootstrap_dMAE_AG}
+
+\clearpage
+\section*{Figure 3: Direction of the mortality effect at each site (signed SHAP)}
+\begin{itemize}
+  \item C+T+M model, per site the \textbf{net signed SHAP of the mortality block} (sum over the mortality predictors,
+        averaged over the site's years, response units). Sites sorted by their maximum \textbf{total mortality} (mean
+        of the five buffers), highest on the left; dashed lines = Low / Mid / High breaks (10.6\,\% and 24.0\,\%).
+        Below zero = the model predicts a \emph{lower} EFP at that site because of its mortality values.
+  \item AutoGluon, 24-month window; the 12-month window and XGBoost / LightGBM are in the Appendix.
+  \item \textbf{The sign follows the mortality class.} Share of sites with a negative contribution (24\,m), Low / Mid / High:
+        GPP$_{sat}$ 7 / 66 / 86\,\%; NEP$_{max}$ 10 / 68 / 91\,\%; WUE 2 / 58 / 86\,\%; ET$_{max}$ 24 / 50 / 77\,\%.
+        The 12-month window gives the same picture.
+  \item \textbf{Size:} median $-2.1$ (GPP$_{sat}$) and $-1.5$ (NEP$_{max}$) $\mu$mol\,m$^{-2}$\,s$^{-1}$ at High
+        sites, $+1.4$ and $+1.2$ at Low sites; ET$_{max}$ contributions are tiny ($\pm$0.005\,mm\,d$^{-1}$).
+  \item Overall importance (share of mean $|$SHAP$|$, C+T+M): mortality 24\,\% (GPP$_{sat}$), 28\,\% (NEP$_{max}$),
+        16\,\% (ET$_{max}$), 23\,\% (WUE); climate 52--66\,\%; traits 11--20\,\%.
+\end{itemize}
+
+\begin{sidewaysfigure}
+\centering
+\includegraphics[width=\linewidth]{figures/fig3_signed_24m_AG.png}\\[2pt]
+{\small \textbf{Fig.\ 3} --- Net signed mortality SHAP per site, C+T+M model, 24\,m, AutoGluon; sites sorted and
+coloured by total mortality (mean of the five buffers).}
+\end{sidewaysfigure}
+
+\textbf{Figure 4: Does the direction differ between High and Low+Mid sites?} (signed SHAP)
+\begin{itemize}
+  \item Per site-year we sum the signed SHAP across the mortality predictors --- the block's net push on the
+        prediction, in response units --- and average over the site's years. \textbf{Below zero means the model
+        predicts a LOWER value of the EFP} (not that it predicts less accurately). Accuracy is Figure 2.
+  \item Classes: site maximum of total mortality (mean of the five buffers); High $>$ mean + 0.5\,SD (22 High vs 79
+        Low+Mid). Mann--Whitney U between the two groups, BH-FDR across the figure.
+  \item \textbf{A clear dose--response.} At \textbf{High}-mortality sites the block pushes predicted carbon uptake
+        \emph{down}; at \textbf{Low+Mid} sites slightly \emph{up} (relative to the average site).
+  \item GPP$_{sat}$: High $-1.83$ / $-2.15$, Low+Mid $+0.47$ / $+0.66$ $\mu$mol\,m$^{-2}$\,s$^{-1}$ (12 / 24\,m);
+        NEP$_{max}$: High $-1.61$ / $-1.51$, Low+Mid $+0.37$ / $+0.51$; WUE: High $-0.22$ / $-0.24$, Low+Mid
+        $+0.07$ g\,C\,mm$^{-1}$; ET$_{max}$: tiny ($-0.003$ / $-0.005$\,mm\,d$^{-1}$). All 8 tests $q<0.001$.
+  \item Split by relative deadwood instead (Appendix): the same for GPP$_{sat}$, NEP$_{max}$ and WUE; ET$_{max}$ not significant.
+  \item \textbf{Read with Figure 2:} mortality improves accuracy by lowering predictions at damaged sites. Sites are
+        grouped by the same variables whose contribution is measured, so the test confirms that the learned
+        relationship is consistent; the direction and size are the informative part.
+\end{itemize}
+
+\begin{center}
+\includegraphics[width=0.48\linewidth]{figures/fig4_total_mort_AG.png}\\[2pt]
+{\small \textbf{Fig.\ 4} --- net signed mortality SHAP, Low+Mid vs High total-mortality sites, AutoGluon.}
+\end{center}
+
+\textbf{Figure 5: Does it depend on ecosystem type or tree cover?}
+\begin{itemize}
+  \item AutoGluon, C+T+M model, 24\,months. \textbf{A} $\Delta$RMSE by IGBP, \textbf{B} net signed mortality SHAP by
+        IGBP, \textbf{C} tree cover vs benefit, \textbf{D} tree cover vs direction, \textbf{E} total mortality vs
+        direction. C/D/E: linear fit with a Spearman test per panel, BH-FDR across the board.
+  \item \textbf{Panel C (benefit):} no relationship with tree cover ($\rho$ = 0.10--0.18, n.s.).
+  \item \textbf{Panel D (direction vs tree cover):} strong and positive, $\rho$ = +0.66 to +0.75, all $p<0.001$ ---
+        at low tree cover mortality pulls predicted carbon uptake \emph{down}, at high tree cover it pushes it \emph{up}.
+  \item \textbf{Panel E (direction vs mortality):} stronger still and negative, $\rho$ = $-0.81$ (GPP$_{sat}$),
+        $-0.83$ (NEP$_{max}$), $-0.78$ (WUE), $-0.47$ (ET$_{max}$), all $p<0.001$.
+  \item \textbf{Panel B:} DBF, EBF and MF mostly positive, CSH, OSH and WET negative, ENF slightly negative.
+  \item \textbf{So:} the \emph{magnitude} of the benefit does not depend on tree cover or ecosystem type; the
+        \emph{direction} does, and it tracks mortality more closely than vegetation class.
+  \item \textbf{Caveats.} OSH has 2 sites, WSA 1, CSH and EBF 3 each, WET 6; the correlations use all 101 sites.
+  \item \decide{drop the IGBP classes with $\leq$3 sites from panels A and B, or keep them with a caveat?}
+\end{itemize}
+
+\begin{center}
+\includegraphics[width=0.82\linewidth]{figures/fig5_igbp_24m_AG.png}\\[2pt]
+{\small \textbf{Fig.\ 5} --- AutoGluon, C+T+M model, 24\,m window (12\,m in the Appendix).}
+\end{center}
+
+\textbf{Figure 6: Which mortality metrics does the model use?}
+\begin{itemize}
+  \item Share of the mortality block's mean $|$SHAP$|$ per metric (C+T+M, mean over sites). AutoGluon:
+        total mortality 26\,\%, relative deadwood 24\,\%, relative tree-cover loss 22\,\%, absolute deadwood 16\,\%,
+        deadwood gain 12\,\%. For ET$_{max}$ tree-cover loss leads (32\,\%).
+  \item \textbf{The metrics are largely interchangeable.} Drop-column test (XGBoost and LightGBM retrained without
+        each metric, Appendix Fig.~A9): removing any single metric changes the error by at most about 1\,\%, because the
+        correlated metrics take over (total mortality vs relative deadwood $\rho$ = 0.91).
+  \item \textbf{Total mortality alone carries most of the effect:} added alone to C+T it gives 6.7--7.1\,\% of the
+        7.6--8.9\,\% NEP$_{max}$ error reduction of the full block.
+  \item Absolute deadwood gets 14--16\,\% of the SHAP but adds nothing when removed (credit borrowed from correlated metrics).
+  \item \decide{reduce the mortality block to total mortality (+ relative deadwood) for a simpler model?}
+\end{itemize}
+
+\begin{center}
+\includegraphics[width=0.8\linewidth]{figures/fig6_mortality_block_AG.png}\\[2pt]
+{\small \textbf{Fig.\ 6} --- mortality block metric by metric, AutoGluon (bars $\pm$ SE over sites).}
+\end{center}
 
 \section*{Discussions}
 
  \begin{itemize}
         \item Canopy mortality informs carbon uptake, not water partitioning
+        \item The effect is concentrated in the years and sites where mortality happened
         \item The effect is functional, not ecosystem-specific
         \item Site-level heterogeneity and its interpretation
         \item Limitations
@@ -253,87 +233,152 @@ Mean, C+T & 0.358 & 0.359 & \textbf{0.395} & 0.361 & 0.374 & \textbf{0.404} \\
 \section*{Conclusions}
 \section*{Methods}
 \begin{itemize}
-  \item \textbf{Dataset (v4.1):} deadtrees v4.1 mortality maps, FLUXNET EFPs (GPP$_{sat}$, NEP$_{max}$ following
+  \item \textbf{Dataset:} deadtrees v5 mortality maps, FLUXNET EFPs (GPP$_{sat}$, NEP$_{max}$ following
         Migliavacca et al.\ 2021, ET$_{max}$, WUE), Lusk et al.\ 2025 trait maps (1\,km). Tree cover $\geq$30\,\%
-        (500\,m, site mean), EFPs in runs of $\geq$2 consecutive years, 2016 excluded, CN-Sb1/2 removed by QC:
-        \textbf{104 sites, 381 site-years}.
-  \item \textbf{Models shown:} \textbf{climate + traits} vs \textbf{climate + traits + mortality} only.
-        The pair differs solely by the mortality block, so it isolates its contribution.
-  \item \textbf{Learners:} XGBoost and LightGBM, \textbf{both tuned with Optuna} (TPE, 50 trials per response and
-        window, grouped 5-fold CV on disjoint site groups). AutoGluon-Tabular 1.6 as an AutoML check (default model
-        zoo, 5-fold site-grouped bagging, weighted ensemble, no stacking).
+        (500\,m, site mean), EFPs in runs of $\geq$2 consecutive years, CN-Sb1/2 removed by QC:
+        \textbf{101 sites, 361 site-years}.
+  \item \textbf{Models:} \textbf{climate + traits (C+T)} vs \textbf{climate + traits + mortality (C+T+M)}.
+        The pair differs only by the mortality block, so it isolates its contribution.
+  \item \textbf{Learner: AutoGluon-Tabular 1.6} (default model zoo: LightGBM, CatBoost, XGBoost, random forest, extra
+        trees, two neural networks; weighted ensemble; 5-fold bagging on site-disjoint folds; no stacking). AutoGluon
+        is refitted inside every cross-validation fold, so model selection never sees the held-out site. The ensemble
+        is dominated by the two neural networks (mean weights 0.43 and 0.32).
+  \item \textbf{Check learners (Appendix):} XGBoost and LightGBM, each tuned with Optuna (TPE, 50 trials per
+        response and window, grouped 5-fold CV on disjoint site groups).
   \item \textbf{Windows:} climate strictly before the growing season --- 12 months (lag 1) or 24 months (lag 1 + lag 2)
         ending the month before season start; mortality of the current year plus lag 1 (12\,m) or lag 1 + lag 2 (24\,m).
-  \item \textbf{Cross-validation:} repeated leave-one-site-out (3 $\times$ 80\,\% of the remaining sites per held-out site).
-  \item \textbf{Mortality predictors:} all metrics at all five buffers (100--500\,m). \textbf{Site classes} in the figures
-        use the mean of the five buffers (site maximum across years; breaks mean $\pm$ 0.5\,SD).
-  \item \textbf{Mortality metrics}: For visualisation and thresholding we define three mortality metrics, each computed within five buffers (100, 200, 300, 400, 500\,m) around the tower from the deadtrees v4.1 deadwood / tree-cover maps; the models use all buffers, the figures classify sites by the mean of the five:
-
-\textbf{Absolute deadwood}
-Standing deadwood cover as a percentage of the total buffer area — the absolute amount of dead canopy.
-absolute deadwood = deadwood / area × 100 (\%)
-\\
-\textbf{Relative deadwood}
-Deadwood relative to tree cover, what \% of the standing trees are currently dead (defined where tree cover $\geq$ 10 \%, capped at 100 \%).
-
-relative deadwood = deadwood / tree cover × 100 (\%)
-\\
-\textbf{Total mortality}
-Combines standing deadwood and tree-cover loss relative to forest plus loss — captures both dead-standing and removed/lost canopy.
-
-total mortality = (deadwood + loss×100) / (forest + loss×100) × 100 (\%)
- 
-\end{itemize}
-
-
-
-
-%%%%%%%%%%%%%%%%%
-
-
-
-
-
-
-    \begin{itemize}
-        \item Study sites and data selection
-        \item Ecosystem functional properties
-        \item Predictor blocks
-        \item Model configurations
-        \item Model training and tunings
-        \item Cross validation 
-        \item Statistical analysis: Statistics: one-sided paired Wilcoxon signed-rank on per-site RMSE, sites as the unit of replication, Benjamini--Hochberg FDR within each figure. Effect size is the \emph{median of the paired per-site
-        differences}, not the difference of medians, the two disagree in sign for some comparisons. Violin y-axes are zoomed to the 95th percentile for readability; no data are removed and all statistics
-        use every site.
-        \item Variable importance 
-        \item Full V10 results are in the interactive report (not yet rebuilt for v4.1):
+  \item \textbf{Cross-validation:} repeated leave-one-site-out (3 $\times$ 80\,\% of the remaining sites per
+        held-out site; predictions averaged over the three repetitions).
+  \item \textbf{Mortality predictors:} absolute deadwood, relative deadwood, deadwood gain, relative tree-cover loss
+        and total mortality, each at five buffers (100, 200, 300, 400, 500\,m) and the lags above.
+  \item \textbf{Site classes} in the figures: site maximum of total mortality across years, mean of the five buffers;
+        breaks mean $\pm$ 0.5\,SD (Low $<$ 10.6\,\%, High $>$ 24.0\,\%; 41 Low, 38 Mid, 22 High).
+  \item \textbf{Mortality metrics} (from the deadtrees v5 deadwood / tree-cover maps, per buffer):
+        \begin{itemize}
+          \item \textbf{Absolute deadwood} = standing deadwood / buffer area $\times$ 100 (\%).
+          \item \textbf{Relative deadwood} = standing deadwood / tree cover $\times$ 100 (\%), where tree cover $\geq$ 10\,\%, capped at 100\,\%.
+          \item \textbf{Total mortality} = (deadwood + tree-cover loss) / (tree cover + tree-cover loss) $\times$ 100 (\%):
+                standing dead and removed canopy relative to the canopy present.
+        \end{itemize}
+  \item \textbf{SHAP:} permutation SHAP for AutoGluon (model-agnostic, approximate); exact TreeSHAP for XGBoost and
+        LightGBM. Compare shares and signs between learners, not magnitudes.
+  \item \textbf{Statistics:}
+        \begin{itemize}
+          \item \emph{Site level} (Table~\ref{tab:t1}): per-site MAE (RMSE) over the site's years; one-sided paired
+                sign-flip permutation test on the per-site log error ratios (100\,000 flips); effect size =
+                geometric-mean change.
+          \item \emph{Paired bootstrap} (Table~\ref{tab:t2}): sites resampled with replacement (10\,000 draws, 95\,\%
+                percentile interval); at site level the ratio of the mean site errors, at site-year level the ratio of
+                the pooled errors over all site-years. Paired permutation with the C+T / C+T+M labels swapped per
+                site (all years of a site together).
+          \item Fig.~2: one-sided paired Wilcoxon on per-site RMSE (median change). Fig.~4: Mann--Whitney U.
+                Fig.~5: Spearman. Benjamini--Hochberg FDR within each table / figure.
+        \end{itemize}
+  \item Interactive report with all learners and datasets:\\
         \url{https://negin-katal.github.io/fluxVSmortality/v10/index.html}
-    
-    \end{itemize}
-
-
-\section*{Appendix: Figure 3, 12-month window and XGBoost--Optuna}
-\begin{itemize}
-  \item Same design as Figure 3 (C+T+M model, net signed mortality SHAP per site, sites sorted by total
-        mortality, all four EFPs): LightGBM--Optuna with the 12-month window (A0) and XGBoost--Optuna with both
-        windows (A1, A2).
 \end{itemize}
 
+\clearpage
+\section*{Appendix}
+
+\subsection*{A1. Learner comparison}
+\begin{itemize}
+  \item Same data, predictors, windows and cross-validation for all three learners.
+  \item AutoGluon best in 7 of 16 tasks; mean $R^2$ (C+T+M) 0.402 / 0.408 (12 / 24\,m) vs XGBoost 0.385 / 0.406
+        and LightGBM 0.388 / 0.400.
+  \item The effect of mortality is very similar: NEP$_{max}$ improves for every learner; overall RMSE change for
+        GPP$_{sat}$ $-2.8$ to $-4.0$\,\% for all learners; AutoGluon gives a somewhat larger WUE effect
+        ($-4$\,\% vs $-1$ to $-4$\,\%).
+\end{itemize}
+
+\begin{table}[htbp]
+\centering
+\caption{Skill of the C+T+M model under repeated leave-one-site-out CV ($R^2$), all learners. Bottom rows: mean over the four EFPs.}
+\label{tab:a_r2}
+\footnotesize
+\begin{tabular}{lcccccc}
+\toprule
+ & \multicolumn{3}{c}{12 months} & \multicolumn{3}{c}{24 months} \\
+\cmidrule(lr){2-4}\cmidrule(lr){5-7}
+EFP & AutoGluon & XGBoost & LightGBM & AutoGluon & XGBoost & LightGBM \\
+\midrule
+GPP$_\mathrm{sat}$ & \textbf{0.367} & 0.334 & 0.346 & 0.370 & \textbf{0.387} & 0.347 \\
+NEP$_\mathrm{max}$ & \textbf{0.503} & 0.473 & 0.492 & 0.502 & 0.514 & \textbf{0.540} \\
+ET$_\mathrm{max}$  & 0.425 & 0.439 & \textbf{0.443} & 0.433 & 0.447 & \textbf{0.453} \\
+WUE                & \textbf{0.312} & 0.292 & 0.270 & \textbf{0.326} & 0.277 & 0.261 \\
+\midrule
+Mean, C+T+M & \textbf{0.402} & 0.385 & 0.388 & \textbf{0.408} & 0.406 & 0.400 \\
+Mean, C+T   & \textbf{0.349} & 0.337 & 0.347 & 0.351 & \textbf{0.365} & 0.356 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{center}\includegraphics[width=\linewidth]{figures/A_fig2_all_learners.png}\\[2pt]
+{\small \textbf{Fig.\ A1} --- Fig.~2a for all three learners.}\end{center}
+\begin{center}\includegraphics[width=\linewidth]{figures/A_fig2b_high_all_learners.png}\\[2pt]
+{\small \textbf{Fig.\ A2} --- Fig.~2b (high total-mortality sites) for all three learners.}\end{center}
+\begin{center}\includegraphics[width=\linewidth]{figures/A_fig2c_site_dRMSE_all_learners.png}\\[2pt]
+{\small \textbf{Fig.\ A3} --- Fig.~2c (per-site $\Delta$RMSE) for all three learners.}\end{center}
+
+\subsection*{A2. Tables~\ref{tab:t1}--\ref{tab:t2} with RMSE and for XGBoost / LightGBM}
+\input{tables/tableA1_dRMSE_AG}
+\input{tables/tableA2_bootstrap_dRMSE_AG}
+\input{tables/tableA3_dMAE_XGBLGB}
+\input{tables/tableA4_bootstrap_dMAE_XGBLGB}
+
+\clearpage
+\subsection*{A3. Figure 3: 12-month window and XGBoost / LightGBM}
 \begin{sidewaysfigure}
 \centering
-\includegraphics[width=\linewidth]{figures/fig3b_signed_total_mort_12m_LGB_landscape.png}\\[2pt]
-{\small \textbf{Fig.\ A0} --- Total mortality, C+T+M model, 12\,m, LightGBM--Optuna.}
+\includegraphics[width=\linewidth]{figures/A_fig3_signed_12m_AG.png}\\[2pt]
+{\small \textbf{Fig.\ A4} --- Fig.~3 with the 12-month window, AutoGluon.}
+\end{sidewaysfigure}
+\begin{sidewaysfigure}
+\centering
+\includegraphics[width=\linewidth]{figures/A_fig3_signed_24m_XGB.png}\\[2pt]
+{\small \textbf{Fig.\ A5} --- Fig.~3, XGBoost--Optuna, 24\,m.}
+\end{sidewaysfigure}
+\begin{sidewaysfigure}
+\centering
+\includegraphics[width=\linewidth]{figures/A_fig3_signed_24m_LGB.png}\\[2pt]
+{\small \textbf{Fig.\ A6} --- Fig.~3, LightGBM--Optuna, 24\,m.}
 \end{sidewaysfigure}
 
-\begin{sidewaysfigure}
-\centering
-\includegraphics[width=\linewidth]{figures/fig3b_signed_total_mort_12m_XGB_landscape.png}\\[2pt]
-{\small \textbf{Fig.\ A1} --- Total mortality, C+T+M model, 12\,m, XGBoost--Optuna.}
-\end{sidewaysfigure}
-\begin{sidewaysfigure}
-\centering
-\includegraphics[width=\linewidth]{figures/fig3b_signed_total_mort_24m_XGB_landscape.png}\\[2pt]
-{\small \textbf{Fig.\ A2} --- Same, 24\,m window.}
-\end{sidewaysfigure}
+\clearpage
+\subsection*{A4. Figure 4: all learners and relative deadwood}
+\begin{center}
+\includegraphics[width=0.85\linewidth]{figures/A_fig4_total_mort_all_learners.png}\\[2pt]
+{\small \textbf{Fig.\ A7} --- Fig.~4 for all three learners (total mortality).}
+\end{center}
+\begin{center}
+\includegraphics[width=0.48\linewidth]{figures/A_fig4_rel_deadwood_AG.png}\\[2pt]
+{\small \textbf{Fig.\ A8} --- Fig.~4 split by relative deadwood, AutoGluon.}
+\end{center}
+
+\subsection*{A5. Mortality block: drop-column test and the tree learners}
+\begin{center}
+\includegraphics[width=\linewidth]{figures/A_fig6_dropcol.png}\\[2pt]
+{\small \textbf{Fig.\ A9} --- per metric: A SHAP share in the mortality block (all learners); B RMSE increase when the
+metric is removed from C+T+M; C RMSE decrease when only this metric is added to C+T (B and C: XGBoost and LightGBM retrained
+with the same tuned settings and folds).}
+\end{center}
+\begin{center}
+\includegraphics[width=0.8\linewidth]{figures/A_fig6_mortality_block_XGB.png}\\[2pt]
+{\small \textbf{Fig.\ A10} --- Fig.~6 for XGBoost.}
+\end{center}
+\begin{center}
+\includegraphics[width=0.8\linewidth]{figures/A_fig6_mortality_block_LGB.png}\\[2pt]
+{\small \textbf{Fig.\ A11} --- Fig.~6 for LightGBM.}
+\end{center}
+
+\subsection*{A6. Figure 5: 12-month window and XGBoost}
+\begin{center}
+\includegraphics[width=0.82\linewidth]{figures/A_fig5_igbp_12m_AG.png}\\[2pt]
+{\small \textbf{Fig.\ A12} --- Fig.~5 with the 12-month window, AutoGluon.}
+\end{center}
+\begin{center}
+\includegraphics[width=0.82\linewidth]{figures/A_fig5_igbp_24m_XGB.png}\\[2pt]
+{\small \textbf{Fig.\ A13} --- Fig.~5, XGBoost--Optuna, 24\,m.}
+\end{center}
 
 \end{document}

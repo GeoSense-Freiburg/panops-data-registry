@@ -2,21 +2,24 @@
 
 Bullet points and figures only — no prose. Built to support decisions, not to be submitted.
 
-## Scope (updated 2026-10-05 to dataset v4.1)
+## Scope (updated 2026-10-09: deadtrees v5, AutoGluon as main learner)
 
 | | |
 |---|---|
-| Dataset | deadtrees v4.1, tree cover >= 30 % (500 m, site mean), CN-Sb1/2 removed — **104 sites / 381 site-years** |
-| Models | **M3 (C+T) vs M4 (C+T+D)** only |
-| Learners | XGBoost, LightGBM (Optuna-tuned); AutoGluon as AutoML check |
+| Dataset | deadtrees v5, tree cover >= 30 % (500 m, site mean), CN-Sb1/2 removed — **101 sites / 361 site-years** |
+| Models | **C+T vs C+T+M** only |
+| Learners | **AutoGluon** (main text); XGBoost, LightGBM (Optuna-tuned) in the Appendix |
 | Windows | 12 m and 24 m, climate strictly pre-season |
 | Cross-validation | repeated leave-one-site-out (3 x 80 %) |
 | Responses | GPPsat, NEPmax, ETmax, WUE |
 | Site classes | mean of the five buffers 100-500 m (site maximum, mean +/- 0.5 SD) |
+| Statistics | MAE: site-level log-ratio permutation test (Table 2), paired bootstrap incl. site-year level (Table 3); RMSE and XGB/LGB versions in the Appendix |
 
-Figures are copied from `plots/paper_v41/` and `AutoGluon/plots/efp/` (`ag_*`); the Fig 2 summary table
-from `manuscript/tables/` (made by `scripts/paper_v41/31_table_fig2_summary.R`). The previous V10 version of
-the draft is in git history (commit before 2026-10-05) and on Overleaf's history.
+Sources: AutoGluon-only figures from `AutoGluon/plots/efp_v5_nothresh/ag_only/` (made by the copies in
+`AutoGluon/fig_scripts/ag_only/`), three-learner figures from `AutoGluon/plots/efp_v5_nothresh/`, XGB/LGB figures
+from `plots/paper_v5_nothresh/`. Tables from `manuscript/tables/` (`31_table_fig2_summary.R` with
+`TABLE1_TEST=permlog TABLE1_SHOW=AG|XGB,LGB`, and `40_table_bootstrap.R`), copied to `tables/` with short names.
+The v4.1 version of the draft is in git history and in Overleaf's history.
 
 ## Files
 

@@ -84,6 +84,11 @@ cell_d <- function(x) sprintf("$%s%.1f$%s", ifelse(x[[SHOW]] < 0, "-", "+"), abs
                               ifelse(x$sig == "", "", sprintf("$^{%s}$", x$sig)))
 cell_i <- function(x) sprintf("%.0f", x$improved_pct)
 L_ok <- intersect(names(LEARNERS), unique(st$learner))
+# env TABLE1_SHOW (e.g. "AG" or "XGB,LGB"; 2026-10-09, coauthor draft): show only these learners. The tests and the
+# BH correction still cover all learners, so tables split between main text and appendix are one family of tests.
+SHOWL <- strsplit(Sys.getenv("TABLE1_SHOW", ""), ",")[[1]]
+if (length(SHOWL)) { L_ok <- intersect(L_ok, SHOWL); TSFX <- paste0(TSFX, "_", paste(L_ok, collapse = "")) }
+BH_TXT <- if (length(SHOWL)) sprintf("all %d tests of the three learners", nrow(st)) else sprintf("all %d tests in the table", nrow(st))
 tex <- c(
   "\\begin{table}[p]",
   "\\centering",
@@ -98,10 +103,10 @@ tex <- c(
            sqrt = "Sensitivity: sites weighted by the square root of their number of site-years (signs flipped per site). ", ""),
     sprintf("Sites are grouped by their maximum total mortality across years (%s); ", if (CLASS_BUF == "avg") "averaged over the five buffers, 100--500\\,m" else paste0(CLASS_BUF, "\\,m buffer")),
     "High $>$ mean $+$ 0.5\\,SD (%.1f\\%%), Low $<$ mean $-$ 0.5\\,SD (%.1f\\%%), Mid in between. ",
-    if (TEST == "permlog") "Stars: one-sided paired permutation test on the per-site log error ratios (100\\,000 random sign flips; C+T+M $<$ C+T), Benjamini--Hochberg corrected across all %d tests in the table " else
-    if (TEST == "perm") "Stars: one-sided paired permutation test (100\\,000 random sign flips of the per-site changes; C+T+M $<$ C+T), Benjamini--Hochberg corrected across all %d tests in the table " else "Stars: one-sided paired Wilcoxon signed-rank test (C+T+M $<$ C+T), Benjamini--Hochberg corrected across all %d tests in the table ",
+    if (TEST == "permlog") "Stars: one-sided paired permutation test on the per-site log error ratios (100\\,000 random sign flips; C+T+M $<$ C+T), Benjamini--Hochberg corrected across %s " else
+    if (TEST == "perm") "Stars: one-sided paired permutation test (100\\,000 random sign flips of the per-site changes; C+T+M $<$ C+T), Benjamini--Hochberg corrected across %s " else "Stars: one-sided paired Wilcoxon signed-rank test (C+T+M $<$ C+T), Benjamini--Hochberg corrected across %s ",
     "($^{*}$\\,$q<0.05$, $^{**}$\\,$q<0.01$, $^{***}$\\,$q<0.001$). Tree cover $\\geq$ 30\\%%, %d sites, %d site-years, %s.}"),
-    b_hi, b_lo, nrow(st), PN[["sites"]], PN[["sy"]], PAPER_MAPS),
+    b_hi, b_lo, BH_TXT, PN[["sites"]], PN[["sy"]], PAPER_MAPS),
   sprintf("\\label{tab:fig2_d%s_total_mort_%s%s}", MET, VTAG, TSFX),
   "\\scriptsize",
   "\\setlength{\\tabcolsep}{4pt}",
