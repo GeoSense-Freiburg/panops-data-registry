@@ -36,6 +36,29 @@
     \item This creates an opportunity to quantify how mortality affects ecosystem functioning and identify \textbf{vegetation types that are more sensitive or resilient}.
 \end{itemize}
 
+\noindent\fbox{\parbox{\dimexpr\linewidth-2\fboxsep-2\fboxrule}{
+\textbf{Main findings} (AutoGluon, deadtrees v5, 101 sites, 361 site-years)
+\begin{enumerate}[leftmargin=1.6em,itemsep=3pt,topsep=3pt]
+  \item \textbf{Knowing about tree mortality makes carbon uptake more predictable, especially in the years when trees died.}
+        Adding mortality lowers the error (MAE) of NEP$_{max}$ by 11--12\,\% over all site-years and by 29--32\,\% in
+        high-mortality years; WUE improves mainly where mortality happened ($-17$ to $-22$\,\% in high-mortality years);
+        GPP$_{sat}$ improves less ($-4$ to $-12$\,\%) and ET$_{max}$ not at all (Table~\ref{tab:main}).
+  \item \textbf{Without mortality, models over-estimate carbon uptake in forests with high mortality; mortality corrects
+        this bias.} At $>$30\,\% total mortality the model without mortality over-predicts NEP$_{max}$ by about 4 and
+        GPP$_{sat}$ by about 4.3\,$\mu$mol\,m$^{-2}$\,s$^{-1}$ and WUE by about 0.8\,g\,C\,mm$^{-1}$. The bias grows with
+        mortality; adding mortality reduces it by about two-thirds, and the correction is significant --- for all three
+        learners and robust to resampling whole sites, leaving out any single site and removing the most extreme sites (Fig.~5).
+  \item \textbf{The effect follows the amount of mortality, not the ecosystem type.} Mortality pushes predicted GPP$_{sat}$,
+        NEP$_{max}$ and WUE down at high-mortality sites (86--91\,\% of them) and slightly up at low-mortality sites
+        (2--10\,\%); the direction tracks total mortality closely ($\rho = -0.78$ to $-0.83$) and does not depend on tree
+        cover or vegetation class. Total mortality alone carries most of the information (Figs.~2--4).
+\end{enumerate}
+\textit{In one sentence:} tree mortality mapped from remote sensing makes ecosystem carbon uptake more predictable ---
+without it, models over-estimate the productivity of forests with high mortality, and the correction scales with the amount
+of mortality regardless of ecosystem type.
+}}
+
+\medskip
 \textbf{What changed in this version}
 \begin{itemize}
   \item \textbf{Dataset:} deadtrees v5 mortality maps (delivered 2026-10-06).
