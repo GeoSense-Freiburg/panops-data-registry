@@ -26,6 +26,13 @@ LEARNERS <- list(XGB = file.path(PAPER_OUT, "XGB_predictions_repCV.csv"),
                  LGB = file.path(PAPER_OUT, "LGB_predictions_repCV.csv"),
                  AG  = file.path(PAPER_ROOT, "AutoGluon/outputs",
                                  paste0(PAPER_RESP_SET, if (PAPER_NO_THRESH) "_nothresh" else ""), "AG_predictions_repCV.csv"))
+# env AG_EXTRA (2026-10-12): another AutoGluon run added as learner "AGx", e.g. efp_v5_nothresh_efpclim (EFP-specific
+# climate block); then only AG and AGx are tested (BH across the two) and the output gets the suffix _<AG_EXTRA>
+AG_EXTRA <- Sys.getenv("AG_EXTRA", ""); OSFX <- ""
+if (AG_EXTRA != "") {
+  LEARNERS <- list(AG = LEARNERS$AG, AGx = file.path(PAPER_ROOT, "AutoGluon/outputs", AG_EXTRA, "AG_predictions_repCV.csv"))
+  OSFX <- paste0("_", AG_EXTRA)
+}
 
 # ---- classes: site maximum of total mortality (as Tables 1-2) and each site-year's own value -------------
 cd <- paper_class_data()[, .(SITE_ID, YEAR, tm = relative_disturbance_cls)]
@@ -91,6 +98,6 @@ st[, sig := fifelse(q < 0.001, "***", fifelse(q < 0.01, "**", fifelse(q < 0.05, 
 st[, ci_below_0 := diff_hi < 0]
 st[, `:=`(b_lo = b_lo, b_hi = b_hi)]
 setcolorder(st, c("learner", "metric", "level", "subset", "window", "response"))
-fwrite(st, file.path(PAPER_FIG, "paired_bootstrap_statistics.csv"))
+fwrite(st, file.path(PAPER_FIG, sprintf("paired_bootstrap_statistics%s.csv", OSFX)))
 print(st[, .(tests = .N, ci_below_0 = sum(ci_below_0), perm_q05 = sum(q < 0.05)), by = .(metric, level)])
 cat("BOOT_DONE\n")

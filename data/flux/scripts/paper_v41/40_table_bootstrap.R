@@ -15,8 +15,9 @@ source("scripts/paper_v41/paper_common.R")
 MET <- toupper(Sys.getenv("TABLE_METRIC", "MAE")); SHOW <- strsplit(Sys.getenv("TABLE_SHOW", "AG"), ",")[[1]]
 VTAG <- c(efp = "v41", efp_v5 = "v5", v10efp = "v22")[[PAPER_RESP_SET]]
 if (PAPER_NO_THRESH) VTAG <- paste0(VTAG, "_nothresh")
-st <- fread(file.path(PAPER_FIG, "paired_bootstrap_statistics.csv"))[metric == MET]
-LAB <- c(XGB = "XGBoost", LGB = "LightGBM", AG = "AutoGluon")
+AG_EXTRA <- Sys.getenv("AG_EXTRA", ""); ISFX <- if (AG_EXTRA != "") paste0("_", AG_EXTRA) else ""
+st <- fread(file.path(PAPER_FIG, sprintf("paired_bootstrap_statistics%s.csv", ISFX)))[metric == MET]
+LAB <- c(XGB = "XGBoost", LGB = "LightGBM", AG = "AutoGluon", AGx = "AutoGluon, EFP-specific climate")
 EFP_TEX <- c(GPPsat = "GPP$_\\mathrm{sat}$", NEPmax = "NEP$_\\mathrm{max}$", ETmax = "ET$_\\mathrm{max}$", WUE = "WUE")
 COLS <- list(c("site", "all"), c("siteyear", "all"), c("siteyear", "high"), c("siteyear", "yr_midhigh"), c("siteyear", "yr_high"))
 # env TABLE_COLS = all (default) | siteyear (2026-10-09, draft main text: site-year columns only); suffix _siteyear
@@ -35,7 +36,8 @@ tex <- c("\\begin{table}[htbp]", "\\centering",
     "\\emph{Site-year level}: every site-year is an observation (pooled %s; no averaging over years). ",
     "Years of one site are not independent, so whole sites are resampled (10\\,000 bootstrap draws) and ",
     "the C+T / C+T+M labels are swapped per site for the paired permutation test (10\\,000 draws, one-sided; stars, ",
-    "Benjamini--Hochberg corrected across all three learners: $^{*}$\\,$q<0.05$, $^{**}$\\,$q<0.01$, $^{***}$\\,$q<0.001$). ",
+    if (AG_EXTRA != "") "Benjamini--Hochberg corrected across both runs: " else "Benjamini--Hochberg corrected across all three learners: ",
+    "$^{*}$\\,$q<0.05$, $^{**}$\\,$q<0.01$, $^{***}$\\,$q<0.001$). ",
     "High sites: site maximum of total mortality $>$ %.1f\\,\\%%; the last two columns keep only the site-years whose own ",
     "total mortality exceeds %.1f\\,\\%% (Mid + High) or %.1f\\,\\%% (High). Column heads: sites / site-years. ",
     "%d sites, %d site-years, deadtrees v5.}"),
@@ -60,5 +62,5 @@ for (L in SHOW) for (w in WINDOWS) {
   }
 }
 tex <- c(tex, "\\bottomrule", "\\end{tabular}}", "\\end{table}")
-out <- file.path(PAPER_ROOT, "manuscript/tables", sprintf("table_bootstrap_d%s_%s_%s%s.tex", MET, VTAG, paste(SHOW, collapse = ""), if (SY_ONLY) "_siteyear" else ""))
+out <- file.path(PAPER_ROOT, "manuscript/tables", sprintf("table_bootstrap_d%s_%s_%s%s%s.tex", MET, VTAG, paste(SHOW, collapse = ""), if (SY_ONLY) "_siteyear" else "", ISFX))
 writeLines(tex, out); cat("wrote", out, "\n")

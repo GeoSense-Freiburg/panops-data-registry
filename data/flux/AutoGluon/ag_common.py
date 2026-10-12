@@ -40,6 +40,14 @@ SETS = {
     "efp_v5_nothresh": dict(
         data=f"{ROOT}/derived_tables/paper_v5/paper_dataset_full_lags_monthly_tc30_minrun2_buf100-200-300-400-500.csv",
         responses=["GPPsat", "NEPmax", "ETmax", "WUE"], ref=f"{ROOT}/derived_tables/paper_v5_nothresh/models", nothresh=True),
+    # EFP-specific climate block (user 2026-10-12, after Miguel's comment on circularity): the climate variables that
+    # appear in the FORMULA of an EFP are removed for that EFP only - GPPsat: light-response curve on PPFD = SW_IN * 2.11
+    # -> no SW_IN; ETmax and WUE: ET = LE / lambda(TA) -> no TA; NEPmax (90th percentile of NEP): nothing removed.
+    # Filters (SW_IN > 50 / 200, rain) are not in the formula and stay. Same data and design as efp_v5_nothresh.
+    "efp_v5_nothresh_efpclim": dict(
+        data=f"{ROOT}/derived_tables/paper_v5/paper_dataset_full_lags_monthly_tc30_minrun2_buf100-200-300-400-500.csv",
+        responses=["GPPsat", "NEPmax", "ETmax", "WUE"], ref=f"{ROOT}/derived_tables/paper_v5_nothresh/models", nothresh=True,
+        clim_drop={"GPPsat": ["SW_IN"], "ETmax": ["TA"], "WUE": ["TA"]}),
     "flux": dict(
         data=f"{ROOT}/derived_tables/paper_v41_fluxes/paper_dataset_fluxes.csv",
         responses=["GPP_gs", "NEP_gs", "ET_gs", "WUE_gs"], ref=f"{ROOT}/derived_tables/paper_v41_fluxes/models"),
@@ -66,11 +74,19 @@ def load(resp_set):
     return df
 
 
-def paper_cols(df, window, spec):
-    """Predictor columns, in the order of paper_cols() in paper_common.R."""
+def clim_drop(resp_set, resp):
+    """Climate variables removed for this EFP (EFP-specific climate block), e.g. ["SW_IN"]; [] for the standard sets."""
+    return SETS[resp_set].get("clim_drop", {}).get(resp, [])
+
+
+def paper_cols(df, window, spec, drop=()):
+    """Predictor columns, in the order of paper_cols() in paper_common.R. drop = climate variables to leave out
+    (e.g. ["SW_IN"] removes lag*_M*_SW_IN_mean/p05/p95)."""
     ac = list(df.columns)
     clim_re = r"^lag1_M[0-9]{2}_" if window == "12m" else r"^lag[12]_M[0-9]{2}_"
     clim = [c for c in ac if re.search(clim_re, c)]
+    if drop:
+        clim = [c for c in clim if not re.search(r"^lag[12]_M[0-9]{2}_(" + "|".join(drop) + r")_", c)]
     mort = [c for c in ac if re.search(MORT_RE + "$", c)]
     mort += [c for c in ac if re.search(MORT_RE + "_lag1$", c)]
     if window == "24m":

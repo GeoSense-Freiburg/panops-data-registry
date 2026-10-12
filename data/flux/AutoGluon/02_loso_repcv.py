@@ -40,7 +40,7 @@ def work(job):
     f = os.path.join(CACHE, f"{mod}_{win}_{resp}", f"{ts}.csv")
     if os.path.exists(f):
         return f
-    xv = C.paper_cols(df, win, C.MODELS[mod])
+    xv = C.paper_cols(df, win, C.MODELS[mod], C.clim_drop(RESP_SET, resp))
     te = df[df["SITE_ID"] == ts]
     tr_sites = sites[sites != ts]
     k = max(5, int(np.floor(C.SUBSAMP * len(tr_sites))))
@@ -105,7 +105,7 @@ if __name__ == "__main__":
     C.run_pool(work, jobs, lambda j: os.path.join(CACHE, f"{j[2]}_{j[0]}_{j[1]}", f"{sites[j[3]]}.csv"),
                N_WORK, f"{RESP_SET}: site folds")   # no max_tasks_per_child: python 3.11 deadlocks when all workers retire at once
     allp = pd.concat([collect(*t) for t in tasks], ignore_index=True)
-    n_pred = {(f"{m}_{w}", r): len(C.paper_cols(df, w, C.MODELS[m])) for (w, r, m) in tasks}
+    n_pred = {(f"{m}_{w}", r): len(C.paper_cols(df, w, C.MODELS[m], C.clim_drop(RESP_SET, r))) for (w, r, m) in tasks}
     out = C.out_dir(RESP_SET)
     allp.to_csv(os.path.join(out, "AG_predictions_repCV_by_model.csv"), index=False)
     mm = metrics(allp, n_pred)

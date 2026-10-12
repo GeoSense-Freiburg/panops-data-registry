@@ -362,6 +362,36 @@ if os.path.exists(f"{DS['v5']['plots']}/dose_response/dose_response_robustness_A
             + "</details>")
     sections.append(("dose", "Mortality as a continuous variable: dose-response (V5)", dose))
 
+# circularity check: EFP-specific climate block (2026-10-12), AutoGluon run efp_v5_nothresh_efpclim
+_ec = f"{DS['v5']['plots']}/paired_bootstrap_statistics_efp_v5_nothresh_efpclim.csv"
+if os.path.exists(_ec):
+    st = pd.read_csv(_ec)
+    st = st[(st.metric == "MAE") & (st.level == "siteyear") & st.subset.isin(["all", "high", "yr_midhigh", "yr_high"])].copy()
+    st["cell"] = [f"{p:+.1f}{'<sup>' + g + '</sup>' if isinstance(g, str) and g else ''} <span class='muted'>[{lo:+.1f}, {hi:+.1f}]</span>"
+                  for p, g, lo, hi in zip(st.pct, st.sig, st.pct_lo, st.pct_hi)]
+    st["run"] = st.learner.map({"AG": "all climate", "AGx": "EFP-specific climate"})
+    ct = st.pivot_table(index=["window", "response", "run"], columns="subset", values="cell", aggfunc="first")[["all", "high", "yr_midhigh", "yr_high"]]
+    ct.columns = ["All site-years", "High sites", "Mid + High years", "High years"]
+    ct = ct.reindex([(w, e, r) for w in ("12m", "24m") for e in EFP for r in ("all climate", "EFP-specific climate")])
+    ct.index = [f"{w.replace('m', ' months')} · {EFPH[e]} · {r}" for w, e, r in ct.index]
+    circ = ("<p><b>Question (Miguel):</b> a climate variable that is part of an EFP's formula could make the prediction partly "
+            "circular. The climate predictors are already strictly pre-season; to be safe, each EFP was refitted with AutoGluon "
+            "(same data and design) <b>without the climate variables in its formula</b>: GPP<sub>sat</sub> without radiation "
+            "(light-response curve on PPFD = SW<sub>IN</sub> × 2.11), ET<sub>max</sub> and WUE without air temperature "
+            "(ET = LE / λ(T<sub>a</sub>)); NEP<sub>max</sub> has no climate variable in its formula and is unchanged. Filters "
+            "(SW<sub>IN</sub> thresholds, rain) are not part of the formulas and were kept.</p>"
+            "<p><b>Result:</b> skill hardly changes (R² of C+T+M: GPP<sub>sat</sub> 0.385 / 0.365 vs 0.367 / 0.370, "
+            "ET<sub>max</sub> 0.409 / 0.420 vs 0.425 / 0.433, WUE 0.281 / 0.302 vs 0.312 / 0.326 for 12 / 24 months) and the "
+            "mortality results stay: WUE still improves significantly at High sites and in high-mortality years; the "
+            "over-prediction without mortality and its correction remain significant for GPP<sub>sat</sub> (+3.6 to +3.7) and "
+            "WUE (+0.25 to +0.27) in the &gt; 30 % class. GPP<sub>sat</sub> is significant at 12 but not at 24 months in the "
+            "MAE table. <b>The mortality results do not depend on climate variables that enter the EFP formulas.</b></p>"
+            + table_html(ct, "Site-year MAE change when mortality is added (%) [95 % site-block bootstrap interval], AutoGluon with "
+                         "all climate vs the EFP-specific climate block; stars = paired permutation, BH across both runs.")
+            + fig("v5", "dose_response/residual_by_mortality_AG_efpclim_24m.png", "Residual by mortality class with the EFP-specific climate block (AutoGluon, 24 months); compare with the figure in the previous section.")
+            + "<details><summary>12 months</summary>" + fig("v5", "dose_response/residual_by_mortality_AG_efpclim_12m.png", "12 months.") + "</details>")
+    sections.append(("circ", "Circularity check: EFP-specific climate block (V5)", circ))
+
 # mortality block split by metric, V5 only (2026-10-08): AutoGluon first, then XGBoost and LightGBM
 sections.append(("msplit", "7. Mortality block, metric by metric (V5)",
                  "<p>Share of the mortality-block |SHAP| per metric (C+T+M, V5 without thresholds, mean over the 101 sites, "

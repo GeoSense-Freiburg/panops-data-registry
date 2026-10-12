@@ -27,7 +27,7 @@ def run(task):
     win, resp, mod = task
     warnings.filterwarnings("ignore")
     df = C.load(RESP_SET)
-    xv = C.paper_cols(df, win, C.MODELS[mod])
+    xv = C.paper_cols(df, win, C.MODELS[mod], C.clim_drop(RESP_SET, resp))
     d = df[xv + [resp]].copy()
     d["_fold"] = C.site_folds(df["SITE_ID"].to_numpy())
     path = os.path.join(C.AG_ROOT, "models", RESP_SET, f"{mod}_{win}_{resp}")

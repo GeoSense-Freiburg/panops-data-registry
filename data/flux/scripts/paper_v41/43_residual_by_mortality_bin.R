@@ -13,8 +13,11 @@ setwd("/mnt/gsdata/projects/panops/panops-data-registry/data/flux")
 source("scripts/paper_v41/paper_common.R")
 a <- commandArgs(trailingOnly = TRUE); L <- if (length(a) >= 1) a[1] else "AG"; WIN <- if (length(a) >= 2) a[2] else "24m"
 LAB <- c(AG = "AutoGluon", XGB = "XGBoost", LGB = "LightGBM")[[L]]
-f <- if (L == "AG") file.path(PAPER_ROOT, "AutoGluon/outputs", paste0(PAPER_RESP_SET, if (PAPER_NO_THRESH) "_nothresh" else ""),
-                              "AG_predictions_repCV.csv") else file.path(PAPER_OUT, sprintf("%s_predictions_repCV.csv", L))
+# env AG_SET (2026-10-12): another AutoGluon run, e.g. efp_v5_nothresh_efpclim; files are tagged AG_<set suffix>
+AG_SET <- Sys.getenv("AG_SET", paste0(PAPER_RESP_SET, if (PAPER_NO_THRESH) "_nothresh" else ""))
+if (L == "AG" && AG_SET != paste0(PAPER_RESP_SET, if (PAPER_NO_THRESH) "_nothresh" else "")) {
+  LAB <- paste0(LAB, ", EFP-specific climate"); L_TAG <- paste0("AG_", sub("^.*_", "", AG_SET)) } else L_TAG <- L
+f <- if (L == "AG") file.path(PAPER_ROOT, "AutoGluon/outputs", AG_SET, "AG_predictions_repCV.csv") else file.path(PAPER_OUT, sprintf("%s_predictions_repCV.csv", L))
 OUT <- file.path(PAPER_FIG, "dose_response"); dir.create(OUT, showWarnings = FALSE, recursive = TRUE)
 BRK <- c(-Inf, 10, 20, 30, Inf); BLAB <- c("0-10 %", "10-20 %", "20-30 %", "> 30 %")
 cd <- paper_class_data()[, .(SITE_ID, YEAR, tm = relative_disturbance_cls)]
@@ -33,7 +36,7 @@ boot_ci <- function(res, site) {               # site-block bootstrap of the mea
 }
 S <- long[, boot_ci(res, SITE_ID), by = .(response, model, bin)]
 S[, response := factor(response, EFP_ORDER)]
-fwrite(S, file.path(OUT, sprintf("residual_by_mortality_%s_%s.csv", L, WIN)))
+fwrite(S, file.path(OUT, sprintf("residual_by_mortality_%s_%s.csv", L_TAG, WIN)))
 # ---- is the correction significant? corr = residual(C+T+M) - residual(C+T) = prediction lowered by adding mortality.
 # Per class: mean correction, 95 % site-block bootstrap interval, one-sided paired permutation (100 000 draws; labels swapped per site,
 # i.e. the site's corrections sign-flipped together; H1: correction > 0 = predictions lowered); BH across the 16 tests.
@@ -56,8 +59,8 @@ TR <- w[, {
     p_boot = min(1, 2 * min(mean(b <= 0, na.rm = TRUE), mean(b >= 0, na.rm = TRUE))))
 }, by = response]
 TR[, q_boot := p.adjust(p_boot, "BH")]
-fwrite(C, file.path(OUT, sprintf("residual_correction_by_mortality_%s_%s.csv", L, WIN)))
-fwrite(TR, file.path(OUT, sprintf("residual_correction_trend_%s_%s.csv", L, WIN)))
+fwrite(C, file.path(OUT, sprintf("residual_correction_by_mortality_%s_%s.csv", L_TAG, WIN)))
+fwrite(TR, file.path(OUT, sprintf("residual_correction_trend_%s_%s.csv", L_TAG, WIN)))
 cat("\n== correction per class (prediction lowered by adding mortality, EFP units) ==\n")
 print(C[order(response, bin), .(response, bin, corr = round(mean, 3), lo = round(lo, 3), hi = round(hi, 3), q_perm = signif(q_perm, 2), n_sy, n_sites)])
 cat("\n== trend: correction per +10 % total mortality (mixed model, site-block bootstrap) ==\n")
@@ -78,11 +81,11 @@ g <- ggplot(S, aes(bin, mean, colour = model, group = model)) +
   scale_y_continuous(expand = expansion(mult = c(0.22, 0.16))) +
   facet_wrap(~ response, nrow = 1, scales = "free_y", labeller = labeller(response = RESP_UNITS)) +
   labs(x = "Total mortality of the site-year", y = "Mean residual (observed - predicted)\nbelow 0 = model over-predicts",
-       title = sprintf("Without mortality the model over-predicts in high-mortality years; with mortality the bias is much smaller (%s, %s)", LAB, WIN),
+       title = sprintf("Over-prediction in high-mortality years: without vs with mortality (%s, %s)", LAB, WIN),
        subtitle = paste0("Points = mean residual of all site-years in the class; bars = 95 % site-block bootstrap interval. Numbers at the bottom: site-years (sites).\n",
                          "Stars at the top: adding mortality lowers the prediction significantly in that class (one-sided paired permutation, models swapped per site, BH-FDR; * q<0.05, ** q<0.01, *** q<0.001)")) +
   theme_bw(base_size = 10) + theme(panel.grid.minor = element_blank(), panel.grid.major.x = element_blank(), legend.position = "bottom",
     strip.background = element_rect(fill = "#EFEFEF", colour = "grey80"), strip.text = element_text(face = "bold"),
     plot.title = element_text(face = "bold", size = 11), plot.subtitle = element_text(size = 8, colour = "grey30"))
-ggsave(file.path(OUT, sprintf("residual_by_mortality_%s_%s.png", L, WIN)), g, width = 12, height = 4.6, dpi = 250, bg = "white")
+ggsave(file.path(OUT, sprintf("residual_by_mortality_%s_%s.png", L_TAG, WIN)), g, width = 12, height = 4.6, dpi = 250, bg = "white")
 print(S[, .(response, model, bin, mean = round(mean, 3), lo = round(lo, 3), hi = round(hi, 3), n_sy, n_sites)])
