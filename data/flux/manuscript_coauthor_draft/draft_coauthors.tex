@@ -19,6 +19,21 @@
 \maketitle
 \vspace{-1cm}
 
+\section*{Abstract}
+{\small\textit{Draft for Nature Ecology \& Evolution: unreferenced, $\leq$200 words.}}
+
+Tree mortality is increasing in forests worldwide, yet how it changes ecosystem functioning across sites remains
+poorly quantified. Here we combine eddy-covariance measurements from 101 forest sites (361 site-years) with
+remote-sensing maps of tree mortality and machine learning, and show that knowing about mortality makes forest carbon
+uptake markedly more predictable. Adding mortality to climate and plant traits reduced the prediction error of maximum
+net ecosystem productivity by 11--12\,\% overall and by about 30\,\% in years with high mortality, and improved
+water-use efficiency mainly where mortality occurred; maximum evapotranspiration did not improve. Without mortality,
+models over-estimated carbon uptake and water-use efficiency in high-mortality years, a bias that grew with the amount of
+mortality and that mortality information reduced by about two-thirds. The direction of the effect followed the amount of
+mortality rather than vegetation type or tree cover, and the results held across three learning algorithms and
+when the climate variables used to calculate each property were left out. Mortality maps can thus correct a systematic over-estimate of
+carbon uptake in forests with high mortality.
+
 \section*{Introduction}
     \begin{itemize}
     \item Terrestrial ecosystems regulate global \textbf{carbon, water, and energy balances}; forest functioning is closely linked to vegetation structure and functional traits.
@@ -268,6 +283,23 @@ points coloured by IGBP class.}
         \item Implications
     \end{itemize}
 \section*{Conclusions}
+{\small\textit{Nature Ecology \& Evolution has no separate Conclusions section: these two paragraphs are meant as the closing paragraphs of the Discussion (no subheadings).}}
+
+Knowing where and when trees die makes the carbon uptake of forests more predictable. Across 101 forest sites,
+mortality information improved predictions of maximum net ecosystem productivity, light-saturated photosynthesis and
+water-use efficiency, and the improvement was largest in the years when mortality happened. Without it, models
+systematically over-estimated carbon uptake in forests with high mortality; with it, this bias shrank by about
+two-thirds. The correction scaled with the amount of mortality and did not depend on vegetation type or tree cover,
+which suggests that mortality acts as a general, transferable predictor of ecosystem function rather than a
+site-specific one.
+
+These results come from predictive models and from few site-years with severe mortality (21 site-years above 30\,\%
+total mortality), so they quantify how much mortality information improves predictions rather than the physiological
+mechanism behind it, and the largest effects rest on a small number of strongly affected sites. With mortality maps now
+available at continental to global scale and flux networks growing, adding mortality to data-driven upscaling products
+and to the evaluation of land-surface models is a direct way to reduce the over-estimate of carbon uptake in forests
+with high mortality.
+
 \section*{Methods}
 \begin{itemize}
   \item \textbf{Dataset:} deadtrees v5 mortality maps, FLUXNET EFPs (GPP$_{sat}$, NEP$_{max}$ following
