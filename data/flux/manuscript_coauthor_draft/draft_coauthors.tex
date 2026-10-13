@@ -329,66 +329,103 @@ products and to the evaluation of land-surface models is a direct way to avoid o
 wooded ecosystems with high mortality.
 
 \section*{Methods}
-\begin{itemize}
-  \item \textbf{Dataset:} deadtrees v5 mortality maps, FLUXNET EFPs (GPP$_{sat}$, NEP$_{max}$ following
-        Migliavacca et al.\ 2021, ET$_{max}$, WUE), Lusk et al.\ 2025 trait maps (1\,km). Tree cover $\geq$30\,\%
-        (500\,m, site mean), EFPs in runs of $\geq$2 consecutive years, CN-Sb1/2 removed by QC:
-        \textbf{101 sites, 361 site-years}.
-  \item \textbf{Models:} \textbf{climate + traits (C+T)} vs \textbf{climate + traits + mortality (C+T+M)}.
-        The pair differs only by the mortality block, so it isolates its contribution.
-  \item \textbf{Learner: AutoGluon-Tabular 1.6} (default model zoo: LightGBM, CatBoost, XGBoost, random forest, extra
-        trees, two neural networks; weighted ensemble; 5-fold bagging on site-disjoint folds; no stacking). AutoGluon
-        is refitted inside every cross-validation fold, so model selection never sees the held-out site. The ensemble
-        is dominated by the two neural networks (mean weights 0.43 and 0.32).
-  \item \textbf{Check learners (Appendix):} XGBoost and LightGBM, each tuned with Optuna (TPE, 50 trials per
-        response and window, grouped 5-fold CV on disjoint site groups).
-  \item \textbf{Windows:} climate strictly before the growing season --- 12 months (lag 1) or 24 months (lag 1 + lag 2)
-        ending the month before season start; mortality of the current year plus lag 1 (12\,m) or lag 1 + lag 2 (24\,m).
-  \item \textbf{Cross-validation:} repeated leave-one-site-out (3 $\times$ 80\,\% of the remaining sites per
-        held-out site; predictions averaged over the three repetitions).
-  \item \textbf{Mortality predictors:} absolute deadwood, relative deadwood, deadwood gain, relative tree-cover loss
-        and total mortality, each at five buffers (100, 200, 300, 400, 500\,m) and the lags above.
-  \item \textbf{Site classes} in the figures: site maximum of total mortality across years, mean of the five buffers;
-        breaks mean $\pm$ 0.5\,SD (Low $<$ 10.6\,\%, High $>$ 24.0\,\%; 41 Low, 38 Mid, 22 High).
-  \item \textbf{Mortality metrics} (from the deadtrees v5 deadwood / tree-cover maps, per buffer):
-        \begin{itemize}
-          \item \textbf{Absolute deadwood} = standing deadwood / buffer area $\times$ 100 (\%).
-          \item \textbf{Relative deadwood} = standing deadwood / tree cover $\times$ 100 (\%), where tree cover $\geq$ 10\,\%, capped at 100\,\%.
-          \item \textbf{Total mortality} = (deadwood + tree-cover loss) / (tree cover + tree-cover loss) $\times$ 100 (\%):
-                standing dead and removed canopy relative to the canopy present.
-        \end{itemize}
-  \item \textbf{SHAP:} permutation SHAP for AutoGluon (model-agnostic, approximate); exact TreeSHAP for XGBoost and
-        LightGBM. Compare shares and signs between learners, not magnitudes.
-  \item \textbf{Statistics:}
-        \begin{itemize}
-          \item \emph{Main test} (Table~\ref{tab:main}): paired bootstrap at the site-year level --- every site-year is an
-                observation, statistic = pooled MAE of C+T+M minus pooled MAE of C+T (\% = ratio of the pooled errors).
-                Sites resampled with replacement with all their years (10\,000 draws, 95\,\% percentile interval);
-                paired permutation test with the C+T / C+T+M labels swapped per site (10\,000 draws, one-sided).
-          \item \emph{Site level} (Appendix): per-site MAE over the site's years; site-level bootstrap and a one-sided paired
-                sign-flip permutation test on the per-site log error ratios (100\,000 flips; geometric-mean change).
-          \item \emph{Dose--response} (Fig.~5): mean residual per class of the site-year's total mortality with a site-block
-                bootstrap (2000 draws); correction = residual(C+T+M) $-$ residual(C+T), one-sided paired permutation with
-                the two models swapped per site (100\,000 draws); mixed models (nlme) residual or correction $\sim$ total
-                mortality + (1\,|\,site), slopes checked with a site-block bootstrap, leave-one-site-out and without sites
-                $>$50\,\% total mortality.
-          \item Fig.~3: Mann--Whitney U. Fig.~4: Spearman. Benjamini--Hochberg FDR within each table / figure
-                (tables: across all three learners).
-        \end{itemize}
-  \item \decide{the journal requires any use of large language models (e.g. for writing or code assistance) to be documented in the Methods}
-  \item Interactive report with all learners and datasets:\\
-        \url{https://negin-katal.github.io/fluxVSmortality/v10/index.html}
-\end{itemize}
+{\small\textit{Draft. Bold paragraph headings as in Nature Ecology \& Evolution.}}
+
+\textbf{Eddy-covariance data.} We used half-hourly FLUXNET data products processed with ONEFlux v1.3\cite{pastorello2020fluxnet2015},
+downloaded for all available sites with the FLUXNET Shuttle on 12 May 2026. Net ecosystem exchange (NEE\_VUT\_REF) and gross
+primary productivity from night-time partitioning (GPP\_NT\_VUT\_REF\cite{reichstein2005separation}) were used together with the
+tower meteorology (air temperature, vapour pressure deficit, incoming shortwave radiation, precipitation) and latent heat flux.
+Only measured or high-quality gap-filled half-hours (quality flags 0 and 1) entered the calculation of the ecosystem functional
+properties. The 101 sites of the final dataset come from AmeriFlux (44 sites), ICOS (29), the European Fluxes Database (18),
+JapanFlux\cite{ueyama2025japanflux} (3), KoFlux (2), ChinaFlux\cite{yu2006chinaflux} (2), TERN-OzFlux\cite{beringer2016ozflux,isaac2017ozflux}
+(2) and FLUXNET (1); the data of each site are cited individually (Data availability).
+
+\textbf{Ecosystem functional properties.} For each site-year we calculated four ecosystem functional properties following
+Migliavacca et al.\cite{migliavacca2021three}, within the growing season, defined as the days on which daily gross primary
+productivity exceeded 30\,\% of its 95th percentile (bigleaf R package\cite{knauer2018bigleaf}). Light-saturated gross
+primary productivity (GPP$_\mathrm{sat}$) was obtained by fitting a light-response curve of NEE against photosynthetic photon
+flux density (shortwave radiation $\times$ 2.11) in five-day windows of daytime data (shortwave radiation $>$ 50\,W\,m$^{-2}$)
+and taking the 95th percentile of the fitted saturation values per year\cite{lasslop2010separation,migliavacca2021three}. Maximum
+net ecosystem productivity (NEP$_\mathrm{max}$) is the 90th percentile of all half-hourly net ecosystem productivity
+($-$NEE, day and night) in the growing season\cite{migliavacca2021three}. Maximum evapotranspiration (ET$_\mathrm{max}$) is the
+95th percentile of half-hourly evapotranspiration, and water-use efficiency (WUE) the median ratio of gross primary productivity
+to evapotranspiration\cite{knauer2018bigleaf}; both used daytime half-hours with shortwave radiation $>$ 200\,W\,m$^{-2}$ and
+friction velocity $>$ 0.2\,m\,s$^{-1}$ and excluded periods during and after rain. Evapotranspiration was converted from latent
+heat flux with the air-temperature-dependent latent heat of vaporization\cite{knauer2018bigleaf}.
+
+\textbf{Tree mortality.} Tree mortality was derived from annual maps of standing deadwood cover and tree cover produced by
+deadtrees.earth from Sentinel-2 imagery, trained on centimetre-resolution aerial imagery with manually annotated dead
+trees\cite{mosig2025deadtrees} (map version 5; year 2016 excluded as unreliable). Within five nested circular buffers around each
+tower (radius 100, 200, 300, 400 and 500\,m; pixels without a valid prediction masked) we calculated, per year: absolute
+deadwood (deadwood cover as a percentage of buffer area), relative deadwood (deadwood cover relative to tree cover, where tree
+cover $\geq$ 10\,\%, capped at 100\,\%), deadwood gain (year-on-year increase of deadwood cover, percentage points), relative
+tree-cover loss (percentage of the previous year's tree cover lost) and total mortality, (deadwood + tree-cover loss) / (tree
+cover + tree-cover loss) $\times$ 100. Each metric entered the models for every buffer, for the year of the ecosystem functional
+property and for the one (12-month window) or two (24-month window) preceding years. For figures, sites were classified by
+their maximum total mortality across years, averaged over the five buffers (Low $<$ mean $-$ 0.5\,s.d., High $>$ mean + 0.5\,s.d.
+across sites).
+
+\textbf{Climate and plant traits.} Climate predictors were calculated from the tower meteorology and cover only the period
+before the growing season: the 12 months ending in the month before the growing-season start (lag 1) and, for the 24-month window,
+the 12 months before that (lag 2). For every month we used the mean, 5th and 95th percentile of air temperature, vapour pressure
+deficit and shortwave radiation, and the precipitation sum. Plant traits were 23 community-weighted mean traits at 1\,km
+resolution from global maps based on crowdsourced biodiversity observations and Earth observation\cite{lusk2026crowdsourced},
+averaged within 500\,m of each tower and weighted by area.
+
+\textbf{Site selection.} Site-years were retained when all four ecosystem functional properties were available (2017--2025),
+lay in runs of at least two consecutive years and had complete climate and mortality predictors including their lags, which
+restricts the years to 2020--2025. Two plantation sites with extreme water-use efficiency (CN-Sb1, CN-Sb2) and site-years with
+negative water-use efficiency were removed. We kept sites with a mean tree cover of at least 30\,\% within 500\,m. The final
+dataset has 101 sites and 361 site-years (median 4 years per site) of evergreen needleleaf (49 sites), deciduous broadleaf (30),
+mixed (7) and evergreen broadleaf (3) forests, wetlands (6), closed (3) and open shrublands (2) and woody savanna (1).
+
+\textbf{Models.} For each property and window, two models were compared that differ only in the mortality predictors:
+climate and traits (C+T; 143 predictors for 12 months, 263 for 24 months) and climate, traits and mortality (C+T+M; 193 and 338
+predictors). The main learner was AutoGluon-Tabular\cite{erickson2020autogluon} (v1.6.3; default model zoo of gradient-boosted
+trees, random forests, extra trees and neural networks, five-fold bagging on site-disjoint folds, weighted ensemble without
+stacking). XGBoost\cite{chen2016xgboost} and LightGBM\cite{ke2017lightgbm}, each tuned with Optuna\cite{akiba2019optuna}
+(tree-structured Parzen estimator, 50 trials per property and window, five-fold cross-validation on site-disjoint groups),
+served as checks.
+
+\textbf{Cross-validation.} Models were evaluated with repeated leave-one-site-out cross-validation: for every site, models were
+trained three times on a random 80\,\% of the remaining sites and the predictions for the held-out site were averaged. AutoGluon
+was refitted inside every fold, so that model selection never saw the held-out site.
+
+\textbf{Model interpretation.} Contributions of predictors were quantified with SHAP values\cite{lundberg2017unified}: exact
+TreeSHAP\cite{lundberg2020local} for XGBoost and LightGBM and permutation-based SHAP for the AutoGluon ensemble. The net
+contribution of the mortality block is the sum of the signed SHAP values of all mortality predictors per site-year, averaged per
+site; negative values mean that mortality lowers the predicted property.
+
+\textbf{Statistics.} The main test compares the mean absolute error (MAE) of C+T+M and C+T at the site-year level: every
+site-year is an observation, and the statistic is the difference of the pooled MAE (percentage change = ratio of the pooled
+errors). Because the years of one site are not independent, whole sites were resampled with replacement (10\,000 bootstrap draws,
+95\,\% percentile intervals) and, for a paired permutation test, the C+T and C+T+M predictions were swapped per site
+(10\,000 draws, one-sided). The same tests were run for subsets of sites (High total mortality) and of site-years (total mortality
+of the year above the Mid or High break). At the site level, per-site errors were compared with a one-sided sign-flip permutation
+test on the log error ratios (100\,000 flips). The relationship between the residuals (observed $-$ predicted) and the total
+mortality of the site-year was tested with linear mixed models with a random intercept per site (nlme\cite{pinheiro2000mixed}),
+checked with a site-block bootstrap of the slope (1,000 draws), leave-one-site-out refits and without the three sites with more
+than 50\,\% total mortality; the correction of the residual by mortality (residual of C+T+M minus residual of C+T) was tested per
+mortality class with the paired site-level permutation (100\,000 draws). Differences in net mortality SHAP between High and
+Low+Mid sites were tested with Mann--Whitney U tests and associations with Spearman correlations. $P$ values were corrected for
+multiple testing with the Benjamini--Hochberg procedure\cite{benjamini1995controlling} within each table or figure. To test for
+circularity, each property was refitted without the climate variables that enter its own formula (shortwave radiation for
+GPP$_\mathrm{sat}$, air temperature for ET$_\mathrm{max}$ and WUE).
+
+\textbf{Software.} Analyses used R\cite{rcore2024} (v4.3.3; xgboost, lightgbm, nlme, bigleaf) and Python (AutoGluon, Optuna, shap).
+
+\textbf{Use of large language models.} \decide{wording to be agreed by the authors; the journal requires any use of LLMs (e.g.
+for code or text assistance) to be documented here}
 
 \section*{Data availability}
-FLUXNET eddy-covariance data (ONEFlux processing) are available from the regional networks (ICOS, AmeriFlux and others;
-site citations in Supplementary Table~[X]). Tree mortality maps (deadtrees v5) are available from deadtrees.earth [REF].
-Plant trait maps are from Lusk et al.\ (2025) [REF]. The derived site-year dataset (ecosystem functional properties,
-mortality, climate and trait predictors) and all model predictions are deposited at [repository, DOI].
+The FLUXNET data products used in this work were downloaded from the ICOS Carbon Portal and AmeriFlux via the FLUXNET Shuttle on
+12 May 2026 and are cited per site\cite{flxATMmg,flxATZoe,flxAUAPL,flxAUHow,flxBEBra,flxBEMaa,flxBEVie,flxCALU2,flxCATP1,flxCATP3,flxCATPD,flxCHDav,flxCHLae,flxCLACF,flxCLSDP,flxCNBeO,flxCNDzo,flxCZBK1,flxCZLnz,flxCZRAJ,flxCZStn,flxDEAkm,flxDEHai,flxDEHar,flxDEHoH,flxDEHzd,flxDEMsr,flxDEObe,flxDERuC,flxDETha,flxDKGds,flxDKSor,flxEEStg,flxESCrg,flxESHen,flxFIHyy,flxFIKen,flxFILet,flxFIRk2,flxFRBil,flxFRFBn,flxFRFon,flxFRPue,flxILYat,flxITBFt,flxITBsB,flxITCp2,flxITLav,flxITNoe,flxITRen,flxITSR2,flxJPApi,flxJPYms,flxJPYnf,flxKRKw1,flxKRKw2,flxNLLoo,flxRUFy2,flxRUFyo,flxSEHtm,flxSENor,flxSERos,flxSESvb,flxUSBZo,flxUSBar,flxUSCMW,flxUSCRK,flxUSCS2,flxUSGLE,flxUSHB2,flxUSHB3,flxUSHBK,flxUSMBP,flxUSMOz,flxUSMtB,flxUSNC2,flxUSNC3,flxUSRRC,flxUSRpf,flxUSSHC,flxUSSSH,flxUSUMd,flxUSVcp,flxUSxAB,flxUSxBL,flxUSxBN,flxUSxBR,flxUSxDJ,flxUSxDL,flxUSxGR,flxUSxJE,flxUSxML,flxUSxRM,flxUSxRN,flxUSxSC,flxUSxSE,flxUSxST,flxUSxTR,flxUSxUK,flxUSxUN,flxUSxWR}. Tree mortality maps are available from deadtrees.earth\cite{mosig2025deadtrees}
+and plant trait maps from Zenodo\cite{lusk2026crowdsourced}. The derived site-year dataset and all model predictions are deposited
+at [repository, DOI].
 
 \section*{Code availability}
-All code for dataset construction, model training (AutoGluon, XGBoost, LightGBM), statistics and figures is available
-at [repository, DOI].
+All code for dataset construction, model training (AutoGluon, XGBoost, LightGBM), statistics and figures is available at
+[repository, DOI].
 
 \renewcommand{\refname}{References}
 {\small\textit{Discussion references so far; Main and Methods still to be added (about 50 for an Article).}}
@@ -396,7 +433,12 @@ at [repository, DOI].
 \bibliography{references}
 
 \section*{Acknowledgements}
-[Data providers (FLUXNET site PIs and networks, deadtrees.earth), colleagues, computing resources.]
+FLUXNET data products were produced and harmonized by eddy covariance regional networks and data processing centers,
+including AmeriFlux, ChinaFlux, European Fluxes Database, ICOS, JapanFlux, KoFlux, OzFlux, SAEON, and TERN. These products also
+include a modified version of ERA5 hourly data provided by the Copernicus Climate Change Service. Funding for the AmeriFlux data
+service was provided by the U.S. Department of Energy Office of Science. ChinaFlux data are from the National ecosystem science
+data center https://www.nesdc.org.cn. TERN data are from the TERN Data Discovery Portal https://portal.tern.org.au/browse/theme.
+We thank all site PIs and teams. [deadtrees.earth, colleagues, computing resources.]
 
 \section*{Funding}
 [Initials] disclose(s) support for the research of this work from [Funder] [grant number]. [Initials] declare(s) no
