@@ -8,6 +8,7 @@
 \usepackage{booktabs}
 \usepackage{multirow}
 \usepackage{rotating}
+\usepackage[numbers,super,sort&compress]{natbib}
 \setlist[itemize]{leftmargin=1.4em,itemsep=2pt,topsep=3pt}
 \newcommand{\decide}[1]{\textcolor{red!75!black}{\textbf{[DECISION: #1]}}}
 
@@ -253,32 +254,78 @@ points coloured by IGBP class.}
 \end{itemize}
 
 \section*{Discussion}
+{\small\textit{Draft (about 1,300 words). Numbered citations; references in references.bib, each checked against the
+paper's abstract.}}
 
- \begin{itemize}
-        \item Canopy mortality informs carbon uptake, not water partitioning
-        \item The effect is concentrated in the years and sites where mortality happened
-        \item The effect is functional, not ecosystem-specific
-        \item Site-level heterogeneity and its interpretation
-        \item Limitations
-        \item Implications
-    \end{itemize}
-\medskip
-\textit{Closing paragraphs of the Discussion (draft; the journal has no separate Conclusions section):}
+Satellite- and aerial-based maps of tree mortality made the functional properties of forests more predictable, and
+the gain was concentrated where mortality occurred. Without mortality information, models over-predicted maximum net
+ecosystem productivity, light-saturated photosynthesis and water-use efficiency in years with high mortality, and this
+bias grew with the amount of mortality. Adding mortality reduced it by one- to two-thirds, depending on the learner,
+and the direction of the mortality effect followed the amount of mortality rather than vegetation type or tree cover.
+Mortality therefore carries information on forest carbon uptake that climate and plant traits do not.
 
-Knowing where and when trees die makes the carbon uptake of forests more predictable. Across 101 forest sites,
-mortality information improved predictions of maximum net ecosystem productivity, light-saturated photosynthesis and
-water-use efficiency, and the improvement was largest in the years when mortality happened. Without it, models
-systematically over-estimated carbon uptake in forests with high mortality; with it, this bias shrank by about
-two-thirds. The correction scaled with the amount of mortality and did not depend on vegetation type or tree cover,
-which suggests that mortality acts as a general, transferable predictor of ecosystem function rather than a
-site-specific one.
+The direction of the effect is consistent with what single-site studies have measured during mortality events. At a
+subalpine forest hit by spruce beetles, net ecosystem exchange diminished by about half once the attacked trees died,
+after an earlier phase in which hydraulic failure restricted gas exchange\cite{frank2014ecosystem}. Across North
+American forests, net ecosystem production became a carbon loss after stand-replacing disturbances and returned to a
+sink within 10 to 20 years\cite{amiro2010ecosystem}. Our results generalize these site observations across 101 sites
+and several forest types, and they suggest why mortality acts on productivity: the first and most important axis of
+ecosystem function, maximum productivity, is mostly explained by vegetation structure\cite{migliavacca2021three}, and
+mortality changes that structure directly. Total mortality, which combines standing dead trees with tree-cover loss,
+carried most of the information, and the direction of its effect was negative at most sites with high mortality and
+slightly positive at sites with little.
 
-These results come from predictive models and from few site-years with severe mortality (21 site-years above 30\,\%
-total mortality), so they quantify how much mortality information improves predictions rather than the physiological
-mechanism behind it, and the largest effects rest on a small number of strongly affected sites. With mortality maps now
-available at continental to global scale and flux networks growing, adding mortality to data-driven upscaling products
-and to the evaluation of land-surface models is a direct way to reduce the over-estimate of carbon uptake in forests
-with high mortality.
+The effect was not uniform, and the literature shows why. At a lodgepole pine forest where beetles killed 30 to 78\,\%
+of the basal area, maximum CO$_2$ uptake did not change, because the remaining vegetation used light more efficiently
+and the changes in photosynthesis and respiration cancelled out\cite{reed2014impact}. In British Columbia, beetle-killed
+stands remained growing-season carbon sinks thanks to surviving trees and understory\cite{brown2009impact}, and a
+synthesis of remote-sensing and flux data suggested that net ecosystem production may recover within about four years
+after climate-driven mortality\cite{anderegg2016when}. Such compensation fits the shape of our results: errors changed
+little at low and moderate mortality and fell sharply only in the site-years with more than 30\,\% total mortality, and
+the reduction over all site-years (11--12\,\% for maximum net ecosystem productivity) was much smaller than in
+high-mortality years (29--32\,\%). Our predictors included mortality of the current and the one or two preceding years,
+which allows models to capture the multi-year legacies that follow drought and mortality\cite{anderegg2015pervasive};
+how quickly the functional properties recover after mortality remains to be tested with longer records.
+
+Mortality improved water-use efficiency where it occurred but not maximum evapotranspiration. Measured responses of
+evapotranspiration to tree death differ between sites: evapotranspiration fell by 28--36\,\% during a spruce beetle
+outbreak\cite{frank2014ecosystem}, and evapotranspiration relative to precipitation fell by 30\,\% at a beetle-affected
+site\cite{knowles2023bark}, whereas reviews of die-off ecohydrology expect the loss of transpiration and interception to
+be partly offset by more evaporation from the soil and by surviving and understory vegetation\cite{adams2011ecohydrological}.
+After drought-induced die-off in semi-arid basins, streamflow even decreased\cite{guardiolaclaramonte2011decreased}.
+Maximum evapotranspiration, the 95th percentile of half-hourly evapotranspiration, is dominated by atmospheric demand
+and is therefore less sensitive to the loss of individual trees than carbon uptake. Mortality thus appears to act more
+on the carbon side of ecosystem function than on its water side.
+
+These results matter for estimates of the forest carbon sink. Disturbances, many of them involving tree mortality,
+already shape the carbon balance at large scales: a mountain pine beetle outbreak turned the forests of British Columbia
+from a small carbon sink into a large source\cite{kurz2008mountain}, increasing disturbances could reduce the carbon
+storage of European forests by about 500\,Tg\,C in 2021--2030\cite{seidl2014increasing}, drought and fire brought the
+Siberian forest carbon sink close to neutral\cite{fan2022siberian}, and stand-replacing disturbances account for a large
+part of global biomass turnover\cite{pugh2019important}. Data-driven upscaling of eddy-covariance fluxes does not include
+time since disturbance or site history among its predictors, which likely contributes to biased net ecosystem exchange
+patterns\cite{jung2020scaling}, and the representation of disturbance in vegetation models is a key reason why their
+estimates of the northern carbon sink disagree with atmospheric inversions\cite{osullivan2024role}. Our models reproduce
+this blind spot: without mortality they over-estimated carbon uptake exactly where mortality was high. With tree
+mortality increasing worldwide\cite{allen2009global,hammond2022global,hartmann2022climate} and forest disturbance
+regimes shifting towards younger and shorter stands\cite{mcdowell2020pervasive,seidl2017forest}, this bias is likely to
+grow unless mortality is represented explicitly.
+
+Our study has limitations. The models are predictive, so they quantify how much mortality information improves
+predictions rather than the physiological mechanisms behind the change. Only 21 site-years at 10 sites had more than
+30\,\% total mortality; the strongest effects rest on these sites, although the over-prediction without mortality held
+when any single site or the three most extreme sites were left out. Mortality was derived from maps around each tower
+(100--500\,m buffers), which do not match the varying flux footprint exactly, and errors in the maps add noise that
+probably weakens rather than strengthens the effects we report. Finally, the climate predictors cover only the period
+before the growing season, and leaving out the climate variables that enter the calculation of each property did not
+change the main results (Appendix~A8), so the mortality effect does not arise from circularity with the climate data.
+
+Knowing where and when trees die makes the carbon uptake of forests more predictable. Without that knowledge, models
+systematically over-estimated carbon uptake in forests with high mortality; with it, this bias shrank, and the correction
+scaled with the amount of mortality regardless of vegetation type or tree cover. Mortality maps now cover large areas
+at high resolution\cite{mosig2025deadtrees}, and flux networks keep growing. Adding mortality to data-driven upscaling
+products and to the evaluation of land-surface models is a direct way to avoid over-estimating the carbon uptake of
+forests with high mortality.
 
 \section*{Methods}
 \begin{itemize}
@@ -342,9 +389,10 @@ mortality, climate and trait predictors) and all model predictions are deposited
 All code for dataset construction, model training (AutoGluon, XGBoost, LightGBM), statistics and figures is available
 at [repository, DOI].
 
-\section*{References}
-{\small\textit{To be added: numbered, in order of citation (main text, Methods, Data availability, figure legends,
-Extended Data); about 50 for an Article.}}
+\renewcommand{\refname}{References}
+{\small\textit{Discussion references so far; Main and Methods still to be added (about 50 for an Article).}}
+\bibliographystyle{unsrtnat}
+\bibliography{references}
 
 \section*{Acknowledgements}
 [Data providers (FLUXNET site PIs and networks, deadtrees.earth), colleagues, computing resources.]
