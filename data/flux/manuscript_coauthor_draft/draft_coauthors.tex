@@ -240,32 +240,7 @@ points coloured by IGBP class.}
 (paired permutation, BH-FDR).}
 \end{center}
 
-\textbf{Last test: EFP-specific climate block (circularity check)}
-\begin{itemize}
-  \item Concern (Miguel): a climate variable that is part of an EFP's formula could make the prediction partly circular.
-        The climate predictors are already strictly pre-season, but to be safe each EFP was refitted (AutoGluon, same design)
-        \textbf{without the climate variables in its formula}: GPP$_{sat}$ without radiation (light-response curve on
-        PPFD = SW$_{IN}$ $\times$ 2.11), ET$_{max}$ and WUE without air temperature (ET = LE / $\lambda$(T$_a$));
-        NEP$_{max}$ has no climate variable in its formula and is unchanged. Filters (SW$_{IN}$ thresholds, rain) are not
-        part of the formulas and were kept. 36 (12\,m) and 72 (24\,m) climate predictors removed.
-  \item \textbf{Skill hardly changes:} $R^2$ of C+T+M (12 / 24\,m) GPP$_{sat}$ 0.385 / 0.365 (before 0.367 / 0.370),
-        ET$_{max}$ 0.409 / 0.420 (0.425 / 0.433), WUE 0.281 / 0.302 (0.312 / 0.326).
-  \item \textbf{The mortality effect is unchanged} (Table~\ref{tab:efpclim}): WUE still improves significantly at High sites
-        ($-11$ / $-15$\,\%) and in high-mortality years ($-17$ / $-20$\,\%); GPP$_{sat}$ $-4$ to $-16$\,\%, significant at
-        12\,m (all site-years $-6.1$\,\%, Mid+High years $-8.3$\,\%) but not at 24\,m; ET$_{max}$ not significant.
-  \item \textbf{The over-prediction without mortality and its correction remain} (Fig.~6): in the $>$30\,\% class
-        GPP$_{sat}$ is over-predicted by 4.6 and corrected by +3.6\,$\mu$mol\,m$^{-2}$\,s$^{-1}$ ($q=0.04$; 12\,m: +3.7,
-        $q=0.009$), WUE by 0.71 and corrected by +0.25\,g\,C\,mm$^{-1}$ ($q=0.04$; 12\,m $q=0.002$); NEP$_{max}$ as before.
-  \item \textbf{So:} the mortality results do not depend on climate variables that enter the EFP formulas --- no
-        circularity from the climate block.
-\end{itemize}
-
-\input{tables/table_efpclim_bootstrap_dMAE}
-
-\begin{center}
-\includegraphics[width=\linewidth]{figures/fig6_residual_by_mortality_AG_efpclim_24m.png}\\[2pt]
-{\small \textbf{Fig.\ 6} --- as Fig.~5, AutoGluon with the EFP-specific climate block, 24\,months.}
-\end{center}
+\textbf{Circularity check.} Refitting each property without the climate variables in its own formula (radiation for GPP$_{sat}$, air temperature for ET$_{max}$ and WUE) leaves the skill and the main mortality results essentially unchanged (Appendix~A8).
 
 \textbf{Mortality metrics}
 \begin{itemize}
@@ -561,6 +536,33 @@ retrained with the same tuned settings and folds).}
 \includegraphics[width=\linewidth]{figures/A_fig_dose_siteyear_AG.png}\\[2pt]
 {\small \textbf{Fig.\ A22} --- every site-year with the mixed-model slope, AutoGluon: top, error change; bottom, residuals
 without (cyan) and with mortality (pink).}
+\end{center}
+
+\subsection*{A8. Circularity check: EFP-specific climate block}
+\begin{itemize}
+  \item Concern (Miguel): a climate variable that is part of an EFP's formula could make the prediction partly circular.
+        The climate predictors are already strictly pre-season, but to be safe each EFP was refitted (AutoGluon, same design)
+        \textbf{without the climate variables in its formula}: GPP$_{sat}$ without radiation (light-response curve on
+        PPFD = SW$_{IN}$ $\times$ 2.11), ET$_{max}$ and WUE without air temperature (ET = LE / $\lambda$(T$_a$));
+        NEP$_{max}$ has no climate variable in its formula and is unchanged. Filters (SW$_{IN}$ thresholds, rain) are not
+        part of the formulas and were kept. 36 (12\,m) and 72 (24\,m) climate predictors removed.
+  \item \textbf{Skill hardly changes:} $R^2$ of C+T+M (12 / 24\,m) GPP$_{sat}$ 0.385 / 0.365 (before 0.367 / 0.370),
+        ET$_{max}$ 0.409 / 0.420 (0.425 / 0.433), WUE 0.281 / 0.302 (0.312 / 0.326).
+  \item \textbf{The mortality effect is unchanged} (Table~\ref{tab:efpclim}): WUE still improves significantly at High sites
+        ($-11$ / $-15$\,\%) and in high-mortality years ($-17$ / $-20$\,\%); GPP$_{sat}$ $-4$ to $-16$\,\%, significant at
+        12\,m (all site-years $-6.1$\,\%, Mid+High years $-8.3$\,\%) but not at 24\,m; ET$_{max}$ not significant.
+  \item \textbf{The over-prediction without mortality and its correction remain} (Fig.~A23): in the $>$30\,\% class
+        GPP$_{sat}$ is over-predicted by 4.6 and corrected by +3.6\,$\mu$mol\,m$^{-2}$\,s$^{-1}$ ($q=0.04$; 12\,m: +3.7,
+        $q=0.009$), WUE by 0.71 and corrected by +0.25\,g\,C\,mm$^{-1}$ ($q=0.04$; 12\,m $q=0.002$); NEP$_{max}$ as before.
+  \item \textbf{So:} the mortality results do not depend on climate variables that enter the EFP formulas --- no
+        circularity from the climate block.
+\end{itemize}
+
+\input{tables/table_efpclim_bootstrap_dMAE}
+
+\begin{center}
+\includegraphics[width=\linewidth]{figures/fig6_residual_by_mortality_AG_efpclim_24m.png}\\[2pt]
+{\small \textbf{Fig.\ A23} --- as Fig.~5, AutoGluon with the EFP-specific climate block, 24\,months.}
 \end{center}
 
 \end{document}
