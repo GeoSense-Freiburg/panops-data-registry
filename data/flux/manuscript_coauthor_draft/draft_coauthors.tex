@@ -170,7 +170,7 @@ Mean               & 0.349 & 0.402 & +0.053 & 0.351 & 0.408 & +0.057 \\
 \end{itemize}
 
 \begin{center}
-\includegraphics[width=0.8\linewidth]{figures/fig2_signed_total_mort_24m_AG_compact.png}\\[2pt]
+\includegraphics[width=\linewidth]{figures/fig2_signed_total_mort_24m_AG_compact.png}\\[2pt]
 {\small \textbf{Fig.\ 2} --- net signed mortality SHAP per site, C+T+M model, 24\,months, AutoGluon; sites sorted and
 coloured by total mortality (mean of the five buffers).}
 \end{center}
@@ -237,8 +237,8 @@ points coloured by IGBP class.}
 
 \begin{center}
 \includegraphics[width=\linewidth]{figures/fig5_residual_by_mortality_AG_24m.png}\\[2pt]
-{\small \textbf{Fig.\ 5} --- mean residual per class of the site-year's total mortality, without (cyan) and with mortality
-(pink), AutoGluon, 24\,months; bars = 95\,\% site-block bootstrap interval; numbers = site-years (sites); stars = adding mortality lowers the prediction significantly in that class
+{\small \textbf{Fig.\ 5} --- mean residual per class of the site-year's total mortality, without (blue) and with mortality
+(vermillion), AutoGluon, 24\,months; bars = 95\,\% site-block bootstrap interval; numbers = site-years (sites); stars = adding mortality lowers the prediction significantly in that class
 (paired permutation, BH-FDR).}
 \end{center}
 
@@ -517,27 +517,28 @@ Mean, C+T   & \textbf{0.349} & 0.337 & 0.347 & 0.351 & \textbf{0.365} & 0.356 \\
 \includegraphics[width=\linewidth]{figures/A_fig_signed_24m_AG_sites.png}\\[2pt]
 {\small \textbf{Fig.\ A5} --- Fig.~2 with site names, AutoGluon, 24\,months.}
 \end{sidewaysfigure}
-\begin{sidewaysfigure}
-\centering
+\begin{center}
 \includegraphics[width=\linewidth]{figures/A_fig_signed_12m_AG_sites.png}\\[2pt]
 {\small \textbf{Fig.\ A6} --- Fig.~2, AutoGluon, 12\,months.}
-\end{sidewaysfigure}
-\begin{sidewaysfigure}
-\centering
+\end{center}
+\begin{center}
 \includegraphics[width=\linewidth]{figures/A_fig_signed_24m_XGB.png}\\[2pt]
 {\small \textbf{Fig.\ A7} --- Fig.~2, XGBoost--Optuna, 24\,months.}
-\end{sidewaysfigure}
-\begin{sidewaysfigure}
-\centering
+\end{center}
+\begin{center}
 \includegraphics[width=\linewidth]{figures/A_fig_signed_24m_LGB.png}\\[2pt]
 {\small \textbf{Fig.\ A8} --- Fig.~2, LightGBM--Optuna, 24\,months.}
-\end{sidewaysfigure}
+\end{center}
 
 \clearpage
 \subsection*{A4. High vs Low+Mid: all learners and relative deadwood}
 \begin{center}
-\includegraphics[width=0.85\linewidth]{figures/A_fig_direction_all_learners.png}\\[2pt]
-{\small \textbf{Fig.\ A9} --- Fig.~3 for all three learners (total mortality).}
+\includegraphics[width=\linewidth]{figures/A_fig_direction_all_learners.png}\\[2pt]
+{\small \textbf{Fig.\ A9} --- Fig.~3, XGBoost--Optuna.}
+\end{center}
+\begin{center}
+\includegraphics[width=\linewidth]{figures/A_fig_direction_LGB.png}\\[2pt]
+{\small \textbf{Fig.\ A9b} --- Fig.~3, LightGBM--Optuna.}
 \end{center}
 \begin{center}
 \includegraphics[width=\linewidth]{figures/A_fig_direction_rel_deadwood_AG.png}\\[2pt]
