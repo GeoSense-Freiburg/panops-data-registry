@@ -221,9 +221,9 @@ for (s in sets) {
                    "D · Tree cover vs. direction of the mortality effect",
                    paste0("Each point = one site | Linear fit with 95% CI | below zero = model predicts a LOWER ", RESP_WORD, " value"),
                    TRUE, TRUE, labD)
-  pE <- scatter_tc(sh, "rel_disturbance", paste0("Total mortality (", CLASS_LAB, ", %, max across years)"),
+  pE <- scatter_tc(sh, "rel_disturbance", paste0("Relative mortality (", CLASS_LAB, ", %, max across years)"),
                    "dist_signed", "Net signed mortality SHAP\n(effect on PREDICTED value)",
-                   "E · Total mortality vs. direction of the mortality effect",
+                   "E · Relative mortality vs. direction of the mortality effect",
                    paste0("Each point = one site | Linear fit with 95% CI | below zero = model predicts a LOWER ", RESP_WORD, " value"),
                    TRUE, TRUE, labE)
 
@@ -237,7 +237,7 @@ for (s in sets) {
   stem <- file.path(out_dir, sprintf("fig5_igbp_board_%s_%s%s", sub("^M4_", "", s$wd), FAM, CLASS_TAG))
   ggsave(paste0(stem, ".png"), board, width = 14, height = 25, dpi = 190, bg = DARK_BG, limitsize = FALSE)
   ggsave(paste0(stem, ".pdf"), board, width = 14, height = 25, bg = DARK_BG, limitsize = FALSE)
-  # panel E on its own (2026-10-09, coauthor draft main text): total mortality vs direction, no panel title
+  # panel E on its own (2026-10-09, coauthor draft main text): relative mortality vs direction, no panel title
   stemE <- file.path(out_dir, sprintf("fig5E_total_mort_direction_%s_%s%s", sub("^M4_", "", s$wd), FAM, CLASS_TAG))
   pE1 <- pE + labs(title = NULL)
   ggsave(paste0(stemE, ".png"), pE1, width = 12, height = 4.4, dpi = 300, bg = DARK_BG)

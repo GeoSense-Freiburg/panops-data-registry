@@ -43,7 +43,7 @@ nb <- function(v){m<-mean(v,na.rm=TRUE); s<-sd(v,na.rm=TRUE)
   factor(cut(v, c(-Inf, m-0.5*s, m+0.5*s, Inf), c("Low","Mid","High")), levels=c("Low","Mid","High"))}
 METRICS <- list(
   list(key="relmort", col="relative_mortality_cls",   lab="relative deadwood"),
-  list(key="reldist", col="relative_disturbance_cls", lab="total mortality"))
+  list(key="reldist", col="relative_disturbance_cls", lab="relative mortality"))
 
 th <- theme_bw(base_size=11) + theme(
   plot.background=element_rect(fill=BG,colour=NA), panel.background=element_rect(fill=PANEL,colour=NA),

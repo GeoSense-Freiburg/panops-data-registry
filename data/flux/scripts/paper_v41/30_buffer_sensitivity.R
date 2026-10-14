@@ -20,7 +20,7 @@ BUFS <- c(100, 200, 300, 400, 500)
 METRICS <- c(tree_cover_mean_pct = "Tree cover (%)",
              absolute_mortality = "Absolute deadwood (% of area)",
              relative_mortality = "Relative deadwood (% of tree cover)",
-             relative_disturbance = "Total mortality (%)",
+             relative_disturbance = "Relative mortality (%)",
              new_deadwood_gain_pp = "New deadwood gain (pp)",
              relative_tree_loss_pct = "Relative tree loss (%)")
 BUF_COLS <- setNames(c("#B2DFDB", "#66B2A9", "#2E8C83", "#0F6660", "#004D4D"), paste0(BUFS, " m"))  # one hue, light -> dark

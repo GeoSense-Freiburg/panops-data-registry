@@ -47,7 +47,7 @@ SCALE_COLS <- c("#004D4D", "#F0E442", "#EE6FA8")   # dark teal -> yellow -> pink
 DIST_META <- list(
   abs_mort = list(label = paste0("Absolute Deadwood\n(", CLASS_LAB, ", %)")),
   rel_mort = list(label = paste0("Relative Deadwood\n(", CLASS_LAB, ", %)")),
-  rel_dist = list(label = paste0("Total Mortality\n(", CLASS_LAB, ", %)")))
+  rel_dist = list(label = paste0("Relative Mortality\n(", CLASS_LAB, ", %)")))
 DIST_META <- DIST_META[intersect(names(DIST_META), strsplit(Sys.getenv("FIG3B_METRICS", "abs_mort,rel_mort,rel_dist"), ",")[[1]])]
 for (k in names(DIST_META)) {     # natural breaks: Low < mean - 0.5 SD <= Mid <= mean + 0.5 SD < High
   x <- site_dist[[k]]

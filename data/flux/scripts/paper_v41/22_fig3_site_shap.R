@@ -55,7 +55,7 @@ NB <- list(abs_mort = nb_high(site_dist$abs_mort), rel_mort = nb_high(site_dist$
 DIST_META <- list(
   abs_mort = list(col = "abs_mort", label = sprintf("Absolute Deadwood\n(%s, %%)  NB=%.1f", CLASS_LAB, NB$abs_mort), mid_v = NB$abs_mort),
   rel_mort = list(col = "rel_mort", label = sprintf("Relative Deadwood\n(%s, %%)  NB=%.1f", CLASS_LAB, NB$rel_mort), mid_v = NB$rel_mort),
-  rel_dist = list(col = "rel_dist", label = sprintf("Total Mortality\n(%s, %%)  NB=%.1f", CLASS_LAB, NB$rel_dist), mid_v = NB$rel_dist)
+  rel_dist = list(col = "rel_dist", label = sprintf("Relative Mortality\n(%s, %%)  NB=%.1f", CLASS_LAB, NB$rel_dist), mid_v = NB$rel_dist)
 )
 
 shap_grp <- merge(shap_grp, site_dist, by.x = "test_site", by.y = "SITE_ID", all.x = TRUE)

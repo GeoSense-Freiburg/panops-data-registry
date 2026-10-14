@@ -37,7 +37,7 @@ stopifnot(SUBSET %in% c("all", "high_reldist", "high_relmort"))
 KEEP_SITES <- NULL; SUB_TXT <- ""; FILE_TAG <- ""
 if (SUBSET != "all") {
   mcol <- c(high_reldist = "relative_disturbance_cls", high_relmort = "relative_mortality_cls")[[SUBSET]]
-  mlab <- c(high_reldist = "total mortality", high_relmort = "relative deadwood")[[SUBSET]]
+  mlab <- c(high_reldist = "relative mortality", high_relmort = "relative deadwood")[[SUBSET]]
   sm <- paper_class_data()[, c("SITE_ID", mcol), with = FALSE]
   setnames(sm, mcol, "v")
   sm <- sm[, .(v = suppressWarnings(max(v, na.rm = TRUE))), by = SITE_ID][is.finite(v)]

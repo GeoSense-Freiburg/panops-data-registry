@@ -60,7 +60,7 @@ Main display items (numbering of the current draft):
 | Table 2 | Site-year MAE change, paired bootstrap and permutation | `scripts/paper_v41/39_paired_bootstrap.R`, `40_table_bootstrap.R` | `Table2_siteyear_MAE_bootstrap.xlsx` |
 | Fig. 2 | Net mortality SHAP per site (compact) | `scripts/paper_v41/32_fig3_landscape.R` (via `AutoGluon/05_figures.sh`) | `Fig2_net_mortality_shap_per_site.xlsx` |
 | Fig. 3 | High vs Low+Mid sites | `scripts/paper_v41/23_fig4_signed_shap.R` (wide layout via `AutoGluon/05b_figures_ag_only.sh`) | `Fig3_high_vs_lowmid.xlsx` |
-| Fig. 4 | Total mortality vs direction (panel E of the board) | `scripts/paper_v41/24_fig5_igbp_board.R` | `Fig4_mortality_vs_direction.xlsx` |
+| Fig. 4 | Relative mortality vs direction (panel E of the board) | `scripts/paper_v41/24_fig5_igbp_board.R` | `Fig4_mortality_vs_direction.xlsx` |
 | Fig. 5 | Residual by mortality class, with correction test | `scripts/paper_v41/43_residual_by_mortality_bin.R` | `Fig5_residual_by_mortality_class.xlsx` |
 
 Extended Data / Supplementary items (all in `scripts/paper_v41/`): per-site MAE and log-ratio permutation (`21_fig2_M3M4.R`

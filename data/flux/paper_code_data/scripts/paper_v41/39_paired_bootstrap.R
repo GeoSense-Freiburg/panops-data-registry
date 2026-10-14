@@ -11,8 +11,8 @@
 # and permute WHOLE SITES: bootstrap = sites drawn with replacement (with all their years), N_BOOT draws,
 # 95 % percentile interval; permutation = C+T / C+T+M labels swapped per site (all years together), N_PERM
 # draws, one-sided (C+T+M better), BH-corrected across each table.
-# Subsets: all sites, Mid+High, High sites (site maximum of total mortality, as Tables 1-2); at site-year level
-# also site-years whose OWN total mortality is above the Mid / High break (years without mortality left out).
+# Subsets: all sites, Mid+High, High sites (site maximum of relative mortality, as Tables 1-2); at site-year level
+# also site-years whose OWN relative mortality is above the Mid / High break (years without mortality left out).
 # Predictions = the repeated CV predictions (mean over the 3 repetitions per site-year), as in Tables 1-2.
 # Output: plots/<sub>/paired_bootstrap_statistics.csv
 #   PAPER_RESP_SET=efp_v5 PAPER_NO_THRESH=1 Rscript 39_paired_bootstrap.R
@@ -34,7 +34,7 @@ if (AG_EXTRA != "") {
   OSFX <- paste0("_", AG_EXTRA)
 }
 
-# ---- classes: site maximum of total mortality (as Tables 1-2) and each site-year's own value -------------
+# ---- classes: site maximum of relative mortality (as Tables 1-2) and each site-year's own value -------------
 cd <- paper_class_data()[, .(SITE_ID, YEAR, tm = relative_disturbance_cls)]
 cl <- cd[, .(v = max(tm, na.rm = TRUE)), by = SITE_ID]
 mu <- mean(cl$v); s <- sd(cl$v); b_lo <- max(mu - 0.5 * s, 0); b_hi <- mu + 0.5 * s
@@ -82,7 +82,7 @@ for (L in names(LEARNERS)) {
       rows[[length(rows) + 1]] <- s2[, test_units(A, B, n, g), by = .(response, window)][
         , `:=`(learner = L, metric = MET, level = "siteyear", subset = k)]
     }
-    # site-year level, years selected by their OWN total mortality (all sites)
+    # site-year level, years selected by their OWN relative mortality (all sites)
     for (k in c("yr_midhigh", "yr_high")) {
       x <- w[!is.na(tm) & tm > (if (k == "yr_high") b_hi else b_lo)]
       s2 <- x[, .(A = sum(e4), B = sum(e3), n = .N), by = .(response, window, SITE_ID)]

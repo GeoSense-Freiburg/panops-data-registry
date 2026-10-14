@@ -63,10 +63,10 @@ mean_dr = dr.groupby(level=0).mean()
 kpis = [("Sites / site-years", ds_lines[0].replace("v4.1: ", "v4.1 ").replace("; v5: ", " · v5 ")),
         ("Mean R², C+T+M (XGB / LGB)",
          f"v4.1 {m4[('XGB','v4.1')]:.3f} / {m4[('LGB','v4.1')]:.3f} · v5 {m4[('XGB','v5')]:.3f} / {m4[('LGB','v5')]:.3f}"),
-        ("Total mortality, shared site-years", f"r = {agree.loc['total mortality','r_site_years']:.2f}, "
-                                               f"median change {agree.loc['total mortality','median_change']:+.1f} pp"),
-        ("High total-mortality sites", f"v4.1 {hi.loc['total mortality','high_v41']} · v5 {hi.loc['total mortality','high_v5']} · "
-                                       f"shared {hi.loc['total mortality','both']}")]
+        ("Relative mortality, shared site-years", f"r = {agree.loc['relative mortality','r_site_years']:.2f}, "
+                                               f"median change {agree.loc['relative mortality','median_change']:+.1f} pp"),
+        ("High relative-mortality sites", f"v4.1 {hi.loc['relative mortality','high_v41']} · v5 {hi.loc['relative mortality','high_v5']} · "
+                                       f"shared {hi.loc['relative mortality','both']}")]
 
 css = """
 :root{--bg:#ffffff;--fg:#1b1f24;--muted:#5b6470;--line:#d9dde3;--card:#f6f7f9;--accent:#0f6660;--warn:#9a5b00}
@@ -109,11 +109,11 @@ s3 = table(dr, "Change in overall RMSE when mortality is added (C+T → C+T+M), 
 if f2a is not None:
     s3 += table(f2a, "Fig 2, all sites: median per-site change in RMSE (%), stars = BH-corrected one-sided Wilcoxon, (share of sites improved).", fmt="{}")
 s3 += pair("fig2_mortality_effect.png", "fig2_mortality_effect.png", "Fig 2, all sites")
-s3 += "<h3>High-mortality sites</h3>" + table(f2h, "Fig 2b, high total-mortality sites.", fmt="{}")
-s3 += pair("fig2_high_total_mort_mortality_effect.png", "fig2_high_total_mort_mortality_effect.png", "Fig 2b, high total-mortality sites")
+s3 += "<h3>High-mortality sites</h3>" + table(f2h, "Fig 2b, high relative-mortality sites.", fmt="{}")
+s3 += pair("fig2_high_total_mort_mortality_effect.png", "fig2_high_total_mort_mortality_effect.png", "Fig 2b, high relative-mortality sites")
 s3 += table(f2r, "Fig 2b, high relative-deadwood sites.", fmt="{}")
 s3 += pair("fig2_high_rel_deadwood_mortality_effect.png", "fig2_high_rel_deadwood_mortality_effect.png", "Fig 2b, high relative-deadwood sites")
-s3 += pair("fig_site_dRMSE_total_mort.png", "fig_site_dRMSE_total_mort.png", "per-site ΔRMSE coloured by total-mortality class")
+s3 += pair("fig_site_dRMSE_total_mort.png", "fig_site_dRMSE_total_mort.png", "per-site ΔRMSE coloured by relative-mortality class")
 sec.append(("effect", "3. Effect of mortality on prediction error", s3))
 
 s4 = pair("fig3b_signed_total_mort_24m_LGB_landscape.png", "fig3b_signed_total_mort_24m_LGB_landscape.png",
@@ -124,7 +124,7 @@ s4 += pair("fig3_total_mort_24m_LGB_landscape.png", "fig3_total_mort_24m_LGB_lan
 sec.append(("shap", "4. What the models use (Fig 3)", s4))
 
 s5 = table(f4, "Fig 4: median net signed mortality SHAP, High vs Low+Mid sites; stars = BH-corrected Mann-Whitney U.", fmt="{}")
-s5 += pair("fig4_signed_shap_total_mort.png", "fig4_signed_shap_total_mort.png", "Fig 4, split by total mortality")
+s5 += pair("fig4_signed_shap_total_mort.png", "fig4_signed_shap_total_mort.png", "Fig 4, split by relative mortality")
 s5 += pair("fig4_signed_shap_rel_deadwood.png", "fig4_signed_shap_rel_deadwood.png", "Fig 4, split by relative deadwood")
 sec.append(("direction", "5. Direction of the effect (Fig 4)", s5))
 

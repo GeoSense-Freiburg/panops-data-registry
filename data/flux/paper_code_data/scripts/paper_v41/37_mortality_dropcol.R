@@ -3,7 +3,7 @@
 # Drop-column (leave-one-family-out) test for the mortality block (2026-10-08, advisor's suggestion).
 # SHAP divides credit among correlated predictors, so a family's SHAP share can over- or understate what it adds.
 # Here every family is removed from / used alone in the model and the change in error is measured.
-#   families: absolute deadwood, relative deadwood, deadwood gain, relative tree-cover loss, total mortality
+#   families: absolute deadwood, relative deadwood, deadwood gain, relative tree-cover loss, relative mortality
 #             (all five buffers and all lags of each)
 #   configs:  C+T, C+T+M (all), C+T+M minus one family (5), C+T + one family only (5)
 #   unique contribution = RMSE(minus family) / RMSE(C+T+M) - 1   (> 0: the family carries information the others lack)
@@ -27,7 +27,7 @@ df <- as.data.table(paper_load())
 safe <- function(x) make.unique(gsub("[^A-Za-z0-9_]", "_", x), sep = "_")
 FAMILIES <- c(absolute_mortality = "Absolute deadwood", relative_mortality = "Relative deadwood",
               new_deadwood_gain_pp = "Deadwood gain", relative_tree_loss_pct = "Relative tree-cover loss",
-              relative_disturbance = "Total mortality")
+              relative_disturbance = "Relative mortality")
 fam_of <- function(v) { f <- sub("_[0-9]+m(_lag[12])?$", "", v); ifelse(f %in% names(FAMILIES), f, NA_character_) }
 
 cfg_of <- function(win, resp) {

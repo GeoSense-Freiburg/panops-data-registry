@@ -25,7 +25,7 @@ OUT <- PAPER_FIG
 MODEL <- paste0("M4_", WIN)
 SCALE_COLS <- c("#004D4D", "#F0E442", "#EE6FA8")   # dark teal -> yellow (site mean) -> pink, as Fig 3b
 GROUP_COLOURS <- c(Climate = "#4A90D9", Traits = "#3DBDAA", Disturbance = "#D4A017")
-METRIC_LAB <- c(abs_mort = "Absolute deadwood", rel_mort = "Relative deadwood", rel_dist = "Total mortality")[[MKEY]]
+METRIC_LAB <- c(abs_mort = "Absolute deadwood", rel_mort = "Relative deadwood", rel_dist = "Relative mortality")[[MKEY]]
 
 # site metric (max over years, class buffer) and IGBP
 na_inf <- function(x) { x[!is.finite(x)] <- NA; x }

@@ -6,8 +6,8 @@
 #                two-sided bootstrap p (2 x share of draws on the other side of 0). No normality assumption.
 #   loso       - leave one site out: the mixed model refitted 101 times, each time without one site; range of
 #                slopes, share of refits with p < 0.05, and the most influential site (largest change of slope).
-#   no_extreme - sensitivity only: without the sites whose maximum total mortality exceeds EXTREME (%).
-# Slopes per 10 % total mortality of the site-year (mean of the five buffers), EFP units, as in script 41.
+#   no_extreme - sensitivity only: without the sites whose maximum relative mortality exceeds EXTREME (%).
+# Slopes per 10 % relative mortality of the site-year (mean of the five buffers), EFP units, as in script 41.
 # Output: plots/<sub>/dose_response/dose_response_robustness_<L>.csv
 #   PAPER_RESP_SET=efp_v5 PAPER_NO_THRESH=1 Rscript 42_dose_response_robustness.R [AG|XGB|LGB]
 # ============================================================================
@@ -73,7 +73,7 @@ R[, q_boot := p.adjust(p_boot, "BH"), by = test]
 R[, q_lme := p.adjust(p_lme, "BH"), by = test]
 R[, q_noext := p.adjust(noext_p, "BH"), by = test]
 fwrite(R, file.path(OUT, sprintf("dose_response_robustness_%s.csv", L)))
-# ---- figure: slope per 10 % total mortality under each check (interval = 95 %; LOSO = range of the 101 refits) ----
+# ---- figure: slope per 10 % relative mortality under each check (interval = 95 %; LOSO = range of the 101 refits) ----
 suppressMessages(library(ggplot2))
 TL <- c(t1a = "1a  Error change\n|C+T+M| - |C+T|", t2a_CT = "2a  Residual\nC+T (without M)",
         t2a_CTM = "2a  Residual\nC+T+M (with M)")
@@ -95,19 +95,19 @@ pr <- ggplot(G, aes(est, y, colour = method)) +
   scale_colour_manual(values = MC, breaks = ML, name = NULL) +
   scale_shape_manual(values = c(significant = 16, `not significant` = 21), name = NULL) +
   ggh4x::facet_grid2(test ~ response, scales = "free_x", independent = "x") +
-  labs(x = "Slope per +10 % total mortality of the site-year (EFP units)", y = NULL,
+  labs(x = "Slope per +10 % relative mortality of the site-year (EFP units)", y = NULL,
        title = sprintf("Robustness of the dose-response slopes (%s)", L),
        subtitle = paste0("Interval: mixed model / without extremes = 95 % CI from the model; bootstrap = 95 % percentile interval (", N_BOOT,
                          " site-block draws); leave one site out = range of the slopes over all refits\n",
                          "Filled = significant (BH q < 0.05 across the 8 EFP x window tests; leave one site out: p < 0.05 in >= 95 % of refits). Extreme sites (> ", EXTREME,
-                         " % total mortality): ", paste(EXT_SITES, collapse = ", "))) +
+                         " % relative mortality): ", paste(EXT_SITES, collapse = ", "))) +
   theme_bw(base_size = 9) + theme(panel.grid.minor = element_blank(), legend.position = "bottom", legend.box = "vertical",
     strip.background = element_rect(fill = "#EFEFEF", colour = "grey80"), strip.text = element_text(face = "bold"),
     strip.text.y = element_text(angle = 0, hjust = 0), panel.grid.major.y = element_blank(),
     plot.title = element_text(face = "bold"), plot.subtitle = element_text(size = 7.5, colour = "grey30"))
 ggsave(file.path(OUT, sprintf("dose_response_robustness_%s.png", L)), pr, width = 11, height = 7, dpi = 250, bg = "white")
 
-cat(sprintf("extreme sites (> %d %% total mortality): %s\n", EXTREME, paste(EXT_SITES, collapse = ", ")))
+cat(sprintf("extreme sites (> %d %% relative mortality): %s\n", EXTREME, paste(EXT_SITES, collapse = ", ")))
 print(R[, .(response, window, test, slope = round(slope, 3), p_lme = signif(p_lme, 2),
             boot = sprintf("[%.3f, %.3f]", boot_lo, boot_hi), q_boot = signif(q_boot, 2),
             loso = sprintf("[%.3f, %.3f]", loso_min, loso_max), loso_p05 = round(loso_share_p05, 2),

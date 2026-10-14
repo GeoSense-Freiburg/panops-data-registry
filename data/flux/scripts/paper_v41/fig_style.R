@@ -19,7 +19,7 @@ OKABE <- c(black = "#000000", orange = "#E69F00", skyblue = "#56B4E9", green = "
 PAL <- list(
   model    = c("C+T" = "#0072B2", "C+T+M" = "#D55E00"),                       # without / with mortality
   model_long = c("Without mortality (C+T)" = "#0072B2", "With mortality (C+T+M)" = "#D55E00"),
-  class    = c(Low = "#FDCC8A", Mid = "#FC8D59", High = "#B30000"),         # total-mortality classes (OrRd)
+  class    = c(Low = "#FDCC8A", Mid = "#FC8D59", High = "#B30000"),         # relative-mortality classes (OrRd)
   class2   = c("Low+Mid" = "#FDCC8A", High = "#B30000"),
   learner  = c(AutoGluon = "#009E73", XGBoost = "#0072B2", LightGBM = "#E69F00"),
   igbp     = c(ENF = "#009E73", DBF = "#E69F00", MF = "#CC79A7", EBF = "#0072B2", WET = "#56B4E9",
@@ -27,14 +27,14 @@ PAL <- list(
   neutral  = "#7F7F7F", zero = "#4D4D4D")
 MORT_LIMITS <- c(0, 90)
 MORT_COLS <- c("#FDD49E", "#FDBB84", "#FC8D59", "#EF6548", "#D7301F", "#B30000", "#7F0000")   # OrRd 3-9: low end still visible on white
-scale_fill_mortality <- function(name = "Total mortality (%)", ...)
+scale_fill_mortality <- function(name = "Relative mortality (%)", ...)
   scale_fill_gradientn(colours = MORT_COLS, limits = MORT_LIMITS, name = name, ...)
-scale_colour_mortality <- function(name = "Total mortality (%)", ...)
+scale_colour_mortality <- function(name = "Relative mortality (%)", ...)
   scale_colour_gradientn(colours = MORT_COLS, limits = MORT_LIMITS, name = name, ...)
 # alternative for Fig. 2 (user, 2026-10-14): green (low) -> pink/magenta (high), ColorBrewer PiYG without its
 # near-white centre so mid-mortality bars stay visible; colour-blind safe (green vs magenta)
 MORT_COLS_PIYG <- c("#4D9221", "#7FBC41", "#B8E186", "#F1B6DA", "#DE77AE", "#C51B7D", "#8E0152")
-scale_fill_mortality_piyg <- function(name = "Total mortality (%)", b_lo = NULL, b_hi = NULL, ...) {
+scale_fill_mortality_piyg <- function(name = "Relative mortality (%)", b_lo = NULL, b_hi = NULL, ...) {
   if (is.null(b_lo)) return(scale_fill_gradientn(colours = MORT_COLS_PIYG, limits = MORT_LIMITS, name = name, ...))
   # colours anchored to the class breaks: Low = greens, Mid = light green -> light pink, High = pink -> magenta
   v <- c(0, b_lo, b_hi, 50, MORT_LIMITS[2]) / MORT_LIMITS[2]

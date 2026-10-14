@@ -8,7 +8,7 @@ Replaces the earlier V10/V4.1 report (27_build_report_v10_v41.py). Three dataset
   V5    deadtrees v5 maps, same build rules (101 / 361)
   V2.2  deadtrees v2-2 maps (the analysis earlier called V10; 93 / 395) - only the figures that exist in the
         same form as for V4.1 / V5
-Paper structure and naming (memory: paper_naming_mortality): models C+T vs C+T+M; metrics "total mortality"
+Paper structure and naming (memory: paper_naming_mortality): models C+T vs C+T+M; metrics "relative mortality"
 (relative_disturbance) and "relative deadwood" (relative_mortality); absolute deadwood is not reported.
 Fig 3 is the landscape signed-SHAP figure. Table 1 = the Fig 2 summary table (also linked as .tex).
 Figures are copied into fluxVSmortality/v10/fig_<ds>/ so the page is self-contained.
@@ -174,9 +174,9 @@ GPP<sub>sat</sub>, NEP<sub>max</sub>, ET<sub>max</sub> and WUE are predicted fro
 </ul>
 <h3>Naming</h3>
 <table class="tbl gl"><tr><th>Name</th><th>Definition</th></tr>
-<tr><td>Total mortality</td><td>(standing deadwood + tree-cover loss) / (tree cover + tree-cover loss) × 100 - dead and lost canopy relative to the canopy present</td></tr>
+<tr><td>Relative mortality</td><td>(standing deadwood + tree-cover loss) / (tree cover + tree-cover loss) × 100 - dead and lost canopy relative to the canopy present</td></tr>
 <tr><td>Relative deadwood</td><td>standing deadwood / tree cover × 100 (where tree cover ≥ 10 %, capped at 100)</td></tr>
-<tr><td>Mortality block (M)</td><td>standing deadwood (cover and relative to tree cover), deadwood gain, relative tree-cover loss and total mortality, at all five buffers and lags (V4.1 / V5: no thresholded gain or loss metrics)</td></tr>
+<tr><td>Mortality block (M)</td><td>standing deadwood (cover and relative to tree cover), deadwood gain, relative tree-cover loss and relative mortality, at all five buffers and lags (V4.1 / V5: no thresholded gain or loss metrics)</td></tr>
 <tr><td>Low / Mid / High</td><td>site maximum of the metric across years; breaks mean − 0.5 SD and mean + 0.5 SD over sites</td></tr>
 </table>
 <h3>Datasets</h3>
@@ -205,31 +205,31 @@ TEST_NOTE = ("<p><b>Statistical test.</b> Tables 1 and 2 use a paired sign-flip 
              "as a robustness check.</p>")
 s3 += "<h3>Statistical tests compared</h3>" + TEST_NOTE
 s3 += per_ds(lambda k: table_html(test_counts(k), f"Significant cells (q < 0.05) per test, all learners, windows, EFPs and site classes ({DS[k]['label']})."))
-s3 += "<h3>Table 1 - summary of Fig 2 by total-mortality class (RMSE, permutation test on log ratios)</h3>"
+s3 += "<h3>Table 1 - summary of Fig 2 by relative-mortality class (RMSE, permutation test on log ratios)</h3>"
 s3 += per_ds(lambda k: table_html(fig2_table(k),
              f"Geometric-mean per-site change in RMSE when mortality is added (%), stars = one-sided paired permutation test on the "
-             f"log RMSE ratios, BH-corrected across the table; (share of sites improved). Classes by total mortality, {DS[k]['cls']}. "
+             f"log RMSE ratios, BH-corrected across the table; (share of sites improved). Classes by relative mortality, {DS[k]['cls']}. "
              f"LaTeX: {tex_link(tex_name(k))}."))
 s3 += "<h3>Table 2 - as Table 1, with MAE instead of RMSE</h3>"
 s3 += per_ds(lambda k: table_html(fig2_table(k, metric="MAE"),
              f"Geometric-mean per-site change in MAE (mean absolute error) when mortality is added (%), stars = one-sided paired "
              f"permutation test on the log MAE ratios, BH-corrected across the table; (share of sites improved). MAE weighs large "
-             f"errors less than RMSE. Classes by total mortality, {DS[k]['cls']}. LaTeX: {tex_link(tex_name(k, 'MAE'))}."))
+             f"errors less than RMSE. Classes by relative mortality, {DS[k]['cls']}. LaTeX: {tex_link(tex_name(k, 'MAE'))}."))
 s3 += "<h3>Table 1b - as Table 1, Wilcoxon test (robustness)</h3>"
 s3 += per_ds(lambda k: table_html(fig2_table(k, test="wilcoxon"),
              f"Median per-site change in RMSE when mortality is added (%), stars = one-sided paired Wilcoxon signed-rank test, "
-             f"BH-corrected across the table; (share of sites improved). Classes by total mortality, {DS[k]['cls']}. "
+             f"BH-corrected across the table; (share of sites improved). Classes by relative mortality, {DS[k]['cls']}. "
              f"LaTeX: {tex_link(tex_name(k, test='wilcoxon'))}."))
 s3 += "<h3>Table 2b - as Table 2, Wilcoxon test (robustness)</h3>"
 s3 += per_ds(lambda k: table_html(fig2_table(k, metric="MAE", test="wilcoxon"),
              f"Median per-site change in MAE when mortality is added (%), stars = one-sided paired Wilcoxon signed-rank test, "
-             f"BH-corrected across the table; (share of sites improved). Classes by total mortality, {DS[k]['cls']}. "
+             f"BH-corrected across the table; (share of sites improved). Classes by relative mortality, {DS[k]['cls']}. "
              f"LaTeX: {tex_link(tex_name(k, 'MAE', 'wilcoxon'))}."))
 s3 += "<h3>High-mortality sites</h3>"
-s3 += per_ds(lambda k: fig(k, f"fig2_high_total_mort{T(k)}_mortality_effect.png", f"Fig 2b ({DS[k]['label']}): high total-mortality sites only (models trained on all sites).")
+s3 += per_ds(lambda k: fig(k, f"fig2_high_total_mort{T(k)}_mortality_effect.png", f"Fig 2b ({DS[k]['label']}): high relative-mortality sites only (models trained on all sites).")
              + fig(k, f"fig2_high_rel_deadwood{T(k)}_mortality_effect.png", f"Fig 2b ({DS[k]['label']}): high relative-deadwood sites only."))
 s3 += "<h3>Per-site ΔRMSE</h3>"
-s3 += per_ds(lambda k: fig(k, f"fig_site_dRMSE_total_mort{T(k)}.png", f"Per-site ΔRMSE ({DS[k]['label']}), bars coloured by total-mortality class."))
+s3 += per_ds(lambda k: fig(k, f"fig_site_dRMSE_total_mort{T(k)}.png", f"Per-site ΔRMSE ({DS[k]['label']}), bars coloured by relative-mortality class."))
 
 
 # paired bootstrap + block permutation (2026-10-08, advisor): V5 only, from 39_paired_bootstrap.R
@@ -261,15 +261,15 @@ if os.path.exists(f"{DS['v5']['plots']}/paired_bootstrap_statistics.csv"):
            "not dilute years with mortality): pooled MAE over the site-years. Years of one site are not independent, so at both "
            "levels <b>whole sites</b> are resampled (bootstrap, 10 000 draws, 95 % percentile interval in brackets) and the "
            "C+T / C+T+M labels are swapped per site (paired permutation, 10 000 draws, one-sided, stars = BH-corrected per table). "
-           "The site-year level also selects site-years by their <b>own</b> total mortality (above the Mid or High break), "
+           "The site-year level also selects site-years by their <b>own</b> relative mortality (above the Mid or High break), "
            "which tests the effect in the years when mortality happened.</p>"
            + table_html(_cnt.reset_index().set_index(["metric", "level"]), "Significant cells (permutation q &lt; 0.05). Every significant cell also has a bootstrap interval entirely below 0.")
            + "<h4>Table 3a - MAE, site level</h4>"
            + table_html(boot_table("MAE", "site", ["all", "midhigh", "high"]),
-                        "% change of the mean site MAE when mortality is added [95 % bootstrap interval], stars = paired permutation (sites); Δ = mean site MAE difference in EFP units. Sites classed by their maximum total mortality.")
+                        "% change of the mean site MAE when mortality is added [95 % bootstrap interval], stars = paired permutation (sites); Δ = mean site MAE difference in EFP units. Sites classed by their maximum relative mortality.")
            + "<h4>Table 3b - MAE, site-year level</h4>"
            + table_html(boot_table("MAE", "siteyear", ["all", "midhigh", "high", "yr_midhigh", "yr_high"]),
-                        "% change of the pooled site-year MAE [95 % bootstrap interval over sites], stars = paired permutation with whole sites swapped; Δ = pooled MAE difference in EFP units. Last two columns: only site-years whose own total mortality is above the Mid or High break.")
+                        "% change of the pooled site-year MAE [95 % bootstrap interval over sites], stars = paired permutation with whole sites swapped; Δ = pooled MAE difference in EFP units. Last two columns: only site-years whose own relative mortality is above the Mid or High break.")
            + "<details><summary>Same with RMSE (Tables 3c, 3d)</summary>"
            + table_html(boot_table("RMSE", "site", ["all", "midhigh", "high"]), "Table 3c - RMSE, site level.")
            + table_html(boot_table("RMSE", "siteyear", ["all", "midhigh", "high", "yr_midhigh", "yr_high"]), "Table 3d - RMSE, site-year level (pooled RMSE).")
@@ -280,7 +280,7 @@ sections.append(("effect", "3. Does mortality reduce prediction error?", s3))
 
 def fig3(k):
     out = fig(k, f"fig3b_signed_total_mort_24m_LGB{T(k)}_landscape.png",
-              f"Fig 3 ({DS[k]['label']}): net signed mortality SHAP per site, C+T+M, LightGBM, 24 months. Sites sorted by total mortality "
+              f"Fig 3 ({DS[k]['label']}): net signed mortality SHAP per site, C+T+M, LightGBM, 24 months. Sites sorted by relative mortality "
               "(highest left); below zero = mortality lowers the predicted EFP.")
     more = "".join(fig(k, f"fig3b_signed_total_mort_{w}_{L}{T(k)}_landscape.png", f"{DS[k]['label']}: {lab}, {w.replace('m', ' months')}.")
                    for L, lab in (("LGB", "LightGBM"), ("XGB", "XGBoost")) for w in ("12m", "24m") if not (L == "LGB" and w == "24m"))
@@ -291,11 +291,11 @@ def fig3(k):
 sections.append(("shap", "4. Direction of the mortality effect at each site (Fig 3)", per_ds(fig3)))
 
 sections.append(("direction", "5. High vs Low+Mid mortality sites (Fig 4)",
-                 per_ds(lambda k: fig(k, f"fig4_signed_shap_total_mort{T(k)}.png", f"Fig 4 ({DS[k]['label']}): net signed mortality SHAP, High vs Low+Mid total-mortality sites; Mann-Whitney U, BH-corrected.")
+                 per_ds(lambda k: fig(k, f"fig4_signed_shap_total_mort{T(k)}.png", f"Fig 4 ({DS[k]['label']}): net signed mortality SHAP, High vs Low+Mid relative-mortality sites; Mann-Whitney U, BH-corrected.")
                         + fig(k, f"fig4_signed_shap_rel_deadwood{T(k)}.png", f"Fig 4 ({DS[k]['label']}): split by relative deadwood."))))
 
 sections.append(("igbp", "6. Ecosystem type and tree cover (Fig 5)",
-                 per_ds(lambda k: fig(k, "fig5_igbp_board_24m_XGB.png", f"Fig 5 ({DS[k]['label']}): benefit and direction by IGBP class, tree cover and total mortality; XGBoost, 24 months.")
+                 per_ds(lambda k: fig(k, "fig5_igbp_board_24m_XGB.png", f"Fig 5 ({DS[k]['label']}): benefit and direction by IGBP class, tree cover and relative mortality; XGBoost, 24 months.")
                         + (lambda m: f"<details><summary>12 months and LightGBM</summary>{m}</details>" if m else "")(
                             "".join(fig(k, f"fig5_igbp_board_{w}_{L}.png", f"{DS[k]['label']}: {L}, {w}.") for L in ("XGB", "LGB") for w in ("12m", "24m") if not (L == "XGB" and w == "24m")))
                         + fig(k, "mortality_split/mortality_composition_concept_LGB.png", f"{DS[k]['label']}: what kind of mortality information the model uses (LightGBM)."))))
@@ -323,10 +323,10 @@ def dose_table():
 
 if os.path.exists(f"{DS['v5']['plots']}/dose_response/dose_response_robustness_AG.csv"):
     dose = ("<p>The Low / Mid / High comparison loses power because the High group is small (22 sites). Here every "
-            "<b>site-year</b> is an observation (361) and total mortality of that year is used directly. The question: "
+            "<b>site-year</b> is an observation (361) and relative mortality of that year is used directly. The question: "
             "<b>is the model without mortality wrong in the years with high mortality, and does adding mortality fix it?</b></p>"
             + fig("v5", "dose_response/residual_by_mortality_AG_24m.png",
-                  "AutoGluon, 24 months: mean residual (observed − predicted) per class of the site-year's total mortality; "
+                  "AutoGluon, 24 months: mean residual (observed − predicted) per class of the site-year's relative mortality; "
                   "below 0 = the model predicts too high. Cyan = without mortality (C+T), pink = with mortality (C+T+M); bars = 95 % "
                   "site-block bootstrap interval; numbers = site-years (sites); stars at the top = adding mortality lowers the prediction significantly in that class (paired permutation, BH-FDR).")
             + "<p><b>Result:</b> without mortality the model predicts the EFPs <b>too high in high-mortality years</b>: in the "
@@ -338,16 +338,16 @@ if os.path.exists(f"{DS['v5']['plots']}/dose_response/dose_response_robustness_A
             "(= how much adding mortality lowers the prediction); one-sided paired permutation with the two models swapped per site. "
             "In the &gt; 30 % class the correction is significant for GPP<sub>sat</sub>, NEP<sub>max</sub> and WUE with every "
             "learner and window (AutoGluon 24 months: +3.2, +2.7 and +0.34; XGBoost / LightGBM about half of that; all q &lt; 0.05). "
-            "In the 0–10 % class mortality slightly <i>raises</i> the predictions. The correction grows with total mortality "
+            "In the 0–10 % class mortality slightly <i>raises</i> the predictions. The correction grows with relative mortality "
             "(mixed model, site-block bootstrap; AutoGluon +0.96, +0.75 and +0.10 per +10 %, all q &lt; 0.001).</p>"
-            "<p>The same with a <b>mixed model</b> (residual ~ total mortality of the year, random intercept per site): the slope "
+            "<p>The same with a <b>mixed model</b> (residual ~ relative mortality of the year, random intercept per site): the slope "
             "without mortality is about −0.7 to −0.8 µmol m<sup>−2</sup> s<sup>−1</sup> (NEP<sub>max</sub>) and −0.18 g C "
-            "mm<sup>−1</sup> (WUE) per +10 % total mortality; it holds with a site-block bootstrap, when leaving out any single "
+            "mm<sup>−1</sup> (WUE) per +10 % relative mortality; it holds with a site-block bootstrap, when leaving out any single "
             "site and without the three most extreme sites (FI-Hyy, US-GLE, US-NC2, &gt; 50 %). With mortality the linear trend "
             "is no longer significant for any learner. GPP<sub>sat</sub> goes the same way but depends more on single sites. "
             "Whether the error <i>reduction</i> itself grows with mortality (test 1a) is the same direction but not robust in the "
             "bootstrap.</p>"
-            + table_html(dose_table(), "Mixed model, slope of the residual per +10 % total mortality of the site-year (EFP units) "
+            + table_html(dose_table(), "Mixed model, slope of the residual per +10 % relative mortality of the site-year (EFP units) "
                          "[95 % site-block bootstrap interval]; * = BH q &lt; 0.05 (bootstrap, across the 8 EFP × window tests).")
             + "<details><summary>12 months, XGBoost and LightGBM</summary>"
             + "".join(fig("v5", f"dose_response/residual_by_mortality_{L}_{W}.png", f"{lab}, {W.replace('m', ' months')}.")
@@ -395,8 +395,8 @@ if os.path.exists(_ec):
 # mortality block split by metric, V5 only (2026-10-08): AutoGluon first, then XGBoost and LightGBM
 sections.append(("msplit", "7. Mortality block, metric by metric (V5)",
                  "<p>Share of the mortality-block |SHAP| per metric (C+T+M, V5 without thresholds, mean over the 101 sites, "
-                 "bars ± SE). Grey = total mortality, red = deadwood metrics, green = tree-cover loss. The metrics are strongly "
-                 "correlated (total mortality vs relative deadwood ρ = 0.91), so SHAP shares show which variables the model "
+                 "bars ± SE). Grey = relative mortality, red = deadwood metrics, green = tree-cover loss. The metrics are strongly "
+                 "correlated (relative mortality vs relative deadwood ρ = 0.91), so SHAP shares show which variables the model "
                  "uses, not what each metric adds on its own. AutoGluon SHAP is permutation-based: compare shares, not magnitudes.</p>"
                  + fig("v5", "mortality_split/mortality_composition_family_AG.png", "V5: mortality block by metric, AutoGluon.")
                  + fig("v5", "mortality_split/mortality_composition_family_XGB.png", "V5: mortality block by metric, XGBoost.")
@@ -487,7 +487,7 @@ def ag_block(k):
                            + (", runs including the thresholded mortality metrics" if AG_SFX == "" else "")
                            + "): geometric-mean per-site change in RMSE when mortality is added (%), stars = one-sided paired "
                            "permutation test on the log RMSE ratios, BH-corrected across the table; (share of sites improved). "
-                           f"Classes by total mortality, {DS[k]['cls']}. Wilcoxon version: Table 1b. LaTeX: {tex_link(t1_tex)}."))
+                           f"Classes by relative mortality, {DS[k]['cls']}. Wilcoxon version: Table 1b. LaTeX: {tex_link(t1_tex)}."))
     return (bullets
             + t1
             + table_html(r2.round(3), f"R² under repeated leave-one-site-out ({lab}); AutoGluon = weighted ensemble rebuilt inside every fold.")
@@ -495,7 +495,7 @@ def ag_block(k):
             + table_html(ms.round(1), f"Mortality share of mean |SHAP| in C+T+M (%) ({lab}).")
             + ag_fig(k, "fig2_mortality_effect.png", f"Fig 2 with AutoGluon ({lab}): per-site RMSE without and with mortality, XGBoost, LightGBM and AutoGluon.")
             + ag_fig(k, "fig3b_signed_total_mort_24m_AG_landscape.png", f"Fig 3 with AutoGluon ({lab}): net signed mortality SHAP per site, C+T+M, 24 months.")
-            + ag_fig(k, "fig4_signed_shap_total_mort.png", f"Fig 4 with AutoGluon ({lab}): net signed mortality SHAP, High vs Low+Mid total-mortality sites."))
+            + ag_fig(k, "fig4_signed_shap_total_mort.png", f"Fig 4 with AutoGluon ({lab}): net signed mortality SHAP, High vs Low+Mid relative-mortality sites."))
 
 
 ag_intro = ("<p>AutoGluon-Tabular (AutoML) chooses the learner itself: in every fit it trains LightGBM (3 variants), CatBoost, XGBoost, "

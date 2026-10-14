@@ -25,7 +25,7 @@ OUT = f"{ROOT}/plots/paper_v5{SFX}/comparison_v41_v5"
 os.makedirs(OUT, exist_ok=True)
 EFP = ["GPPsat", "NEPmax", "ETmax", "WUE"]
 B = [100, 200, 300, 400, 500]
-MET = {"relative_disturbance": "total mortality", "relative_mortality": "relative deadwood",
+MET = {"relative_disturbance": "relative mortality", "relative_mortality": "relative deadwood",
        "absolute_mortality": "absolute deadwood", "tree_cover_mean_pct": "tree cover (500 m)"}
 md = ["# deadtrees v4.1 vs v5 - effect on the paper's EFP analysis", ""]
 
@@ -103,7 +103,7 @@ dr = dr.reindex([(r, x) for r in EFP for x in ("12m", "24m")])
 dr.to_csv(f"{OUT}/3_dRMSE_pct.csv")
 md += ["## 3. Effect of adding mortality: dRMSE % (C+T -> C+T+M, overall RMSE; negative = mortality helps)", "", tbl(dr, 2), ""]
 for f, lab, tag in [("fig2_statistics.csv", "all sites", "all"),
-                    ("fig2_high_total_mort_statistics.csv", "high total-mortality sites", "high_total_mort"),
+                    ("fig2_high_total_mort_statistics.csv", "high relative-mortality sites", "high_total_mort"),
                     ("fig2_high_rel_deadwood_statistics.csv", "high relative-deadwood sites", "high_rel_deadwood")]:
     s = []
     for v in DS:

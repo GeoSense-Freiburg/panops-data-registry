@@ -11,17 +11,17 @@ Mean of the five buffers, shared site-years:
 
 | metric             |   mean_v41 |   mean_v5 |   median_change |   r_site_years |   r_spearman |
 |:-------------------|-----------:|----------:|----------------:|---------------:|-------------:|
-| total mortality    |     13.285 |    12.284 |          -1.298 |          0.883 |        0.87  |
+| relative mortality |     13.285 |    12.284 |          -1.298 |          0.883 |        0.87  |
 | relative deadwood  |     10.873 |     9.336 |          -1.497 |          0.88  |        0.877 |
 | absolute deadwood  |      7.137 |     5.863 |          -1.051 |          0.857 |        0.842 |
 | tree cover (500 m) |     69.027 |    67.605 |          -0.731 |          0.979 |        0.979 |
 
 High-mortality sites (site maximum > mean + 0.5 SD, mean of the five buffers):
 
-| metric            |   high_v41 |   high_v5 |   both | only_v41                               | only_v5                                        |
-|:------------------|-----------:|----------:|-------:|:---------------------------------------|:-----------------------------------------------|
-| total mortality   |         21 |        22 |     16 | CA-DB2, CA-LU1, US-BZB, US-BZo, US-Rpf | AU-How, FI-Ken, FR-Bil, SE-Htm, US-CMW, US-xBN |
-| relative deadwood |         23 |        22 |     18 | CA-DB2, CA-LU1, CZ-BK1, CZ-RAJ, IT-Lav | AU-How, FI-Ken, US-CMW, US-MtB                 |
+| metric             |   high_v41 |   high_v5 |   both | only_v41                               | only_v5                                        |
+|:-------------------|-----------:|----------:|-------:|:---------------------------------------|:-----------------------------------------------|
+| relative mortality |         21 |        22 |     16 | CA-DB2, CA-LU1, US-BZB, US-BZo, US-Rpf | AU-How, FI-Ken, FR-Bil, SE-Htm, US-CMW, US-xBN |
+| relative deadwood  |         23 |        22 |     18 | CA-DB2, CA-LU1, CZ-BK1, CZ-RAJ, IT-Lav | AU-How, FI-Ken, US-CMW, US-MtB                 |
 
 ## 2. Skill (R2, repeated leave-one-site-out)
 
@@ -100,7 +100,7 @@ Fig 2, all sites: median per-site change % with stars (share of sites improved):
 | ('WUE', '12m')    | -2.2 (54%)                      | -0.8 (52%)                    | -2.4 (53%)                     | 0.0 (50%)                    |
 | ('WUE', '24m')    | -3.7* (56%)                     | 0.0 (50%)                     | -2.4 (55%)                     | -1.0 (54%)                   |
 
-Fig 2, high total-mortality sites: median per-site change % with stars (share of sites improved):
+Fig 2, high relative-mortality sites: median per-site change % with stars (share of sites improved):
 
 |                   | ('LightGBM (Optuna)', 'v4.1')   | ('LightGBM (Optuna)', 'v5')   | ('XGBoost (Optuna)', 'v4.1')   | ('XGBoost (Optuna)', 'v5')   |
 |:------------------|:--------------------------------|:------------------------------|:-------------------------------|:-----------------------------|
@@ -128,28 +128,37 @@ Fig 2, high relative-deadwood sites: median per-site change % with stars (share 
 
 ## 4. Direction (Fig 4): median net signed mortality SHAP, High vs Low+Mid
 
-|                                        | ('LightGBM (Optuna)', 'v4.1')   | ('LightGBM (Optuna)', 'v5')   | ('XGBoost (Optuna)', 'v4.1')   | ('XGBoost (Optuna)', 'v5')   |
-|:---------------------------------------|:--------------------------------|:------------------------------|:-------------------------------|:-----------------------------|
-| ('relative deadwood', 'ETmax', '12m')  | -0.003 vs 0.001 ns              | -0.003 vs 0.001 ns            | -0.003 vs 0.001 ns             | -0.004 vs 0.001*             |
-| ('relative deadwood', 'ETmax', '24m')  | -0.004 vs 0.001**               | -0.003 vs 0.002 ns            | -0.001 vs 0.001 ns             | -0.002 vs 0.002 ns           |
-| ('relative deadwood', 'GPPsat', '12m') | -1.255 vs 0.181**               | -1.421 vs 0.311***            | -1.623 vs 0.639***             | -1.339 vs 0.313***           |
-| ('relative deadwood', 'GPPsat', '24m') | -1.43 vs 0.468**                | -1.262 vs 0.264***            | -1.349 vs 0.321**              | -1.848 vs 0.314***           |
-| ('relative deadwood', 'NEPmax', '12m') | -0.931 vs 0.119**               | -1.367 vs 0.149***            | -0.986 vs 0.152**              | -1.183 vs 0.161***           |
-| ('relative deadwood', 'NEPmax', '24m') | -0.789 vs 0.102**               | -1.494 vs 0.183***            | -1.028 vs -0.02***             | -1.301 vs 0.17***            |
-| ('relative deadwood', 'WUE', '12m')    | -0.2 vs 0.106***                | -0.257 vs 0.067***            | -0.243 vs 0.099***             | -0.261 vs 0.097***           |
-| ('relative deadwood', 'WUE', '24m')    | -0.192 vs 0.097**               | -0.264 vs 0.083***            | -0.32 vs 0.095***              | -0.262 vs 0.084***           |
-| ('total mortality', 'ETmax', '12m')    | -0.004 vs 0.001*                | -0.004 vs 0.001**             | -0.004 vs 0.001**              | -0.004 vs 0.002**            |
-| ('total mortality', 'ETmax', '24m')    | -0.006 vs 0.001***              | -0.004 vs 0.002**             | -0.006 vs 0.002*               | -0.005 vs 0.002**            |
-| ('total mortality', 'GPPsat', '12m')   | -1.796 vs 0.181***              | -1.477 vs 0.275***            | -2.192 vs 0.639***             | -1.339 vs 0.292***           |
-| ('total mortality', 'GPPsat', '24m')   | -1.642 vs 0.468***              | -1.619 vs 0.229***            | -2.529 vs 0.366***             | -1.966 vs 0.252***           |
-| ('total mortality', 'NEPmax', '12m')   | -1.333 vs 0.14***               | -1.83 vs 0.136***             | -1.507 vs 0.207***             | -1.383 vs 0.147***           |
-| ('total mortality', 'NEPmax', '24m')   | -1.332 vs 0.102***              | -1.74 vs 0.113***             | -1.433 vs -0.02***             | -1.641 vs 0.168***           |
-| ('total mortality', 'WUE', '12m')      | -0.2 vs 0.112***                | -0.234 vs 0.055***            | -0.223 vs 0.099***             | -0.22 vs 0.087***            |
-| ('total mortality', 'WUE', '24m')      | -0.227 vs 0.098***              | -0.215 vs 0.071***            | -0.247 vs 0.105***             | -0.206 vs 0.054***           |
+|                                         | ('LightGBM (Optuna)', 'v4.1')   | ('LightGBM (Optuna)', 'v5')   | ('XGBoost (Optuna)', 'v4.1')   | ('XGBoost (Optuna)', 'v5')   |
+|:----------------------------------------|:--------------------------------|:------------------------------|:-------------------------------|:-----------------------------|
+| ('relative deadwood', 'ETmax', '12m')   | -0.003 vs 0.001 ns              | -0.003 vs 0.001 ns            | -0.003 vs 0.001 ns             | -0.004 vs 0.001*             |
+| ('relative deadwood', 'ETmax', '24m')   | -0.004 vs 0.001**               | -0.003 vs 0.002 ns            | -0.001 vs 0.001 ns             | -0.002 vs 0.002 ns           |
+| ('relative deadwood', 'GPPsat', '12m')  | -1.255 vs 0.181**               | -1.421 vs 0.311***            | -1.623 vs 0.639***             | -1.339 vs 0.313***           |
+| ('relative deadwood', 'GPPsat', '24m')  | -1.43 vs 0.468**                | -1.262 vs 0.264***            | -1.349 vs 0.321**              | -1.848 vs 0.314***           |
+| ('relative deadwood', 'NEPmax', '12m')  | -0.931 vs 0.119**               | -1.367 vs 0.149***            | -0.986 vs 0.152**              | -1.183 vs 0.161***           |
+| ('relative deadwood', 'NEPmax', '24m')  | -0.789 vs 0.102**               | -1.494 vs 0.183***            | -1.028 vs -0.02***             | -1.301 vs 0.17***            |
+| ('relative deadwood', 'WUE', '12m')     | -0.2 vs 0.106***                | -0.257 vs 0.067***            | -0.243 vs 0.099***             | -0.261 vs 0.097***           |
+| ('relative deadwood', 'WUE', '24m')     | -0.192 vs 0.097**               | -0.264 vs 0.083***            | -0.32 vs 0.095***              | -0.262 vs 0.084***           |
+| ('relative mortality', 'ETmax', '12m')  | nan                             | -0.004 vs 0.001**             | nan                            | -0.004 vs 0.002**            |
+| ('relative mortality', 'ETmax', '24m')  | nan                             | -0.004 vs 0.002**             | nan                            | -0.005 vs 0.002**            |
+| ('relative mortality', 'GPPsat', '12m') | nan                             | -1.477 vs 0.275***            | nan                            | -1.339 vs 0.292***           |
+| ('relative mortality', 'GPPsat', '24m') | nan                             | -1.619 vs 0.229***            | nan                            | -1.966 vs 0.252***           |
+| ('relative mortality', 'NEPmax', '12m') | nan                             | -1.83 vs 0.136***             | nan                            | -1.383 vs 0.147***           |
+| ('relative mortality', 'NEPmax', '24m') | nan                             | -1.74 vs 0.113***             | nan                            | -1.641 vs 0.168***           |
+| ('relative mortality', 'WUE', '12m')    | nan                             | -0.234 vs 0.055***            | nan                            | -0.22 vs 0.087***            |
+| ('relative mortality', 'WUE', '24m')    | nan                             | -0.215 vs 0.071***            | nan                            | -0.206 vs 0.054***           |
+| ('total mortality', 'ETmax', '12m')     | -0.004 vs 0.001*                | nan                           | -0.004 vs 0.001**              | nan                          |
+| ('total mortality', 'ETmax', '24m')     | -0.006 vs 0.001***              | nan                           | -0.006 vs 0.002*               | nan                          |
+| ('total mortality', 'GPPsat', '12m')    | -1.796 vs 0.181***              | nan                           | -2.192 vs 0.639***             | nan                          |
+| ('total mortality', 'GPPsat', '24m')    | -1.642 vs 0.468***              | nan                           | -2.529 vs 0.366***             | nan                          |
+| ('total mortality', 'NEPmax', '12m')    | -1.333 vs 0.14***               | nan                           | -1.507 vs 0.207***             | nan                          |
+| ('total mortality', 'NEPmax', '24m')    | -1.332 vs 0.102***              | nan                           | -1.433 vs -0.02***             | nan                          |
+| ('total mortality', 'WUE', '12m')       | -0.2 vs 0.112***                | nan                           | -0.223 vs 0.099***             | nan                          |
+| ('total mortality', 'WUE', '24m')       | -0.227 vs 0.098***              | nan                           | -0.247 vs 0.105***             | nan                          |
 
 Significant tests per metric:
 
-| metric            | v4.1     | v5       |
-|:------------------|:---------|:---------|
-| relative deadwood | 13 of 16 | 13 of 16 |
-| total mortality   | 16 of 16 | 16 of 16 |
+| metric             | v4.1     | v5       |
+|:-------------------|:---------|:---------|
+| relative deadwood  | 13 of 16 | 13 of 16 |
+| relative mortality | nan      | 16 of 16 |
+| total mortality    | 16 of 16 | nan      |

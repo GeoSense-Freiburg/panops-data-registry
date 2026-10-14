@@ -53,7 +53,7 @@ w["dRMSE_pct"] = 100 * (w.M4 - w.M3) / w.M3
 d = w.pivot_table(index=["maps", "response"], columns="thresholds", values="dRMSE_pct", aggfunc="mean")[["with", "without"]]
 md += ["## Effect of adding mortality: change in overall RMSE (%), mean of learners and windows", "", d.round(2).to_markdown(), ""]
 
-# Table 1 statistics (median per-site change, by total-mortality class)
+# Table 1 statistics (median per-site change, by relative-mortality class)
 if eff:
     E = pd.concat(eff)
     E.to_csv(f"{OUT}/table1_stats_all.csv", index=False)
@@ -61,7 +61,7 @@ if eff:
     e = e.reindex([(v, s, r) for v in ("V4.1", "V5") for s in ("all", "midhigh", "high") for r in EFP])
     sig = E.assign(s=E.q < 0.05).pivot_table(index=["maps", "subset", "response"], columns="thresholds", values="s", aggfunc="sum")[["with", "without"]]
     e["sig with (of 4)"] = sig["with"].reindex(e.index); e["sig without (of 4)"] = sig["without"].reindex(e.index)
-    md += ["## Table 1 statistics: median per-site RMSE change (%) by total-mortality class",
+    md += ["## Table 1 statistics: median per-site RMSE change (%) by relative-mortality class",
            "(mean of XGB/LGB × 12/24 m; 'sig' = number of the 4 learner-window tests with q < 0.05)", "", e.round(2).to_markdown(), ""]
 
 # Fig 4 tests

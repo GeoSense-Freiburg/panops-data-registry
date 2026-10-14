@@ -1,9 +1,9 @@
 #!/usr/bin/env Rscript
 # ============================================================================
 # Simple view of test 2a (2026-10-09): mean residual (observed - predicted) of the models without (C+T) and with
-# mortality (C+T+M) per class of the site-year's total mortality. Below 0 = the model over-predicts the EFP.
+# mortality (C+T+M) per class of the site-year's relative mortality. Below 0 = the model over-predicts the EFP.
 # Interval: 95 % site-block bootstrap within each class (sites resampled with all their years in that class).
-# Total mortality = mean of the five buffers (paper_class_data()); classes 0-10, 10-20, 20-30, >= 30 %.
+# Relative mortality = mean of the five buffers (paper_class_data()); classes 0-10, 10-20, 20-30, >= 30 %.
 # Output: plots/<sub>/dose_response/residual_by_mortality_<L>_<win>.png (+ .csv)
 #   PAPER_RESP_SET=efp_v5 PAPER_NO_THRESH=1 Rscript 43_residual_by_mortality_bin.R [AG|XGB|LGB] [24m|12m]
 # ============================================================================
@@ -40,7 +40,7 @@ fwrite(S, file.path(OUT, sprintf("residual_by_mortality_%s_%s.csv", L_TAG, WIN))
 # ---- is the correction significant? corr = residual(C+T+M) - residual(C+T) = prediction lowered by adding mortality.
 # Per class: mean correction, 95 % site-block bootstrap interval, one-sided paired permutation (100 000 draws; labels swapped per site,
 # i.e. the site's corrections sign-flipped together; H1: correction > 0 = predictions lowered); BH across the 16 tests.
-# Trend: mixed model corr ~ total mortality (per 10 %) + (1 | site), slope with site-block bootstrap.
+# Trend: mixed model corr ~ relative mortality (per 10 %) + (1 | site), slope with site-block bootstrap.
 w[, corr := (observed - M4) - (observed - M3)]
 perm_p <- function(v, site, n = 100000L) {
   ss <- rowsum(v, site)[, 1]; obs <- sum(ss); k <- length(ss)
@@ -63,7 +63,7 @@ fwrite(C, file.path(OUT, sprintf("residual_correction_by_mortality_%s_%s.csv", L
 fwrite(TR, file.path(OUT, sprintf("residual_correction_trend_%s_%s.csv", L_TAG, WIN)))
 cat("\n== correction per class (prediction lowered by adding mortality, EFP units) ==\n")
 print(C[order(response, bin), .(response, bin, corr = round(mean, 3), lo = round(lo, 3), hi = round(hi, 3), q_perm = signif(q_perm, 2), n_sy, n_sites)])
-cat("\n== trend: correction per +10 % total mortality (mixed model, site-block bootstrap) ==\n")
+cat("\n== trend: correction per +10 % relative mortality (mixed model, site-block bootstrap) ==\n")
 print(TR[, .(response, slope = round(slope, 3), lo = round(lo, 3), hi = round(hi, 3), q_boot = signif(q_boot, 2))])
 
 SIG <- C[, .(response = factor(response, EFP_ORDER), bin, lab = fifelse(q_perm < 0.001, "***", fifelse(q_perm < 0.01, "**", fifelse(q_perm < 0.05, "*", ""))))]
@@ -80,7 +80,7 @@ g <- ggplot(S, aes(bin, mean, colour = model, group = model)) +
   scale_colour_manual(values = MC, breaks = names(MC), name = NULL) +
   scale_y_continuous(expand = expansion(mult = c(0.22, 0.16))) +
   facet_wrap(~ response, nrow = 1, scales = "free_y", labeller = labeller(response = RESP_UNITS)) +
-  labs(x = "Total mortality of the site-year", y = "Mean residual (observed - predicted)\nbelow 0 = model over-predicts",
+  labs(x = "Relative mortality of the site-year", y = "Mean residual (observed - predicted)\nbelow 0 = model over-predicts",
        title = sprintf("Over-prediction in high-mortality years: without vs with mortality (%s, %s)", LAB, WIN),
        subtitle = paste0("Points = mean residual of all site-years in the class; bars = 95 % site-block bootstrap interval. Numbers at the bottom: site-years (sites).\n",
                          "Stars at the top: adding mortality lowers the prediction significantly in that class (one-sided paired permutation, models swapped per site, BH-FDR; * q<0.05, ** q<0.01, *** q<0.001)")) +

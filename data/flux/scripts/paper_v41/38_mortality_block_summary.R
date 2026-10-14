@@ -17,7 +17,7 @@ OUT <- file.path(PAPER_FIG, "mortality_split"); dir.create(OUT, showWarnings = F
 PN <- paper_n()
 FAMILIES <- c(absolute_mortality = "Absolute deadwood", relative_mortality = "Relative deadwood",
               new_deadwood_gain_pp = "Deadwood gain", relative_tree_loss_pct = "Relative tree-cover loss",
-              relative_disturbance = "Total mortality")
+              relative_disturbance = "Relative mortality")
 fam_of <- function(v) sub("_[0-9]+m(_lag[12])?$", "", v)
 LEARN <- c(XGB = "XGBoost", LGB = "LightGBM", AG = "AutoGluon")
 LCOL <- c(XGBoost = "#3B6FB6", LightGBM = "#2E9E6A", AutoGluon = "#C2571A")

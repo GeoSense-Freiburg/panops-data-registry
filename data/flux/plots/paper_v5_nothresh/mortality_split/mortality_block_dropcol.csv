@@ -1,121 +1,121 @@
 learner,window,response,family_label,family,unique,alone,full_gain,shap_share
 AutoGluon,12m,ETmax,Absolute deadwood,absolute_mortality,,,,19.2482081194436
 AutoGluon,12m,ETmax,Deadwood gain,new_deadwood_gain_pp,,,,15.83394137922
-AutoGluon,12m,ETmax,Total mortality,relative_disturbance,,,,23.1709608240449
+AutoGluon,12m,ETmax,Relative mortality,relative_disturbance,,,,23.1709608240449
 AutoGluon,12m,ETmax,Relative deadwood,relative_mortality,,,,9.28223358554466
 AutoGluon,12m,ETmax,Relative tree-cover loss,relative_tree_loss_pct,,,,32.4646560917469
 LightGBM,12m,ETmax,Absolute deadwood,absolute_mortality,-0.128392523110477,0.457909942749324,0.71814607913081,19.2642581314208
 LightGBM,12m,ETmax,Deadwood gain,new_deadwood_gain_pp,-0.272424140957261,0.252797591756093,0.71814607913081,24.7516189667296
-LightGBM,12m,ETmax,Total mortality,relative_disturbance,-0.467074400258505,0.570120355776305,0.71814607913081,16.5728256919109
+LightGBM,12m,ETmax,Relative mortality,relative_disturbance,-0.467074400258505,0.570120355776305,0.71814607913081,16.5728256919109
 LightGBM,12m,ETmax,Relative deadwood,relative_mortality,-0.537200445806652,0.504654437983498,0.71814607913081,10.9485516868602
 LightGBM,12m,ETmax,Relative tree-cover loss,relative_tree_loss_pct,-0.719501397337652,0.762762048058818,0.71814607913081,28.4627455230786
 XGBoost,12m,ETmax,Absolute deadwood,absolute_mortality,0.394803818468681,0.105625149396216,0.402923331291938,20.5794123939592
 XGBoost,12m,ETmax,Deadwood gain,new_deadwood_gain_pp,0.343145274088807,-0.397439372752961,0.402923331291938,27.1941626015462
-XGBoost,12m,ETmax,Total mortality,relative_disturbance,-0.0197759407787323,-0.130887672572233,0.402923331291938,16.3014850658054
+XGBoost,12m,ETmax,Relative mortality,relative_disturbance,-0.0197759407787323,-0.130887672572233,0.402923331291938,16.3014850658054
 XGBoost,12m,ETmax,Relative deadwood,relative_mortality,0.0123409912264227,-0.541257175251975,0.402923331291938,7.3450745817517
 XGBoost,12m,ETmax,Relative tree-cover loss,relative_tree_loss_pct,0.271464620437079,-0.239266682043215,0.402923331291938,28.5798653569375
 AutoGluon,24m,ETmax,Absolute deadwood,absolute_mortality,,,,22.7163210118144
 AutoGluon,24m,ETmax,Deadwood gain,new_deadwood_gain_pp,,,,17.1454566402953
-AutoGluon,24m,ETmax,Total mortality,relative_disturbance,,,,15.7766440907064
+AutoGluon,24m,ETmax,Relative mortality,relative_disturbance,,,,15.7766440907064
 AutoGluon,24m,ETmax,Relative deadwood,relative_mortality,,,,12.2938154451219
 AutoGluon,24m,ETmax,Relative tree-cover loss,relative_tree_loss_pct,,,,32.0677628120619
 LightGBM,24m,ETmax,Absolute deadwood,absolute_mortality,0.433937572106857,0.490205718409853,0.949412148306628,21.1534411249913
 LightGBM,24m,ETmax,Deadwood gain,new_deadwood_gain_pp,0.295583309485226,0.162865812722557,0.949412148306628,23.7163154345843
-LightGBM,24m,ETmax,Total mortality,relative_disturbance,0.132729633336881,0.187952746115516,0.949412148306628,19.8332729222488
+LightGBM,24m,ETmax,Relative mortality,relative_disturbance,0.132729633336881,0.187952746115516,0.949412148306628,19.8332729222488
 LightGBM,24m,ETmax,Relative deadwood,relative_mortality,0.300164066113973,-0.066254501610552,0.949412148306628,8.48511437429323
 LightGBM,24m,ETmax,Relative tree-cover loss,relative_tree_loss_pct,0.0193033973964862,0.697684437221136,0.949412148306628,26.8118561438823
 XGBoost,24m,ETmax,Absolute deadwood,absolute_mortality,-0.026814390316543,0.121643520266601,0.103659651433929,25.253804043912
 XGBoost,24m,ETmax,Deadwood gain,new_deadwood_gain_pp,-0.0804949636033947,-0.373370913176063,0.103659651433929,15.5874196815886
-XGBoost,24m,ETmax,Total mortality,relative_disturbance,-0.0789848891759148,-0.30372738342368,0.103659651433929,21.758833201968
+XGBoost,24m,ETmax,Relative mortality,relative_disturbance,-0.0789848891759148,-0.30372738342368,0.103659651433929,21.758833201968
 XGBoost,24m,ETmax,Relative deadwood,relative_mortality,-0.506278668485871,-0.669409245651575,0.103659651433929,8.7571387778741
 XGBoost,24m,ETmax,Relative tree-cover loss,relative_tree_loss_pct,-0.277098040532608,0.0980478916113081,0.103659651433929,28.6428042946574
 AutoGluon,12m,GPPsat,Absolute deadwood,absolute_mortality,,,,16.1085902326679
 AutoGluon,12m,GPPsat,Deadwood gain,new_deadwood_gain_pp,,,,11.2556254740152
-AutoGluon,12m,GPPsat,Total mortality,relative_disturbance,,,,26.1171681569929
+AutoGluon,12m,GPPsat,Relative mortality,relative_disturbance,,,,26.1171681569929
 AutoGluon,12m,GPPsat,Relative deadwood,relative_mortality,,,,31.2254399908109
 AutoGluon,12m,GPPsat,Relative tree-cover loss,relative_tree_loss_pct,,,,15.2931761455131
 LightGBM,12m,GPPsat,Absolute deadwood,absolute_mortality,-0.304784466119912,-0.280474177440593,2.97296063993984,15.4366726163622
 LightGBM,12m,GPPsat,Deadwood gain,new_deadwood_gain_pp,0.147116861588437,0.179991600527929,2.97296063993984,8.6065014143731
-LightGBM,12m,GPPsat,Total mortality,relative_disturbance,0.0422725553489656,2.39562078940243,2.97296063993984,21.0649522268928
+LightGBM,12m,GPPsat,Relative mortality,relative_disturbance,0.0422725553489656,2.39562078940243,2.97296063993984,21.0649522268928
 LightGBM,12m,GPPsat,Relative deadwood,relative_mortality,0.498037175468014,2.31715629496508,2.97296063993984,41.5890994925708
 LightGBM,12m,GPPsat,Relative tree-cover loss,relative_tree_loss_pct,0.143054248904462,1.49260121456145,2.97296063993984,13.3027742498011
 XGBoost,12m,GPPsat,Absolute deadwood,absolute_mortality,-0.306921857663423,0.173573151895257,2.78314276526573,7.12279289979157
 XGBoost,12m,GPPsat,Deadwood gain,new_deadwood_gain_pp,-0.197388753360028,0.515467635498679,2.78314276526573,0.590065022500865
-XGBoost,12m,GPPsat,Total mortality,relative_disturbance,-0.108665812921749,2.72035762534986,2.78314276526573,25.3550419273283
+XGBoost,12m,GPPsat,Relative mortality,relative_disturbance,-0.108665812921749,2.72035762534986,2.78314276526573,25.3550419273283
 XGBoost,12m,GPPsat,Relative deadwood,relative_mortality,0.748325270490979,2.79588963517763,2.78314276526573,51.5552989827483
 XGBoost,12m,GPPsat,Relative tree-cover loss,relative_tree_loss_pct,-0.0882838009312992,1.38384417185716,2.78314276526573,15.376801167631
 AutoGluon,24m,GPPsat,Absolute deadwood,absolute_mortality,,,,14.5197282840392
 AutoGluon,24m,GPPsat,Deadwood gain,new_deadwood_gain_pp,,,,6.80033565877465
-AutoGluon,24m,GPPsat,Total mortality,relative_disturbance,,,,29.9674886918323
+AutoGluon,24m,GPPsat,Relative mortality,relative_disturbance,,,,29.9674886918323
 AutoGluon,24m,GPPsat,Relative deadwood,relative_mortality,,,,27.9493609064775
 AutoGluon,24m,GPPsat,Relative tree-cover loss,relative_tree_loss_pct,,,,20.7630864588763
 LightGBM,24m,GPPsat,Absolute deadwood,absolute_mortality,-0.563893812830274,-0.64795472044199,2.88099182174529,19.4194763714033
 LightGBM,24m,GPPsat,Deadwood gain,new_deadwood_gain_pp,-0.471104814015688,0.278257325923204,2.88099182174529,6.9037282741228
-LightGBM,24m,GPPsat,Total mortality,relative_disturbance,-0.370624458803015,2.17597026681626,2.88099182174529,28.8238989916263
+LightGBM,24m,GPPsat,Relative mortality,relative_disturbance,-0.370624458803015,2.17597026681626,2.88099182174529,28.8238989916263
 LightGBM,24m,GPPsat,Relative deadwood,relative_mortality,0.767727247230265,2.51251186222059,2.88099182174529,32.2581714052439
 LightGBM,24m,GPPsat,Relative tree-cover loss,relative_tree_loss_pct,0.165295604640847,1.27396475990054,2.88099182174529,12.5947249576038
 XGBoost,24m,GPPsat,Absolute deadwood,absolute_mortality,-0.0832078440820894,0.276725253866894,3.7171882534967,17.3035295385662
 XGBoost,24m,GPPsat,Deadwood gain,new_deadwood_gain_pp,-0.153035530977397,0.341095894143106,3.7171882534967,10.0199921622916
-XGBoost,24m,GPPsat,Total mortality,relative_disturbance,0.0195913237804879,2.06295220057654,3.7171882534967,21.6866547749787
+XGBoost,24m,GPPsat,Relative mortality,relative_disturbance,0.0195913237804879,2.06295220057654,3.7171882534967,21.6866547749787
 XGBoost,24m,GPPsat,Relative deadwood,relative_mortality,0.870878259627728,2.13134601524173,3.7171882534967,29.4919890722608
 XGBoost,24m,GPPsat,Relative tree-cover loss,relative_tree_loss_pct,0.521824459978926,2.50488403168508,3.7171882534967,21.4978344519027
 AutoGluon,12m,NEPmax,Absolute deadwood,absolute_mortality,,,,12.9382657968527
 AutoGluon,12m,NEPmax,Deadwood gain,new_deadwood_gain_pp,,,,10.0225287538817
-AutoGluon,12m,NEPmax,Total mortality,relative_disturbance,,,,31.7817448909703
+AutoGluon,12m,NEPmax,Relative mortality,relative_disturbance,,,,31.7817448909703
 AutoGluon,12m,NEPmax,Relative deadwood,relative_mortality,,,,28.5906058664154
 AutoGluon,12m,NEPmax,Relative tree-cover loss,relative_tree_loss_pct,,,,16.66685469188
 LightGBM,12m,NEPmax,Absolute deadwood,absolute_mortality,-0.345501090895162,-1.06922455886938,8.11595494555719,12.5750962842362
 LightGBM,12m,NEPmax,Deadwood gain,new_deadwood_gain_pp,-0.861623252729338,-1.09573471493944,8.11595494555719,9.58271564702262
-LightGBM,12m,NEPmax,Total mortality,relative_disturbance,-0.402774597472799,7.19216769056108,8.11595494555719,28.6173811059009
+LightGBM,12m,NEPmax,Relative mortality,relative_disturbance,-0.402774597472799,7.19216769056108,8.11595494555719,28.6173811059009
 LightGBM,12m,NEPmax,Relative deadwood,relative_mortality,0.473149426607455,4.88666942812879,8.11595494555719,31.8213049054934
 LightGBM,12m,NEPmax,Relative tree-cover loss,relative_tree_loss_pct,-1.33196290892341,2.8092652187335,8.11595494555719,17.4035020573468
 XGBoost,12m,NEPmax,Absolute deadwood,absolute_mortality,0.518239910445706,1.05727819428505,8.18365464781663,7.9816154881598
 XGBoost,12m,NEPmax,Deadwood gain,new_deadwood_gain_pp,0.403817744322921,1.14787392697403,8.18365464781663,4.71315404581919
-XGBoost,12m,NEPmax,Total mortality,relative_disturbance,1.87180050094604,8.50245955298822,8.18365464781663,36.70218579505
+XGBoost,12m,NEPmax,Relative mortality,relative_disturbance,1.87180050094604,8.50245955298822,8.18365464781663,36.70218579505
 XGBoost,12m,NEPmax,Relative deadwood,relative_mortality,1.55027146364326,6.07417539940076,8.18365464781663,34.4182197166492
 XGBoost,12m,NEPmax,Relative tree-cover loss,relative_tree_loss_pct,0.349823045923081,4.00298821940227,8.18365464781663,16.1848249543218
 AutoGluon,24m,NEPmax,Absolute deadwood,absolute_mortality,,,,15.5269999629095
 AutoGluon,24m,NEPmax,Deadwood gain,new_deadwood_gain_pp,,,,7.28244542259241
-AutoGluon,24m,NEPmax,Total mortality,relative_disturbance,,,,29.2296364004003
+AutoGluon,24m,NEPmax,Relative mortality,relative_disturbance,,,,29.2296364004003
 AutoGluon,24m,NEPmax,Relative deadwood,relative_mortality,,,,28.5565501857102
 AutoGluon,24m,NEPmax,Relative tree-cover loss,relative_tree_loss_pct,,,,19.4043680283876
 LightGBM,24m,NEPmax,Absolute deadwood,absolute_mortality,1.86805267931305,-0.01832773479713,9.6541701528978,18.1431854957247
 LightGBM,24m,NEPmax,Deadwood gain,new_deadwood_gain_pp,0.566306704093278,-0.0168110501282737,9.6541701528978,10.1711262151885
-LightGBM,24m,NEPmax,Total mortality,relative_disturbance,0.856195652800973,6.19063685094778,9.6541701528978,26.130645073375
+LightGBM,24m,NEPmax,Relative mortality,relative_disturbance,0.856195652800973,6.19063685094778,9.6541701528978,26.130645073375
 LightGBM,24m,NEPmax,Relative deadwood,relative_mortality,1.73886324149861,4.20101570665284,9.6541701528978,28.5912000026303
 LightGBM,24m,NEPmax,Relative tree-cover loss,relative_tree_loss_pct,1.50181055298346,4.33689898498562,9.6541701528978,16.9638432130814
 XGBoost,24m,NEPmax,Absolute deadwood,absolute_mortality,0.438433333962673,-0.597856777649009,6.93675612535096,17.2335709190222
 XGBoost,24m,NEPmax,Deadwood gain,new_deadwood_gain_pp,-0.213205190061916,0.0116085993195347,6.93675612535096,6.19470834450774
-XGBoost,24m,NEPmax,Total mortality,relative_disturbance,-0.260939658590842,5.78177479641947,6.93675612535096,25.0704804267424
+XGBoost,24m,NEPmax,Relative mortality,relative_disturbance,-0.260939658590842,5.78177479641947,6.93675612535096,25.0704804267424
 XGBoost,24m,NEPmax,Relative deadwood,relative_mortality,1.28419840032425,3.80154440305885,6.93675612535096,36.7924969668172
 XGBoost,24m,NEPmax,Relative tree-cover loss,relative_tree_loss_pct,0.243582164101541,2.61787576572833,6.93675612535096,14.7087433429104
 AutoGluon,12m,WUE,Absolute deadwood,absolute_mortality,,,,16.6808603637041
 AutoGluon,12m,WUE,Deadwood gain,new_deadwood_gain_pp,,,,11.5213724694115
-AutoGluon,12m,WUE,Total mortality,relative_disturbance,,,,25.0391785050715
+AutoGluon,12m,WUE,Relative mortality,relative_disturbance,,,,25.0391785050715
 AutoGluon,12m,WUE,Relative deadwood,relative_mortality,,,,29.7217148413948
 AutoGluon,12m,WUE,Relative tree-cover loss,relative_tree_loss_pct,,,,17.0368738204183
 LightGBM,12m,WUE,Absolute deadwood,absolute_mortality,-0.341333256429366,0.00855957630466753,1.30352168677936,4.65774111914994
 LightGBM,12m,WUE,Deadwood gain,new_deadwood_gain_pp,-0.226945783219112,0.367075922552951,1.30352168677936,5.79516242311962
-LightGBM,12m,WUE,Total mortality,relative_disturbance,-0.226402102727674,2.48212654392327,1.30352168677936,36.3632722192028
+LightGBM,12m,WUE,Relative mortality,relative_disturbance,-0.226402102727674,2.48212654392327,1.30352168677936,36.3632722192028
 LightGBM,12m,WUE,Relative deadwood,relative_mortality,0.0987290570439781,2.00619665844614,1.30352168677936,45.1246864253942
 LightGBM,12m,WUE,Relative tree-cover loss,relative_tree_loss_pct,-0.14143542015882,0.0842965980356158,1.30352168677936,8.05913781313342
 XGBoost,12m,WUE,Absolute deadwood,absolute_mortality,0.0437540664758318,-0.0315460261457012,3.45474746793913,6.0234861203836
 XGBoost,12m,WUE,Deadwood gain,new_deadwood_gain_pp,0.0947854206294396,0.16406317196187,3.45474746793913,5.64891108189713
-XGBoost,12m,WUE,Total mortality,relative_disturbance,1.07260755327916,3.39856444562722,3.45474746793913,52.9280944261757
+XGBoost,12m,WUE,Relative mortality,relative_disturbance,1.07260755327916,3.39856444562722,3.45474746793913,52.9280944261757
 XGBoost,12m,WUE,Relative deadwood,relative_mortality,0.808137462254721,3.17797372568358,3.45474746793913,27.1092852325111
 XGBoost,12m,WUE,Relative tree-cover loss,relative_tree_loss_pct,0.0099625265261416,0.333899592904652,3.45474746793913,8.29022313903248
 AutoGluon,24m,WUE,Absolute deadwood,absolute_mortality,,,,13.6956590324498
 AutoGluon,24m,WUE,Deadwood gain,new_deadwood_gain_pp,,,,14.9288890549747
-AutoGluon,24m,WUE,Total mortality,relative_disturbance,,,,24.9159906736848
+AutoGluon,24m,WUE,Relative mortality,relative_disturbance,,,,24.9159906736848
 AutoGluon,24m,WUE,Relative deadwood,relative_mortality,,,,27.5441077647716
 AutoGluon,24m,WUE,Relative tree-cover loss,relative_tree_loss_pct,,,,18.9153534741192
 LightGBM,24m,WUE,Absolute deadwood,absolute_mortality,-0.477047627972671,-0.816719961466106,1.55747743355615,5.5033025455604
 LightGBM,24m,WUE,Deadwood gain,new_deadwood_gain_pp,-0.762240344508003,-0.399444194039877,1.55747743355615,7.80270840756957
-LightGBM,24m,WUE,Total mortality,relative_disturbance,0.0605011860658866,1.48118378081603,1.55747743355615,48.9517703921406
+LightGBM,24m,WUE,Relative mortality,relative_disturbance,0.0605011860658866,1.48118378081603,1.55747743355615,48.9517703921406
 LightGBM,24m,WUE,Relative deadwood,relative_mortality,0.244136553717067,1.417862281011,1.55747743355615,24.2161753603689
 LightGBM,24m,WUE,Relative tree-cover loss,relative_tree_loss_pct,-0.294675144100054,-0.697348805799258,1.55747743355615,13.5260432943606
 XGBoost,24m,WUE,Absolute deadwood,absolute_mortality,-0.0726982919326047,-0.162632062398838,2.55456442211592,11.0451934330892
 XGBoost,24m,WUE,Deadwood gain,new_deadwood_gain_pp,-0.203228845688797,0.0659965715786526,2.55456442211592,10.0682507927849
-XGBoost,24m,WUE,Total mortality,relative_disturbance,0.14959503107983,3.39949017011231,2.55456442211592,34.292784367329
+XGBoost,24m,WUE,Relative mortality,relative_disturbance,0.14959503107983,3.39949017011231,2.55456442211592,34.292784367329
 XGBoost,24m,WUE,Relative deadwood,relative_mortality,0.57756096295436,2.68035633881297,2.55456442211592,33.4492369134662
 XGBoost,24m,WUE,Relative tree-cover loss,relative_tree_loss_pct,-0.293638149803954,0.4601689828867,2.55456442211592,11.1445344933308

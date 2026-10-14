@@ -2,7 +2,7 @@
 # ============================================================================
 # LaTeX table of the paired bootstrap / block permutation (39_paired_bootstrap.R), 2026-10-09.
 # Columns: site level (all sites) and site-year level (all sites, High sites, site-years with Mid+High and with
-# High total mortality in that year). Cells: % change of the error [95 % bootstrap interval], stars = paired
+# High relative mortality in that year). Cells: % change of the error [95 % bootstrap interval], stars = paired
 # permutation with whole sites swapped, BH-corrected across all learners per metric and level (as in the CSV).
 #   env TABLE_METRIC = MAE (default) | RMSE;  TABLE_SHOW = "AG" (default) | "XGB,LGB" | ...
 # Output: manuscript/tables/table_bootstrap_d<MET>_<VTAG>_<learners>.tex
@@ -38,8 +38,8 @@ tex <- c("\\begin{table}[htbp]", "\\centering",
     "the C+T / C+T+M labels are swapped per site for the paired permutation test (10\\,000 draws, one-sided; stars, ",
     if (AG_EXTRA != "") "Benjamini--Hochberg corrected across both runs: " else "Benjamini--Hochberg corrected across all three learners: ",
     "$^{*}$\\,$q<0.05$, $^{**}$\\,$q<0.01$, $^{***}$\\,$q<0.001$). ",
-    "High sites: site maximum of total mortality $>$ %.1f\\,\\%%; the last two columns keep only the site-years whose own ",
-    "total mortality exceeds %.1f\\,\\%% (Mid + High) or %.1f\\,\\%% (High). Column heads: sites / site-years. ",
+    "High sites: site maximum of relative mortality $>$ %.1f\\,\\%%; the last two columns keep only the site-years whose own ",
+    "relative mortality exceeds %.1f\\,\\%% (Mid + High) or %.1f\\,\\%% (High). Column heads: sites / site-years. ",
     "%d sites, %d site-years, deadtrees v5.}"),
     MET, paste(LAB[SHOW], collapse = " and "), MET, MET, if (SY_ONLY) "" else MET, MET, b$b_hi, b$b_lo, b$b_hi, max(st$n_units), max(st$n_obs)),
   sprintf("\\label{tab:bootstrap_d%s_%s}", MET, paste(SHOW, collapse = "")),

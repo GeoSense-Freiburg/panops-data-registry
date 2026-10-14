@@ -3,13 +3,13 @@
 # Dose-response tests with mortality as a CONTINUOUS variable (2026-10-09). The group tests (Low / Mid / High)
 # lose power because the High group is small (22 sites); these tests use all sites and site-years.
 #   Test 1  - does the error reduction grow with mortality?
-#     1a site-year: d = |err C+T+M| - |err C+T| ~ total mortality of that year + (1 | site)   (nlme::lme)
-#     1b site:      log(MAE C+T+M / MAE C+T) per site ~ site maximum of total mortality         (Spearman)
+#     1a site-year: d = |err C+T+M| - |err C+T| ~ relative mortality of that year + (1 | site)   (nlme::lme)
+#     1b site:      log(MAE C+T+M / MAE C+T) per site ~ site maximum of relative mortality         (Spearman)
 #   Test 2  - is the model WITHOUT mortality wrong where mortality is high?
-#     2a site-year: residual of C+T (observed - predicted) ~ total mortality + (1 | site); the same for C+T+M
+#     2a site-year: residual of C+T (observed - predicted) ~ relative mortality + (1 | site); the same for C+T+M
 #                   (if mortality is the missing information, the slope should shrink towards 0 with C+T+M)
-#     2b site:      mean C+T residual per site ~ site maximum of total mortality                   (Spearman)
-# Total mortality = mean of the five buffers (paper_class_data(), as the site classes). Slopes per 10 % total
+#     2b site:      mean C+T residual per site ~ site maximum of relative mortality                   (Spearman)
+# Relative mortality = mean of the five buffers (paper_class_data(), as the site classes). Slopes per 10 % total
 # mortality, in EFP units. Tests two-sided; BH-FDR within each test family (8 = 4 EFPs x 2 windows).
 # Output: plots/<sub>/dose_response/dose_response_<L>.csv and dose_response_<L>.png
 #   PAPER_RESP_SET=efp_v5 PAPER_NO_THRESH=1 Rscript 41_mortality_dose_response.R [AG|XGB|LGB]
@@ -30,7 +30,7 @@ w <- dcast(p, response + window + SITE_ID + YEAR + observed ~ mod, value.var = "
 w <- merge(w, cd, by = c("SITE_ID", "YEAR"))[is.finite(M3) & is.finite(M4) & is.finite(tm)]
 w[, `:=`(r3 = observed - M3, r4 = observed - M4)]
 w[, d := abs(r4) - abs(r3)]
-w[, tm10 := tm / 10]                                   # slope per 10 % total mortality
+w[, tm10 := tm / 10]                                   # slope per 10 % relative mortality
 
 slope_lme <- function(y, x, g) {
   fit <- tryCatch(lme(y ~ x, random = ~ 1 | g, method = "REML", control = lmeControl(opt = "optim")), error = function(e) NULL)
@@ -73,7 +73,7 @@ mk <- function(yv, ylab, LL, ttl) ggplot(S, aes(tmax, .data[[yv]])) +
   geom_smooth(method = "lm", formula = y ~ x, colour = "#C2571A", fill = "#C2571A", alpha = 0.2, linewidth = 0.6) +
   geom_text(data = LL, aes(x = Inf, y = Inf, label = txt), hjust = 1.05, vjust = 1.4, size = 2.6, inherit.aes = FALSE) +
   facet_grid(window ~ response, scales = "free_y") +
-  labs(x = "Site maximum of total mortality (%, mean of 100-500 m buffers)", y = ylab, title = ttl) + th
+  labs(x = "Site maximum of relative mortality (%, mean of 100-500 m buffers)", y = ylab, title = ttl) + th
 p1 <- mk("lr", "log(MAE C+T+M / MAE C+T)\n(below 0 = mortality helps)", L1, "1b  Error reduction vs mortality (per site)")
 S2 <- rbind(S[, .(response, window, tmax, y = res3, model = "C+T (without mortality)")],
             S[, .(response, window, tmax, y = res4, model = "C+T+M (with mortality)")])
@@ -85,7 +85,7 @@ p2 <- ggplot(S2, aes(tmax, y, colour = model, fill = model)) +
   geom_text(data = L2, aes(x = Inf, y = Inf, label = txt), hjust = 1.05, vjust = 1.2, size = 2.4, lineheight = 0.9, inherit.aes = FALSE) +
   scale_colour_manual(values = MC2, name = NULL) + scale_fill_manual(values = MC2, name = NULL) +
   ggh4x::facet_grid2(window ~ response, scales = "free_y", independent = "y") +
-  labs(x = "Site maximum of total mortality (%, mean of 100-500 m buffers)", y = "Mean residual per site\n(observed - predicted)",
+  labs(x = "Site maximum of relative mortality (%, mean of 100-500 m buffers)", y = "Mean residual per site\n(observed - predicted)",
        title = "2b  Residual vs mortality, per site: without (C+T) and with mortality (C+T+M)") +
   th + theme(legend.position = "bottom")
 suppressMessages(library(patchwork))
@@ -109,7 +109,7 @@ pa <- ggplot(W, aes(tm, d)) +
   geom_blank(data = lim1, aes(x = 0, y = lo), inherit.aes = FALSE) + geom_blank(data = lim1, aes(x = 0, y = hi), inherit.aes = FALSE) +
   ggh4x::facet_grid2(window ~ response, scales = "free_y", independent = "y") +
   ggh4x::facetted_pos_scales(y = rep(lapply(EFP_ORDER, function(e) scale_y_continuous(limits = unlist(lim1[response == e, .(lo, hi)]), oob = scales::oob_keep)), length(WINDOWS))) +
-  labs(x = "Total mortality of the site-year (%, mean of 100-500 m buffers)",
+  labs(x = "Relative mortality of the site-year (%, mean of 100-500 m buffers)",
        y = "|error C+T+M| - |error C+T|\n(below 0 = mortality helps)",
        title = "1a  Error change vs mortality, every site-year (mixed model, random intercept per site)") + th
 F2 <- rbind(R[, fitline(t2a_int_CT, t2a_slope_CT), by = .(response, window)][, model := "C+T (without mortality)"],
@@ -129,7 +129,7 @@ pb <- ggplot(W2, aes(tm, y, colour = model)) +
   scale_colour_manual(values = MC, name = NULL) +
   ggh4x::facet_grid2(window ~ response, scales = "free_y", independent = "y") +
   ggh4x::facetted_pos_scales(y = rep(lapply(EFP_ORDER, function(e) scale_y_continuous(limits = unlist(lim2[response == e, .(lo, hi)]), oob = scales::oob_keep)), length(WINDOWS))) +
-  labs(x = "Total mortality of the site-year (%, mean of 100-500 m buffers)", y = "Residual (observed - predicted)",
+  labs(x = "Relative mortality of the site-year (%, mean of 100-500 m buffers)", y = "Residual (observed - predicted)",
        title = "2a  Residual vs mortality, every site-year: the model without mortality over-predicts where mortality is high") +
   th + theme(legend.position = "bottom")
 ggsave(file.path(OUT, sprintf("dose_response_siteyear_%s.png", L)), pa / pb + plot_layout(heights = c(1, 1.1)),

@@ -3,10 +3,10 @@
 # Main figures of the paper in Nature house style (fig_style.R), 2026-10-14. Reuses the model outputs and statistics;
 # nothing is refitted. V5 maps, mortality block without thresholded metrics.
 #   Fig. 1  sites (map) and distributions of the four ecosystem functional properties by IGBP class
-#   Fig. 2  net mortality SHAP per site, sites ordered by total mortality (compact)            [learner, window]
-#   Fig. 3  net mortality SHAP, High vs Low+Mid total-mortality sites, 12 and 24 months          [learner]
-#   Fig. 4  site maximum of total mortality vs net mortality SHAP                               [learner, window]
-#   Fig. 5  mean residual per class of the site-year's total mortality, without / with mortality [learner, window]
+#   Fig. 2  net mortality SHAP per site, sites ordered by relative mortality (compact)            [learner, window]
+#   Fig. 3  net mortality SHAP, High vs Low+Mid relative-mortality sites, 12 and 24 months          [learner]
+#   Fig. 4  site maximum of relative mortality vs net mortality SHAP                               [learner, window]
+#   Fig. 5  mean residual per class of the site-year's relative mortality, without / with mortality [learner, window]
 # Usage: Rscript 50_figures_nature.R [AG|XGB|LGB] [24m|12m]     (default AG 24m = the main-text versions)
 # Output: plots/paper_v5_nothresh/nature/<learner>_<window>/figN_*.pdf/.png
 # ============================================================================
@@ -97,7 +97,7 @@ p2 <- lapply(EFP, function(e) {
   if (FIG2_NAMES && NAMES_MODE == "top" && e == EFP[1]) g <- g + theme(axis.text.x.top = element_text(size = 6, angle = 90, vjust = 0.5, hjust = 0),
                                                 axis.ticks.x.top = element_line(linewidth = 0.2), axis.line.x.top = element_blank())
   if (e == EFP[length(EFP)]) {
-    g <- g + labs(x = "Sites, ordered by maximum total mortality (highest left)")
+    g <- g + labs(x = "Sites, ordered by maximum relative mortality (highest left)")
     if (FIG2_NAMES) g <- g + theme(axis.text.x = element_text(size = 6, angle = 90, vjust = 0.5, hjust = 1),
                                    axis.ticks.x = element_line(linewidth = 0.2))
   }
@@ -120,14 +120,14 @@ p3 <- lapply(EFP, function(e) ggplot(s3[response == e], aes(win, shap, fill = gr
   geom_point(aes(colour = grp), position = position_jitterdodge(jitter.width = 0.12, dodge.width = 0.72), size = 0.3,
              alpha = 0.55, stroke = 0, show.legend = FALSE) +
   geom_text(data = st3[response == e], aes(win, ytop, label = stars(q)), inherit.aes = FALSE, vjust = -0.2) +
-  scale_fill_manual(values = PAL$class2, name = "Total mortality") + scale_colour_manual(values = c("Low+Mid" = "#B35806", High = "#3D0000")) +
+  scale_fill_manual(values = PAL$class2, name = "Relative mortality") + scale_colour_manual(values = c("Low+Mid" = "#B35806", High = "#3D0000")) +
   scale_y_continuous(expand = expansion(mult = c(0.05, 0.12))) +
   labs(x = NULL, y = if (e == EFP[1]) "Net mortality SHAP (response units)" else NULL, title = parse(text = EFP_SHORT[[e]])) +
   theme_pub())
 f3 <- wrap_plots(p3, nrow = 1, guides = "collect") + plot_annotation(tag_levels = "a") & theme(legend.position = "bottom")
 save_pub(f3, file.path(OUT, "fig3_high_vs_lowmid"), W2, 62)
 
-# ---- Fig. 4: total mortality vs direction ------------------------------------------------------------------
+# ---- Fig. 4: relative mortality vs direction ------------------------------------------------------------------
 s4 <- sh[window == WIN]
 st4 <- s4[, {ct <- suppressWarnings(cor.test(tm_max, shap, method = "spearman", exact = FALSE)); .(rho = unname(ct$estimate), p = ct$p.value)}, by = response]
 st4[, q := p.adjust(p, "BH")][, lab := sprintf("rho == '%s%.2f%s'", ifelse(rho < 0, "\u2212", ""), abs(rho), stars(q))]
@@ -137,7 +137,7 @@ p4 <- lapply(EFP, function(e) ggplot(s4[response == e], aes(tm_max, shap)) +
   geom_point(aes(fill = igbp), shape = 21, size = 1.0, stroke = 0.15, colour = "black", alpha = 0.85) +
   geom_text(data = st4[response == e], aes(x = Inf, y = Inf, label = lab), parse = TRUE, inherit.aes = FALSE, hjust = 1.05, vjust = 1.3) +
   scale_fill_manual(values = PAL$igbp, breaks = names(PAL$igbp), name = NULL) +
-  labs(x = "Site maximum total mortality (%)",
+  labs(x = "Site maximum relative mortality (%)",
        y = if (e == EFP[1]) "Net mortality SHAP (response units)" else NULL, title = parse(text = EFP_SHORT[[e]])) +
   theme_pub())
 f4 <- wrap_plots(p4, nrow = 1, guides = "collect") + plot_annotation(tag_levels = "a") &
@@ -165,7 +165,7 @@ if (file.exists(rf) && file.exists(cf)) {
       geom_text(data = nn[response == e], aes(bin, yr[1] - pad * 1.15, label = lab), inherit.aes = FALSE, size = 5 / .pt, lineheight = 0.85, colour = "#4D4D4D") +
       scale_colour_manual(values = PAL$model, labels = c("C+T" = "Without mortality (C+T)", "C+T+M" = "With mortality (C+T+M)"), name = NULL) +
       scale_y_continuous(limits = c(yr[1] - pad * 1.9, yr[2] + pad * 1.5)) +
-      labs(x = "Site-year total mortality",
+      labs(x = "Site-year relative mortality",
            y = if (e == EFP[1]) "Mean residual (observed \u2212 predicted)" else NULL, title = parse(text = EFP_SHORT[[e]])) +
       theme_pub() + theme(axis.text.x = element_text(size = 5.5))
   })

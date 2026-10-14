@@ -101,7 +101,7 @@ tex <- c(
     if (MINY > 1) sprintf("Sensitivity: only sites with at least %d site-years. ", MINY) else "",
     switch(WT, n = "Sensitivity: sites weighted by their number of site-years (signs flipped per site). ",
            sqrt = "Sensitivity: sites weighted by the square root of their number of site-years (signs flipped per site). ", ""),
-    sprintf("Sites are grouped by their maximum total mortality across years (%s); ", if (CLASS_BUF == "avg") "averaged over the five buffers, 100--500\\,m" else paste0(CLASS_BUF, "\\,m buffer")),
+    sprintf("Sites are grouped by their maximum relative mortality across years (%s); ", if (CLASS_BUF == "avg") "averaged over the five buffers, 100--500\\,m" else paste0(CLASS_BUF, "\\,m buffer")),
     "High $>$ mean $+$ 0.5\\,SD (%.1f\\%%), Low $<$ mean $-$ 0.5\\,SD (%.1f\\%%), Mid in between. ",
     if (TEST == "permlog") "Stars: one-sided paired permutation test on the per-site log error ratios (100\\,000 random sign flips; C+T+M $<$ C+T), Benjamini--Hochberg corrected across %s " else
     if (TEST == "perm") "Stars: one-sided paired permutation test (100\\,000 random sign flips of the per-site changes; C+T+M $<$ C+T), Benjamini--Hochberg corrected across %s " else "Stars: one-sided paired Wilcoxon signed-rank test (C+T+M $<$ C+T), Benjamini--Hochberg corrected across %s ",
