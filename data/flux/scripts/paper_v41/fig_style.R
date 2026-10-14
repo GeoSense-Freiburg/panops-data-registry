@@ -31,6 +31,16 @@ scale_fill_mortality <- function(name = "Total mortality (%)", ...)
   scale_fill_gradientn(colours = MORT_COLS, limits = MORT_LIMITS, name = name, ...)
 scale_colour_mortality <- function(name = "Total mortality (%)", ...)
   scale_colour_gradientn(colours = MORT_COLS, limits = MORT_LIMITS, name = name, ...)
+# alternative for Fig. 2 (user, 2026-10-14): green (low) -> pink/magenta (high), ColorBrewer PiYG without its
+# near-white centre so mid-mortality bars stay visible; colour-blind safe (green vs magenta)
+MORT_COLS_PIYG <- c("#4D9221", "#7FBC41", "#B8E186", "#F1B6DA", "#DE77AE", "#C51B7D", "#8E0152")
+scale_fill_mortality_piyg <- function(name = "Total mortality (%)", b_lo = NULL, b_hi = NULL, ...) {
+  if (is.null(b_lo)) return(scale_fill_gradientn(colours = MORT_COLS_PIYG, limits = MORT_LIMITS, name = name, ...))
+  # colours anchored to the class breaks: Low = greens, Mid = light green -> light pink, High = pink -> magenta
+  v <- c(0, b_lo, b_hi, 50, MORT_LIMITS[2]) / MORT_LIMITS[2]
+  scale_fill_gradientn(colours = c("#276419", "#7FBC41", "#F1B6DA", "#C51B7D", "#8E0152"), values = v,
+                       limits = MORT_LIMITS, name = name, breaks = c(0, round(b_lo), round(b_hi), 50, 75), ...)
+}
 
 # EFP axis / strip labels as plotmath (subscripts, units in parentheses)
 EFP_ORDER_FIG <- c("GPPsat", "NEPmax", "ETmax", "WUE")

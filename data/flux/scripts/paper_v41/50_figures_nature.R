@@ -59,6 +59,9 @@ if (L == "AG" && WIN == "24m") {
 }
 
 # ---- Fig. 2: net mortality SHAP per site -----------------------------------------------------------------
+# env FIG2_PALETTE = orrd (default) | piyg (green -> pink); FIG2_NAMES = 1 adds site codes under the last panel
+FIG2_PAL <- Sys.getenv("FIG2_PALETTE", "orrd"); FIG2_NAMES <- Sys.getenv("FIG2_NAMES", "0") == "1"
+fill2 <- if (FIG2_PAL == "piyg") scale_fill_mortality_piyg(b_lo = B_LO, b_hi = B_HI) else scale_fill_mortality()
 s2 <- sh[window == WIN]
 ord <- site[order(-tm_max), SITE_ID]
 s2[, x := match(SITE_ID, ord)]
@@ -71,17 +74,22 @@ p2 <- lapply(EFP, function(e) {
   g <- ggplot(d, aes(x, shap, fill = tm_max)) +
     geom_hline(yintercept = 0, colour = PAL$zero, linewidth = 0.25) +
     geom_vline(xintercept = brk, linetype = "22", linewidth = 0.25, colour = PAL$neutral) +
-    geom_col(width = 0.75) + scale_fill_mortality() +
-    scale_x_continuous(expand = expansion(add = 0.6)) +
+    geom_col(width = 0.75) + fill2 +
+    scale_x_continuous(expand = expansion(add = 0.6), breaks = seq_along(ord), labels = ord) +
     labs(x = NULL, y = parse(text = paste0(EFP_SHORT[[e]], "~SHAP"))) + theme_pub() +
     theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
   if (e == EFP[1]) g <- g + geom_text(data = cls_lab, aes(x, Inf, label = lab), inherit.aes = FALSE, vjust = 1.2)
-  if (e == EFP[length(EFP)]) g <- g + labs(x = "Sites, ordered by maximum total mortality (highest left)")
+  if (e == EFP[length(EFP)]) {
+    g <- g + labs(x = "Sites, ordered by maximum total mortality (highest left)")
+    if (FIG2_NAMES) g <- g + theme(axis.text.x = element_text(size = 5, angle = 90, vjust = 0.5, hjust = 1),
+                                   axis.ticks.x = element_line(linewidth = 0.2))
+  }
   g })
 f2 <- wrap_plots(p2, ncol = 1, guides = "collect") + plot_annotation(tag_levels = "a") &
   theme(legend.position = "right", legend.key.height = unit(10, "mm"), legend.key.width = unit(2, "mm"))
 f2 <- f2 + plot_annotation(caption = NULL)
-save_pub(wrap_elements(full = f2) + labs(subtitle = NULL), file.path(OUT, "fig2_net_mortality_shap_per_site"), W2, 125)
+f2_stem <- paste0("fig2_net_mortality_shap_per_site", if (FIG2_PAL == "piyg") "_piyg" else "", if (FIG2_NAMES) "_names" else "")
+save_pub(f2, file.path(OUT, f2_stem), W2, if (FIG2_NAMES) 140 else 125)
 
 # ---- Fig. 3: High vs Low+Mid -------------------------------------------------------------------------------
 s3 <- copy(sh)[, grp := factor(fifelse(cls == "High", "High", "Low+Mid"), c("Low+Mid", "High"))]
