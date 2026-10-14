@@ -69,19 +69,32 @@ n_cls <- site[, .N, by = cls]
 brk <- c(sum(site$cls == "High") + 0.5, sum(site$cls %in% c("High", "Mid")) + 0.5)
 cls_lab <- data.table(x = c(brk[1] / 2, mean(brk), (brk[2] + nrow(site)) / 2),
                       lab = sprintf("%s (%d)", c("High", "Mid", "Low"), n_cls[match(c("High", "Mid", "Low"), cls), N]))
+# site codes alternate between the bottom of the last panel (odd ranks) and the top of the first panel (even ranks),
+# which doubles the space per label (6 pt instead of 5 pt)
+odd <- seq(1, length(ord), 2); even <- seq(2, length(ord), 2)
+x_scale <- function(e) {
+  if (FIG2_NAMES && e == EFP[1])
+    return(scale_x_continuous(expand = expansion(add = 0.6), breaks = NULL,
+                              sec.axis = dup_axis(breaks = even, labels = ord[even], name = NULL)))
+  if (FIG2_NAMES && e == EFP[length(EFP)])
+    return(scale_x_continuous(expand = expansion(add = 0.6), breaks = odd, labels = ord[odd]))
+  scale_x_continuous(expand = expansion(add = 0.6), breaks = NULL)
+}
 p2 <- lapply(EFP, function(e) {
   d <- s2[response == e]
   g <- ggplot(d, aes(x, shap, fill = tm_max)) +
     geom_hline(yintercept = 0, colour = PAL$zero, linewidth = 0.25) +
     geom_vline(xintercept = brk, linetype = "22", linewidth = 0.25, colour = PAL$neutral) +
     geom_col(width = 0.75) + fill2 +
-    scale_x_continuous(expand = expansion(add = 0.6), breaks = seq_along(ord), labels = ord) +
+    x_scale(e) +
     labs(x = NULL, y = parse(text = paste0(EFP_SHORT[[e]], "~SHAP"))) + theme_pub() +
     theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
   if (e == EFP[1]) g <- g + geom_text(data = cls_lab, aes(x, Inf, label = lab), inherit.aes = FALSE, vjust = 1.2)
+  if (FIG2_NAMES && e == EFP[1]) g <- g + theme(axis.text.x.top = element_text(size = 6, angle = 90, vjust = 0.5, hjust = 0),
+                                                axis.ticks.x.top = element_line(linewidth = 0.2), axis.line.x.top = element_blank())
   if (e == EFP[length(EFP)]) {
     g <- g + labs(x = "Sites, ordered by maximum total mortality (highest left)")
-    if (FIG2_NAMES) g <- g + theme(axis.text.x = element_text(size = 5, angle = 90, vjust = 0.5, hjust = 1),
+    if (FIG2_NAMES) g <- g + theme(axis.text.x = element_text(size = 6, angle = 90, vjust = 0.5, hjust = 1),
                                    axis.ticks.x = element_line(linewidth = 0.2))
   }
   g })
@@ -89,7 +102,7 @@ f2 <- wrap_plots(p2, ncol = 1, guides = "collect") + plot_annotation(tag_levels 
   theme(legend.position = "right", legend.key.height = unit(10, "mm"), legend.key.width = unit(2, "mm"))
 f2 <- f2 + plot_annotation(caption = NULL)
 f2_stem <- paste0("fig2_net_mortality_shap_per_site", if (FIG2_PAL == "piyg") "_piyg" else "", if (FIG2_NAMES) "_names" else "")
-save_pub(f2, file.path(OUT, f2_stem), W2, if (FIG2_NAMES) 140 else 125)
+save_pub(f2, file.path(OUT, f2_stem), W2, if (FIG2_NAMES) 150 else 125)
 
 # ---- Fig. 3: High vs Low+Mid -------------------------------------------------------------------------------
 s3 <- copy(sh)[, grp := factor(fifelse(cls == "High", "High", "Low+Mid"), c("Low+Mid", "High"))]
