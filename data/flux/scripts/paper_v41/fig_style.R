@@ -90,3 +90,12 @@ save_pub <- function(p, stem, width_mm, height_mm) {
   ggsave(paste0(stem, ".png"), p, width = width_mm * MM, height = height_mm * MM, dpi = 600, device = ragg::agg_png, bg = "white")
   invisible(stem)
 }
+
+# Robinson projection without PROJ (sf/PROJ is broken on this server), from the standard table (Snyder 1993, Map
+# Projections: A Working Manual); returns x/y in Earth radii. Used for the curved world map of Fig. 1 (2026-10-15).
+robinson <- function(lon, lat) {
+  X <- c(1, .9986, .9954, .99, .9822, .973, .96, .9427, .9216, .8962, .8679, .835, .7986, .7597, .7186, .6732, .6213, .5722, .5322)
+  Y <- c(0, .062, .124, .186, .248, .31, .372, .434, .4958, .5571, .6176, .6769, .7346, .7903, .8435, .8936, .9394, .9761, 1)
+  a <- abs(pmin(pmax(lat, -90), 90)); fx <- splinefun(seq(0, 90, 5), X); fy <- splinefun(seq(0, 90, 5), Y)
+  data.frame(x = 0.8487 * fx(a) * lon * pi / 180, y = 1.3523 * fy(a) * sign(lat))
+}

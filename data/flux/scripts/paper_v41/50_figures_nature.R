@@ -36,12 +36,15 @@ efp_lab <- function(x) EFP_EXPR[as.character(x)]
 
 # ---- Fig. 1: map + EFP distributions -------------------------------------------------------------------
 if (L == "AG" && WIN == "24m") {
-  world <- as.data.table(map_data("world"))[region != "Antarctica"]   # plain lon/lat outlines (no PROJ needed)
+  # Robinson projection (curved, as in Jung et al. 2020 Sci. Data Fig. 2), computed with robinson() in fig_style.R
+  world <- as.data.table(map_data("world", wrap = c(-180, 180)))[region != "Antarctica"]
+  world[, c("x", "y") := robinson(long, lat)]
+  sitep <- cbind(site, robinson(site$lon, site$lat))
   pmap <- ggplot() +
-    geom_polygon(data = world, aes(long, lat, group = group), fill = "#EDEDED", colour = "white", linewidth = 0.1) +
-    geom_point(data = site, aes(lon, lat, fill = igbp), shape = 21, size = 1.4, stroke = 0.2, colour = "black") +
+    geom_polygon(data = world, aes(x, y, group = group), fill = "#E3E3E3", colour = "white", linewidth = 0.08) +
+    geom_point(data = sitep, aes(x, y, fill = igbp), shape = 21, size = 1.4, stroke = 0.2, colour = "black") +
     scale_fill_manual(values = PAL$igbp, breaks = names(PAL$igbp), name = NULL) +
-    coord_quickmap(xlim = c(-170, 180), ylim = c(-45, 72), expand = FALSE) +
+    coord_fixed(ylim = range(robinson(0, c(-58, 84))$y), expand = FALSE, clip = "off") +
     guides(fill = guide_legend(nrow = 1, override.aes = list(size = 1.8))) +
     labs(x = NULL, y = NULL) + theme_pub() +
     theme(axis.line = element_blank(), axis.ticks = element_blank(), axis.text = element_blank(), legend.position = "bottom")
