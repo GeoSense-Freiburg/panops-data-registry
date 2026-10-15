@@ -98,6 +98,24 @@ pr <- unlist(lapply(WINS, function(w) lapply(EFP, function(e) {      # EFPs as c
 })), recursive = FALSE)
 save_pub(wrap_plots(pr, ncol = 4) + plot_annotation(tag_levels = "a"), file.path(OUT, "site_drmse_AG"), W2, 85)
 
+# ---- 2b. the same per site-year: change in absolute error, coloured by the site-year's own relative mortality ----------
+sy <- dcast(P[learner == "AutoGluon"], response + window + SITE_ID + YEAR + observed ~ mod, value.var = "predicted")
+sy <- merge(sy, ds[, .(SITE_ID, YEAR, tm)], by = c("SITE_ID", "YEAR"))[is.finite(M3) & is.finite(M4)]
+sy[, d := abs(observed - M4) - abs(observed - M3)][, col := mortality_piyg_col(tm, B_LO, B_HI)]
+sy[, rk := frank(d, ties.method = "first"), by = .(response, window)]
+impy <- sy[, .(lab = sprintf("%.0f%% of site-years improved", 100 * mean(d < 0))), by = .(response, window)]
+py <- unlist(lapply(WINS, function(w) lapply(EFP, function(e) {
+  ggplot(sy[response == e & window == w], aes(rk, d, fill = col)) +
+    geom_hline(yintercept = 0, colour = PAL$zero, linewidth = 0.25) + geom_col(width = 1) + scale_fill_identity() +
+    geom_text(data = impy[response == e & window == w], aes(x = 1, y = Inf, label = lab), inherit.aes = FALSE, hjust = 0, vjust = 1.3) +
+    scale_y_continuous(expand = expansion(mult = c(0.05, 0.15))) +
+    labs(x = if (w == "24m") "Site-years, sorted by the change" else NULL,
+         y = if (e == EFP[1]) paste0(WLAB[[w]], "\n\u0394|error| (EFP units)") else NULL,
+         title = if (w == "12m") efp_title(e) else NULL) +
+    theme_pub() + theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
+})), recursive = FALSE)
+save_pub(wrap_plots(py, ncol = 4) + plot_annotation(tag_levels = "a"), file.path(OUT, "siteyear_dabs_AG"), W2, 85)
+
 # ---- 3. Fig. 4 with the sites grouped by relative deadwood ------------------------------------------------------
 sh <- function(L) fread(file.path(FI, sprintf("%s_site_signed_shap_M4.csv", L)))[group == "Disturbance" & response %in% EFP][
   , .(SITE_ID = test_site, response, window = sub("M4_", "", model), shap = mean_signed_shap, learner = LAB[[L]])]
