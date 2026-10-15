@@ -83,12 +83,13 @@ mae_fig(c("AutoGluon", "XGBoost", "LightGBM"), FALSE, "site_mae_all")
 # ---- 2. per-site change in RMSE, sites sorted -------------------------------------------------------------------
 rm <- P[learner == "AutoGluon", .(rmse = sqrt(mean((observed - predicted)^2))), by = .(response, window, mod, SITE_ID)]
 rm <- dcast(rm, response + window + SITE_ID ~ mod, value.var = "rmse")[, d := M4 - M3]
-rm <- merge(rm, site[, .(SITE_ID, col)], by = "SITE_ID")
+rm <- merge(rm, site[, .(SITE_ID, tm_max)], by = "SITE_ID")
 rm[, rk := frank(d, ties.method = "first"), by = .(response, window)]
 imp <- rm[, .(lab = sprintf("%.0f%% of sites improved", 100 * mean(d < 0))), by = .(response, window)]
 pr <- unlist(lapply(WINS, function(w) lapply(EFP, function(e) {      # EFPs as columns, windows as rows (2026-10-15)
-  ggplot(rm[response == e & window == w], aes(rk, d, fill = col)) +
-    geom_hline(yintercept = 0, colour = PAL$zero, linewidth = 0.25) + geom_col(width = 0.8) + scale_fill_identity() +
+  ggplot(rm[response == e & window == w], aes(rk, d, fill = tm_max)) +
+    geom_hline(yintercept = 0, colour = PAL$zero, linewidth = 0.25) + geom_col(width = 0.8) +
+    scale_fill_mortality_piyg(name = "Site maximum\nrelative mortality (%)", b_lo = B_LO, b_hi = B_HI) +
     geom_text(data = imp[response == e & window == w], aes(x = 1, y = Inf, label = lab), inherit.aes = FALSE, hjust = 0, vjust = 1.3) +
     scale_y_continuous(expand = expansion(mult = c(0.05, 0.15))) +
     labs(x = if (w == "24m") "Sites, sorted by the change" else NULL,
@@ -96,7 +97,9 @@ pr <- unlist(lapply(WINS, function(w) lapply(EFP, function(e) {      # EFPs as c
          title = if (w == "12m") efp_title(e) else NULL) +
     theme_pub() + theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
 })), recursive = FALSE)
-save_pub(wrap_plots(pr, ncol = 4) + plot_annotation(tag_levels = "a"), file.path(OUT, "site_drmse_AG"), W2, 85)
+save_pub(wrap_plots(pr, ncol = 4, guides = "collect") + plot_annotation(tag_levels = "a") & theme(legend.position = "right") &
+           guides(fill = guide_colourbar(barheight = unit(40, "mm"), barwidth = unit(2.5, "mm"))),
+         file.path(OUT, "site_drmse_AG"), W2, 85)
 
 # ---- 2b. the same per site-year: change in absolute error, coloured by the site-year's own relative mortality ----------
 sy <- dcast(P[learner == "AutoGluon"], response + window + SITE_ID + YEAR + observed ~ mod, value.var = "predicted")
@@ -105,8 +108,9 @@ sy[, d := abs(observed - M4) - abs(observed - M3)][, col := mortality_piyg_col(t
 sy[, rk := frank(d, ties.method = "first"), by = .(response, window)]
 impy <- sy[, .(lab = sprintf("%.0f%% of site-years improved", 100 * mean(d < 0))), by = .(response, window)]
 py <- unlist(lapply(WINS, function(w) lapply(EFP, function(e) {
-  ggplot(sy[response == e & window == w], aes(rk, d, fill = col)) +
-    geom_hline(yintercept = 0, colour = PAL$zero, linewidth = 0.25) + geom_col(width = 1) + scale_fill_identity() +
+  ggplot(sy[response == e & window == w], aes(rk, d, fill = tm)) +
+    geom_hline(yintercept = 0, colour = PAL$zero, linewidth = 0.25) + geom_col(width = 1) +
+    scale_fill_mortality_piyg(name = "Relative mortality\nof the site-year (%)", b_lo = B_LO, b_hi = B_HI) +
     geom_text(data = impy[response == e & window == w], aes(x = 1, y = Inf, label = lab), inherit.aes = FALSE, hjust = 0, vjust = 1.3) +
     scale_y_continuous(expand = expansion(mult = c(0.05, 0.15))) +
     labs(x = if (w == "24m") "Site-years, sorted by the change" else NULL,
@@ -114,7 +118,9 @@ py <- unlist(lapply(WINS, function(w) lapply(EFP, function(e) {
          title = if (w == "12m") efp_title(e) else NULL) +
     theme_pub() + theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
 })), recursive = FALSE)
-save_pub(wrap_plots(py, ncol = 4) + plot_annotation(tag_levels = "a"), file.path(OUT, "siteyear_dabs_AG"), W2, 85)
+save_pub(wrap_plots(py, ncol = 4, guides = "collect") + plot_annotation(tag_levels = "a") & theme(legend.position = "right") &
+           guides(fill = guide_colourbar(barheight = unit(40, "mm"), barwidth = unit(2.5, "mm"))),
+         file.path(OUT, "siteyear_dabs_AG"), W2, 85)
 
 # ---- 3. Fig. 4 with the sites grouped by relative deadwood ------------------------------------------------------
 sh <- function(L) fread(file.path(FI, sprintf("%s_site_signed_shap_M4.csv", L)))[group == "Disturbance" & response %in% EFP][
