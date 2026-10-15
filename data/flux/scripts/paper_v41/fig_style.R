@@ -21,6 +21,8 @@ PAL <- list(
   model_long = c("Without mortality (C+T)" = "#0072B2", "With mortality (C+T+M)" = "#D55E00"),
   class    = c(Low = "#FDCC8A", Mid = "#FC8D59", High = "#B30000"),         # relative-mortality classes (OrRd)
   class2   = c("Low+Mid" = "#FDCC8A", High = "#B30000"),
+  class2_piyg = c("Low+Mid" = "#7FBC41", High = "#C51B7D"),          # Fig 3 matched to the PiYG Fig 2 (2026-10-15)
+  class2_piyg_pt = c("Low+Mid" = "#276419", High = "#5E0130"),
   learner  = c(AutoGluon = "#009E73", XGBoost = "#0072B2", LightGBM = "#E69F00"),
   igbp     = c(ENF = "#009E73", DBF = "#E69F00", MF = "#CC79A7", EBF = "#0072B2", WET = "#56B4E9",
                CSH = "#D55E00", OSH = "#F0E442", WSA = "#000000"),
