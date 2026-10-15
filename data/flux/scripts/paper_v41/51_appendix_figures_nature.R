@@ -86,16 +86,17 @@ rm <- dcast(rm, response + window + SITE_ID ~ mod, value.var = "rmse")[, d := M4
 rm <- merge(rm, site[, .(SITE_ID, col)], by = "SITE_ID")
 rm[, rk := frank(d, ties.method = "first"), by = .(response, window)]
 imp <- rm[, .(lab = sprintf("%.0f%% of sites improved", 100 * mean(d < 0))), by = .(response, window)]
-pr <- unlist(lapply(EFP, function(e) lapply(WINS, function(w) {
+pr <- unlist(lapply(WINS, function(w) lapply(EFP, function(e) {      # EFPs as columns, windows as rows (2026-10-15)
   ggplot(rm[response == e & window == w], aes(rk, d, fill = col)) +
     geom_hline(yintercept = 0, colour = PAL$zero, linewidth = 0.25) + geom_col(width = 0.8) + scale_fill_identity() +
     geom_text(data = imp[response == e & window == w], aes(x = 1, y = Inf, label = lab), inherit.aes = FALSE, hjust = 0, vjust = 1.3) +
-    labs(x = if (e == EFP[4]) "Sites, sorted by the change in RMSE" else NULL,
-         y = if (w == "12m") parse(text = sprintf("atop(Delta*RMSE~%s, %s)", EFP_SHORT[[e]], EFP_UNIT[[e]])) else NULL,
-         title = if (e == EFP[1]) WLAB[[w]] else NULL) +
+    scale_y_continuous(expand = expansion(mult = c(0.05, 0.15))) +
+    labs(x = if (w == "24m") "Sites, sorted by the change" else NULL,
+         y = if (e == EFP[1]) paste0(WLAB[[w]], "\n\u0394RMSE (EFP units)") else NULL,
+         title = if (w == "12m") efp_title(e) else NULL) +
     theme_pub() + theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
 })), recursive = FALSE)
-save_pub(wrap_plots(pr, ncol = 2) + plot_annotation(tag_levels = "a"), file.path(OUT, "site_drmse_AG"), W15, 150)
+save_pub(wrap_plots(pr, ncol = 4) + plot_annotation(tag_levels = "a"), file.path(OUT, "site_drmse_AG"), W2, 85)
 
 # ---- 3. Fig. 4 with the sites grouped by relative deadwood ------------------------------------------------------
 sh <- function(L) fread(file.path(FI, sprintf("%s_site_signed_shap_M4.csv", L)))[group == "Disturbance" & response %in% EFP][
