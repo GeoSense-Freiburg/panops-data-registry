@@ -252,6 +252,9 @@ for (w in WINS) for (e in EFP) {
 }
 for (w in WINS) for (e in EFP) {
   z <- wy[response == e & window == w]; r <- DR[response == e & window == w]
+  # difference of the two slopes = trend of the correction (residual C+T+M - residual C+T), mixed model with a site-block
+  # bootstrap (500 draws, 43_residual_by_mortality_bin.R); q shown at least 1/500 because the bootstrap cannot resolve less
+  tr <- fread(sprintf("plots/paper_v5_nothresh/dose_response/residual_correction_trend_AG_%s.csv", w))[response == e]
   zz <- rbind(z[, .(tmc, y = r3, model = "C+T")], z[, .(tmc, y = r4, model = "C+T+M")])
   fl <- rbind(data.table(tmc = xs, y = r$t2a_int_CT + r$t2a_slope_CT * xs / 10, model = "C+T"),
               data.table(tmc = xs, y = r$t2a_int_CTM + r$t2a_slope_CTM * xs / 10, model = "C+T+M"))
@@ -260,7 +263,8 @@ for (w in WINS) for (e in EFP) {
     geom_hline(yintercept = 0, colour = PAL$zero, linewidth = 0.25, linetype = "22") +
     geom_point(size = 0.35, alpha = 0.35, stroke = 0) + geom_line(data = fl, linewidth = 0.55) +
     annotate("text", x = Inf, y = Inf, hjust = 1.05, vjust = 1.2, size = 5 / .pt, lineheight = 0.9,
-             label = gsub("-", "−", sprintf("C+T %+.3f%s\nC+T+M %+.3f%s", r$t2a_slope_CT, qs(r$t2a_q_CT), r$t2a_slope_CTM, qs(r$t2a_q_CTM)))) +
+             label = gsub("-", "−", sprintf("C+T %+.3f%s\nC+T+M %+.3f%s\n\u0394 %+.3f%s", r$t2a_slope_CT, qs(r$t2a_q_CT), r$t2a_slope_CTM,
+                     qs(r$t2a_q_CTM), tr$slope, qs(pmax(tr$q_boot, 1 / 500))))) +
     scale_colour_manual(values = PAL$model, labels = c("Without mortality (C+T)", "With mortality (C+T+M)"), name = NULL) +
     coord_cartesian(ylim = lim) +
     labs(x = if (w == "24m") "Relative mortality of the site-year (%)" else NULL,

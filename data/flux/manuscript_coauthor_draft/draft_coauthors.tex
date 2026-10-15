@@ -153,7 +153,7 @@ with little mortality. Adding mortality reduced these over-predictions by about 
 intervals that included zero. This correction --- the amount by which adding mortality lowered the prediction --- was
 significant in the $>$\,30\,\% class (GPP$_\mathrm{sat}$ $+3.2$, NEP$_\mathrm{max}$ $+2.7$\,$\mu$mol\,m$^{-2}$\,s$^{-1}$, WUE $+0.34$\,g\,C\,mm$^{-1}$; all $q<0.01$, paired permutation test
 with whole sites swapped) and grew with relative mortality (mixed model with a random intercept per site, per
-$+10$\,\% relative mortality: $+0.96$, $+0.75$ and $+0.10$; all $q<0.001$). In years with less than 10\,\% mortality the
+$+10$\,\% relative mortality: $+0.96$, $+0.75$ and $+0.10$; all $q<0.01$, site-block bootstrap; Fig.~A22). In years with less than 10\,\% mortality the
 mortality predictors instead raised the predictions slightly. ET$_\mathrm{max}$ showed no such pattern. Across all 361 site-years, the
 residual of the model without mortality declined with relative mortality (per $+10$\,\%: NEP$_\mathrm{max}$ $-0.77$\,$\mu$mol\,m$^{-2}$\,s$^{-1}$, WUE
 $-0.18$\,g\,C\,mm$^{-1}$); for NEP$_\mathrm{max}$ and WUE this decline held when whole sites were resampled, when any single site was left out and
@@ -580,7 +580,7 @@ Mean, C+T   & \textbf{0.349} & 0.337 & 0.347 & 0.351 & \textbf{0.365} & 0.356 \\
 \end{center}
 \begin{center}
 \includegraphics[width=\linewidth]{figures/A_fig_dose_siteyear_AG.png}\\[2pt]
-\parbox{\linewidth}{{\small \textbf{Fig.\ A22} $|$ \textbf{All site-years with the mixed-model slopes (AutoGluon).} \textbf{a--h}, Change in absolute error when mortality is added (grey points, site-years; black line, mixed-model slope) for the 12- and 24-month windows; \textbf{i--p}, residuals without (blue) and with mortality (vermillion) with their slopes, against the relative mortality of the site-year. Labels, slope per +10\,\% relative mortality with Benjamini--Hochberg corrected significance; y axes cut at the 1st and 99th percentiles (no data removed).}}
+\parbox{\linewidth}{{\small \textbf{Fig.\ A22} $|$ \textbf{All site-years with the mixed-model slopes (AutoGluon).} \textbf{a--h}, Change in absolute error when mortality is added (grey points, site-years; black line, mixed-model slope) for the 12- and 24-month windows; \textbf{i--p}, residuals without (blue) and with mortality (vermillion) with their slopes, against the relative mortality of the site-year. Labels, slope per +10\,\% relative mortality with Benjamini--Hochberg corrected significance (mixed model with a random intercept per site); $\Delta$, difference between the two slopes, estimated as the trend of the correction (residual with minus residual without mortality per site-year) with a mixed model and tested with a site-block bootstrap (500 draws; $^{**}$\,$q<0.01$, the smallest value 500 draws can resolve); y axes cut at the 1st and 99th percentiles (no data removed).}}
 \end{center}
 
 \subsection*{A8. Circularity check: EFP-specific climate block}
