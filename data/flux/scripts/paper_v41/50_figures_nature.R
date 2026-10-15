@@ -91,7 +91,7 @@ p2 <- lapply(EFP, function(e) {
     geom_vline(xintercept = brk, linetype = "22", linewidth = 0.25, colour = PAL$neutral) +
     geom_col(width = 0.75) + fill2 +
     x_scale(e) +
-    labs(x = NULL, y = parse(text = paste0(EFP_SHORT[[e]], "~SHAP"))) + theme_pub() +
+    labs(x = NULL, y = parse(text = sprintf("atop(%s~SHAP, %s)", EFP_SHORT[[e]], EFP_UNIT[[e]]))) + theme_pub() +
     theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
   if (e == EFP[1]) g <- g + geom_text(data = cls_lab, aes(x, Inf, label = lab), inherit.aes = FALSE, vjust = 1.2)
   if (FIG2_NAMES && NAMES_MODE == "top" && e == EFP[1]) g <- g + theme(axis.text.x.top = element_text(size = 6, angle = 90, vjust = 0.5, hjust = 0),
@@ -122,7 +122,7 @@ p3 <- lapply(EFP, function(e) ggplot(s3[response == e], aes(win, shap, fill = gr
   geom_text(data = st3[response == e], aes(win, ytop, label = stars(q)), inherit.aes = FALSE, vjust = -0.2) +
   scale_fill_manual(values = PAL$class2, name = "Relative mortality") + scale_colour_manual(values = c("Low+Mid" = "#B35806", High = "#3D0000")) +
   scale_y_continuous(expand = expansion(mult = c(0.05, 0.12))) +
-  labs(x = NULL, y = if (e == EFP[1]) "Net mortality SHAP (response units)" else NULL, title = parse(text = EFP_SHORT[[e]])) +
+  labs(x = NULL, y = if (e == EFP[1]) "Net mortality SHAP (EFP units)" else NULL, title = parse(text = EFP_EXPR[[e]])) +
   theme_pub())
 f3 <- wrap_plots(p3, nrow = 1, guides = "collect") + plot_annotation(tag_levels = "a") & theme(legend.position = "bottom")
 save_pub(f3, file.path(OUT, "fig3_high_vs_lowmid"), W2, 62)
@@ -138,7 +138,7 @@ p4 <- lapply(EFP, function(e) ggplot(s4[response == e], aes(tm_max, shap)) +
   geom_text(data = st4[response == e], aes(x = Inf, y = Inf, label = lab), parse = TRUE, inherit.aes = FALSE, hjust = 1.05, vjust = 1.3) +
   scale_fill_manual(values = PAL$igbp, breaks = names(PAL$igbp), name = NULL) +
   labs(x = "Site maximum relative mortality (%)",
-       y = if (e == EFP[1]) "Net mortality SHAP (response units)" else NULL, title = parse(text = EFP_SHORT[[e]])) +
+       y = if (e == EFP[1]) "Net mortality SHAP (EFP units)" else NULL, title = parse(text = EFP_EXPR[[e]])) +
   theme_pub())
 f4 <- wrap_plots(p4, nrow = 1, guides = "collect") + plot_annotation(tag_levels = "a") &
   theme(legend.position = "bottom") & guides(fill = guide_legend(nrow = 1, override.aes = list(size = 1.8)))
@@ -166,7 +166,7 @@ if (file.exists(rf) && file.exists(cf)) {
       scale_colour_manual(values = PAL$model, labels = c("C+T" = "Without mortality (C+T)", "C+T+M" = "With mortality (C+T+M)"), name = NULL) +
       scale_y_continuous(limits = c(yr[1] - pad * 1.9, yr[2] + pad * 1.5)) +
       labs(x = "Site-year relative mortality",
-           y = if (e == EFP[1]) "Mean residual (observed \u2212 predicted)" else NULL, title = parse(text = EFP_SHORT[[e]])) +
+           y = if (e == EFP[1]) "Mean residual (observed \u2212 predicted)" else NULL, title = parse(text = EFP_EXPR[[e]])) +
       theme_pub() + theme(axis.text.x = element_text(size = 5.5))
   })
   f5 <- wrap_plots(p5, nrow = 1, guides = "collect") + plot_annotation(tag_levels = "a") & theme(legend.position = "bottom")

@@ -30,11 +30,11 @@ if (PAPER_RESP_SET %in% c("efp", "v10efp", "efp_v5")) {
   .sub <- switch(PAPER_RESP_SET, efp = "paper_v41", efp_v5 = "paper_v5", v10efp = "paper_v10_efp")
   EFP_ORDER  <- c("GPPsat", "NEPmax", "ETmax", "WUE")
   RESP_UNITS <- c(GPPsat = "GPPsat  (µmol m⁻² s⁻¹)", NEPmax = "NEPmax  (µmol m⁻² s⁻¹)",
-                  ETmax  = "ETmax  (mm d⁻¹)",         WUE    = "WUE  (g C mm⁻¹)")
+                  ETmax  = "ETmax  (mm (30 min)⁻¹)",   WUE    = "WUE  (g C kg⁻¹ H₂O)")
   RESP_EXPR  <- c(GPPsat = expression(GPP[sat]~~(mu*mol~m^{-2}~s^{-1})),
                   NEPmax = expression(NEP[max]~~(mu*mol~m^{-2}~s^{-1})),
-                  ETmax  = expression(ET[max]~~(mm~d^{-1})),
-                  WUE    = expression(WUE~~(g~C~mm^{-1})))
+                  ETmax  = expression(ET[max]~~(mm~(30~min)^{-1})),
+                  WUE    = expression(WUE~~(g~C~kg^{-1}~H[2]*O)))
   RESP_WORD  <- "EFP"
 } else {
   PAPER_DATA <- file.path(PAPER_ROOT, if (PAPER_RESP_SET == "flux") "derived_tables/paper_v41_fluxes/paper_dataset_fluxes.csv"

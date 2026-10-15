@@ -331,7 +331,7 @@ if os.path.exists(f"{DS['v5']['plots']}/dose_response/dose_response_robustness_A
                   "site-block bootstrap interval; numbers = site-years (sites); stars at the top = adding mortality lowers the prediction significantly in that class (paired permutation, BH-FDR).")
             + "<p><b>Result:</b> without mortality the model predicts the EFPs <b>too high in high-mortality years</b>: in the "
             "&gt; 30 % class (21 site-years, 10 sites) NEP<sub>max</sub> by about 4 µmol m<sup>−2</sup> s<sup>−1</sup>, "
-            "GPP<sub>sat</sub> by 3.4–4.4 and WUE by 0.75–0.9 g C mm<sup>−1</sup> (all learners, intervals below 0). Adding "
+            "GPP<sub>sat</sub> by 3.4–4.4 and WUE by 0.75–0.9 g C kg<sup>−1</sup> H<sub>2</sub>O (all learners, intervals below 0). Adding "
             "mortality <b>reduces</b> this bias: AutoGluon by about two-thirds (NEP<sub>max</sub> −4.0 → −1.3), XGBoost and "
             "LightGBM by about a third to a half (−3.6 to −4.0 → −1.8 to −2.4, still below 0). ET<sub>max</sub> shows no pattern.</p>"
             "<p><b>Is the correction significant?</b> Per site-year, correction = residual with − residual without mortality "
@@ -342,7 +342,7 @@ if os.path.exists(f"{DS['v5']['plots']}/dose_response/dose_response_robustness_A
             "(mixed model, site-block bootstrap; AutoGluon +0.96, +0.75 and +0.10 per +10 %, all q &lt; 0.001).</p>"
             "<p>The same with a <b>mixed model</b> (residual ~ relative mortality of the year, random intercept per site): the slope "
             "without mortality is about −0.7 to −0.8 µmol m<sup>−2</sup> s<sup>−1</sup> (NEP<sub>max</sub>) and −0.18 g C "
-            "mm<sup>−1</sup> (WUE) per +10 % relative mortality; it holds with a site-block bootstrap, when leaving out any single "
+            "kg<sup>−1</sup> H<sub>2</sub>O (WUE) per +10 % relative mortality; it holds with a site-block bootstrap, when leaving out any single "
             "site and without the three most extreme sites (FI-Hyy, US-GLE, US-NC2, &gt; 50 %). With mortality the linear trend "
             "is no longer significant for any learner. GPP<sub>sat</sub> goes the same way but depends more on single sites. "
             "Whether the error <i>reduction</i> itself grows with mortality (test 1a) is the same direction but not robust in the "
