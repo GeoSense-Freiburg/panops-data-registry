@@ -4,3 +4,4 @@ outs:
   nfiles: 7720
   hash: md5
   path: all_tracheophyta_non-cult_2026-10-15
+  desc: GBIF download 0028282-260928105237408. Taxon keys in the output (taxonkey, specieskey, ...) are Catalogue of Life XR IDs (checklist 7ddf754f-d193-4cc9-b351-99906754a03b), not GBIF backbone keys; the taxon filter itself used the backbone.

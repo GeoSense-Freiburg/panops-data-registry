@@ -14,6 +14,12 @@ from src.utils.log_utils import setup_logger
 
 log = setup_logger(__name__, "INFO")
 
+# GBIF Backbone Taxonomy. GBIF now defaults to the Catalogue of Life checklist for
+# both the taxon filter and the taxon key columns of the output (taxonkey,
+# specieskey, ...), so the checklist has to be named explicitly to keep the
+# numeric backbone keys that trait tables are matched on.
+GBIF_BACKBONE_CHECKLIST = "d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+
 
 class GbifDownloadFailure(Exception):
     """Exception raised when a GBIF download job fails."""
@@ -23,11 +29,16 @@ class GbifDownloadFailure(Exception):
         super().__init__(self.message)
 
 
-def init_gbif_download(query: dict) -> str:
+def init_gbif_download(query: dict, checklist_key: str = GBIF_BACKBONE_CHECKLIST) -> str:
     """
     Initiate a GBIF download job in the Apache Parquet format and return the job key.
+
+    ``checklist_key`` sets the taxonomy of both the taxon filter and the output's
+    taxon key columns (needs pygbif >= 0.7).
     """
-    download_key = occ.download(query, format="SIMPLE_PARQUET")  # type: ignore
+    download_key = occ.download(  # type: ignore
+        query, format="SIMPLE_PARQUET", checklistKey=checklist_key
+    )
     return download_key[0]
 
 
@@ -158,6 +169,15 @@ def unzip_and_rename(file_path: Path) -> None:
     help="Key of download already created. Will simply re-download.",
 )
 @click.option(
+    "-c",
+    "--checklist-key",
+    "checklist_key",
+    type=click.STRING,
+    default=GBIF_BACKBONE_CHECKLIST,
+    show_default=True,
+    help="GBIF checklist for the taxon filter and the output taxon keys.",
+)
+@click.option(
     "-o",
     "--output",
     "output_path",
@@ -165,7 +185,9 @@ def unzip_and_rename(file_path: Path) -> None:
     default=Path().cwd(),
     show_default=True,
 )
-def main(query_file: Path, name: str, key: str, output_path: Path):
+def main(
+    query_file: Path, name: str, key: str, checklist_key: str, output_path: Path
+):
     """Check the status of a GBIF download job and download the CSV file once it's ready."""
     load_dotenv(find_dotenv())  # Find local .env to expose GBIF credentials
 
@@ -180,7 +202,7 @@ def main(query_file: Path, name: str, key: str, output_path: Path):
 
     if key is None:
         log.info("No key provided. Initializing new query.")
-        download_key = init_gbif_download(gbif_query)
+        download_key = init_gbif_download(gbif_query, checklist_key)
     else:
         log.info("Re-checking download using key: %s", key)
         download_key = key
