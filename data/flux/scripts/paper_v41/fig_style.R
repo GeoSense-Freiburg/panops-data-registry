@@ -44,10 +44,9 @@ scale_fill_mortality_piyg <- function(name = "Relative mortality (%)", b_lo = NU
 
 # EFP axis / strip labels as plotmath (subscripts, units in parentheses)
 EFP_ORDER_FIG <- c("GPPsat", "NEPmax", "ETmax", "WUE")
-# ETmax = 95th percentile of half-hourly ET (bigleaf LE.to.ET x 1800 s) -> mm per 30 min (not mm d-1, fixed 2026-10-15);
-# WUE = bigleaf WUE.metrics, g C per kg H2O (= g C m-2 mm-1)
+# unit labels as used by the authors (user decision 2026-10-15): ETmax mm d-1, WUE g C mm-1
 EFP_UNIT <- c(GPPsat = "(mu*mol~m^{-2}~s^{-1})", NEPmax = "(mu*mol~m^{-2}~s^{-1})",
-              ETmax = "(mm~(30~min)^{-1})", WUE = "(g~C~kg^{-1}~H[2]*O)")
+              ETmax = "(mm~d^{-1})", WUE = "(g~C~mm^{-1})")
 EFP_EXPR <- setNames(paste0(c(GPPsat = "GPP[sat]", NEPmax = "NEP[max]", ETmax = "ET[max]", WUE = "WUE"), "~", EFP_UNIT), names(EFP_UNIT))
 EFP_SHORT <- c(GPPsat = "GPP[sat]", NEPmax = "NEP[max]", ETmax = "ET[max]", WUE = "WUE")
 

@@ -33,7 +33,7 @@ Funding, Author information, Extended Data / Supplementary Information.}}
         GPP$_{sat}$ improves less ($-4$ to $-12$\,\%) and ET$_{max}$ not at all (Table~\ref{tab:main}).
   \item \textbf{Without mortality, models over-estimate carbon uptake in ecosystems with high mortality; mortality corrects
         this bias.} At $>$30\,\% relative mortality the model without mortality over-predicts NEP$_{max}$ by about 4 and
-        GPP$_{sat}$ by about 4.3\,$\mu$mol\,m$^{-2}$\,s$^{-1}$ and WUE by about 0.8\,g\,C\,kg$^{-1}$\,H$_2$O. The bias grows with
+        GPP$_{sat}$ by about 4.3\,$\mu$mol\,m$^{-2}$\,s$^{-1}$ and WUE by about 0.8\,g\,C\,mm$^{-1}$. The bias grows with
         mortality; adding mortality reduces it by about two-thirds, and the correction is significant --- for all three
         learners and robust to resampling whole sites, leaving out any single site and removing the most extreme sites (Fig.~5).
   \item \textbf{The effect follows the amount of mortality, not the ecosystem type.} Mortality pushes predicted GPP$_{sat}$,
@@ -163,7 +163,7 @@ Mean               & 0.349 & 0.402 & +0.053 & 0.351 & 0.408 & +0.057 \\
   \item \textbf{The sign follows the mortality class.} Share of sites with a negative contribution, Low / Mid / High:
         GPP$_{sat}$ 7 / 66 / 86\,\%; NEP$_{max}$ 10 / 68 / 91\,\%; WUE 2 / 58 / 86\,\%; ET$_{max}$ 24 / 50 / 77\,\%.
   \item \textbf{Size:} median $-2.1$ (GPP$_{sat}$) and $-1.5$ (NEP$_{max}$) $\mu$mol\,m$^{-2}$\,s$^{-1}$ at High
-        sites, $+1.4$ and $+1.2$ at Low sites; ET$_{max}$ contributions are tiny ($\pm$0.005\,mm\,(30\,min)$^{-1}$).
+        sites, $+1.4$ and $+1.2$ at Low sites; ET$_{max}$ contributions are tiny ($\pm$0.005\,mm\,d$^{-1}$).
   \item Overall importance (share of mean $|$SHAP$|$, C+T+M): mortality 24\,\% (GPP$_{sat}$), 28\,\% (NEP$_{max}$),
         16\,\% (ET$_{max}$), 23\,\% (WUE); climate 52--66\,\%; traits 11--20\,\%.
   \item The version with site names, the 12-month window and XGBoost / LightGBM are in the Appendix.
@@ -185,7 +185,7 @@ AutoGluon; sites sorted by their maximum relative mortality (mean of the five bu
         \emph{down}; at \textbf{Low+Mid} sites slightly \emph{up} (relative to the average site).
   \item GPP$_{sat}$: High $-1.83$ / $-2.15$, Low+Mid $+0.47$ / $+0.66$ $\mu$mol\,m$^{-2}$\,s$^{-1}$ (12 / 24\,m);
         NEP$_{max}$: High $-1.61$ / $-1.51$, Low+Mid $+0.37$ / $+0.51$; WUE: High $-0.22$ / $-0.24$, Low+Mid
-        $+0.07$ g\,C\,kg$^{-1}$\,H$_2$O; ET$_{max}$: tiny ($-0.003$ / $-0.005$\,mm\,(30\,min)$^{-1}$). All 8 tests $q<0.001$.
+        $+0.07$ g\,C\,mm$^{-1}$; ET$_{max}$: tiny ($-0.003$ / $-0.005$\,mm\,d$^{-1}$). All 8 tests $q<0.001$.
   \item \textbf{Read with Table~\ref{tab:main}:} mortality improves accuracy by lowering predictions at damaged sites.
         Sites are grouped by the same variables whose contribution is measured, so the test confirms that the learned
         relationship is consistent; the direction and size are the informative part.
@@ -219,7 +219,7 @@ points coloured by IGBP class.}
         by the relative mortality of that year; y = mean residual (observed $-$ predicted), below 0 = the model predicts too high.
   \item \textbf{Without mortality (C+T)} the model over-predicts in the $>$30\,\% class (21 site-years, 10 sites):
         NEP$_{max}$ by $-4.0$\,$\mu$mol\,m$^{-2}$\,s$^{-1}$ [$-5.5$, $-2.4$], GPP$_{sat}$ by $-4.3$ [$-7.5$, $-1.3$],
-        WUE by $-0.77$\,g\,C\,kg$^{-1}$\,H$_2$O [$-1.10$, $-0.29$] (AutoGluon, 24\,months; 95\,\% site-block bootstrap).
+        WUE by $-0.77$\,g\,C\,mm$^{-1}$ [$-1.10$, $-0.29$] (AutoGluon, 24\,months; 95\,\% site-block bootstrap).
         In the low classes the residual is close to 0.
   \item \textbf{With mortality (C+T+M)} the over-prediction shrinks by about two-thirds (NEP$_{max}$ $-1.3$, GPP$_{sat}$
         $-1.1$, WUE $-0.43$) and the intervals include 0. ET$_{max}$ shows no pattern.
@@ -349,8 +349,8 @@ flux density (shortwave radiation $\times$ 2.11) in five-day windows of daytime 
 and taking the 95th percentile of the fitted saturation values per year\cite{lasslop2010separation,migliavacca2021three}. Maximum
 net ecosystem productivity (NEP$_\mathrm{max}$) is the 90th percentile of all half-hourly net ecosystem productivity
 ($-$NEE, day and night) in the growing season\cite{migliavacca2021three}. Maximum evapotranspiration (ET$_\mathrm{max}$) is the
-95th percentile of half-hourly evapotranspiration (mm per 30\,min), and water-use efficiency (WUE) the median ratio of gross
-primary productivity to evapotranspiration (g\,C\,kg$^{-1}$\,H$_2$O)\cite{knauer2018bigleaf}; both used daytime half-hours with shortwave radiation $>$ 200\,W\,m$^{-2}$ and
+95th percentile of half-hourly evapotranspiration (mm\,d$^{-1}$), and water-use efficiency (WUE) the median ratio of gross
+primary productivity to evapotranspiration (g\,C\,mm$^{-1}$)\cite{knauer2018bigleaf}; both used daytime half-hours with shortwave radiation $>$ 200\,W\,m$^{-2}$ and
 friction velocity $>$ 0.2\,m\,s$^{-1}$ and excluded half-hours within 24\,h after precipitation of more than
 0.1\,mm, so that evaporation of intercepted water does not inflate evapotranspiration. Evapotranspiration was converted from latent
 heat flux with the air-temperature-dependent latent heat of vaporization\cite{knauer2018bigleaf}.
@@ -647,7 +647,7 @@ without (cyan) and with mortality (pink).}
         12\,m (all site-years $-6.1$\,\%, Mid+High years $-8.3$\,\%) but not at 24\,m; ET$_{max}$ not significant.
   \item \textbf{The over-prediction without mortality and its correction remain} (Fig.~A23): in the $>$30\,\% class
         GPP$_{sat}$ is over-predicted by 4.6 and corrected by +3.6\,$\mu$mol\,m$^{-2}$\,s$^{-1}$ ($q=0.04$; 12\,m: +3.7,
-        $q=0.009$), WUE by 0.71 and corrected by +0.25\,g\,C\,kg$^{-1}$\,H$_2$O ($q=0.04$; 12\,m $q=0.002$); NEP$_{max}$ as before.
+        $q=0.009$), WUE by 0.71 and corrected by +0.25\,g\,C\,mm$^{-1}$ ($q=0.04$; 12\,m $q=0.002$); NEP$_{max}$ as before.
   \item \textbf{So:} the mortality results do not depend on climate variables that enter the EFP formulas --- no
         circularity from the climate block.
 \end{itemize}
