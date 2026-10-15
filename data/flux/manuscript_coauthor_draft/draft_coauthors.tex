@@ -35,11 +35,11 @@ Funding, Author information, Extended Data / Supplementary Information.}}
         this bias.} At $>$30\,\% relative mortality the model without mortality over-predicts NEP$_{max}$ by about 4 and
         GPP$_{sat}$ by about 4.3\,$\mu$mol\,m$^{-2}$\,s$^{-1}$ and WUE by about 0.8\,g\,C\,mm$^{-1}$. The bias grows with
         mortality; adding mortality reduces it by about two-thirds, and the correction is significant --- for all three
-        learners and robust to resampling whole sites, leaving out any single site and removing the most extreme sites (Fig.~5).
+        learners and robust to resampling whole sites, leaving out any single site and removing the most extreme sites (Fig.~2).
   \item \textbf{The effect follows the amount of mortality, not the ecosystem type.} Mortality pushes predicted GPP$_{sat}$,
         NEP$_{max}$ and WUE down at high-mortality sites (86--91\,\% of them) and slightly up at low-mortality sites
         (2--10\,\%); the direction tracks relative mortality closely ($\rho = -0.78$ to $-0.83$) and does not depend on tree
-        cover or vegetation class. Relative mortality alone carries most of the information (Figs.~2--4).
+        cover or vegetation class. Relative mortality alone carries most of the information (Figs.~3--5).
 \end{enumerate}
 \textit{In one sentence:} tree mortality mapped from remote sensing makes ecosystem carbon uptake more predictable ---
 without it, models over-estimate the productivity of woody ecosystems with high mortality, and the correction scales with the amount
@@ -154,69 +154,11 @@ Mean               & 0.349 & 0.402 & +0.053 & 0.351 & 0.408 & +0.057 \\
 
 \input{tables/table1_bootstrap_siteyear_dMAE_AG}
 
-\textbf{Figure 2: Direction of the mortality effect at each site} (signed SHAP, relative mortality, 24 months)
+\textbf{Figure 2: Without mortality the model predicts too high in high-mortality years}
 \begin{itemize}
-  \item C+T+M model, per site the \textbf{net signed SHAP of the mortality block} (sum over the mortality predictors,
-        averaged over the site's years, response units). Sites sorted by their maximum \textbf{relative mortality} (mean
-        of the five buffers), highest on the left; dashed lines = Low / Mid / High breaks (10.6\,\% and 24.0\,\%).
-        Below zero = the model predicts a \emph{lower} EFP at that site because of its mortality values.
-  \item \textbf{The sign follows the mortality class.} Share of sites with a negative contribution, Low / Mid / High:
-        GPP$_{sat}$ 7 / 66 / 86\,\%; NEP$_{max}$ 10 / 68 / 91\,\%; WUE 2 / 58 / 86\,\%; ET$_{max}$ 24 / 50 / 77\,\%.
-  \item \textbf{Size:} median $-2.1$ (GPP$_{sat}$) and $-1.5$ (NEP$_{max}$) $\mu$mol\,m$^{-2}$\,s$^{-1}$ at High
-        sites, $+1.4$ and $+1.2$ at Low sites; ET$_{max}$ contributions are tiny ($\pm$0.005\,mm\,d$^{-1}$).
-  \item Overall importance (share of mean $|$SHAP$|$, C+T+M): mortality 24\,\% (GPP$_{sat}$), 28\,\% (NEP$_{max}$),
-        16\,\% (ET$_{max}$), 23\,\% (WUE); climate 52--66\,\%; traits 11--20\,\%.
-  \item The version with site names, the 12-month window and XGBoost / LightGBM are in the Appendix.
-\end{itemize}
-
-\begin{center}
-\includegraphics[width=\linewidth]{figures/fig2_signed_total_mort_24m_AG_piyg_names.png}\\[2pt]
-{\small \textbf{Fig.\ 2} --- net signed mortality SHAP per site (in the units of each EFP), C+T+M model, 24\,months,
-AutoGluon; sites sorted by their maximum relative mortality (mean of the five buffers) and coloured from green (low) to pink
-(high), with the colour change anchored at the class breaks (10.6 and 24.0\,\%); FLUXNET site codes below the panels.}
-\end{center}
-
-\textbf{Figure 3: Does the direction differ between High and Low+Mid sites?} (signed SHAP)
-\begin{itemize}
-  \item \textbf{Below zero means the model predicts a LOWER value of the EFP} (not that it predicts less accurately).
-        Classes: site maximum of relative mortality; High $>$ mean + 0.5\,SD (22 High vs 79 Low+Mid). Mann--Whitney U,
-        BH-FDR across the figure.
-  \item \textbf{A clear dose--response.} At \textbf{High}-mortality sites the block pushes predicted carbon uptake
-        \emph{down}; at \textbf{Low+Mid} sites slightly \emph{up} (relative to the average site).
-  \item GPP$_{sat}$: High $-1.83$ / $-2.15$, Low+Mid $+0.47$ / $+0.66$ $\mu$mol\,m$^{-2}$\,s$^{-1}$ (12 / 24\,m);
-        NEP$_{max}$: High $-1.61$ / $-1.51$, Low+Mid $+0.37$ / $+0.51$; WUE: High $-0.22$ / $-0.24$, Low+Mid
-        $+0.07$ g\,C\,mm$^{-1}$; ET$_{max}$: tiny ($-0.003$ / $-0.005$\,mm\,d$^{-1}$). All 8 tests $q<0.001$.
-  \item \textbf{Read with Table~\ref{tab:main}:} mortality improves accuracy by lowering predictions at damaged sites.
-        Sites are grouped by the same variables whose contribution is measured, so the test confirms that the learned
-        relationship is consistent; the direction and size are the informative part.
-\end{itemize}
-
-\begin{center}
-\includegraphics[width=\linewidth]{figures/fig3_total_mort_AG_wide.png}\\[2pt]
-{\small \textbf{Fig.\ 3} --- net signed mortality SHAP, Low+Mid (green) vs High (pink) relative-mortality sites, AutoGluon, 12 and 24 months; colours from the Fig.~2 scale (boxes: colour at the group's median site maximum; points: each site in its Fig.~2 colour).}
-\end{center}
-
-\textbf{Figure 4: The direction tracks relative mortality}
-\begin{itemize}
-  \item Per site, net signed mortality SHAP against the site's maximum relative mortality (AutoGluon, C+T+M, 24\,months);
-        linear fit with 95\,\% CI, Spearman test.
-  \item \textbf{Strong and negative for the carbon fluxes and WUE:} $\rho$ = $-0.81$ (GPP$_{sat}$), $-0.83$ (NEP$_{max}$),
-        $-0.78$ (WUE); weaker for ET$_{max}$ ($-0.47$); all $p<0.001$. More mortality, lower predicted carbon uptake.
-  \item Sites with little mortality get a positive push, so the sign changes at roughly 10--20\,\% relative mortality.
-  \item The benefit itself (error reduction) does not depend on tree cover ($\rho$ = 0.10--0.18, n.s.), and the direction
-        tracks mortality more closely than ecosystem type or tree cover (full board in the Appendix).
-\end{itemize}
-
-\begin{center}
-\includegraphics[width=\linewidth]{figures/fig4_total_mort_direction_24m_AG.png}\\[2pt]
-{\small \textbf{Fig.\ 4} --- relative mortality vs direction of the mortality effect, AutoGluon, C+T+M, 24\,months;
-points coloured by IGBP class.}
-\end{center}
-
-\textbf{Figure 5: Without mortality the model predicts too high in high-mortality years}
-\begin{itemize}
-  \item The Low / Mid / High site groups lose power (22 High sites). Here every \textbf{site-year} is an observation, grouped
-        by the relative mortality of that year; y = mean residual (observed $-$ predicted), below 0 = the model predicts too high.
+  \item Every \textbf{site-year} is an observation, grouped by the relative mortality of that year (so the years in which
+        mortality happened are not averaged with undisturbed years); y = mean residual (observed $-$ predicted), below 0 = the
+        model predicts too high.
   \item \textbf{Without mortality (C+T)} the model over-predicts in the $>$30\,\% class (21 site-years, 10 sites):
         NEP$_{max}$ by $-4.0$\,$\mu$mol\,m$^{-2}$\,s$^{-1}$ [$-5.5$, $-2.4$], GPP$_{sat}$ by $-4.3$ [$-7.5$, $-1.3$],
         WUE by $-0.77$\,g\,C\,mm$^{-1}$ [$-1.10$, $-0.29$] (AutoGluon, 24\,months; 95\,\% site-block bootstrap).
@@ -237,11 +179,71 @@ points coloured by IGBP class.}
 \end{itemize}
 
 \begin{center}
-\includegraphics[width=\linewidth]{figures/fig5_residual_by_mortality_AG_24m.png}\\[2pt]
-{\small \textbf{Fig.\ 5} --- mean residual per class of the site-year's relative mortality, without (blue) and with mortality
+\includegraphics[width=\linewidth]{figures/fig2_residual_by_mortality_AG_24m.png}\\[2pt]
+{\small \textbf{Fig.\ 2} --- mean residual per class of the site-year's relative mortality, without (blue) and with mortality
 (vermillion), AutoGluon, 24\,months; bars = 95\,\% site-block bootstrap interval; numbers = site-years (sites); stars = adding mortality lowers the prediction significantly in that class
 (paired permutation, BH-FDR).}
 \end{center}
+
+\textbf{Figure 3: Direction of the mortality effect at each site} (signed SHAP, relative mortality, 24 months)
+\begin{itemize}
+  \item C+T+M model, per site the \textbf{net signed SHAP of the mortality block} (sum over the mortality predictors,
+        averaged over the site's years, response units). Sites sorted by their maximum \textbf{relative mortality} (mean
+        of the five buffers), highest on the left; dashed lines = Low / Mid / High breaks (10.6\,\% and 24.0\,\%).
+        Below zero = the model predicts a \emph{lower} EFP at that site because of its mortality values.
+  \item \textbf{The sign follows the mortality class.} Share of sites with a negative contribution, Low / Mid / High:
+        GPP$_{sat}$ 7 / 66 / 86\,\%; NEP$_{max}$ 10 / 68 / 91\,\%; WUE 2 / 58 / 86\,\%; ET$_{max}$ 24 / 50 / 77\,\%.
+  \item \textbf{Size:} median $-2.1$ (GPP$_{sat}$) and $-1.5$ (NEP$_{max}$) $\mu$mol\,m$^{-2}$\,s$^{-1}$ at High
+        sites, $+1.4$ and $+1.2$ at Low sites; ET$_{max}$ contributions are tiny ($\pm$0.005\,mm\,d$^{-1}$).
+  \item Overall importance (share of mean $|$SHAP$|$, C+T+M): mortality 24\,\% (GPP$_{sat}$), 28\,\% (NEP$_{max}$),
+        16\,\% (ET$_{max}$), 23\,\% (WUE); climate 52--66\,\%; traits 11--20\,\%.
+  \item The version with site names, the 12-month window and XGBoost / LightGBM are in the Appendix.
+\end{itemize}
+
+\begin{center}
+\includegraphics[width=\linewidth]{figures/fig3_signed_relmort_24m_AG_piyg_names.png}\\[2pt]
+{\small \textbf{Fig.\ 3} --- net signed mortality SHAP per site (in the units of each EFP), C+T+M model, 24\,months,
+AutoGluon; sites sorted by their maximum relative mortality (mean of the five buffers) and coloured from green (low) to pink
+(high), with the colour change anchored at the class breaks (10.6 and 24.0\,\%); FLUXNET site codes below the panels.}
+\end{center}
+
+\textbf{Figure 4: Does the direction differ between High and Low+Mid sites?} (signed SHAP)
+\begin{itemize}
+  \item \textbf{Below zero means the model predicts a LOWER value of the EFP} (not that it predicts less accurately).
+        Classes: site maximum of relative mortality; High $>$ mean + 0.5\,SD (22 High vs 79 Low+Mid). Mann--Whitney U,
+        BH-FDR across the figure.
+  \item \textbf{A clear dose--response.} At \textbf{High}-mortality sites the block pushes predicted carbon uptake
+        \emph{down}; at \textbf{Low+Mid} sites slightly \emph{up} (relative to the average site).
+  \item GPP$_{sat}$: High $-1.83$ / $-2.15$, Low+Mid $+0.47$ / $+0.66$ $\mu$mol\,m$^{-2}$\,s$^{-1}$ (12 / 24\,m);
+        NEP$_{max}$: High $-1.61$ / $-1.51$, Low+Mid $+0.37$ / $+0.51$; WUE: High $-0.22$ / $-0.24$, Low+Mid
+        $+0.07$ g\,C\,mm$^{-1}$; ET$_{max}$: tiny ($-0.003$ / $-0.005$\,mm\,d$^{-1}$). All 8 tests $q<0.001$.
+  \item \textbf{Read with Table~\ref{tab:main}:} mortality improves accuracy by lowering predictions at damaged sites.
+        Sites are grouped by the same variables whose contribution is measured, so the test confirms that the learned
+        relationship is consistent; the direction and size are the informative part.
+\end{itemize}
+
+\begin{center}
+\includegraphics[width=\linewidth]{figures/fig4_relmort_high_vs_lowmid_AG.png}\\[2pt]
+{\small \textbf{Fig.\ 4} --- net signed mortality SHAP, Low+Mid (green) vs High (pink) relative-mortality sites, AutoGluon, 12 and 24 months; colours from the Fig.~3 scale (boxes: colour at the group's median site maximum; points: each site in its Fig.~3 colour).}
+\end{center}
+
+\textbf{Figure 5: The direction tracks relative mortality}
+\begin{itemize}
+  \item Per site, net signed mortality SHAP against the site's maximum relative mortality (AutoGluon, C+T+M, 24\,months);
+        linear fit with 95\,\% CI, Spearman test.
+  \item \textbf{Strong and negative for the carbon fluxes and WUE:} $\rho$ = $-0.81$ (GPP$_{sat}$), $-0.83$ (NEP$_{max}$),
+        $-0.78$ (WUE); weaker for ET$_{max}$ ($-0.47$); all $p<0.001$. More mortality, lower predicted carbon uptake.
+  \item Sites with little mortality get a positive push, so the sign changes at roughly 10--20\,\% relative mortality.
+  \item The benefit itself (error reduction) does not depend on tree cover ($\rho$ = 0.10--0.18, n.s.), and the direction
+        tracks mortality more closely than ecosystem type or tree cover (full board in the Appendix).
+\end{itemize}
+
+\begin{center}
+\includegraphics[width=\linewidth]{figures/fig5_relmort_direction_24m_AG.png}\\[2pt]
+{\small \textbf{Fig.\ 5} --- relative mortality vs direction of the mortality effect, AutoGluon, C+T+M, 24\,months;
+points coloured by IGBP class.}
+\end{center}
+
 
 \textbf{Circularity check.} Refitting each property without the climate variables in its own formula (radiation for GPP$_{sat}$, air temperature for ET$_{max}$ and WUE) leaves the skill and the main mortality results essentially unchanged (Appendix~A8).
 
@@ -251,7 +253,7 @@ points coloured by IGBP class.}
         tree-cover loss, relative mortality) at five buffers. They are strongly correlated and largely interchangeable:
         removing any single metric changes the error by at most about 1\,\% (drop-column test, Appendix).
   \item \textbf{Relative mortality carries most of the effect} (added alone to C+T it gives 6.7--7.1\,\% of the 7.6--8.9\,\%
-        NEP$_{max}$ error reduction of the full block) and has the largest SHAP share (26\,\%), so the figures use total
+        NEP$_{max}$ error reduction of the full block) and has the largest SHAP share (26\,\%), so the figures use relative
         mortality only. The other metrics are in the Appendix.
 \end{itemize}
 
@@ -516,41 +518,41 @@ Mean, C+T   & \textbf{0.349} & 0.337 & 0.347 & 0.351 & \textbf{0.365} & 0.356 \\
 \begin{sidewaysfigure}
 \centering
 \includegraphics[width=\linewidth]{figures/A_fig_signed_24m_AG_sites.png}\\[2pt]
-{\small \textbf{Fig.\ A5} --- Fig.~2 with site names, AutoGluon, 24\,months.}
+{\small \textbf{Fig.\ A5} --- Fig.~3 with site names, AutoGluon, 24\,months.}
 \end{sidewaysfigure}
 \begin{center}
 \includegraphics[width=\linewidth]{figures/A_fig_signed_12m_AG_sites.png}\\[2pt]
-{\small \textbf{Fig.\ A6} --- Fig.~2, AutoGluon, 12\,months.}
+{\small \textbf{Fig.\ A6} --- Fig.~3, AutoGluon, 12\,months.}
 \end{center}
 \begin{center}
 \includegraphics[width=\linewidth]{figures/A_fig_signed_24m_XGB.png}\\[2pt]
-{\small \textbf{Fig.\ A7} --- Fig.~2, XGBoost--Optuna, 24\,months.}
+{\small \textbf{Fig.\ A7} --- Fig.~3, XGBoost--Optuna, 24\,months.}
 \end{center}
 \begin{center}
 \includegraphics[width=\linewidth]{figures/A_fig_signed_24m_LGB.png}\\[2pt]
-{\small \textbf{Fig.\ A8} --- Fig.~2, LightGBM--Optuna, 24\,months.}
+{\small \textbf{Fig.\ A8} --- Fig.~3, LightGBM--Optuna, 24\,months.}
 \end{center}
 
 \clearpage
 \subsection*{A4. High vs Low+Mid: all learners and relative deadwood}
 \begin{center}
 \includegraphics[width=\linewidth]{figures/A_fig_direction_all_learners.png}\\[2pt]
-{\small \textbf{Fig.\ A9} --- Fig.~3, XGBoost--Optuna.}
+{\small \textbf{Fig.\ A9} --- Fig.~4, XGBoost--Optuna.}
 \end{center}
 \begin{center}
 \includegraphics[width=\linewidth]{figures/A_fig_direction_LGB.png}\\[2pt]
-{\small \textbf{Fig.\ A9b} --- Fig.~3, LightGBM--Optuna.}
+{\small \textbf{Fig.\ A9b} --- Fig.~4, LightGBM--Optuna.}
 \end{center}
 \begin{center}
 \includegraphics[width=\linewidth]{figures/A_fig_direction_rel_deadwood_AG.png}\\[2pt]
-{\small \textbf{Fig.\ A10} --- Fig.~3 split by relative deadwood, AutoGluon: the same for GPP$_{sat}$, NEP$_{max}$ and WUE;
+{\small \textbf{Fig.\ A10} --- Fig.~4 split by relative deadwood, AutoGluon: the same for GPP$_{sat}$, NEP$_{max}$ and WUE;
 ET$_{max}$ not significant.}
 \end{center}
 
 \subsection*{A5. Ecosystem type and tree cover}
 \begin{itemize}
   \item \textbf{A} $\Delta$RMSE by IGBP, \textbf{B} net signed mortality SHAP by IGBP, \textbf{C} tree cover vs benefit,
-        \textbf{D} tree cover vs direction, \textbf{E} relative mortality vs direction (= Fig.~4).
+        \textbf{D} tree cover vs direction, \textbf{E} relative mortality vs direction (= Fig.~5).
   \item C: no relationship ($\rho$ = 0.10--0.18, n.s.). D: positive, $\rho$ = +0.66 to +0.75 (all $p<0.001$) --- at low
         tree cover mortality pulls predicted carbon uptake down, at high tree cover it pushes it up.
   \item B: DBF, EBF and MF mostly positive, CSH, OSH and WET negative, ENF slightly negative.
@@ -598,7 +600,7 @@ retrained with the same tuned settings and folds).}
 {\small \textbf{Fig.\ A17} --- Fig.~A14 for LightGBM.}
 \end{center}
 
-\subsection*{A7. Fig.~5: other learners, 12 months, mixed models and robustness}
+\subsection*{A7. Fig.~2: other learners, 12 months, mixed models and robustness}
 \begin{itemize}
   \item XGBoost and LightGBM over-predict in the $>$30\,\% class as much as AutoGluon without mortality (NEP$_{max}$ $-3.6$ to
         $-4.0$\,$\mu$mol\,m$^{-2}$\,s$^{-1}$); with mortality the over-prediction is smaller but stays below 0 ($-1.8$ to $-2.4$).
@@ -612,15 +614,15 @@ retrained with the same tuned settings and folds).}
 \end{itemize}
 \begin{center}
 \includegraphics[width=\linewidth]{figures/A_fig_residual_by_mortality_AG_12m.png}\\[2pt]
-{\small \textbf{Fig.\ A18} --- Fig.~5 with the 12-month window, AutoGluon.}
+{\small \textbf{Fig.\ A18} --- Fig.~2 with the 12-month window, AutoGluon.}
 \end{center}
 \begin{center}
 \includegraphics[width=\linewidth]{figures/A_fig_residual_by_mortality_XGB_24m.png}\\[2pt]
-{\small \textbf{Fig.\ A19} --- Fig.~5, XGBoost--Optuna, 24\,months.}
+{\small \textbf{Fig.\ A19} --- Fig.~2, XGBoost--Optuna, 24\,months.}
 \end{center}
 \begin{center}
 \includegraphics[width=\linewidth]{figures/A_fig_residual_by_mortality_LGB_24m.png}\\[2pt]
-{\small \textbf{Fig.\ A20} --- Fig.~5, LightGBM--Optuna, 24\,months.}
+{\small \textbf{Fig.\ A20} --- Fig.~2, LightGBM--Optuna, 24\,months.}
 \end{center}
 \begin{center}
 \includegraphics[width=\linewidth]{figures/A_fig_dose_robustness_AG.png}\\[2pt]
@@ -656,7 +658,7 @@ without (cyan) and with mortality (pink).}
 
 \begin{center}
 \includegraphics[width=\linewidth]{figures/fig6_residual_by_mortality_AG_efpclim_24m.png}\\[2pt]
-{\small \textbf{Fig.\ A23} --- as Fig.~5, AutoGluon with the EFP-specific climate block, 24\,months.}
+{\small \textbf{Fig.\ A23} --- as Fig.~2, AutoGluon with the EFP-specific climate block, 24\,months.}
 \end{center}
 
 \end{document}
