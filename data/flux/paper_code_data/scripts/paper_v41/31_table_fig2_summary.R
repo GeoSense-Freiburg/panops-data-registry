@@ -92,7 +92,7 @@ BH_TXT <- if (length(SHOWL)) sprintf("all %d tests of the three learners", nrow(
 tex <- c(
   "\\begin{table}[p]",
   "\\centering",
-  sprintf(paste0("\\caption{Effect of adding mortality predictors on per-site prediction error (summary of Fig.~2). ",
+  sprintf(paste0("\\caption{\\textbf{Adding mortality reduces the per-site prediction error} (site level; per-site errors in Fig.~A1). ",
     "For every site, ", MET, " of the model with climate, traits and mortality (C+T+M) is compared with the model without ",
     "mortality (C+T), both evaluated by repeated leave-one-site-out cross-validation (3 $\\times$ 80\\%%). ",
     if (TEST == "permlog") sprintf("$\\Delta$%s = geometric mean over sites of the paired error ratio, (exp(mean$_\\mathrm{sites}$ ln(%s$_\\mathrm{C+T+M}$ / %s$_\\mathrm{C+T}$)) $-$ 1) $\\times$ 100; ", MET, MET, MET) else

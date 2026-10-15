@@ -19,7 +19,8 @@ AG_EXTRA <- Sys.getenv("AG_EXTRA", ""); ISFX <- if (AG_EXTRA != "") paste0("_", 
 st <- fread(file.path(PAPER_FIG, sprintf("paired_bootstrap_statistics%s.csv", ISFX)))[metric == MET]
 LAB <- c(XGB = "XGBoost", LGB = "LightGBM", AG = "AutoGluon", AGx = "AutoGluon, EFP-specific climate")
 EFP_TEX <- c(GPPsat = "GPP$_\\mathrm{sat}$", NEPmax = "NEP$_\\mathrm{max}$", ETmax = "ET$_\\mathrm{max}$", WUE = "WUE")
-COLS <- list(c("site", "all"), c("siteyear", "all"), c("siteyear", "high"), c("siteyear", "yr_midhigh"), c("siteyear", "yr_high"))
+COLS <- list(c("site", "all"), c("siteyear", "all"), c("siteyear", "midhigh"), c("siteyear", "high"), c("siteyear", "yr_midhigh"),
+             c("siteyear", "yr_high"))   # midhigh = all years of the Mid + High sites (added 2026-10-15)
 # env TABLE_COLS = all (default) | siteyear (2026-10-09, draft main text: site-year columns only); suffix _siteyear
 SY_ONLY <- Sys.getenv("TABLE_COLS", "all") == "siteyear"
 if (SY_ONLY) COLS <- COLS[-1]
@@ -30,26 +31,32 @@ nobs <- function(lv, sb) { x <- st[level == lv & subset == sb]; c(max(x$n_units)
 hdr_n <- vapply(COLS, function(c) { n <- nobs(c[1], c[2]); if (c[1] == "site") sprintf("%d sites", n[1]) else sprintf("%d / %d", n[1], n[2]) }, "")
 b <- unique(st[, .(b_lo, b_hi)])
 tex <- c("\\begin{table}[htbp]", "\\centering",
-  sprintf(paste0("\\caption{Paired bootstrap of the change in %s when mortality is added (C+T $\\rightarrow$ C+T+M), %s. ",
-    "Cells: \\%% change of the error, 100\\,(%s$_\\mathrm{C+T+M}$ / %s$_\\mathrm{C+T}$ $-$ 1), with the 95\\,\\%% bootstrap interval in brackets. ",
-    if (SY_ONLY) "%s" else "\\emph{Site level}: one %s per site and model over its years, ratio of the mean site errors. ",
-    "\\emph{Site-year level}: every site-year is an observation (pooled %s; no averaging over years). ",
-    "Years of one site are not independent, so whole sites are resampled (10\\,000 bootstrap draws) and ",
-    "the C+T / C+T+M labels are swapped per site for the paired permutation test (10\\,000 draws, one-sided; stars, ",
-    if (AG_EXTRA != "") "Benjamini--Hochberg corrected across both runs: " else "Benjamini--Hochberg corrected across all three learners: ",
-    "$^{*}$\\,$q<0.05$, $^{**}$\\,$q<0.01$, $^{***}$\\,$q<0.001$). ",
-    "High sites: site maximum of relative mortality $>$ %.1f\\,\\%%; the last two columns keep only the site-years whose own ",
-    "relative mortality exceeds %.1f\\,\\%% (Mid + High) or %.1f\\,\\%% (High). Column heads: sites / site-years. ",
-    "%d sites, %d site-years, deadtrees v5.}"),
-    MET, paste(LAB[SHOW], collapse = " and "), MET, MET, if (SY_ONLY) "" else MET, MET, b$b_hi, b$b_lo, b$b_hi, max(st$n_units), max(st$n_obs)),
+  sprintf(paste0("\\caption{\\textbf{Adding mortality reduces the prediction error (%s), most in the years in which trees died.} ",
+    "Change in the %s when the mortality predictors are added to climate and traits (C+T $\\rightarrow$ C+T+M), %s, ",
+    "leave-one-site-out predictions: 100\\,(%s$_\\mathrm{C+T+M}$ / %s$_\\mathrm{C+T}$ $-$ 1)\\,\\%%; negative = smaller error. ",
+    "Brackets: 95\\,\\%% interval of a bootstrap that resamples whole sites (10\\,000 draws). ",
+    "Stars: one-sided paired permutation test with the two models swapped per site (10\\,000 draws), ",
+    if (AG_EXTRA != "") "Benjamini--Hochberg corrected across both runs: " else "Benjamini--Hochberg corrected across all learners: ",
+    "$^{*}$\\,$q<0.05$, $^{**}$\\,$q<0.01$, $^{***}$\\,$q<0.001$. ",
+    if (SY_ONLY) "" else "\\emph{Site level}: one error per site (mean over its years). ",
+    "\\emph{Site-year level}: every site-year is one observation. ",
+    "\\emph{All years of the sites}: all sites, or only the sites whose maximum relative mortality exceeds %.1f\\,\\%% (Mid + High) ",
+    "or %.1f\\,\\%% (High), with all their years. \\emph{Only the years with mortality}: site-years whose own relative mortality ",
+    "exceeds %.1f\\,\\%% or %.1f\\,\\%%. Numbers under the column heads: sites / site-years. ",
+    "%d sites, %d site-years, deadtrees v5 maps.}"),
+    MET, MET, paste(LAB[SHOW], collapse = " and "), MET, MET, b$b_lo, b$b_hi, b$b_lo, b$b_hi, max(st$n_units), max(st$n_obs)),
   sprintf("\\label{tab:bootstrap_d%s_%s}", MET, paste(SHOW, collapse = "")),
   "\\scriptsize", "\\setlength{\\tabcolsep}{3pt}",
   "\\resizebox{\\linewidth}{!}{%",
-  if (SY_ONLY) c("\\begin{tabular}{llcccc}", "\\toprule",
-    " & & All sites & High sites & Mid + High years & High years \\\\") else
-  c("\\begin{tabular}{llccccc}", "\\toprule",
-    " & & Site level & \\multicolumn{4}{c}{Site-year level} \\\\", "\\cmidrule(lr){3-3}\\cmidrule(lr){4-7}",
-    " & & All sites & All sites & High sites & Mid + High years & High years \\\\"),
+  if (SY_ONLY) c("\\begin{tabular}{llccccc}", "\\toprule",
+    " & & \\multicolumn{3}{c}{All years of the sites} & \\multicolumn{2}{c}{Only the years with mortality} \\\\",
+    "\\cmidrule(lr){3-5}\\cmidrule(lr){6-7}",
+    sprintf(" & & All sites & Mid + High sites & High sites & $>$ %.1f\\,\\%% & $>$ %.1f\\,\\%% \\\\", b$b_lo, b$b_hi)) else
+  c("\\begin{tabular}{llcccccc}", "\\toprule",
+    " & & Site level & \\multicolumn{5}{c}{Site-year level} \\\\", "\\cmidrule(lr){3-3}\\cmidrule(lr){4-8}",
+    " & & & \\multicolumn{3}{c}{All years of the sites} & \\multicolumn{2}{c}{Only the years with mortality} \\\\",
+    "\\cmidrule(lr){4-6}\\cmidrule(lr){7-8}",
+    sprintf(" & & All sites & All sites & Mid + High sites & High sites & $>$ %.1f\\,\\%% & $>$ %.1f\\,\\%% \\\\", b$b_lo, b$b_hi)),
   sprintf(" & & (%s) \\\\", paste(hdr_n, collapse = ") & (")), "\\midrule")
 first <- TRUE
 for (L in SHOW) for (w in WINDOWS) {
