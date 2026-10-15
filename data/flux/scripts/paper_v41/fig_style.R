@@ -43,6 +43,12 @@ scale_fill_mortality_piyg <- function(name = "Relative mortality (%)", b_lo = NU
   scale_fill_gradientn(colours = c("#276419", "#7FBC41", "#F1B6DA", "#C51B7D", "#8E0152"), values = v,
                        limits = MORT_LIMITS, name = name, breaks = c(0, round(b_lo), round(b_hi), 50, 75), ...)
 }
+# the exact colour of the anchored PiYG scale (Fig. 2) for given relative-mortality values, e.g. for Fig. 3
+mortality_piyg_col <- function(x, b_lo, b_hi) {
+  v <- c(0, b_lo, b_hi, 50, MORT_LIMITS[2]) / MORT_LIMITS[2]
+  scales::gradient_n_pal(c("#276419", "#7FBC41", "#F1B6DA", "#C51B7D", "#8E0152"), values = v)(
+    pmin(pmax(x, MORT_LIMITS[1]), MORT_LIMITS[2]) / MORT_LIMITS[2])
+}
 
 # EFP axis / strip labels as plotmath (subscripts, units in parentheses)
 EFP_ORDER_FIG <- c("GPPsat", "NEPmax", "ETmax", "WUE")

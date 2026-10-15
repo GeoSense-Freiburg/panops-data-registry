@@ -111,20 +111,24 @@ save_pub(f2, file.path(OUT, f2_stem), W2, if (FIG2_NAMES) 150 else 125)
 # ---- Fig. 3: High vs Low+Mid -------------------------------------------------------------------------------
 # env FIG3_PALETTE = piyg (default since 2026-10-15, matches Fig 2) | orrd
 FIG3_PAL <- Sys.getenv("FIG3_PALETTE", "piyg")
-FILL3 <- if (FIG3_PAL == "piyg") PAL$class2_piyg else PAL$class2
-PT3 <- if (FIG3_PAL == "piyg") PAL$class2_piyg_pt else c("Low+Mid" = "#B35806", High = "#3D0000")
+FILL3 <- PAL$class2; PT3 <- c("Low+Mid" = "#B35806", High = "#3D0000")
 s3 <- copy(sh)[, grp := factor(fifelse(cls == "High", "High", "Low+Mid"), c("Low+Mid", "High"))]
 s3[, win := factor(sub("m", " months", window), c("12 months", "24 months"))]
+if (FIG3_PAL == "piyg") {   # exact Fig. 2 colours: box = scale colour at the group's median site maximum, point = the site's bar colour
+  med3 <- s3[, .(m = median(unique(data.table(SITE_ID, tm_max))$tm_max)), by = grp]
+  FILL3 <- setNames(mortality_piyg_col(med3$m, B_LO, B_HI), as.character(med3$grp))[c("Low+Mid", "High")]
+  s3[, pcol := mortality_piyg_col(tm_max, B_LO, B_HI)]
+} else s3[, pcol := PT3[as.character(grp)]]
 st3 <- s3[, .(p = wilcox.test(shap[grp == "High"], shap[grp == "Low+Mid"], exact = FALSE)$p.value,
               ytop = max(shap)), by = .(response, win)]
 st3[, q := p.adjust(p, "BH")]
 p3 <- lapply(EFP, function(e) ggplot(s3[response == e], aes(win, shap, fill = grp)) +
   geom_hline(yintercept = 0, colour = PAL$zero, linewidth = 0.25) +
   geom_boxplot(outlier.shape = NA, width = 0.62, linewidth = 0.25, position = position_dodge(0.72)) +
-  geom_point(aes(colour = grp), position = position_jitterdodge(jitter.width = 0.12, dodge.width = 0.72), size = 0.3,
-             alpha = 0.55, stroke = 0, show.legend = FALSE) +
+  geom_point(aes(colour = pcol, group = grp), position = position_jitterdodge(jitter.width = 0.12, dodge.width = 0.72),
+             shape = 21, fill = NA, size = 0.45, stroke = 0.35, show.legend = FALSE) +
   geom_text(data = st3[response == e], aes(win, ytop, label = stars(q)), inherit.aes = FALSE, vjust = -0.2) +
-  scale_fill_manual(values = FILL3, name = "Relative mortality") + scale_colour_manual(values = PT3) +
+  scale_fill_manual(values = FILL3, name = "Relative mortality") + scale_colour_identity() +
   scale_y_continuous(expand = expansion(mult = c(0.05, 0.12))) +
   labs(x = NULL, y = if (e == EFP[1]) "Net mortality SHAP (EFP units)" else NULL, title = parse(text = EFP_EXPR[[e]])) +
   theme_pub())
