@@ -1,0 +1,85 @@
+source,site_id,lat,lon,included,map_site_id,igbp,nearest_map_site,distance_to_nearest_map_m,note
+ICOS_list,BE-Bra,51.30761,4.51984,True,BE-Bra,ENF,BE-Bra,0,same ID
+ICOS_list,CA-Cbo,44.3184,-79.9341,False,,,CA-TP3,182287,not in the maps; nearest mapped site CA-TP3 at 182287 m
+ICOS_list,CA-DBB,49.1293,-122.9849,True,CA-DBB,WET,CA-DBB,0,same ID
+ICOS_list,CA-EM1,50.3623,-100.2024,True,CA-EM1,WET,CA-EM1,0,same ID
+ICOS_list,CA-EM2,50.3706,-100.5339,True,CA-EM2,WET,CA-EM2,0,same ID
+ICOS_list,CA-TPD,42.6353,-80.5577,True,CA-TPD,DBF,CA-TPD,0,same ID
+ICOS_list,CZ-wet,49.02465,14.77035,True,CZ-wet,WET,CZ-wet,0,same ID
+ICOS_list,DE-Hai,51.079212,10.452168,True,DE-Hai,DBF,DE-Hai,0,same ID
+ICOS_list,DE-Har,47.93391,7.59814,True,DE-Har,ENF,DE-Har,0,same ID
+ICOS_list,DE-Msr,47.80918,11.456168,True,DE-Msr,ENF,DE-Msr,0,same ID
+ICOS_list,ES-LMa,39.94033,-5.77465,True,ES-LMa,SAV,ES-LMa,0,same ID
+ICOS_list,FR-Fon,48.476357,2.780096,True,FR-Fon,DBF,FR-Fon,0,same ID
+ICOS_list,FR-LGt,47.322918,2.284102,True,FR-LGt,WET,FR-LGt,0,same ID
+ICOS_list,IT-Lsn,45.740482,12.750297,True,IT-Lsn,OSH,IT-Lsn,0,same ID
+ICOS_list,IT-MBo,46.01468,11.045831,True,IT-MBo,GRA,IT-MBo,0,same ID
+ICOS_list,IT-TrF,45.82376,7.56089,True,IT-TrF,DNF,IT-TrF,0,same ID
+ICOS_list,US-ALQ,46.0308,-89.6067,True,US-ALQ,WET,US-ALQ,0,same ID
+ICOS_list,US-CRK,31.4629,-95.3415,True,US-CRK,ENF,US-CRK,0,same ID
+ICOS_list,US-Ho2,45.209,-68.747,True,US-Ho2,ENF,US-Ho2,11,same ID
+ICOS_list,US-KFS,39.0561,-95.1907,True,US-KFS,GRA,US-KFS,0,same ID
+ICOS_list,US-KLS,38.7745,-97.5684,False,,,US-Kon,93682,not in the maps; nearest mapped site US-Kon at 93682 m
+ICOS_list,US-Kon,39.0824,-96.5603,True,US-Kon,GRA,US-Kon,0,same ID
+ICOS_list,US-MOz,38.7441,-92.2,True,US-MOz,DBF,US-MOz,0,same ID
+ICOS_list,US-Me2,44.4526,-121.5589,False,,,US-Me7,254,not in the maps; nearest mapped site US-Me7 at 254 m
+ICOS_list,US-Mo2,38.9488,-91.9945,True,US-Mo2,GRA,US-Mo2,0,same ID
+ICOS_list,US-NC3,35.799,-76.656,True,US-NC3,ENF,US-NC3,0,same ID
+ICOS_list,US-PFk,45.9149,-90.3425,True,US-PFk,DBF,US-PFk,0,same ID
+ICOS_list,US-PFm,45.9207,-90.3099,True,US-PFm,DBF,US-PFm,0,same ID
+ICOS_list,US-Rls,43.1439,-116.7356,True,US-Rls,CSH,US-Rls,0,same ID
+ICOS_list,US-Rms,43.0645,-116.7486,True,US-Rms,CSH,US-Rms,0,same ID
+ICOS_list,US-Rwf,43.1207,-116.7231,True,US-Rwf,CSH,US-Rwf,0,same ID
+ICOS_list,US-Rws,43.1675,-116.7132,True,US-Rws,OSH,US-Rws,0,same ID
+ICOS_list,US-SRM,31.8214,-110.8661,True,US-SRM,WSA,US-SRM,0,same ID
+ICOS_list,US-Seg,34.3603,-106.7003,True,US-Seg,GRA,US-Seg,272,same ID; map centred 272 m from the coordinate in the request
+ICOS_list,US-Ton,38.4309,-120.966,True,US-Ton,WSA,US-Ton,0,same ID
+ICOS_list,US-Tw1,38.1074,-121.6469,True,US-Tw1,WET,US-Tw1,0,same ID
+ICOS_list,US-Tw5,38.1072,-121.6426,True,US-Tw5,WET,US-Tw5,0,same ID
+ICOS_list,US-UMB,45.5598,-84.7138,False,,,US-UMd,1304,not in the maps; nearest mapped site US-UMd at 1304 m
+ICOS_list,US-UMd,45.5625,-84.6975,True,US-UMd,DBF,US-UMd,0,same ID
+ICOS_list,US-Var,38.4133,-120.9508,False,,,US-Ton,2363,not in the maps; nearest mapped site US-Ton at 2363 m
+ICOS_list,US-Vcm,35.8885,-106.5322,True,US-Vcm,ENF,US-Vcm,14,same ID
+ICOS_list,US-Whs,31.7438,-110.0522,True,US-Whs,OSH,US-Whs,0,same ID
+ICOS_list,US-Wjs,34.4258,-105.8617,True,US-Wjs,SAV,US-Wjs,38,same ID
+ICOS_list,US-xAE,35.4106,-99.0588,True,US-xAE,GRA,US-xAE,0,same ID
+ICOS_list,US-xCL,33.4012,-97.57,True,US-xCL,GRA,US-xCL,0,same ID
+ICOS_list,US-xCP,40.8155,-104.7456,True,US-xCP,GRA,US-xCP,0,same ID
+ICOS_list,US-xDC,47.1617,-99.1066,True,US-xDC,GRA,US-xDC,0,same ID
+ICOS_list,US-xDL,32.5417,-87.8039,True,US-xDL,MF,US-xDL,0,same ID
+ICOS_list,US-xGR,35.689,-83.5019,True,US-xGR,DBF,US-xGR,0,same ID
+ICOS_list,US-xJR,32.5907,-106.8425,True,US-xJR,OSH,US-xJR,0,same ID
+ICOS_list,US-xML,37.3783,-80.5248,True,US-xML,DBF,US-xML,0,same ID
+ICOS_list,US-xNQ,40.1776,-112.4524,True,US-xNQ,OSH,US-xNQ,0,same ID
+ICOS_list,US-xRM,40.2759,-105.5459,True,US-xRM,ENF,US-xRM,0,same ID
+ICOS_list,US-xSE,38.8901,-76.56,True,US-xSE,DBF,US-xSE,0,same ID
+ICOS_list,US-xSJ,37.1088,-119.7323,True,US-xSJ,SAV,US-xSJ,0,same ID
+ICOS_list,US-xSR,31.9107,-110.8355,True,US-xSR,OSH,US-xSR,0,same ID
+ICOS_list,US-xTR,45.4937,-89.5857,True,US-xTR,DBF,US-xTR,0,same ID
+ICOS_list,US-xUK,39.0404,-95.1921,True,US-xUK,DBF,US-xUK,0,same ID
+ICOS_list,US-xUN,46.2339,-89.5373,True,US-xUN,MF,US-xUN,0,same ID
+ICOS_list,US-xWD,47.1282,-99.2414,True,US-xWD,GRA,US-xWD,0,same ID
+ICOS_list,US-xYE,44.9535,-110.5391,True,US-xYE,ENF,US-xYE,0,same ID
+NEON_list,ABBY,45.762439,-122.330317,True,US-xAB,ENF,US-xAB,5,NEON code -> AmeriFlux ID
+NEON_list,BART,44.063889,-71.287375,True,US-xBR,DBF,US-xBR,6,NEON code -> AmeriFlux ID
+NEON_list,BONA,65.15401,-147.50258,True,US-xBN,ENF,US-xBN,1,NEON code -> AmeriFlux ID
+NEON_list,CLBJ,33.40123,-97.57,True,US-xCL,GRA,US-xCL,3,NEON code -> AmeriFlux ID
+NEON_list,DEJU,63.88112,-145.75136,True,US-xDJ,ENF,US-xDJ,3,NEON code -> AmeriFlux ID
+NEON_list,DELA,32.541727,-87.803877,True,US-xDL,MF,US-xDL,4,NEON code -> AmeriFlux ID
+NEON_list,GUAN,17.96955,-66.8687,False,,,PR-xLA,22755,not in the maps; nearest mapped site PR-xLA at 22755 m
+NEON_list,HARV,42.53691,-72.17265,False,,,US-Ha1,137,not in the maps; nearest mapped site US-Ha1 at 137 m
+NEON_list,JERC,31.194839,-84.468623,True,US-xJE,ENF,US-xJE,5,NEON code -> AmeriFlux ID
+NEON_list,LENO,31.853861,-88.161181,True,US-xLE,DBF,US-xLE,5,NEON code -> AmeriFlux ID
+NEON_list,MLBS,37.378314,-80.524847,True,US-xML,DBF,US-xML,4,NEON code -> AmeriFlux ID
+NEON_list,ORNL,35.964128,-84.282588,True,US-xRN,DBF,US-xRN,3,NEON code -> AmeriFlux ID
+NEON_list,OSBS,29.689282,-81.993431,True,US-xSB,ENF,US-xSB,4,NEON code -> AmeriFlux ID
+NEON_list,PUUM,19.55309,-155.31731,True,US-xPU,EBF,US-xPU,2,NEON code -> AmeriFlux ID
+NEON_list,RMNP,40.275903,-105.545955,True,US-xRM,ENF,US-xRM,5,NEON code -> AmeriFlux ID
+NEON_list,SJER,37.10878,-119.73228,True,US-xSJ,SAV,US-xSJ,3,NEON code -> AmeriFlux ID
+NEON_list,STEI,45.50894,-89.58637,True,US-xST,DBF,US-xST,5,NEON code -> AmeriFlux ID
+NEON_list,TEAK,37.00583,-119.00602,True,US-xTE,ENF,US-xTE,4,NEON code -> AmeriFlux ID
+NEON_list,TREE,45.49369,-89.58571,True,US-xTR,DBF,US-xTR,1,NEON code -> AmeriFlux ID
+NEON_list,UKFS,39.040431,-95.19215,True,US-xUK,DBF,US-xUK,6,NEON code -> AmeriFlux ID
+NEON_list,UNDE,46.23391,-89.537254,True,US-xUN,MF,US-xUN,4,NEON code -> AmeriFlux ID
+NEON_list,WREF,45.82049,-121.95191,True,US-xWR,ENF,US-xWR,1,NEON code -> AmeriFlux ID
+NEON_list,YELL,44.95348,-110.53914,True,US-xYE,ENF,US-xYE,4,NEON code -> AmeriFlux ID
