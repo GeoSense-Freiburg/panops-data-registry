@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>How each EFP is calculated, and Miguel&#x27;s circularity concern</title><style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0D0D0D;color:#E0E0E0;font-family:Arial,Helvetica,sans-serif;line-height:1.6;padding:28px 18px 60px}
+a{color:#22D4EB;text-decoration:none} a:hover{text-decoration:underline}
+.wrap{max-width:900px;margin:0 auto}
+.nav{font-size:.85em;color:#6B7280;margin-bottom:22px} .nav a{margin-right:14px}
+h1{font-size:1.65em;color:#fff;line-height:1.25;margin-bottom:6px;letter-spacing:-.01em}
+.article h1{display:none}
+.article h2{font-size:1.3em;color:#22D4EB;margin:34px 0 12px;padding-bottom:6px;border-bottom:1px solid #22D4EB55}
+.article h3{font-size:1.1em;color:#E5E7EB;margin:24px 0 8px}
+.article h4{font-size:1em;color:#9CA3AF;margin:18px 0 6px}
+.article p{margin:10px 0} .article ul,.article ol{margin:8px 0 8px 24px} .article li{margin:4px 0}
+.article hr{border:0;border-top:1px solid #2A2A3A;margin:26px 0}
+.article blockquote{border-left:3px solid #22D4EB;padding:2px 14px;color:#9CA3AF;margin:12px 0}
+.article code{background:#1F2937;border-radius:4px;padding:1px 5px;font-size:.88em;color:#A7F3D0;font-family:Consolas,Menlo,monospace}
+.article pre{background:#111827;border:1px solid #2A2A3A;border-radius:8px;padding:12px 14px;overflow-x:auto;margin:12px 0}
+.article pre code{background:none;padding:0;color:#E5E7EB}
+.tw{overflow-x:auto;margin:14px 0}
+.article table{border-collapse:collapse;font-size:.88em;min-width:60%}
+.article th{background:#1F2937;color:#22D4EB;text-align:left}
+.article th,.article td{border:1px solid #2A2A3A;padding:6px 10px;vertical-align:top}
+.article tr:nth-child(even) td{background:#111827}
+.article img{max-width:100%;height:auto;background:#fff;border-radius:6px;margin:12px 0 4px;display:block}
+.article em{color:#9CA3AF}
+.badge{display:inline-block;font-size:.75em;background:#1F2937;border:1px solid #374151;border-radius:4px;padding:2px 8px;color:#9CA3AF;margin-right:6px}
+.meta{margin:6px 0 22px}
+.footer{margin-top:50px;font-size:.75em;color:#4B5563;text-align:center}
+
+.month{font-size:1.05em;color:#22D4EB;margin:34px 0 12px;padding-bottom:6px;border-bottom:1px solid #22D4EB55}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.card{display:flex;flex-direction:column;gap:8px;background:#111827;border:1px solid #2A2A3A;border-radius:12px;padding:20px 20px;color:#E0E0E0;transition:border-color .2s,transform .15s}
+.card:hover{border-color:#22D4EB;transform:translateY(-2px);text-decoration:none}
+.card-title{font-size:1.02em;font-weight:bold;color:#22D4EB;line-height:1.3}
+.card-desc{font-size:.83em;color:#9CA3AF;line-height:1.5}
+.card-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto;padding-top:4px}
+.tag{font-size:.72em;background:#1F2937;border:1px solid #374151;border-radius:4px;padding:2px 8px;color:#6B7280}
+#q{width:100%;background:#111827;border:1px solid #2A2A3A;border-radius:8px;color:#E0E0E0;padding:10px 14px;font-size:.95em;margin:14px 0 4px}
+#q:focus{outline:none;border-color:#22D4EB}
+.sub{color:#9CA3AF;font-size:.9em}
+</style></head>
+<body><div class="wrap">
+<div class="nav"><a href="index.html">&larr; Daily reports</a><a href="../index.html">Hub</a></div>
+<h1>How each EFP is calculated, and Miguel&#x27;s circularity concern</h1><div class="meta"><span class="badge">2026-09-17</span><span class="badge">2 tables</span></div>
+<div class="article"><h1 id="how-each-efp-is-calculated-and-miguels-circularity-concern">How each EFP is calculated, and Miguel's circularity concern</h1>
+<p><strong>Date:</strong> 2026-09-17 <strong>Question addressed:</strong> FORTRACK meeting action item #1 (Miguel, 2026-09-14) — "several EFPs are designed to be relatively independent of the climate variables used in their calculation. Using monthly climate variables to predict annual EFPs could therefore introduce conceptual/circularity issues. Recommendation: reconsider the predictor set for each EFP individually, excluding variables that were directly used to derive/normalize that EFP." This report documents exactly how each EFP is computed in the codebase, as groundwork for deciding whether/how to act on that recommendation.</p>
+<hr />
+<h2 id="where-this-happens-in-the-code">Where this happens in the code</h2>
+<p><code>notebooks/14_calc_EFPs.ipynb</code> computes all EFPs, one site-year at a time, via the function <code>EFPcalc_year()</code> (cell 12), fed by <code>read_fluxmet_hh()</code> (cell 10) which reads and standardises the raw half-hourly FLUXNET <code>FLUXMET_HH</code> files.</p>
+<h3 id="raw-inputs-from-read_fluxmet_hh">Raw inputs (from <code>read_fluxmet_hh()</code>)</h3>
+<p>Standard FLUXNET half-hourly columns are renamed/derived once per site-year:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>derived column</th>
+<th>source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GPP_NT</code>, <code>RECO_NT</code>, <code>NEE</code></td>
+<td><code>GPP_NT_VUT_REF</code>, <code>RECO_NT_VUT_REF</code>, <code>NEE_VUT_REF</code> (standard nighttime-partitioning flux products)</td>
+</tr>
+<tr>
+<td><code>LE</code>, <code>H</code></td>
+<td><code>LE_F_MDS</code>, <code>H_F_MDS</code> (energy fluxes)</td>
+</tr>
+<tr>
+<td><code>TA</code>, <code>VPD</code> (→ <code>VPD_kPa</code>)</td>
+<td><code>TA_F</code>, <code>VPD_F / 10</code></td>
+</tr>
+<tr>
+<td><code>SW_IN</code> (→ <code>PPFD_IN_FROM_SWIN</code>)</td>
+<td><code>SW_IN_F</code>, converted via <code>× 2.11</code></td>
+</tr>
+<tr>
+<td><code>P</code>, <code>WS</code>, <code>USTAR</code>, <code>CO2</code></td>
+<td><code>P_F</code>, <code>WS_F</code>, <code>USTAR</code>, <code>CO2_F_MDS</code></td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="per-efp-calculation">Per-EFP calculation</h2>
+<h3 id="gppsat">GPPsat</h3>
+<p>Fit a Michaelis-Menten light-response curve (<code>bigleaf::light.response()</code>, inputs <code>NEE</code>, <code>Reco = RECO_NT</code>, <code>PPFD</code> derived from <code>SW_IN</code>) independently on every consecutive 5-day window across the growing season. Take the asymptote parameter from each window's fit; <strong>GPPsat = the 90th percentile of those per-window asymptotes across the year.</strong> Growing-season filtering is itself threshold-based on <code>GPP_NT</code> and temperature.</p>
+<p>→ <strong>Bakes in <code>SW_IN</code> continuously</strong> (as the light-response curve's x-axis) <strong>and <code>TA</code></strong> (via the growing-season filter, and via <code>RECO_NT</code>, which is itself a temperature-driven partitioning product computed upstream of this notebook).</p>
+<h3 id="nepmax">NEPmax</h3>
+<p>Subset to daytime records (<code>PPFD &gt; 200 × 2.11</code>, i.e. an <code>SW_IN</code> threshold), take <code>−NEE</code> at those records, then <strong>NEPmax = the 99th percentile</strong>.</p>
+<p>→ Uses <code>SW_IN</code> only as a <strong>threshold/filter</strong>, not as a continuous input — a much weaker climate dependence than GPPsat.</p>
+<h3 id="etmax">ETmax</h3>
+<p>Convert <code>LE</code> to <code>ET</code> via <code>bigleaf::LE.to.ET(LE, TA)</code> — this needs <code>TA</code> because the latent heat of vaporization is temperature-dependent — restricted to daytime + turbulent conditions (<code>SW_IN &gt; 200</code>, <code>USTAR &gt; 0.2</code>), then <strong>ETmax = the 95th percentile of ET</strong>.</p>
+<p>→ <strong><code>TA</code> is directly, functionally embedded</strong> in the ET conversion itself, not just used as a filter.</p>
+<h3 id="wue--uwue">WUE / uWUE</h3>
+<p><code>bigleaf::WUE.metrics()</code> on the same daytime/turbulent subset, using <code>GPP_NT</code>, <code>NEE</code>, <code>LE</code>, <code>VPD_kPa</code>, <code>TA</code>. uWUE specifically exists to <em>remove</em> VPD's influence on raw WUE (uWUE ≈ GPP×√VPD / ET), but this only partially decouples it — both metrics still pass <code>TA</code> and <code>VPD</code> through the underlying ET/LE conversion.</p>
+<p>→ <strong><code>VPD</code> and <code>TA</code> are directly embedded</strong> in both.</p>
+<hr />
+<h2 id="why-this-matters-for-the-predictor-set">Why this matters for the predictor set</h2>
+<p>The climate predictor block used in every V10 model (<code>lag1_*</code> columns — monthly summaries of <code>TA</code>, <code>VPD</code>, <code>SW_IN</code>, <code>P</code>) is strictly <strong>the 12 months <em>before</em> the response year</strong> — <code>get_predictor_cols()</code> (used identically across every <code>run_v10_*.R</code> script) only ever selects <code>^lag1_</code> / <code>^lag2_</code> prefixed columns, never a same-year/contemporaneous climate block. So there is no literal "using the same half-hourly data point twice": the EFP is computed from <em>this</em> year's flux data, the predictor is <em>last</em> year's climate summary.</p>
+<p>That doesn't fully dissolve Miguel's concern, though, because:</p>
+<ul>
+<li>Temperature, radiation, and VPD are all strongly <strong>autocorrelated year-to-year</strong> at a given site — last year's TA is a decent proxy for this year's TA.</li>
+<li>So predicting <strong>GPPsat</strong> from <code>lag1_SW_IN_*</code> / <code>lag1_TA_*</code>, or <strong>ETmax / WUE / uWUE</strong> from <code>lag1_TA_*</code> / <code>lag1_VPD_*</code>, is predicting an EFP using a lagged proxy for the <em>same physical quantities</em> that were used to derive that EFP in the first place. Not a literal data leak, but the model could be partly "rediscovering" the EFP's own definition rather than learning something new about ecosystem function from climate.</li>
+<li><strong>NEPmax is the least exposed</strong> (SW_IN only sets a threshold, never enters a fitted curve) — which may be part of why it's one of the two EFPs (with GPPsat) showing the most robust disturbance improvement across every test this project has run, though for different reasons in each case (GPPsat has the <em>strongest</em> climate coupling of any EFP here, so this isn't a simple "less circular = more robust" story either).</li>
+</ul>
+<h3 id="summary-table">Summary table</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>EFP</th>
+<th>climate variables embedded in its own calculation</th>
+<th>how</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GPPsat</td>
+<td><code>SW_IN</code> (continuous), <code>TA</code> (filter + upstream Reco partitioning)</td>
+<td>light-response curve fit</td>
+</tr>
+<tr>
+<td>NEPmax</td>
+<td><code>SW_IN</code> (threshold only)</td>
+<td>daytime filter</td>
+</tr>
+<tr>
+<td>ETmax</td>
+<td><code>TA</code> (continuous)</td>
+<td>LE→ET conversion</td>
+</tr>
+<tr>
+<td>WUE</td>
+<td><code>TA</code>, <code>VPD</code> (continuous)</td>
+<td>GPP/ET via bigleaf</td>
+</tr>
+<tr>
+<td>uWUE</td>
+<td><code>TA</code>, <code>VPD</code> (continuous, partially normalised)</td>
+<td>GPP×√VPD/ET via bigleaf</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="concrete-next-step-not-yet-implemented">Concrete next step (not yet implemented)</h2>
+<p>Matching what Miguel actually proposed: for each EFP, drop the climate predictor(s) most implicated in its own calculation and check whether the disturbance effect (RMSE gain, SHAP) holds up:</p>
+<ul>
+<li><strong>ETmax</strong> models without <code>lag1_TA_*</code></li>
+<li><strong>WUE / uWUE</strong> models without <code>lag1_TA_*</code> and <code>lag1_VPD_*</code></li>
+<li><strong>GPPsat</strong> models without <code>lag1_SW_IN_*</code> and <code>lag1_TA_*</code></li>
+</ul>
+<p>This is meeting action item #1, still open. Worth prioritizing alongside item #2 (René's suggestion to replace monthly climate histories with static long-term descriptors), since both bear on the same underlying predictor-design question.</p>
+<hr />
+<h2 id="provenance">Provenance</h2>
+<ul>
+<li>EFP calculation code: <code>notebooks/14_calc_EFPs.ipynb</code>, function <code>EFPcalc_year()</code> (cell 12), fed by <code>read_fluxmet_hh()</code> (cell 10)</li>
+<li>Predictor selection: <code>get_predictor_cols()</code>, identical across every <code>scripts/run_v10_*.R</code> script — climate block is <code>grep('^lag1_', ...)</code> (12m window) or <code>grep('^(lag1_|lag2_)', ...)</code> (24m window), never same-year</li>
+<li>Meeting notes: <code>meeting's note/2026-09-14-fortrack-monthly-meeting.md</code>, action item #1</li>
+</ul>
+</div>
+<div class="footer">FluxNet &times; Mortality &middot; generated from daily_reports/*.md</div>
+</div></body></html>

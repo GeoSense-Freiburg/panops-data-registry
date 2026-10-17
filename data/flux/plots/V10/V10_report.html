@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Disturbance–Flux Report</title>
+<style>
+  :root{
+    --bg:#0b0f14; --panel:#121a24; --panel2:#0f151d; --edge:#243244;
+    --txt:#e6edf3; --muted:#9fb0c3; --accent:#4DAECC; --accent2:#E8257A;
+    --green:#33A14A; --gold:#D4A017;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--txt);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+  a{color:var(--accent);text-decoration:none}
+  header{position:sticky;top:0;z-index:50;background:linear-gradient(180deg,#0b0f14,#0b0f14f2);
+    border-bottom:1px solid var(--edge);backdrop-filter:blur(6px);}
+  .hwrap{max-width:1400px;margin:0 auto;padding:14px 22px;}
+  h1{font-size:19px;margin:0 0 2px;font-weight:700;letter-spacing:.2px}
+  .sub{color:var(--muted);font-size:13px;margin:0}
+  .toprow{display:flex;flex-wrap:wrap;align-items:center;gap:18px;margin-top:12px}
+  .toggle{display:inline-flex;background:var(--panel2);border:1px solid var(--edge);border-radius:10px;padding:4px;gap:4px}
+  .toggle button{background:transparent;color:var(--muted);border:0;border-radius:7px;
+    padding:8px 16px;font-size:13.5px;font-weight:600;cursor:pointer;transition:.15s}
+  .toggle button.active{background:var(--accent);color:#04222b}
+  .meta{display:flex;flex-wrap:wrap;gap:10px;font-size:12.5px;color:var(--muted)}
+  .chip{background:var(--panel2);border:1px solid var(--edge);border-radius:20px;padding:5px 12px}
+  .chip b{color:var(--txt)}
+  nav.jump{max-width:1400px;margin:0 auto;padding:8px 22px;display:flex;flex-wrap:wrap;gap:6px;
+    border-top:1px solid var(--edge)}
+  nav.jump a{font-size:12px;color:var(--muted);background:var(--panel2);border:1px solid var(--edge);
+    padding:5px 10px;border-radius:7px}
+  nav.jump a:hover{color:var(--txt);border-color:var(--accent)}
+  main{max-width:1400px;margin:0 auto;padding:14px 22px 80px}
+  section{background:var(--panel);border:1px solid var(--edge);border-radius:14px;
+    padding:20px 22px;margin:20px 0;scroll-margin-top:130px}
+  .secnum{color:var(--accent);font-weight:700;font-size:13px;letter-spacing:1px}
+  h2{margin:2px 0 4px;font-size:20px}
+  .desc{color:var(--muted);font-size:13.5px;margin:0 0 14px;max-width:900px;line-height:1.5}
+  .controls{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;margin:0 0 14px}
+  .ctrl label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:4px}
+  select,.chkwrap{background:var(--panel2);color:var(--txt);border:1px solid var(--edge);
+    border-radius:8px;padding:8px 10px;font-size:13px;min-width:130px}
+  .chkwrap{display:inline-flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
+  .chkwrap input{accent-color:var(--accent2);width:16px;height:16px}
+  .imgwrap{background:#0d1117;border:1px solid var(--edge);border-radius:10px;overflow:auto;text-align:center}
+  .imgwrap img{max-width:100%;height:auto;display:block;margin:0 auto;cursor:zoom-in}
+  .imgrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px}
+  .cap{color:var(--muted);font-size:12px;margin:8px 2px 0;font-family:ui-monospace,Menlo,Consolas,monospace;word-break:break-all}
+  .lightbox{position:fixed;inset:0;background:#000d;z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
+  .lightbox.open{display:flex}
+  .lightbox img{max-width:96vw;max-height:94vh;border-radius:8px}
+  .note{font-size:12px;color:var(--muted);border-left:3px solid var(--gold);padding:6px 12px;background:#1a130055;border-radius:4px;margin:10px 0}
+  .tblwrap{max-height:540px;overflow:auto;border:1px solid var(--edge);border-radius:10px}
+  table.metrics{width:100%;border-collapse:collapse;font-size:12.5px}
+  table.metrics th,table.metrics td{padding:6px 11px;text-align:right;border-bottom:1px solid var(--edge);white-space:nowrap}
+  table.metrics th{position:sticky;top:0;background:var(--panel2);cursor:pointer;color:var(--muted);user-select:none;z-index:2}
+  table.metrics th:hover{color:var(--txt)}
+  table.metrics th.txt,table.metrics td.txt{text-align:left}
+  table.metrics td.mono{font-family:ui-monospace,Menlo,Consolas,monospace}
+  table.metrics tbody tr:hover{background:#1a2430}
+  table.metrics th.sorted::after{content:" \25B2";font-size:9px}
+  table.metrics th.sorted.desc::after{content:" \25BC"}
+  .itxt{font-size:14px;line-height:1.65;color:#cdd8e3;max-width:980px}
+  .itxt b{color:var(--txt)}
+  h3.mini{margin:22px 0 8px;font-size:15.5px;color:#e6edf3;border-left:3px solid var(--accent);padding-left:10px}
+  .metricgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin:12px 0}
+  .metriccard{background:var(--panel2);border:1px solid var(--edge);border-radius:10px;padding:14px 16px}
+  .metriccard h4{margin:0 0 6px;font-size:14px;color:var(--accent)}
+  .metriccard p{margin:0;font-size:12.8px;color:var(--muted);line-height:1.5}
+  .metriccard .f{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;color:#dfe8f0;
+    background:#0d1117;border:1px solid var(--edge);border-radius:6px;padding:6px 9px;margin-top:8px;display:block}
+  .deftbl{border-collapse:collapse;font-size:13px;margin:6px 0 4px}
+  .deftbl th,.deftbl td{border:1px solid var(--edge);padding:6px 13px;text-align:left}
+  .deftbl th{background:var(--panel2);color:var(--muted)}
+  .deftbl td.k{font-family:ui-monospace,Menlo,Consolas,monospace;color:var(--accent);font-weight:700}
+  .deftbl tr.add td.k{color:var(--accent2)}
+  .pill{display:inline-block;background:#0d1117;border:1px solid var(--edge);border-radius:5px;
+    padding:1px 7px;font-size:12px;font-family:ui-monospace,Menlo,Consolas,monospace;color:#cdd8e3}
+  footer{max-width:1400px;margin:0 auto;padding:30px 22px;color:var(--muted);font-size:12px}
+  .toggle button.off{opacity:.3;cursor:not-allowed}
+  body.ds-v41 .v10only{display:none !important}
+  body:not(.ds-v41) .v41only{display:none !important}
+  body:not(.ds-v41) .na41{display:none !important}
+  .note.v41only{border-left-color:var(--accent)}
+  table.cmp td,table.cmp th{text-align:center}
+  table.cmp td.txt,table.cmp th.txt{text-align:left}
+  td.pos{color:#7ee2a0} td.neg{color:#f08a8a}
+</style>
+</head>
+<body>
+<header>
+  <div class="hwrap">
+    <h1>Disturbance effects on ecosystem functional properties · V2.2 and V4.1</h1>
+    <p class="sub">Optuna-tuned learners on the tree-cover &ge;30&nbsp;% datasets: V2.2 (deadtrees v2-2, 93 sites) and the
+      new paper dataset (deadtrees v4.1, 106 sites), each with the EFPs or with growing-season flux totals as the
+      response — interactive browser</p>
+    <div class="toprow">
+      <div class="toggle" id="cvToggle" title="Resampling structure used to validate the models">
+        <button data-cv="loo" class="active">Leave-one-site-out</button>
+        <button data-cv="rep">Repeated CV (3x80%)</button>
+      </div>
+      <div class="toggle" id="dsToggle">
+        <button data-ds="sites_with_high_Tcover" class="active">V2.2 EFP (93)</button>
+        <button data-ds="v10f">V2.2 Flux (93)</button>
+        <button data-ds="v41">V4.1 EFP (106)</button>
+        <button data-ds="v41f">V4.1 Flux (102)</button>
+      </div>
+      <div class="toggle" id="cfgToggle" title="Learner - all tuned with Optuna (TPE, 50 trials)">
+        <button data-cfg="rfopt">RF Optuna</button>
+        <button data-cfg="xgbopt" class="active">XGBoost Optuna</button>
+        <button data-cfg="lgbopt">LightGBM Optuna</button>
+      </div>
+      <div class="meta" id="metaBar"></div>
+    </div>
+  </div>
+  <nav class="jump">
+    <a href="#s0">Overview</a>
+    <a href="#s1">1 · Site map</a>
+    <a href="#s2">2 · Sites per IGBP</a>
+    <a href="#sm">Metrics</a>
+    <a href="#s3">3 · Model performance (RMSE)</a>
+    <a href="#s4">4 · Threshold methods</a>
+    <a href="#s5">5 · Site ΔRMSE</a>
+    <a href="#s6">6 · ΔRMSE by threshold</a>
+    <a href="#s7">7 · Site SHAP</a>
+    <a href="#s8">8 · Grouped SHAP</a>
+    <a href="#s9">9 · IGBP &amp; tree cover</a>
+    <a href="#s10">10 · Disturbance block</a>
+    <a href="#s11">11 · V2.2 vs V4.1 · EFPs vs fluxes</a>
+    <a href="#s13">12 · Model structures</a><a href="#s14">13 · Decisions (V2.2)</a>
+  </nav>
+</header>
+
+<main>
+  <section id="s0">
+    <div class="secnum">OVERVIEW</div>
+    <h2>About this report</h2>
+    <p class="itxt">Two datasets, both restricted to sites with mean tree cover &ge;&nbsp;30&nbsp;% within 500&nbsp;m, and
+      three learners, all tuned with <b>Optuna</b> (TPE, 50 trials, grouped 5-fold site CV). Switch between them at the
+      top; every figure and the metrics table follow the switches.</p>
+    <p class="itxt"><b>Naming.</b> <b>V2.2</b> is the analysis previously called V10 (deadtrees v2-2 maps, 93 sites); <b>V4.1</b> is the new paper dataset (deadtrees v4.1 maps). Folder and file names still use <code>V10</code>.</p>
+    <table class="deftbl">
+      <thead><tr><th>Dataset</th><th>Sites</th><th>Site-years</th><th>Mortality maps</th><th>Models</th><th>CV</th><th>Learners</th></tr></thead>
+      <tbody>
+        <tr><td class="k">V2.2 EFP</td><td>93</td><td>395</td><td>deadtrees v2-2</td><td>M1–M8 (raw / anomaly memory)</td><td>LOSO + repeated</td><td>RF, XGBoost, LightGBM</td></tr>
+        <tr class="add"><td class="k">V4.1 EFP</td><td>106</td><td>388</td><td>deadtrees v4.1</td><td>M3, M4 only</td><td>repeated only</td><td>XGBoost, LightGBM</td></tr>
+        <tr><td class="k">V2.2 Flux</td><td>93</td><td>372</td><td>deadtrees v2-2</td><td>M3, M4 only</td><td>repeated only</td><td>XGBoost, LightGBM</td></tr>
+        <tr class="add"><td class="k">V4.1 Flux</td><td>102</td><td>362</td><td>deadtrees v4.1</td><td>M3, M4 only</td><td>repeated only</td><td>XGBoost, LightGBM</td></tr>
+      </tbody>
+    </table>
+    <p class="itxt" style="margin-top:10px"><b>V4.1 Flux</b> is the V4.1 EFP with the four EFPs
+      replaced by growing-season totals from the half-hourly FLUXNET data: GPP and NEP (g&nbsp;C&nbsp;m<sup>&minus;2</sup>),
+      ET (mm) and WUE = GPP/ET (g&nbsp;C&nbsp;mm<sup>&minus;1</sup>), summed over the same growing-season days as the EFPs.
+      Identical predictors and pipeline. A seasonal sum is deflated by missing data, so site-years with &lt;&nbsp;80&nbsp;%
+      of the growing season present are dropped (26 of 388; CA-LU1, US-GLE, US-NC3 and US-SHC lose all years).</p>
+    <p class="itxt" style="margin-top:10px"><b>V2.2 Flux</b> uses the V2.2 predictors (deadtrees v2-2, V2.2 climate
+      lags, traits and 11-family mortality block; 93 sites) with exactly the same flux totals, completeness gate (23 of
+      395 site-years dropped, no site lost), tuning, repeated CV, SHAP and figures as the V4.1 flux set, so the two flux
+      sets differ only in their predictors and site-years. It replaces the earlier <code>predict_fluxes/</code> run
+      (daily files, GPP<sub>sat</sub> tuning reused, no SHAP), whose results are kept in that folder.</p>
+    <p class="itxt" style="margin-top:10px">With either <b>V4.1</b> dataset or the V2.2 Flux selected, <span class="pill">RF Optuna</span> and
+      <span class="pill">Leave-one-site-out</span> are greyed out because they were not run for it. Sections without a
+      V4.1 counterpart say so. What differs between the two datasets beyond the mortality maps (climate window, NEPmax
+      definition, traits, years) is listed in <a href="#s11">Section&nbsp;11</a>, together with a direct comparison of
+      the results.</p>
+
+    <h3 class="mini">Cross-validation structures</h3>
+    <p class="itxt">Every result is available under <b>two resampling structures</b>, switchable at the top left:</p>
+    <div class="metricgrid">
+      <div class="metriccard">
+        <h4>Leave-one-site-out (LOSO)</h4>
+        <p>Each site is held out in turn and predicted by a model trained on all remaining sites. Tests extrapolation
+          to an unseen site. <b>Primary structure.</b></p>
+      </div>
+      <div class="metriccard">
+        <h4>Repeated LOSO-CV (3 &times; 80%)</h4>
+        <p>Each held-out site is predicted three times, each from a different random 80&nbsp;% subsample of the
+          remaining sites; predictions are averaged. Tests whether a result depends on one particular split, and yields
+          a per-prediction stability measure (<b>pred SD</b> in the metrics table).</p>
+      </div>
+    </div>
+    <p class="itxt">The two agree on every conclusion — model-rank agreement &rho;&nbsp;=&nbsp;0.85–0.96, disturbance
+      effect correlated at r&nbsp;=&nbsp;0.966, same best learner in all six dataset&nbsp;&times;&nbsp;CV combinations.
+      Repeated CV is slightly <i>more</i> optimistic (it averages three predictions) and has less statistical power, so
+      LOSO is used as the primary structure and repeated CV as a robustness check. See Section&nbsp;13.</p>
+
+
+    <h3 class="mini">Disturbance metrics</h3>
+    <p class="itxt">For visualisation and thresholding we define three disturbance metrics, all computed within a
+      <b>500&nbsp;m buffer</b> around each tower from the deadwood / tree-cover maps:</p>
+    <div class="metricgrid">
+      <div class="metriccard">
+        <h4>Absolute mortality</h4>
+        <p>Standing deadwood cover as a percentage of the total buffer area — the absolute amount of dead canopy.</p>
+        <span class="f">absolute mortality = deadwood&nbsp;/&nbsp;area × 100&nbsp;(%)</span>
+      </div>
+      <div class="metriccard">
+        <h4>Relative mortality</h4>
+        <p>Deadwood relative to tree cover — what&nbsp;% of the standing trees are currently dead (defined where tree
+          cover ≥ 10&nbsp;%, capped at 100&nbsp;%).</p>
+        <span class="f">relative mortality = deadwood&nbsp;/&nbsp;tree&nbsp;cover × 100&nbsp;(%)</span>
+      </div>
+      <div class="metriccard">
+        <h4>Relative disturbance</h4>
+        <p>Combines standing deadwood and tree-cover loss relative to forest plus loss — captures both dead-standing
+          and removed/lost canopy.</p>
+        <span class="f">relative disturbance = (deadwood + loss×100) / (forest + loss×100) × 100&nbsp;(%)</span>
+      </div>
+    </div>
+
+
+    <h3 class="mini">Models</h3>
+    <p class="itxt">Predictor blocks:
+      <span class="pill">C</span> climate,
+      <span class="pill">T</span> plant traits,
+      <span class="pill">M</span> memory (the response's own previous-year value, V2.2 only),
+      <span class="pill">D</span> disturbance / mortality metrics. Pairs that differ only by <span class="pill">D</span>
+      isolate the effect of adding disturbance. Every model runs at a <b>12-month</b> and a <b>24-month</b> lag window.
+      <b>The V4.1 EFP uses only M3 and M4.</b></p>
+    <table class="deftbl">
+      <thead><tr><th>Model</th><th>Predictors</th><th>Adds disturbance?</th></tr></thead>
+      <tbody>
+        <tr><td class="k">M1</td><td>C — climate only</td><td>—</td></tr>
+        <tr class="add"><td class="k">M2</td><td>C + D</td><td>vs M1</td></tr>
+        <tr><td class="k">M3</td><td>C + T</td><td>—</td></tr>
+        <tr class="add"><td class="k">M4</td><td>C + T + D</td><td>vs M3</td></tr>
+        <tr><td class="k">M5</td><td>C + M</td><td>—</td></tr>
+        <tr class="add"><td class="k">M6</td><td>C + M + D</td><td>vs M5</td></tr>
+        <tr><td class="k">M7</td><td>C + T + M</td><td>—</td></tr>
+        <tr class="add"><td class="k">M8</td><td>C + T + M + D</td><td>vs M7</td></tr>
+      </tbody>
+    </table>
+    <h3 class="mini">Disturbance-level thresholds</h3>
+    <p class="itxt">To classify each site's disturbance level into <b>Low / Mid / High</b> for each metric, we compare
+      three thresholding schemes (all computed on the per-site peak value):</p>
+    <div class="metricgrid">
+      <div class="metriccard"><h4>Tertiles</h4>
+        <p>Equal-sized groups split at the 33rd and 67th percentiles — each class holds ~⅓ of sites (balanced
+          statistical power, ignores natural clustering).</p></div>
+      <div class="metriccard"><h4>Equal-width</h4>
+        <p>The min-to-max range divided into three equal-width bins — reflects the distribution shape but yields
+          unequal group sizes (most sites fall in the low bin).</p></div>
+      <div class="metriccard"><h4>Natural breaks</h4>
+        <p>Cut points at <span class="pill">mean ± 0.5·SD</span> — Low below, High above, Mid in between; grounded in
+          the variance structure and roughly balanced.</p></div>
+    </div>
+  </section>
+
+  <!-- 1 -->
+  <section id="s1">
+    <div class="secnum">SECTION 1</div>
+    <h2>Site distribution &amp; EFP characteristics</h2>
+    <p class="desc">Global map of the analysed FLUXNET sites coloured by IGBP land-cover class (panel a), with the
+      distribution of each ecosystem functional property by IGBP class. V4.1: GPP<sub>sat</sub>, NEP<sub>max</sub>,
+      ET<sub>max</sub>, WUE (uWUE dropped).</p>
+    <div class="imgwrap"><img id="img_fig1" loading="lazy" alt="site map"></div>
+  </section>
+
+  <!-- 2 -->
+  <section id="s2">
+    <div class="secnum">SECTION 2</div>
+    <h2>Number of sites per IGBP class</h2>
+    <p class="desc">Count of sites in each IGBP land-cover class for the selected dataset.</p>
+    <div class="note na41">Not produced for this dataset.</div>
+    <div class="imgwrap v10only"><img id="img_bar" loading="lazy" alt="sites per IGBP"></div>
+  </section>
+
+  <!-- RF metrics -->
+  <section id="sm">
+    <div class="secnum">MODEL METRICS</div>
+    <h2>Model metrics</h2>
+    <p class="desc">Cross-validation metrics for every model × window × response of the selected dataset, learner
+      and CV structure (V2.2: 24 model configurations × 5 EFPs; V4.1: M3/M4 × 2 windows × 4 EFPs). Click a column
+      header to sort; filter by response. R² cells are shaded from red (low) to green (high).</p>
+    <div class="controls">
+      <div class="ctrl"><label>Response (EFP)</label><select id="selm_resp"></select></div>
+      <div class="ctrl"><label>Model family</label><select id="selm_fam"></select></div>
+    </div>
+    <div class="tblwrap">
+      <table class="metrics" id="metricsTbl">
+        <thead><tr>
+          <th data-k="model" class="txt">Model</th>
+          <th data-k="response" class="txt">EFP</th>
+          <th data-k="n_predictors"># pred</th>
+          <th data-k="n_pairs"># pairs</th>
+          <th data-k="RMSE">RMSE</th>
+          <th data-k="MAE">MAE</th>
+          <th data-k="R2">R²</th>
+          <th data-k="pred_sd" id="th_predsd" style="display:none" title="SD of the prediction across the 3 repetitions - lower = more stable">pred SD</th>
+        </tr></thead>
+        <tbody id="metricsBody"></tbody>
+      </table>
+    </div>
+    <div class="cap" id="cap_metrics"></div>
+  </section>
+
+  <!-- 3 -->
+  <section id="s3">
+    <div class="secnum">SECTION 3</div>
+    <h2>Model performance &amp; effect of disturbance on RMSE</h2>
+    <p class="desc">Per-site RMSE without disturbance (cyan, M3 = climate + traits) and with it (pink, M4 = + mortality),
+      for XGBoost and LightGBM (Optuna) at the 12&nbsp;m and 24&nbsp;m windows, repeated CV (3&nbsp;×&nbsp;80&nbsp;%). The same
+      figure for all four datasets; it does not follow the learner and CV switches.</p>
+    <p class="itxt"><b>Reading the labels.</b> Each pair carries three numbers:
+      <span class="pill">%</span> the <b>median paired change</b> in per-site RMSE (negative = less error, green);
+      <span class="pill">stars</span> a <b>one-sided paired Wilcoxon signed-rank test</b>, H<sub>1</sub>: adding D
+      <i>reduces</i> per-site RMSE, with Benjamini–Hochberg FDR across the 16 tests in the figure
+      (*** q&lt;0.001, ** q&lt;0.01, * q&lt;0.05, ns); and <span class="pill">%↓</span> the share of sites whose RMSE
+      improved. Sites are paired on <code>SITE_ID</code>. Statistics are written to <code>fig2_statistics.csv</code>
+      (or <code>fig2_high_*_statistics.csv</code>) beside each figure.</p>
+    <p class="itxt"><b>Caveat.</b> The effect size is the <i>median of the paired per-site changes</i>, not the difference
+      of the two medians. Because the models share training sites, the per-site errors are not fully independent, which
+      makes p-values mildly <b>anti-conservative</b>; strong results are safe, marginal ones (q ≈ 0.05) should not be
+      over-read.</p>
+    <div class="controls">
+      <div class="ctrl"><label>Sites</label><select id="sel3_sites"></select></div>
+    </div>
+    <div class="note" id="note3_high" style="display:none"><b>High-disturbance sites only.</b> The same figure and
+      statistics restricted to the sites whose maximum disturbance across years lies above the natural break
+      (mean + 0.5&nbsp;SD over sites; the number of sites is given in the figure subtitle). Models are trained on all
+      sites; only the sites shown and tested change. With ~20–26 sites the tests have less power, so read the effect
+      size together with the stars.</div>
+    <div class="imgwrap"><img id="img_rmse" loading="lazy" alt="paired RMSE"></div>
+    <div class="cap" id="cap_rmse"></div>
+  </section>
+
+  <!-- 4 -->
+  <section id="s4">
+    <div class="secnum">SECTION 4</div>
+    <h2>Mortality / disturbance threshold methods</h2>
+    <p class="desc">Three ways of binning each disturbance metric into Low / Mid / High categories — tertiles,
+      equal-width and natural breaks — for absolute mortality, relative mortality and relative disturbance (500 m buffer).</p>
+    <div class="note na41">Not produced for this dataset.</div>
+    <div class="imrow v10only">
+      <div class="imgwrap"><img id="img_thr1" loading="lazy" alt="abs mort"></div>
+      <div class="imgwrap" style="margin-top:14px"><img id="img_thr2" loading="lazy" alt="rel mort"></div>
+      <div class="imgwrap" style="margin-top:14px"><img id="img_thr3" loading="lazy" alt="rel dist"></div>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section id="s5">
+    <div class="secnum">SECTION 5</div>
+    <h2>Site-specific ΔRMSE (diverging bars)</h2>
+    <p class="desc">Per-site change in RMSE from adding disturbance (ΔRMSE = RMSE<sub>with D</sub> − RMSE<sub>without D</sub>),
+      M3 (climate + traits) vs M4 (+ mortality): one bar per site, sorted within each panel; below zero = mortality
+      reduces that site's error. Rows = responses, columns = XGBoost and LightGBM (Optuna) at 12&nbsp;m and 24&nbsp;m,
+      repeated CV (3&nbsp;×&nbsp;80&nbsp;%). Bars are coloured by the site's disturbance intensity (site maximum, 500&nbsp;m) on
+      the same dark teal → yellow → pink scale as the signed-SHAP figure in Section&nbsp;7; each panel gives the share of
+      sites improved. Numbers, including the rank correlation between ΔRMSE and intensity, are in
+      <code>fig_site_dRMSE_statistics.csv</code> beside the figure. Does not follow the learner and CV switches.</p>
+    <div class="controls">
+      <div class="ctrl v10only"><label>View</label><select id="sel5_view"></select></div>
+      <div class="ctrl"><label>Colour by</label><select id="sel5_metric"></select></div>
+      <div class="ctrl" style="display:none"><label>Response (EFP)</label><select id="sel5_efp"></select></div>
+    </div>
+    <div class="note v10only" id="note5_all" style="display:none"><b>All model pairs (V2.2).</b> The earlier figure:
+      one board per EFP with all four model pairs (C vs C+D … C+T+M vs C+T+D+M) × memory type × window, bars coloured by
+      relative-disturbance tier. Follows the learner and CV switches.</div>
+    <div class="imgwrap"><img id="img_dbar" loading="lazy" alt="delta RMSE bars"></div>
+    <div class="cap" id="cap_dbar"></div>
+  </section>
+
+  <!-- 6 -->
+  <section id="s6">
+    <div class="secnum">SECTION 6</div>
+    <h2>ΔRMSE by disturbance category</h2>
+    <p class="desc">Per-site ΔRMSE (violins) stratified by disturbance category, in the SHAP-percent style — 3 rows
+      (absolute mortality / relative mortality / relative disturbance) × 5 EFP columns.</p>
+    <p class="itxt"><b>Significance (merged figures).</b> ΔRMSE is already the paired per-site difference, so each
+      category is tested with a <b>one-sided one-sample Wilcoxon signed-rank test</b>, H<sub>1</sub>: median ΔRMSE &lt; 0
+      (adding D reduces RMSE), BH-FDR across the 30 tests in each figure. Each violin is annotated with the star, the
+      <b>share of sites improved</b> and <b>n</b>.</p>
+    <p class="itxt"><b>Do not compare significance across categories.</b> The High class holds ~26 sites versus ~86 for
+      Low+Mid, so it clears fewer FDR thresholds <i>despite a ~3.6× larger median effect</i>. Read the effect size and
+      %↓ together with the star — on effect size, disturbance information helps most exactly where disturbance
+      occurred. Full statistics in <code>delta_RMSE_category_significance.csv</code>.</p>
+    <div class="note na41">Not produced for this dataset.</div>
+    <div class="v10only">
+    <div class="controls">
+      <div class="ctrl"><label>Comparison</label><select id="sel6_unit"></select></div>
+      <div class="ctrl"><label>Threshold method</label><select id="sel6_method"></select></div>
+      <div class="ctrl"><label class="chkwrap"><input type="checkbox" id="sel6_merged"> Merge Low+Mid</label></div>
+    </div>
+    <div class="imgwrap"><img id="img_dcat" loading="lazy" alt="delta RMSE category"></div>
+    <div class="cap" id="cap_dcat"></div>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section id="s7">
+    <div class="secnum">SECTION 7</div>
+    <h2>Site-specific SHAP composition</h2>
+    <p class="desc">Per-site stacked driver-group SHAP (Climate / Traits / Disturbance / Memory), with dot columns
+      coloured by three mortality metrics and IGBP on the right axis. Sites ordered by disturbance SHAP share.</p>
+    <div class="note v41only"><b>V4.1 and flux sets:</b> M4 only, one board per mortality metric with the four EFPs side by side.
+      <b>Composition</b> = relative mean |SHAP| per driver group with the site's metric value as dots (Fig.&nbsp;3).
+      <b>Signed disturbance SHAP</b> = net signed SHAP of the disturbance block in response units (same quantity as
+      Fig.&nbsp;4 and 5), bars coloured by the site's disturbance intensity (dark teal → yellow → pink,
+      colour-blind safe), sites sorted by intensity, dashed lines = the two natural breaks, mean ± 0.5 SD (High above
+      the upper, Mid between, Low below the lower).</div>
+    <div class="controls v41only">
+      <div class="ctrl"><label>Mortality metric</label><select id="sel7v_metric"></select></div>
+      <div class="ctrl"><label>Window</label><select id="sel7v_win"></select></div>
+      <div class="ctrl"><label>View</label><select id="sel7v_style"></select></div>
+    </div>
+    <div class="note v10only" id="note7_signed" style="display:none"><b>Signed disturbance SHAP (V2.2):</b> net signed
+      SHAP of the disturbance block for M4 (response units), bars coloured by the site's disturbance intensity (dark teal → yellow → pink,
+      colour-blind safe), sites sorted by intensity, dashed lines = the two natural breaks, mean ± 0.5 SD (High above
+      the upper, Mid between, Low below the lower). From the V2.2 Optuna models
+      (lag2-corrected 24&nbsp;m); computed for XGBoost and LightGBM only.</div>
+    <div class="controls v10only">
+      <div class="ctrl"><label>View</label><select id="sel7_view"></select></div>
+      <div class="ctrl" style="display:none"><label>Mortality metric</label><select id="sel7_metric10"></select></div>
+      <div class="ctrl"><label>Model</label><select id="sel7_model"></select></div>
+      <div class="ctrl"><label>Response (EFP)</label><select id="sel7_efp"></select></div>
+      <div class="ctrl"><label>Window</label><select id="sel7_win"></select></div>
+    </div>
+    <div class="imgwrap"><img id="img_sshap" loading="lazy" alt="site SHAP"></div>
+    <div class="cap" id="cap_sshap"></div>
+  </section>
+
+  <!-- 8 -->
+  <section id="s8">
+    <div class="secnum">SECTION 8</div>
+    <h2>Grouped disturbance SHAP by threshold category</h2>
+    <p class="desc">Disturbance SHAP % (violins) grouped by Low / Mid / High disturbance category — 3 mortality-metric
+      rows × 5 EFP columns.</p>
+    <div class="note v41only"><b>V4.1 and flux sets:</b> net signed disturbance SHAP (M4) for High vs Low+Mid sites, natural break
+      = site maximum &gt; mean + 0.5&nbsp;SD. Both learners and windows in one figure; Mann–Whitney, BH-FDR. Numbers in
+      <code>plots/paper_v41/fig4_statistics.csv</code>.</div>
+    <div class="controls v41only">
+      <div class="ctrl"><label>Mortality metric</label><select id="sel8v_metric"></select></div>
+    </div>
+    <div class="controls v10only">
+      <div class="ctrl"><label>Model</label><select id="sel8_model"></select></div>
+      <div class="ctrl"><label>Window</label><select id="sel8_win"></select></div>
+      <div class="ctrl"><label>Threshold method</label><select id="sel8_method"></select></div>
+      <div class="ctrl"><label class="chkwrap"><input type="checkbox" id="sel8_merged"> Merge Low+Mid</label></div>
+    </div>
+    <div class="imgwrap"><img id="img_gshap" loading="lazy" alt="grouped SHAP"></div>
+    <div class="cap" id="cap_gshap"></div>
+  </section>
+
+  <!-- 9 -->
+  <section id="s9">
+    <div class="secnum">SECTION 9</div>
+    <h2>Disturbance benefit &amp; SHAP vs. IGBP and tree cover</h2>
+    <p class="desc">Combined boards and individual panels: ΔRMSE and disturbance-SHAP by IGBP class (violins) and vs.
+      tree cover (loess scatters). Boards stack all four panels for one model set.</p>
+    <div class="note v41only"><b>V4.1 and flux sets:</b> 4-panel board for M4 (M3 vs M4 per site), per window and learner.</div>
+    <div class="controls v41only">
+      <div class="ctrl"><label>Window</label><select id="sel9v_win"></select></div>
+    </div>
+    <div class="controls v10only">
+      <div class="ctrl"><label>View</label><select id="sel9_type">
+        <option value="board">Board (4-panel)</option>
+        <option value="rmse_igbp">ΔRMSE by IGBP</option>
+        <option value="rmse_tc">ΔRMSE vs tree cover</option>
+        <option value="shap_igbp">SHAP % by IGBP</option>
+        <option value="shap_tc">SHAP % vs tree cover</option>
+      </select></div>
+      <div class="ctrl"><label id="lbl9">Model</label><select id="sel9_id"></select></div>
+    </div>
+    <div class="imgwrap"><img id="img_igbp" loading="lazy" alt="IGBP board"></div>
+    <div class="cap" id="cap_igbp"></div>
+  </section>
+
+  <!-- 10 -->
+  <section id="s10">
+    <div class="secnum">SECTION 10</div>
+    <h2>Disturbance block, metric by metric</h2>
+    <p class="desc">Share of the disturbance block's |SHAP| (M4, block renormalised to 100&nbsp;%), per metric family
+      (5 buffers and all lags pooled) or per sub-block: <b>mortality</b> (deadwood stock and new deadwood),
+      <b>tree cover loss</b>, and the <b>combined index</b> (relative disturbance). Mean over sites. Follows the dataset
+      and learner switches.</p>
+    <p class="itxt"><b>V2.2 vs V4.1.</b> V4.1 has 7 metric families instead of 11 (no <code>new_mortality_rate_pct</code>,
+      no severity metrics) and lag&nbsp;2 of every metric at 24&nbsp;m. The largest change is <b>tree cover loss</b>:
+      <code>relative_tree_loss_pct</code> is now the single largest metric for GPP<sub>sat</sub> and ET<sub>max</sub>
+      (27–39&nbsp;%, versus ~10–13&nbsp;% in V2.2); by sub-block, mortality 39–45&nbsp;%, tree cover loss 34–36&nbsp;%,
+      combined index 21–25&nbsp;%.</p>
+    <div class="controls">
+      <div class="ctrl"><label>View</label><select id="sel10_view"></select></div>
+    </div>
+    <div class="imgwrap"><img id="img_dcomp" loading="lazy" alt="disturbance block composition"></div>
+    <div class="cap" id="cap_dcomp"></div>
+  </section>
+
+  <!-- 11 -->
+  <section id="s11">
+    <div class="secnum">SECTION 11</div>
+    <h2>V2.2 vs V4.1 — what changed and how the results compare</h2>
+    <p class="desc">Both on tree cover &ge;&nbsp;30&nbsp;%, repeated CV (3&nbsp;×&nbsp;80&nbsp;%), XGBoost and LightGBM
+      Optuna, M3 (climate + traits) vs M4 (+ mortality). Independent of the switches at the top.</p>
+
+    <h3 class="mini">What changed between the two datasets</h3>
+    <table class="deftbl">
+      <thead><tr><th></th><th>V2.2</th><th>V4.1 EFP</th></tr></thead>
+      <tbody>
+        <tr><td class="k">Mortality maps</td><td>deadtrees v2-2</td><td>deadtrees v4.1: mid-season prediction date fixed (median shift 38&nbsp;days), cube-corner pixels fixed at 42 sites, per-year <code>covered</code> mask</td></tr>
+        <tr><td class="k">Sites / site-years</td><td>93 / 395, 2019–2025</td><td>106 / 388, 2020–2025 (83 sites shared, 10 dropped, 23 new)</td></tr>
+        <tr><td class="k">Climate window</td><td>centre-of-season month Y−1 to Y (overlaps the first half of the EFP's own season)</td><td>12 months strictly before the growing-season start (lag&nbsp;1), the 12 before that (lag&nbsp;2)</td></tr>
+        <tr><td class="k">NEP<sub>max</sub></td><td>99th pct of daytime NEP</td><td>90th pct of all growing-season half-hourly NEP (Migliavacca et al. 2021); ≈&nbsp;57&nbsp;% of the old values</td></tr>
+        <tr><td class="k">Responses</td><td>GPP<sub>sat</sub>, NEP<sub>max</sub>, ET<sub>max</sub>, uWUE, WUE</td><td>GPP<sub>sat</sub>, NEP<sub>max</sub>, ET<sub>max</sub>, WUE</td></tr>
+        <tr><td class="k">Traits</td><td>21 hydraulic / leaf / stem traits</td><td>23 Lusk et al. 2025 CWM traits, 1&nbsp;km, area-weighted 500&nbsp;m buffer</td></tr>
+        <tr><td class="k">Disturbance block</td><td>11 families × 5 buffers, current + lag&nbsp;1 (24&nbsp;m: + lag&nbsp;2 for the 2 stock metrics)</td><td>7 families × 5 buffers, current + lag&nbsp;1 (12&nbsp;m, 70 vars) or + lag&nbsp;2 (24&nbsp;m, 105 vars)</td></tr>
+        <tr><td class="k">Models · CV · learners</td><td>M1–M8 · LOSO + repeated · RF, XGB, LGB Optuna</td><td>M3, M4 · repeated · XGB, LGB Optuna (objective = RMSE averaged over M3 and M4)</td></tr>
+      </tbody>
+    </table>
+    <p class="itxt" style="margin-top:8px">Observed GPP<sub>sat</sub>, ET<sub>max</sub> and WUE are <b>identical</b> at the
+      303 site-years both datasets share, so differences for these responses come from the predictors and the site set,
+      not from the responses.</p>
+
+    <h3 class="mini">Per-site effect of adding mortality (Fig. 2 statistics)</h3>
+    <p class="desc">Median per-site change in RMSE (M3&nbsp;→&nbsp;M4), one-sided Wilcoxon, BH-FDR. Negative = mortality
+      reduces the error.</p>
+    <div class="tblwrap"><table class="metrics cmp">
+      <thead><tr><th class="txt" rowspan="2">EFP</th><th colspan="2">XGB 12m</th><th colspan="2">XGB 24m</th><th colspan="2">LGB 12m</th><th colspan="2">LGB 24m</th></tr><tr><th>V2.2</th><th>V4.1</th><th>V2.2</th><th>V4.1</th><th>V2.2</th><th>V4.1</th><th>V2.2</th><th>V4.1</th></tr></thead>
+      <tbody>
+        <tr><td class="txt"><b>GPPsat</b></td><td>-7.6% ***</td><td><b>-4.3% *</b></td><td>-6.7% **</td><td><b>-1.5% ns</b></td><td>-8.3% ***</td><td><b>-3.8% *</b></td><td>-8.7% **</td><td><b>-4.8% *</b></td></tr>
+        <tr><td class="txt"><b>NEPmax</b></td><td>-13.3% ***</td><td><b>-7.3% ***</b></td><td>-4.8% *</td><td><b>-9.6% ***</b></td><td>-12.7% ***</td><td><b>-9.5% ***</b></td><td>-16.0% ***</td><td><b>-8.0% ***</b></td></tr>
+        <tr><td class="txt"><b>ETmax</b></td><td>+1.7% ns</td><td><b>-5.2% ***</b></td><td>+2.2% ns</td><td><b>-4.0% *</b></td><td>+0.8% ns</td><td><b>-3.2% *</b></td><td>+1.1% ns</td><td><b>-3.0% *</b></td></tr>
+        <tr><td class="txt"><b>WUE</b></td><td>-3.9% *</td><td><b>-6.3% *</b></td><td>-6.0% *</td><td><b>-2.3% ns</b></td><td>-3.8% *</td><td><b>-1.2% ns</b></td><td>-7.2% *</td><td><b>-2.2% ns</b></td></tr>
+      </tbody>
+    </table></div>
+
+    <h3 class="mini">Pooled R² (all site-years)</h3>
+    <div class="tblwrap"><table class="metrics cmp">
+      <thead><tr><th class="txt">EFP</th><th class="txt">learner · window</th><th>V2.2 M3</th><th>V2.2 M4</th><th>V2.2 gain</th><th>V4.1 M3</th><th>V4.1 M4</th><th>V4.1 gain</th></tr></thead>
+      <tbody>
+        <tr><td class="txt">GPPsat</td><td class="txt">XGB 12m</td><td>0.19</td><td>0.35</td><td>+0.16</td><td>0.33</td><td>0.39</td><td><b>+0.06</b></td></tr>
+        <tr><td class="txt">GPPsat</td><td class="txt">XGB 24m</td><td>0.17</td><td>0.33</td><td>+0.16</td><td>0.33</td><td>0.38</td><td><b>+0.05</b></td></tr>
+        <tr><td class="txt">GPPsat</td><td class="txt">LGB 12m</td><td>0.16</td><td>0.33</td><td>+0.17</td><td>0.31</td><td>0.39</td><td><b>+0.08</b></td></tr>
+        <tr><td class="txt">GPPsat</td><td class="txt">LGB 24m</td><td>0.19</td><td>0.34</td><td>+0.15</td><td>0.34</td><td>0.41</td><td><b>+0.07</b></td></tr>
+        <tr><td class="txt">NEPmax</td><td class="txt">XGB 12m</td><td>0.19</td><td>0.40</td><td>+0.21</td><td>0.40</td><td>0.49</td><td><b>+0.09</b></td></tr>
+        <tr><td class="txt">NEPmax</td><td class="txt">XGB 24m</td><td>0.18</td><td>0.35</td><td>+0.17</td><td>0.42</td><td>0.50</td><td><b>+0.08</b></td></tr>
+        <tr><td class="txt">NEPmax</td><td class="txt">LGB 12m</td><td>0.18</td><td>0.41</td><td>+0.23</td><td>0.41</td><td>0.51</td><td><b>+0.10</b></td></tr>
+        <tr><td class="txt">NEPmax</td><td class="txt">LGB 24m</td><td>0.17</td><td>0.40</td><td>+0.23</td><td>0.43</td><td>0.52</td><td><b>+0.09</b></td></tr>
+        <tr><td class="txt">ETmax</td><td class="txt">XGB 12m</td><td>0.39</td><td>0.39</td><td>+0.00</td><td>0.41</td><td>0.44</td><td><b>+0.03</b></td></tr>
+        <tr><td class="txt">ETmax</td><td class="txt">XGB 24m</td><td>0.41</td><td>0.40</td><td>-0.01</td><td>0.44</td><td>0.46</td><td><b>+0.02</b></td></tr>
+        <tr><td class="txt">ETmax</td><td class="txt">LGB 12m</td><td>0.41</td><td>0.42</td><td>+0.01</td><td>0.43</td><td>0.45</td><td><b>+0.02</b></td></tr>
+        <tr><td class="txt">ETmax</td><td class="txt">LGB 24m</td><td>0.41</td><td>0.39</td><td>-0.02</td><td>0.42</td><td>0.45</td><td><b>+0.03</b></td></tr>
+        <tr><td class="txt">WUE</td><td class="txt">XGB 12m</td><td>0.13</td><td>0.27</td><td>+0.14</td><td>0.44</td><td>0.48</td><td><b>+0.04</b></td></tr>
+        <tr><td class="txt">WUE</td><td class="txt">XGB 24m</td><td>0.11</td><td>0.23</td><td>+0.12</td><td>0.41</td><td>0.42</td><td><b>+0.01</b></td></tr>
+        <tr><td class="txt">WUE</td><td class="txt">LGB 12m</td><td>0.12</td><td>0.27</td><td>+0.15</td><td>0.43</td><td>0.45</td><td><b>+0.02</b></td></tr>
+        <tr><td class="txt">WUE</td><td class="txt">LGB 24m</td><td>0.10</td><td>0.24</td><td>+0.14</td><td>0.43</td><td>0.46</td><td><b>+0.03</b></td></tr>
+      </tbody>
+    </table></div>
+
+    <h3 class="mini">Flux totals: V2.2 (93 sites) vs V4.1 (102 sites), with the V4.1 EFPs for reference</h3>
+    <p class="desc">Pooled R² M3&nbsp;→&nbsp;M4 and median per-site RMSE change (one-sided Wilcoxon, BH-FDR), repeated CV.
+      Both flux sets: identical half-hourly totals, completeness gate, tuning and pipeline; they differ only in their
+      predictors (V2.2 vs V4.1) and site-years (372 at 93 sites vs 362 at 102 sites).</p>
+    <div class="tblwrap"><table class="metrics cmp">
+      <thead><tr><th class="txt" rowspan="2">flux</th><th class="txt" rowspan="2">learner · window</th><th colspan="2">V2.2 Flux</th><th colspan="2">V4.1 Flux</th><th>V4.1 EFP</th></tr>
+      <tr><th>R²</th><th>ΔRMSE</th><th>R²</th><th>ΔRMSE</th><th>ΔRMSE</th></tr></thead>
+      <tbody>
+        <tr><td class="txt">GPP</td><td class="txt">XGB 12m</td><td>0.31 → 0.43</td><td>-5.7% *</td><td>0.56 → 0.59</td><td><b>-4.0% ns</b></td><td>-4.3% *</td></tr>
+        <tr><td class="txt">GPP</td><td class="txt">XGB 24m</td><td>0.29 → 0.40</td><td>-6.7% **</td><td>0.56 → 0.59</td><td><b>-6.5% *</b></td><td>-1.5% ns</td></tr>
+        <tr><td class="txt">GPP</td><td class="txt">LGB 12m</td><td>0.27 → 0.43</td><td>-10.3% **</td><td>0.56 → 0.57</td><td><b>-5.5% ns</b></td><td>-3.8% *</td></tr>
+        <tr><td class="txt">GPP</td><td class="txt">LGB 24m</td><td>0.27 → 0.40</td><td>-7.5% **</td><td>0.55 → 0.59</td><td><b>-7.0% *</b></td><td>-4.8% *</td></tr>
+        <tr><td class="txt">NEP</td><td class="txt">XGB 12m</td><td>0.01 → 0.07</td><td>-6.0% **</td><td>0.21 → 0.26</td><td><b>-3.0% *</b></td><td>-7.3% ***</td></tr>
+        <tr><td class="txt">NEP</td><td class="txt">XGB 24m</td><td>-0.01 → 0.09</td><td>-6.9% **</td><td>0.27 → 0.32</td><td><b>-5.4% *</b></td><td>-9.6% ***</td></tr>
+        <tr><td class="txt">NEP</td><td class="txt">LGB 12m</td><td>-0.01 → 0.09</td><td>-4.8% **</td><td>0.24 → 0.27</td><td><b>-5.1% *</b></td><td>-9.5% ***</td></tr>
+        <tr><td class="txt">NEP</td><td class="txt">LGB 24m</td><td>0.02 → 0.09</td><td>-6.0% **</td><td>0.24 → 0.29</td><td><b>-5.0% *</b></td><td>-8.0% ***</td></tr>
+        <tr><td class="txt">ET</td><td class="txt">XGB 12m</td><td>0.52 → 0.51</td><td>+0.3% ns</td><td>0.47 → 0.45</td><td><b>+2.2% ns</b></td><td>-5.2% ***</td></tr>
+        <tr><td class="txt">ET</td><td class="txt">XGB 24m</td><td>0.53 → 0.51</td><td>+2.0% ns</td><td>0.46 → 0.43</td><td><b>+0.9% ns</b></td><td>-4.0% *</td></tr>
+        <tr><td class="txt">ET</td><td class="txt">LGB 12m</td><td>0.53 → 0.52</td><td>+0.1% ns</td><td>0.46 → 0.45</td><td><b>-0.8% ns</b></td><td>-3.2% *</td></tr>
+        <tr><td class="txt">ET</td><td class="txt">LGB 24m</td><td>0.51 → 0.50</td><td>-0.5% ns</td><td>0.45 → 0.43</td><td><b>+0.7% ns</b></td><td>-3.0% *</td></tr>
+        <tr><td class="txt">WUE</td><td class="txt">XGB 12m</td><td>0.20 → 0.29</td><td>-3.6% *</td><td>0.41 → 0.42</td><td><b>-2.0% ns</b></td><td>-6.3% *</td></tr>
+        <tr><td class="txt">WUE</td><td class="txt">XGB 24m</td><td>0.15 → 0.25</td><td>-8.4% ns</td><td>0.41 → 0.45</td><td><b>-8.8% *</b></td><td>-2.3% ns</td></tr>
+        <tr><td class="txt">WUE</td><td class="txt">LGB 12m</td><td>0.19 → 0.27</td><td>-4.0% ns</td><td>0.38 → 0.44</td><td><b>-4.1% *</b></td><td>-1.2% ns</td></tr>
+        <tr><td class="txt">WUE</td><td class="txt">LGB 24m</td><td>0.14 → 0.26</td><td>-5.6% *</td><td>0.38 → 0.43</td><td><b>-7.5% *</b></td><td>-2.2% ns</td></tr>
+      </tbody>
+    </table></div>
+    <ul class="itxt">
+      <li><b>Same pattern in all four sets.</b> Mortality improves the carbon fluxes and WUE and not ET, in V2.2 and V4.1,
+        for EFPs and for totals. The ET null holds everywhere except the V4.1 ET<sub>max</sub>.</li>
+      <li><b>V2.2 vs V4.1 totals.</b> Mortality adds more in V2.2: GPP R² 0.27–0.31&nbsp;→&nbsp;0.40–0.43 (per site
+        −6 to −10&nbsp;%, all significant) and NEP −5 to −7&nbsp;% (all significant), versus GPP 0.55–0.57&nbsp;→&nbsp;0.57–0.59
+        in V4.1. The difference sits in the <b>baseline</b>: with the same responses and tuning, V4.1 climate + traits
+        explain GPP far better (R² ≈&nbsp;0.56 vs 0.29) and NEP too (≈&nbsp;0.24 vs ≈&nbsp;0), leaving less for mortality.
+        What makes the V4.1 baseline stronger (pre-season climate window, Lusk traits, site set) has not been isolated.</li>
+      <li><b>Windows.</b> 24&nbsp;m beats 12&nbsp;m for the V4.1 fluxes (GPP and WUE significant mainly at 24&nbsp;m); for the
+        V2.2 fluxes and the EFPs the two windows are about equal.</li>
+      <li><b>High vs Low+Mid SHAP</b> (Fig.&nbsp;4): GPP and WUE significant in all 8 tests in both flux sets; NEP in 7 of 8
+        (V2.2) and 4 of 8 (V4.1, relative disturbance only); ET never.</li>
+      <li><b>Caveat:</b> the V4.1 completeness gate removes all years of two strongly disturbed sites (CA-LU1, US-GLE)
+        and some of DE-Akm and US-NC2, so the V4.1 flux set carries less high-disturbance data.</li>
+    </ul>
+
+    <h3 class="mini">Reading the comparison</h3>
+    <ul class="itxt">
+      <li><b>Same direction, smaller increment.</b> Mortality still helps GPP<sub>sat</sub>, NEP<sub>max</sub> and WUE,
+        and NEP<sub>max</sub> is still the strongest. M4 is as good as or better than in V2.2, but the M3 baseline is much
+        stronger (GPP<sub>sat</sub> ≈&nbsp;0.18&nbsp;→&nbsp;0.33, NEP<sub>max</sub> 0.18&nbsp;→&nbsp;0.42, WUE
+        0.12&nbsp;→&nbsp;0.43), so the R² gain from mortality is about a third to a half of V2.2's (a quarter for WUE).</li>
+      <li><b>The stronger baseline is mostly the site set.</b> On the 303 shared site-years M3 is not stronger in V4.1
+        (GPP<sub>sat</sub> 0.16–0.20 vs 0.12–0.16; WUE −0.23 to −0.06 vs 0.04–0.09). The 23 new sites and years widen the
+        range of WUE between sites, which traits capture. On the shared site-years mortality still adds +0.07 to +0.09 R²
+        (GPP<sub>sat</sub>) and +0.07 to +0.27 (WUE). R² depends on the spread of the sample, so compare the datasets on
+        RMSE.</li>
+      <li><b>ET<sub>max</sub> moved from a slight loss to a slight gain</b> (≈&nbsp;+0.02 R²). It holds on the 83 shared
+        sites (median −1 to −4&nbsp;% per site vs +1 to +2&nbsp;% in V2.2) and is larger at the 23 new sites (−6 to −12&nbsp;%).
+        M3 skill for ET<sub>max</sub> is unchanged, so the change is in what mortality adds; it is concentrated in ENF and
+        MF, not DBF.</li>
+      <li><b>Not explained by the date fix.</b> The per-site change in gain is unrelated to how far V4.1 moved the map
+        date (Spearman ρ between −0.15 and 0.12, all p&nbsp;&gt;&nbsp;0.17), and DBF sites, with the largest shifts, show
+        no ET<sub>max</sub> change. The corner fix, masking, lag structure, traits, years and tuning also changed; a swap
+        test (V4.1 pipeline with the v2-2 mortality block) would isolate the maps.</li>
+    </ul>
+  </section>
+
+  <section id="s13">
+    <div class="secnum">SECTION 12 · REFERENCE</div>
+    <h2>Model structures</h2>
+    <p class="desc">Optuna search, cross-validation structure and predictor counts for both datasets.</p>
+
+    <h3 class="mini">Optuna tuning</h3>
+    <table class="deftbl">
+      <thead><tr><th>Learner</th><th>Search space</th><th>V2.2</th><th>V4.1</th></tr></thead>
+      <tbody>
+        <tr><td class="k">RF Optuna (<code>ranger</code>)</td><td><code>mtry_frac</code> 0.02–1.0, <code>num.trees</code> 250–1500, <code>min.node.size</code> 1–30, <code>sample.fraction</code> 0.4–1.0</td><td>50 trials per response</td><td>not run</td></tr>
+        <tr><td class="k">XGBoost Optuna</td><td><code>learning_rate</code> 0.01–0.3, <code>nrounds</code> 100–1000, <code>max_depth</code> 1–8, <code>min_child_weight</code> 1–20, <code>subsample</code> 0.5–1, <code>colsample_bytree</code> 0.2–1, <code>reg_lambda</code> 0.001–50</td><td>50 trials per response</td><td>50 trials per response × window</td></tr>
+        <tr><td class="k">LightGBM Optuna</td><td><code>learning_rate</code> 0.01–0.3, <code>nrounds</code> 100–1000, <code>num_leaves</code> 2–63, <code>min_data_in_leaf</code> 2–40, <code>feature_fraction</code> 0.2–1, <code>bagging_fraction</code> 0.5–1, <code>lambda_l2</code> 0.001–50</td><td>50 trials per response</td><td>50 trials per response × window</td></tr>
+      </tbody>
+    </table>
+    <p class="itxt" style="margin-top:8px">TPE sampler; every trial scored by grouped 5-fold CV (folds = disjoint site
+      groups), so tuning never touches the reported CV metrics. In V4.1 the objective is the scale-free RMSE averaged
+      over M3 and M4, so both models share one configuration per EFP and window (best configurations in
+      <code>plots/paper_v41/Optuna/{12m,24m}/best_configs.csv</code>).</p>
+
+    <h3 class="mini">Cross-validation structure (top-left toggle)</h3>
+    <p class="itxt">Two resampling structures are available, and they change how the models are
+      <i>validated</i> — never what data or predictors they see.</p>
+    <table class="deftbl">
+      <thead><tr><th></th><th>Leave-one-site-out</th><th>Repeated CV (3 × 80 %)</th></tr></thead>
+      <tbody>
+        <tr><td class="k">Training set per held-out site</td><td>all remaining sites (92 in V2.2)</td><td>a random 80 % of them (~74 in V2.2, ~84 in V4.1), <b>3 independent times</b></td></tr>
+        <tr><td class="k">Prediction</td><td>one model, one prediction</td><td>mean of the 3 repetitions</td></tr>
+        <tr class="add"><td class="k">Extra diagnostic</td><td>—</td><td><b>SD across repetitions</b> = prediction stability, which LOSO cannot provide</td></tr>
+        <tr><td class="k">Hyperparameters</td><td colspan="2">identical — each variant uses exactly its own configuration under both structures</td></tr>
+      </tbody>
+    </table>
+    <p class="itxt"><b>Note on the SHAP sections.</b> Sections 7, 8, 10 and the SHAP views of Section 9 do not change with
+      this toggle. SHAP is computed from a <b>full-data model</b> trained on every site, not from the CV folds, so the
+      resampling structure cannot affect it — those figures are identical under both and the toggle intentionally
+      resolves them to the same files.</p>
+
+
+    <h3 class="mini">Model families and predictor counts</h3>
+    <table class="deftbl">
+      <thead><tr><th rowspan="2">Model</th><th rowspan="2">Blocks</th><th colspan="2">V2.2 EFP</th><th rowspan="2">Adds D vs</th></tr><tr><th>p (12m)</th><th>p (24m)</th></tr></thead>
+      <tbody>
+        <tr><td class="k">M1</td><td>C</td><td>143</td><td>286</td><td>—</td></tr>
+        <tr class="add"><td class="k">M2</td><td>C + D</td><td style="background:#FFF4D6">243</td><td style="background:#FFF4D6">386</td><td>M1</td></tr>
+        <tr><td class="k">M3</td><td>C + T</td><td>164</td><td>307</td><td>—</td></tr>
+        <tr class="add"><td class="k">M4</td><td>C + T + D</td><td style="background:#FFF4D6">264</td><td style="background:#FFF4D6">407</td><td>M3</td></tr>
+        <tr><td class="k">M5 raw/anom</td><td>C + M</td><td>144</td><td style="background:#FFF4D6">287</td><td>—</td></tr>
+        <tr class="add"><td class="k">M6 raw/anom</td><td>C + D + M</td><td style="background:#FFF4D6">244</td><td style="background:#FFF4D6">387</td><td>M5</td></tr>
+        <tr><td class="k">M7 raw/anom</td><td>C + T + M</td><td>165</td><td style="background:#FFF4D6">308</td><td>—</td></tr>
+        <tr class="add"><td class="k">M8 raw/anom</td><td>C + T + D + M</td><td style="background:#FFF4D6">265</td><td style="background:#FFF4D6">408</td><td>M7</td></tr>
+      </tbody>
+    </table>
+
+
+    <h3 class="mini">V4.1 predictor counts</h3>
+    <table class="deftbl">
+      <thead><tr><th>Model</th><th>Blocks</th><th>p (12m)</th><th>p (24m)</th></tr></thead>
+      <tbody>
+        <tr><td class="k">M3</td><td>C + T</td><td>143 (120 climate + 23 traits)</td><td>263 (240 + 23)</td></tr>
+        <tr class="add"><td class="k">M4</td><td>C + T + D</td><td>213 (+ 70 mortality)</td><td>368 (+ 105 mortality)</td></tr>
+      </tbody>
+    </table>
+    <p class="itxt" style="margin-top:8px">Climate: monthly mean / p05 / p95 of TA, VPD and SW_IN plus precipitation sum,
+      12 months per lag (10 × 12 = 120). Mortality: 7 metric families × 5 buffers (100–500&nbsp;m) × current + lag&nbsp;1
+      (+ lag&nbsp;2 at 24&nbsp;m).</p>
+  </section>
+
+  <section id="s14">
+    <div class="secnum">SECTION 13 · DECISIONS (V2.2)</div>
+    <h2>What gets reported — and why (V2.2, 2026-08-19)</h2>
+    <div class="note"><b>Superseded for the paper.</b> This section records the V2.2 decisions as written on 2026-08-19.
+      The paper now uses the V4.1 dataset (106 sites), M3 and M4 only, repeated CV (3&nbsp;×&nbsp;80&nbsp;%) and
+      XGBoost + LightGBM Optuna. The dataset, learner and CV comparisons below still describe V2.2.</div>
+    <p class="desc">The full grid is 3 datasets &times; 9 learners &times; 2 CV structures &times; 24 models.
+      This section records which cell goes in the manuscript, the evidence behind each choice, and the claims the
+      results do and do not support. Written 2026-08-19; source:
+      <code>daily_reports/2026-08-19-reporting-decisions.md</code>.</p>
+
+    <div class="tblwrap"><table class="metrics">
+      <thead><tr><th class="txt">Choice</th><th class="txt">Selected</th><th class="txt">Role</th></tr></thead>
+      <tbody>
+        <tr><td class="txt">Dataset</td><td class="txt">Tree cover &ge;30% — 93 sites, 395 site-years</td><td class="txt">main text</td></tr>
+        <tr><td class="txt">Cross-validation</td><td class="txt">Leave-one-site-out</td><td class="txt">main text</td></tr>
+        <tr><td class="txt"></td><td class="txt">Repeated LOSO-CV (3 &times; 80% of sites)</td><td class="txt">sanity check</td></tr>
+        <tr><td class="txt">Learner</td><td class="txt">XGBoost + Optuna</td><td class="txt">main text</td></tr>
+        <tr><td class="txt">Models</td><td class="txt">M3/M4 (no memory), M7/M8 raw (with memory)</td><td class="txt">main text</td></tr>
+        <tr><td class="txt">Everything else</td><td class="txt">3 &times; 9 &times; 2 full grid</td><td class="txt">appendix</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>The finding in four numbers</h3>
+    <p class="desc">tc&ge;30 &middot; LOSO &middot; XGB_optuna. Adding the disturbance block to a model that already
+      has climate and traits.</p>
+    <div class="tblwrap"><table class="metrics">
+      <thead><tr><th class="txt"></th><th class="txt">GPPsat</th><th class="txt">NEPmax</th></tr></thead>
+      <tbody>
+        <tr><td class="txt"><b>no memory</b> (M3&rarr;M4)</td>
+            <td class="txt">R&sup2; 0.191 &rarr; <b>0.359</b>, &minus;10.2% RMSE ***</td>
+            <td class="txt">R&sup2; 0.192 &rarr; <b>0.405</b>, &minus;8.9% RMSE ***</td></tr>
+        <tr><td class="txt"><b>raw memory</b> (M7&rarr;M8)</td>
+            <td class="txt">R&sup2; 0.677 &rarr; 0.693, &minus;2.2% *</td>
+            <td class="txt">R&sup2; 0.731 &rarr; 0.747, ns</td></tr>
+      </tbody>
+    </table></div>
+    <p class="desc">Disturbance roughly <b>doubles explained variance</b> for both carbon fluxes when EFP memory is
+      absent, and adds almost nothing once raw memory is included — raw EFP memory already carries most of the
+      information disturbance provides. 9 of 20 tests significant: 7/10 without memory, 2/10 with it.</p>
+
+    <h3>1 · Dataset — disturbance effect is not monotonic in tree cover</h3>
+    <p class="desc">1,620 paired comparisons (9 learners &times; 12 model pairs &times; 5 EFPs &times; 3 datasets),
+      each pair differing only by the disturbance block.</p>
+    <div class="tblwrap"><table class="metrics">
+      <thead><tr><th class="txt">Dataset</th><th>median &Delta;RMSE</th><th>improved</th><th>EFPs helped</th></tr></thead>
+      <tbody>
+        <tr><td class="txt"><b>tc&ge;30 (93)</b></td><td><b>&minus;4.74%</b></td><td><b>83.1%</b></td><td><b>4/5</b></td></tr>
+        <tr><td class="txt">all_sites (112)</td><td>&minus;2.11%</td><td>79.4%</td><td>4/5</td></tr>
+        <tr><td class="txt">tc&ge;50 (65)</td><td>&minus;0.75%</td><td>65.0%</td><td>3/5</td></tr>
+      </tbody>
+    </table></div>
+    <p class="desc">The most forested dataset is the <i>weakest</i>. But tc&ge;50 also has 42% less spread in
+      mortality rate (sd 3.18 vs 5.46) and fewer site-years, so this reflects less disturbance variance to
+      detect — not evidence that mortality matters less in dense forest.</p>
+
+    <h3>2 · Does disturbance matter more for forests? No evidence</h3>
+    <p class="desc">Tested at site level (one value per site, pooled over all 9 learners, so no pseudo-replication),
+      on all_sites which spans the full gradient:</p>
+    <ul class="desc">
+      <li>Tree cover vs disturbance benefit: <b>Spearman &rho; = 0.044, p = 0.65</b> — no relationship</li>
+      <li>Forest (83 sites) &minus;3.09% vs non-forest (29 sites) &minus;7.09%: <b>p = 0.163</b> — not significant,
+          and pointing opposite to the hypothesis</li>
+    </ul>
+    <p class="desc"><b>Caution:</b> pooling all site &times; pair &times; EFP rows gives "non-forest benefits more,
+      p = 1e-08". That is pseudo-replication — 60 non-independent rows per site — and the effect disappears once
+      aggregated per site. Do not quote the pooled version.</p>
+    <p class="desc"><b>Conclusion:</b> the disturbance effect is <b>EFP-specific, not ecosystem-specific</b>. It
+      depends on which function is predicted (carbon yes, water no), not on ecosystem type.</p>
+
+    <h3>3 · Cross-validation — agree on conclusions, differ in power</h3>
+    <p class="desc">3,240 matched rows. Model-rank agreement &rho; = 0.85–0.96; disturbance effect correlates at
+      <b>r = 0.966</b>; same best learner in 6/6 dataset &times; CV combinations; per-EFP sign agreement 13/15
+      (both exceptions are effectively-zero effects flipping around zero). Repeated CV is slightly <i>more</i>
+      optimistic, since it averages 3 predictions.</p>
+    <div class="tblwrap"><table class="metrics">
+      <thead><tr><th class="txt">tc&ge;30, XGB_optuna</th><th>significant</th><th>no-memory</th><th>raw-memory</th><th>median effect</th></tr></thead>
+      <tbody>
+        <tr><td class="txt"><b>LOSO</b></td><td><b>9/20</b></td><td>7/10</td><td>2/10</td><td>&minus;4.53%</td></tr>
+        <tr><td class="txt">repeated CV</td><td>4/20</td><td>4/10</td><td>0/10</td><td>&minus;4.00%</td></tr>
+      </tbody>
+    </table></div>
+    <p class="desc">Effect sizes nearly identical, but averaging 3 predictions smooths both models and shrinks the
+      paired differences. LOSO is therefore primary; repeated CV answers the reviewer question
+      <i>"is this an artefact of one split?"</i></p>
+
+    <h3>4 · Learner — why not the most accurate one</h3>
+    <p class="desc">RF_exp02 has the highest mean R&sup2; (0.372 vs XGB_optuna 0.358) but was rejected. Its
+      <code>always.split.variables = raw memory</code> hard-codes a structural privilege for one predictor block.
+      RF_exp02 and RF_base are <i>identical</i> without raw memory (0.234 both); the forcing is worth +0.244 R&sup2;
+      there and nothing elsewhere.</p>
+    <p class="desc">The defence that exists: memory is the <b>control</b> (an autoregressive nuisance term),
+      disturbance is the <b>treatment</b>; forcing the control is conservative — RF_exp02 shows the <i>weakest</i>
+      disturbance effect of the RF family. Forcing disturbance instead would be circular.</p>
+    <p class="desc"><b>But the forcing is unnecessary.</b> RF_optuna reaches essentially the same raw-memory
+      performance (<b>0.644 vs 0.648</b>) with no forcing — purely by tuning <code>mtry</code> to 0.72–0.91 of
+      predictors instead of ranger's <code>sqrt(p)</code> default (~0.05 when p &approx; 449). With ~21 of 449
+      predictors sampled per split, RF picked the memory variable by chance ~5% of the time. The forcing was a
+      workaround for a hyperparameter pathology, not a scientific statement.</p>
+    <p class="desc"><b>XGB_optuna selected:</b> highest R&sup2; of any non-forcing learner, hyperparameters from a
+      defined TPE search space, disturbance effect mid-pack (&minus;2.15%, 78.3% improved) so not cherry-picked, and
+      disturbance SHAP share 26.7% — slightly above RF_exp02's 25.9%.</p>
+    <p class="desc"><b>Caveat:</b> RF_base has the highest disturbance SHAP share (35.6%) partly <i>because it is the
+      worst model</i> — its raw-memory models underperform (0.404), so proportionally more attribution falls to
+      disturbance. Not evidence that disturbance matters more.</p>
+
+    <h3>5 · Six things to state explicitly in the manuscript</h3>
+    <ol class="desc">
+      <li><b>Justify tc&ge;30 a priori</b> — "the forest-relevant subset" — not because it showed the strongest
+        effect. The other two datasets are in the appendix showing the same direction.</li>
+      <li><b>The 2 raw-memory significant results are fragile.</b> GPPsat 12m and WUE 24m (* under LOSO) drop to
+        0/10 under repeated CV. The defensible line: <i>once raw EFP memory is included, disturbance adds no
+        consistent improvement.</i></li>
+      <li><b>ETmax is a consistent null</b> — ns in every configuration, slightly positive in places. An honest null
+        across 3 datasets &times; 9 learners &times; 2 CV structures is a result; report it.</li>
+      <li><b>uWUE/WUE are borderline</b> — significant at 24m, not 12m. Describe as weak and window-dependent.</li>
+      <li><b>Do not compare R&sup2; across datasets.</b> tc&ge;50's R&sup2; is depressed ~41% by range restriction
+        (GPPsat sd 8.72 &rarr; 6.97) while its RMSE <i>improves</i> ~6.7%. Use RMSE across datasets; R&sup2; only
+        for ranking models within one.</li>
+      <li><b>Robustness sentence available:</b> <i>"The disturbance effect is invariant across nine learner
+        configurations (RF, XGBoost, LightGBM, each with tuned and Optuna variants) and two resampling structures;
+        the adopted configuration yields a mid-range estimate."</i></li>
+    </ol>
+  </section>
+
+  <div class="note">All figures are also available as PDF next to each PNG. This report references the image files by
+    relative path: keep it inside <code>plots/V10/</code> (V4.1, flux and signed-SHAP figures are read from <code>../paper_v41/</code>, <code>../paper_v41_fluxes/</code>, <code>../paper_v10_fluxes/</code> and <code>../paper_v10_efp/</code>).</div>
+</main>
+
+<div class="lightbox" id="lb"><img id="lbimg" alt="zoom"></div>
+
+<footer>Disturbance–flux interactive report (V2.2 and V4.1) · Optuna learners, tree cover &ge;30&nbsp;%.</footer>
+
+<script>
+const EFPS=['GPPsat','NEPmax','ETmax','uWUE','WUE'];
+const WINDOWS=['12m','24m'];
+const METHODS=[['tertiles','Tertiles'],['equal_width','Equal-width'],['natural_breaks','Natural breaks']];
+const SHAP_MODELS=[['M4','M4 (C+T+D)'],['M6_raw','M6 raw (C+D+Mem)'],['M6_anom','M6 anom (C+D+Mem)'],
+  ['M8_raw','M8 raw (C+T+D+Mem)'],['M8_anom','M8 anom (C+T+D+Mem)']];
+const DELTA_UNITS=['M1vsM2_12m','M1vsM2_24m','M3vsM4_12m','M3vsM4_24m',
+  'M5vsM6_raw_12m','M5vsM6_raw_24m','M5vsM6_anom_12m','M5vsM6_anom_24m',
+  'M7vsM8_raw_12m','M7vsM8_raw_24m','M7vsM8_anom_12m','M7vsM8_anom_24m'];
+const MODEL_WIN=[]; SHAP_MODELS.forEach(m=>WINDOWS.forEach(w=>MODEL_WIN.push(m[0]+'_'+w)));
+const MODEL_FAMS=['M1','M2','M3','M4','M5','M6','M7','M8'];
+
+const METRICS_LOO={"rfopt":{"sites_with_high_Tcover":[{"model":"M1_12m","response":"GPPsat","n_predictors":143,"n_pairs":395,"RMSE":7.682,"MAE":6.078,"R2":0.222},{"model":"M1_24m","response":"GPPsat","n_predictors":286,"n_pairs":395,"RMSE":7.705,"MAE":6.101,"R2":0.217},{"model":"M2_12m","response":"GPPsat","n_predictors":243,"n_pairs":395,"RMSE":7.002,"MAE":5.494,"R2":0.354},{"model":"M2_24m","response":"GPPsat","n_predictors":396,"n_pairs":395,"RMSE":7.054,"MAE":5.54,"R2":0.344},{"model":"M3_12m","response":"GPPsat","n_predictors":164,"n_pairs":395,"RMSE":7.818,"MAE":6.125,"R2":0.194},{"model":"M3_24m","response":"GPPsat","n_predictors":307,"n_pairs":395,"RMSE":7.849,"MAE":6.16,"R2":0.188},{"model":"M4_12m","response":"GPPsat","n_predictors":264,"n_pairs":395,"RMSE":7.359,"MAE":5.668,"R2":0.286},{"model":"M4_24m","response":"GPPsat","n_predictors":417,"n_pairs":395,"RMSE":7.389,"MAE":5.682,"R2":0.28},{"model":"M5_raw_12m","response":"GPPsat","n_predictors":144,"n_pairs":395,"RMSE":4.719,"MAE":3.429,"R2":0.706},{"model":"M5_raw_24m","response":"GPPsat","n_predictors":287,"n_pairs":395,"RMSE":4.771,"MAE":3.469,"R2":0.7},{"model":"M5_anom_12m","response":"GPPsat","n_predictors":144,"n_pairs":395,"RMSE":7.681,"MAE":6.071,"R2":0.222},{"model":"M5_anom_24m","response":"GPPsat","n_predictors":287,"n_pairs":395,"RMSE":7.7,"MAE":6.105,"R2":0.218},{"model":"M6_raw_12m","response":"GPPsat","n_predictors":244,"n_pairs":395,"RMSE":4.762,"MAE":3.454,"R2":0.701},{"model":"M6_raw_24m","response":"GPPsat","n_predictors":397,"n_pairs":395,"RMSE":4.773,"MAE":3.473,"R2":0.7},{"model":"M6_anom_12m","response":"GPPsat","n_predictors":244,"n_pairs":395,"RMSE":6.994,"MAE":5.492,"R2":0.355},{"model":"M6_anom_24m","response":"GPPsat","n_predictors":397,"n_pairs":395,"RMSE":7.068,"MAE":5.535,"R2":0.341},{"model":"M7_raw_12m","response":"GPPsat","n_predictors":165,"n_pairs":395,"RMSE":4.754,"MAE":3.438,"R2":0.702},{"model":"M7_raw_24m","response":"GPPsat","n_predictors":308,"n_pairs":395,"RMSE":4.798,"MAE":3.472,"R2":0.697},{"model":"M7_anom_12m","response":"GPPsat","n_predictors":165,"n_pairs":395,"RMSE":7.792,"MAE":6.104,"R2":0.2},{"model":"M7_anom_24m","response":"GPPsat","n_predictors":308,"n_pairs":395,"RMSE":7.852,"MAE":6.143,"R2":0.187},{"model":"M8_raw_12m","response":"GPPsat","n_predictors":265,"n_pairs":395,"RMSE":4.757,"MAE":3.441,"R2":0.702},{"model":"M8_raw_24m","response":"GPPsat","n_predictors":418,"n_pairs":395,"RMSE":4.794,"MAE":3.469,"R2":0.697},{"model":"M8_anom_12m","response":"GPPsat","n_predictors":265,"n_pairs":395,"RMSE":7.36,"MAE":5.667,"R2":0.286},{"model":"M8_anom_24m","response":"GPPsat","n_predictors":418,"n_pairs":395,"RMSE":7.378,"MAE":5.679,"R2":0.282},{"model":"M1_12m","response":"NEPmax","n_predictors":143,"n_pairs":395,"RMSE":7.658,"MAE":5.82,"R2":0.226},{"model":"M1_24m","response":"NEPmax","n_predictors":286,"n_pairs":395,"RMSE":7.697,"MAE":5.864,"R2":0.218},{"model":"M2_12m","response":"NEPmax","n_predictors":243,"n_pairs":395,"RMSE":6.59,"MAE":5.01,"R2":0.427},{"model":"M2_24m","response":"NEPmax","n_predictors":396,"n_pairs":395,"RMSE":6.642,"MAE":5.036,"R2":0.418},{"model":"M3_12m","response":"NEPmax","n_predictors":164,"n_pairs":395,"RMSE":7.991,"MAE":6.1,"R2":0.157},{"model":"M3_24m","response":"NEPmax","n_predictors":307,"n_pairs":395,"RMSE":7.935,"MAE":6.063,"R2":0.169},{"model":"M4_12m","response":"NEPmax","n_predictors":264,"n_pairs":395,"RMSE":7.166,"MAE":5.434,"R2":0.322},{"model":"M4_24m","response":"NEPmax","n_predictors":417,"n_pairs":395,"RMSE":7.164,"MAE":5.422,"R2":0.323},{"model":"M5_raw_12m","response":"NEPmax","n_predictors":144,"n_pairs":395,"RMSE":4.531,"MAE":2.933,"R2":0.729},{"model":"M5_raw_24m","response":"NEPmax","n_predictors":287,"n_pairs":395,"RMSE":4.488,"MAE":2.939,"R2":0.734},{"model":"M5_anom_12m","response":"NEPmax","n_predictors":144,"n_pairs":395,"RMSE":7.709,"MAE":5.866,"R2":0.215},{"model":"M5_anom_24m","response":"NEPmax","n_predictors":287,"n_pairs":395,"RMSE":7.676,"MAE":5.845,"R2":0.222},{"model":"M6_raw_12m","response":"NEPmax","n_predictors":244,"n_pairs":395,"RMSE":4.54,"MAE":2.981,"R2":0.728},{"model":"M6_raw_24m","response":"NEPmax","n_predictors":397,"n_pairs":395,"RMSE":4.455,"MAE":2.96,"R2":0.738},{"model":"M6_anom_12m","response":"NEPmax","n_predictors":244,"n_pairs":395,"RMSE":6.607,"MAE":5.012,"R2":0.424},{"model":"M6_anom_24m","response":"NEPmax","n_predictors":397,"n_pairs":395,"RMSE":6.63,"MAE":5.043,"R2":0.42},{"model":"M7_raw_12m","response":"NEPmax","n_predictors":165,"n_pairs":395,"RMSE":4.555,"MAE":3.006,"R2":0.726},{"model":"M7_raw_24m","response":"NEPmax","n_predictors":308,"n_pairs":395,"RMSE":4.507,"MAE":2.98,"R2":0.732},{"model":"M7_anom_12m","response":"NEPmax","n_predictors":165,"n_pairs":395,"RMSE":7.956,"MAE":6.111,"R2":0.164},{"model":"M7_anom_24m","response":"NEPmax","n_predictors":308,"n_pairs":395,"RMSE":7.897,"MAE":6.021,"R2":0.177},{"model":"M8_raw_12m","response":"NEPmax","n_predictors":265,"n_pairs":395,"RMSE":4.532,"MAE":2.992,"R2":0.729},{"model":"M8_raw_24m","response":"NEPmax","n_predictors":418,"n_pairs":395,"RMSE":4.5,"MAE":3.006,"R2":0.733},{"model":"M8_anom_12m","response":"NEPmax","n_predictors":265,"n_pairs":395,"RMSE":7.186,"MAE":5.437,"R2":0.318},{"model":"M8_anom_24m","response":"NEPmax","n_predictors":418,"n_pairs":395,"RMSE":7.159,"MAE":5.415,"R2":0.323},{"model":"M1_12m","response":"ETmax","n_predictors":143,"n_pairs":395,"RMSE":0.052,"MAE":0.039,"R2":0.364},{"model":"M1_24m","response":"ETmax","n_predictors":286,"n_pairs":395,"RMSE":0.052,"MAE":0.039,"R2":0.361},{"model":"M2_12m","response":"ETmax","n_predictors":243,"n_pairs":395,"RMSE":0.053,"MAE":0.04,"R2":0.358},{"model":"M2_24m","response":"ETmax","n_predictors":396,"n_pairs":395,"RMSE":0.053,"MAE":0.04,"R2":0.359},{"model":"M3_12m","response":"ETmax","n_predictors":164,"n_pairs":395,"RMSE":0.051,"MAE":0.038,"R2":0.398},{"model":"M3_24m","response":"ETmax","n_predictors":307,"n_pairs":395,"RMSE":0.051,"MAE":0.038,"R2":0.397},{"model":"M4_12m","response":"ETmax","n_predictors":264,"n_pairs":395,"RMSE":0.051,"MAE":0.038,"R2":0.405},{"model":"M4_24m","response":"ETmax","n_predictors":417,"n_pairs":395,"RMSE":0.051,"MAE":0.038,"R2":0.394},{"model":"M5_raw_12m","response":"ETmax","n_predictors":144,"n_pairs":395,"RMSE":0.038,"MAE":0.027,"R2":0.669},{"model":"M5_raw_24m","response":"ETmax","n_predictors":287,"n_pairs":395,"RMSE":0.038,"MAE":0.027,"R2":0.659},{"model":"M5_anom_12m","response":"ETmax","n_predictors":144,"n_pairs":395,"RMSE":0.052,"MAE":0.039,"R2":0.361},{"model":"M5_anom_24m","response":"ETmax","n_predictors":287,"n_pairs":395,"RMSE":0.052,"MAE":0.039,"R2":0.361},{"model":"M6_raw_12m","response":"ETmax","n_predictors":244,"n_pairs":395,"RMSE":0.038,"MAE":0.027,"R2":0.666},{"model":"M6_raw_24m","response":"ETmax","n_predictors":397,"n_pairs":395,"RMSE":0.038,"MAE":0.027,"R2":0.659},{"model":"M6_anom_12m","response":"ETmax","n_predictors":244,"n_pairs":395,"RMSE":0.052,"MAE":0.04,"R2":0.36},{"model":"M6_anom_24m","response":"ETmax","n_predictors":397,"n_pairs":395,"RMSE":0.053,"MAE":0.04,"R2":0.358},{"model":"M7_raw_12m","response":"ETmax","n_predictors":165,"n_pairs":395,"RMSE":0.038,"MAE":0.027,"R2":0.667},{"model":"M7_raw_24m","response":"ETmax","n_predictors":308,"n_pairs":395,"RMSE":0.038,"MAE":0.027,"R2":0.66},{"model":"M7_anom_12m","response":"ETmax","n_predictors":165,"n_pairs":395,"RMSE":0.051,"MAE":0.038,"R2":0.395},{"model":"M7_anom_24m","response":"ETmax","n_predictors":308,"n_pairs":395,"RMSE":0.051,"MAE":0.038,"R2":0.398},{"model":"M8_raw_12m","response":"ETmax","n_predictors":265,"n_pairs":395,"RMSE":0.038,"MAE":0.027,"R2":0.663},{"model":"M8_raw_24m","response":"ETmax","n_predictors":418,"n_pairs":395,"RMSE":0.038,"MAE":0.027,"R2":0.661},{"model":"M8_anom_12m","response":"ETmax","n_predictors":265,"n_pairs":395,"RMSE":0.051,"MAE":0.038,"R2":0.397},{"model":"M8_anom_24m","response":"ETmax","n_predictors":418,"n_pairs":395,"RMSE":0.051,"MAE":0.038,"R2":0.392},{"model":"M1_12m","response":"uWUE","n_predictors":143,"n_pairs":395,"RMSE":0.937,"MAE":0.717,"R2":0.115},{"model":"M1_24m","response":"uWUE","n_predictors":286,"n_pairs":395,"RMSE":0.929,"MAE":0.712,"R2":0.131},{"model":"M2_12m","response":"uWUE","n_predictors":243,"n_pairs":395,"RMSE":0.897,"MAE":0.684,"R2":0.189},{"model":"M2_24m","response":"uWUE","n_predictors":396,"n_pairs":395,"RMSE":0.901,"MAE":0.685,"R2":0.182},{"model":"M3_12m","response":"uWUE","n_predictors":164,"n_pairs":395,"RMSE":0.99,"MAE":0.756,"R2":0.012},{"model":"M3_24m","response":"uWUE","n_predictors":307,"n_pairs":395,"RMSE":0.98,"MAE":0.746,"R2":0.033},{"model":"M4_12m","response":"uWUE","n_predictors":264,"n_pairs":395,"RMSE":0.948,"MAE":0.715,"R2":0.096},{"model":"M4_24m","response":"uWUE","n_predictors":417,"n_pairs":395,"RMSE":0.942,"MAE":0.712,"R2":0.106},{"model":"M5_raw_12m","response":"uWUE","n_predictors":144,"n_pairs":395,"RMSE":0.595,"MAE":0.435,"R2":0.644},{"model":"M5_raw_24m","response":"uWUE","n_predictors":287,"n_pairs":395,"RMSE":0.59,"MAE":0.432,"R2":0.65},{"model":"M5_anom_12m","response":"uWUE","n_predictors":144,"n_pairs":395,"RMSE":0.932,"MAE":0.713,"R2":0.125},{"model":"M5_anom_24m","response":"uWUE","n_predictors":287,"n_pairs":395,"RMSE":0.93,"MAE":0.712,"R2":0.13},{"model":"M6_raw_12m","response":"uWUE","n_predictors":244,"n_pairs":395,"RMSE":0.602,"MAE":0.444,"R2":0.635},{"model":"M6_raw_24m","response":"uWUE","n_predictors":397,"n_pairs":395,"RMSE":0.595,"MAE":0.438,"R2":0.644},{"model":"M6_anom_12m","response":"uWUE","n_predictors":244,"n_pairs":395,"RMSE":0.898,"MAE":0.681,"R2":0.188},{"model":"M6_anom_24m","response":"uWUE","n_predictors":397,"n_pairs":395,"RMSE":0.901,"MAE":0.685,"R2":0.182},{"model":"M7_raw_12m","response":"uWUE","n_predictors":165,"n_pairs":395,"RMSE":0.597,"MAE":0.435,"R2":0.641},{"model":"M7_raw_24m","response":"uWUE","n_predictors":308,"n_pairs":395,"RMSE":0.593,"MAE":0.434,"R2":0.647},{"model":"M7_anom_12m","response":"uWUE","n_predictors":165,"n_pairs":395,"RMSE":0.993,"MAE":0.759,"R2":0.008},{"model":"M7_anom_24m","response":"uWUE","n_predictors":308,"n_pairs":395,"RMSE":0.98,"MAE":0.746,"R2":0.032},{"model":"M8_raw_12m","response":"uWUE","n_predictors":265,"n_pairs":395,"RMSE":0.604,"MAE":0.445,"R2":0.633},{"model":"M8_raw_24m","response":"uWUE","n_predictors":418,"n_pairs":395,"RMSE":0.599,"MAE":0.441,"R2":0.639},{"model":"M8_anom_12m","response":"uWUE","n_predictors":265,"n_pairs":395,"RMSE":0.944,"MAE":0.709,"R2":0.102},{"model":"M8_anom_24m","response":"uWUE","n_predictors":418,"n_pairs":395,"RMSE":0.942,"MAE":0.712,"R2":0.106},{"model":"M1_12m","response":"WUE","n_predictors":143,"n_pairs":395,"RMSE":0.962,"MAE":0.722,"R2":0.205},{"model":"M1_24m","response":"WUE","n_predictors":286,"n_pairs":395,"RMSE":0.966,"MAE":0.726,"R2":0.199},{"model":"M2_12m","response":"WUE","n_predictors":243,"n_pairs":395,"RMSE":0.909,"MAE":0.678,"R2":0.291},{"model":"M2_24m","response":"WUE","n_predictors":396,"n_pairs":395,"RMSE":0.917,"MAE":0.679,"R2":0.277},{"model":"M3_12m","response":"WUE","n_predictors":164,"n_pairs":395,"RMSE":0.997,"MAE":0.742,"R2":0.147},{"model":"M3_24m","response":"WUE","n_predictors":307,"n_pairs":395,"RMSE":1.005,"MAE":0.749,"R2":0.133},{"model":"M4_12m","response":"WUE","n_predictors":264,"n_pairs":395,"RMSE":0.943,"MAE":0.699,"R2":0.237},{"model":"M4_24m","response":"WUE","n_predictors":417,"n_pairs":395,"RMSE":0.949,"MAE":0.703,"R2":0.226},{"model":"M5_raw_12m","response":"WUE","n_predictors":144,"n_pairs":395,"RMSE":0.617,"MAE":0.456,"R2":0.673},{"model":"M5_raw_24m","response":"WUE","n_predictors":287,"n_pairs":395,"RMSE":0.619,"MAE":0.459,"R2":0.671},{"model":"M5_anom_12m","response":"WUE","n_predictors":144,"n_pairs":395,"RMSE":0.961,"MAE":0.72,"R2":0.207},{"model":"M5_anom_24m","response":"WUE","n_predictors":287,"n_pairs":395,"RMSE":0.966,"MAE":0.727,"R2":0.198},{"model":"M6_raw_12m","response":"WUE","n_predictors":244,"n_pairs":395,"RMSE":0.611,"MAE":0.454,"R2":0.679},{"model":"M6_raw_24m","response":"WUE","n_predictors":397,"n_pairs":395,"RMSE":0.616,"MAE":0.46,"R2":0.674},{"model":"M6_anom_12m","response":"WUE","n_predictors":244,"n_pairs":395,"RMSE":0.907,"MAE":0.676,"R2":0.294},{"model":"M6_anom_24m","response":"WUE","n_predictors":397,"n_pairs":395,"RMSE":0.917,"MAE":0.68,"R2":0.278},{"model":"M7_raw_12m","response":"WUE","n_predictors":165,"n_pairs":395,"RMSE":0.616,"MAE":0.458,"R2":0.674},{"model":"M7_raw_24m","response":"WUE","n_predictors":308,"n_pairs":395,"RMSE":0.616,"MAE":0.456,"R2":0.675},{"model":"M7_anom_12m","response":"WUE","n_predictors":165,"n_pairs":395,"RMSE":0.994,"MAE":0.739,"R2":0.152},{"model":"M7_anom_24m","response":"WUE","n_predictors":308,"n_pairs":395,"RMSE":1.002,"MAE":0.745,"R2":0.137},{"model":"M8_raw_12m","response":"WUE","n_predictors":265,"n_pairs":395,"RMSE":0.615,"MAE":0.459,"R2":0.675},{"model":"M8_raw_24m","response":"WUE","n_predictors":418,"n_pairs":395,"RMSE":0.615,"MAE":0.458,"R2":0.676},{"model":"M8_anom_12m","response":"WUE","n_predictors":265,"n_pairs":395,"RMSE":0.95,"MAE":0.704,"R2":0.224},{"model":"M8_anom_24m","response":"WUE","n_predictors":418,"n_pairs":395,"RMSE":0.946,"MAE":0.701,"R2":0.231}]},"xgbopt":{"sites_with_high_Tcover":[{"model":"M1_12m","response":"GPPsat","n_predictors":143,"n_pairs":395,"RMSE":7.769,"MAE":6.141,"R2":0.204},{"model":"M1_24m","response":"GPPsat","n_predictors":286,"n_pairs":395,"RMSE":7.85,"MAE":6.277,"R2":0.188},{"model":"M2_12m","response":"GPPsat","n_predictors":243,"n_pairs":395,"RMSE":6.832,"MAE":5.317,"R2":0.385},{"model":"M2_24m","response":"GPPsat","n_predictors":396,"n_pairs":395,"RMSE":6.918,"MAE":5.405,"R2":0.369},{"model":"M3_12m","response":"GPPsat","n_predictors":164,"n_pairs":395,"RMSE":7.834,"MAE":6.136,"R2":0.191},{"model":"M3_24m","response":"GPPsat","n_predictors":307,"n_pairs":395,"RMSE":7.927,"MAE":6.214,"R2":0.172},{"model":"M4_12m","response":"GPPsat","n_predictors":264,"n_pairs":395,"RMSE":6.973,"MAE":5.315,"R2":0.359},{"model":"M4_24m","response":"GPPsat","n_predictors":417,"n_pairs":395,"RMSE":7.009,"MAE":5.409,"R2":0.352},{"model":"M5_raw_12m","response":"GPPsat","n_predictors":144,"n_pairs":395,"RMSE":4.779,"MAE":3.551,"R2":0.699},{"model":"M5_raw_24m","response":"GPPsat","n_predictors":287,"n_pairs":395,"RMSE":4.995,"MAE":3.781,"R2":0.671},{"model":"M5_anom_12m","response":"GPPsat","n_predictors":144,"n_pairs":395,"RMSE":7.759,"MAE":6.132,"R2":0.206},{"model":"M5_anom_24m","response":"GPPsat","n_predictors":287,"n_pairs":395,"RMSE":7.777,"MAE":6.159,"R2":0.203},{"model":"M6_raw_12m","response":"GPPsat","n_predictors":244,"n_pairs":395,"RMSE":4.739,"MAE":3.513,"R2":0.704},{"model":"M6_raw_24m","response":"GPPsat","n_predictors":397,"n_pairs":395,"RMSE":4.886,"MAE":3.67,"R2":0.685},{"model":"M6_anom_12m","response":"GPPsat","n_predictors":244,"n_pairs":395,"RMSE":6.786,"MAE":5.286,"R2":0.393},{"model":"M6_anom_24m","response":"GPPsat","n_predictors":397,"n_pairs":395,"RMSE":6.921,"MAE":5.397,"R2":0.368},{"model":"M7_raw_12m","response":"GPPsat","n_predictors":165,"n_pairs":395,"RMSE":4.948,"MAE":3.652,"R2":0.677},{"model":"M7_raw_24m","response":"GPPsat","n_predictors":308,"n_pairs":395,"RMSE":5.124,"MAE":3.813,"R2":0.654},{"model":"M7_anom_12m","response":"GPPsat","n_predictors":165,"n_pairs":395,"RMSE":7.81,"MAE":6.139,"R2":0.196},{"model":"M7_anom_24m","response":"GPPsat","n_predictors":308,"n_pairs":395,"RMSE":7.98,"MAE":6.323,"R2":0.16},{"model":"M8_raw_12m","response":"GPPsat","n_predictors":265,"n_pairs":395,"RMSE":4.824,"MAE":3.544,"R2":0.693},{"model":"M8_raw_24m","response":"GPPsat","n_predictors":418,"n_pairs":395,"RMSE":5.117,"MAE":3.809,"R2":0.655},{"model":"M8_anom_12m","response":"GPPsat","n_predictors":265,"n_pairs":395,"RMSE":6.912,"MAE":5.255,"R2":0.37},{"model":"M8_anom_24m","response":"GPPsat","n_predictors":418,"n_pairs":395,"RMSE":7.007,"MAE":5.402,"R2":0.353},{"model":"M1_12m","response":"NEPmax","n_predictors":143,"n_pairs":395,"RMSE":7.886,"MAE":6.041,"R2":0.179},{"model":"M1_24m","response":"NEPmax","n_predictors":286,"n_pairs":395,"RMSE":7.753,"MAE":5.945,"R2":0.206},{"model":"M2_12m","response":"NEPmax","n_predictors":243,"n_pairs":395,"RMSE":6.352,"MAE":4.75,"R2":0.467},{"model":"M2_24m","response":"NEPmax","n_predictors":396,"n_pairs":395,"RMSE":6.698,"MAE":5.078,"R2":0.408},{"model":"M3_12m","response":"NEPmax","n_predictors":164,"n_pairs":395,"RMSE":7.823,"MAE":5.94,"R2":0.192},{"model":"M3_24m","response":"NEPmax","n_predictors":307,"n_pairs":395,"RMSE":7.791,"MAE":5.856,"R2":0.199},{"model":"M4_12m","response":"NEPmax","n_predictors":264,"n_pairs":395,"RMSE":6.713,"MAE":5.014,"R2":0.405},{"model":"M4_24m","response":"NEPmax","n_predictors":417,"n_pairs":395,"RMSE":6.913,"MAE":5.233,"R2":0.369},{"model":"M5_raw_12m","response":"NEPmax","n_predictors":144,"n_pairs":395,"RMSE":4.432,"MAE":3.116,"R2":0.741},{"model":"M5_raw_24m","response":"NEPmax","n_predictors":287,"n_pairs":395,"RMSE":4.294,"MAE":2.894,"R2":0.757},{"model":"M5_anom_12m","response":"NEPmax","n_predictors":144,"n_pairs":395,"RMSE":7.932,"MAE":6.092,"R2":0.169},{"model":"M5_anom_24m","response":"NEPmax","n_predictors":287,"n_pairs":395,"RMSE":7.764,"MAE":5.946,"R2":0.204},{"model":"M6_raw_12m","response":"NEPmax","n_predictors":244,"n_pairs":395,"RMSE":4.314,"MAE":2.962,"R2":0.754},{"model":"M6_raw_24m","response":"NEPmax","n_predictors":397,"n_pairs":395,"RMSE":4.221,"MAE":2.865,"R2":0.765},{"model":"M6_anom_12m","response":"NEPmax","n_predictors":244,"n_pairs":395,"RMSE":6.374,"MAE":4.807,"R2":0.464},{"model":"M6_anom_24m","response":"NEPmax","n_predictors":397,"n_pairs":395,"RMSE":6.661,"MAE":5.034,"R2":0.414},{"model":"M7_raw_12m","response":"NEPmax","n_predictors":165,"n_pairs":395,"RMSE":4.513,"MAE":3.2,"R2":0.731},{"model":"M7_raw_24m","response":"NEPmax","n_predictors":308,"n_pairs":395,"RMSE":4.389,"MAE":2.961,"R2":0.746},{"model":"M7_anom_12m","response":"NEPmax","n_predictors":165,"n_pairs":395,"RMSE":7.879,"MAE":6.06,"R2":0.18},{"model":"M7_anom_24m","response":"NEPmax","n_predictors":308,"n_pairs":395,"RMSE":7.826,"MAE":5.888,"R2":0.191},{"model":"M8_raw_12m","response":"NEPmax","n_predictors":265,"n_pairs":395,"RMSE":4.376,"MAE":3.048,"R2":0.747},{"model":"M8_raw_24m","response":"NEPmax","n_predictors":418,"n_pairs":395,"RMSE":4.316,"MAE":2.93,"R2":0.754},{"model":"M8_anom_12m","response":"NEPmax","n_predictors":265,"n_pairs":395,"RMSE":6.775,"MAE":5.003,"R2":0.394},{"model":"M8_anom_24m","response":"NEPmax","n_predictors":418,"n_pairs":395,"RMSE":6.908,"MAE":5.221,"R2":0.37},{"model":"M1_12m","response":"ETmax","n_predictors":143,"n_pairs":395,"RMSE":0.055,"MAE":0.041,"R2":0.306},{"model":"M1_24m","response":"ETmax","n_predictors":286,"n_pairs":395,"RMSE":0.053,"MAE":0.04,"R2":0.357},{"model":"M2_12m","response":"ETmax","n_predictors":243,"n_pairs":395,"RMSE":0.054,"MAE":0.04,"R2":0.328},{"model":"M2_24m","response":"ETmax","n_predictors":396,"n_pairs":395,"RMSE":0.052,"MAE":0.04,"R2":0.362},{"model":"M3_12m","response":"ETmax","n_predictors":164,"n_pairs":395,"RMSE":0.05,"MAE":0.036,"R2":0.42},{"model":"M3_24m","response":"ETmax","n_predictors":307,"n_pairs":395,"RMSE":0.05,"MAE":0.037,"R2":0.416},{"model":"M4_12m","response":"ETmax","n_predictors":264,"n_pairs":395,"RMSE":0.05,"MAE":0.037,"R2":0.419},{"model":"M4_24m","response":"ETmax","n_predictors":417,"n_pairs":395,"RMSE":0.05,"MAE":0.037,"R2":0.421},{"model":"M5_raw_12m","response":"ETmax","n_predictors":144,"n_pairs":395,"RMSE":0.037,"MAE":0.027,"R2":0.673},{"model":"M5_raw_24m","response":"ETmax","n_predictors":287,"n_pairs":395,"RMSE":0.037,"MAE":0.026,"R2":0.674},{"model":"M5_anom_12m","response":"ETmax","n_predictors":144,"n_pairs":395,"RMSE":0.054,"MAE":0.04,"R2":0.317},{"model":"M5_anom_24m","response":"ETmax","n_predictors":287,"n_pairs":395,"RMSE":0.052,"MAE":0.039,"R2":0.366},{"model":"M6_raw_12m","response":"ETmax","n_predictors":244,"n_pairs":395,"RMSE":0.037,"MAE":0.027,"R2":0.675},{"model":"M6_raw_24m","response":"ETmax","n_predictors":397,"n_pairs":395,"RMSE":0.037,"MAE":0.026,"R2":0.677},{"model":"M6_anom_12m","response":"ETmax","n_predictors":244,"n_pairs":395,"RMSE":0.054,"MAE":0.04,"R2":0.327},{"model":"M6_anom_24m","response":"ETmax","n_predictors":397,"n_pairs":395,"RMSE":0.052,"MAE":0.04,"R2":0.366},{"model":"M7_raw_12m","response":"ETmax","n_predictors":165,"n_pairs":395,"RMSE":0.038,"MAE":0.027,"R2":0.67},{"model":"M7_raw_24m","response":"ETmax","n_predictors":308,"n_pairs":395,"RMSE":0.038,"MAE":0.026,"R2":0.672},{"model":"M7_anom_12m","response":"ETmax","n_predictors":165,"n_pairs":395,"RMSE":0.05,"MAE":0.037,"R2":0.418},{"model":"M7_anom_24m","response":"ETmax","n_predictors":308,"n_pairs":395,"RMSE":0.05,"MAE":0.037,"R2":0.421},{"model":"M8_raw_12m","response":"ETmax","n_predictors":265,"n_pairs":395,"RMSE":0.037,"MAE":0.027,"R2":0.673},{"model":"M8_raw_24m","response":"ETmax","n_predictors":418,"n_pairs":395,"RMSE":0.038,"MAE":0.026,"R2":0.672},{"model":"M8_anom_12m","response":"ETmax","n_predictors":265,"n_pairs":395,"RMSE":0.05,"MAE":0.037,"R2":0.411},{"model":"M8_anom_24m","response":"ETmax","n_predictors":418,"n_pairs":395,"RMSE":0.05,"MAE":0.037,"R2":0.423},{"model":"M1_12m","response":"uWUE","n_predictors":143,"n_pairs":395,"RMSE":0.932,"MAE":0.714,"R2":0.125},{"model":"M1_24m","response":"uWUE","n_predictors":286,"n_pairs":395,"RMSE":0.926,"MAE":0.712,"R2":0.136},{"model":"M2_12m","response":"uWUE","n_predictors":243,"n_pairs":395,"RMSE":0.869,"MAE":0.668,"R2":0.24},{"model":"M2_24m","response":"uWUE","n_predictors":396,"n_pairs":395,"RMSE":0.866,"MAE":0.662,"R2":0.245},{"model":"M3_12m","response":"uWUE","n_predictors":164,"n_pairs":395,"RMSE":0.976,"MAE":0.739,"R2":0.041},{"model":"M3_24m","response":"uWUE","n_predictors":307,"n_pairs":395,"RMSE":0.976,"MAE":0.751,"R2":0.041},{"model":"M4_12m","response":"uWUE","n_predictors":264,"n_pairs":395,"RMSE":0.927,"MAE":0.716,"R2":0.134},{"model":"M4_24m","response":"uWUE","n_predictors":417,"n_pairs":395,"RMSE":0.92,"MAE":0.701,"R2":0.149},{"model":"M5_raw_12m","response":"uWUE","n_predictors":144,"n_pairs":395,"RMSE":0.597,"MAE":0.425,"R2":0.642},{"model":"M5_raw_24m","response":"uWUE","n_predictors":287,"n_pairs":395,"RMSE":0.601,"MAE":0.437,"R2":0.637},{"model":"M5_anom_12m","response":"uWUE","n_predictors":144,"n_pairs":395,"RMSE":0.918,"MAE":0.706,"R2":0.151},{"model":"M5_anom_24m","response":"uWUE","n_predictors":287,"n_pairs":395,"RMSE":0.929,"MAE":0.712,"R2":0.131},{"model":"M6_raw_12m","response":"uWUE","n_predictors":244,"n_pairs":395,"RMSE":0.607,"MAE":0.436,"R2":0.63},{"model":"M6_raw_24m","response":"uWUE","n_predictors":397,"n_pairs":395,"RMSE":0.595,"MAE":0.432,"R2":0.643},{"model":"M6_anom_12m","response":"uWUE","n_predictors":244,"n_pairs":395,"RMSE":0.87,"MAE":0.669,"R2":0.238},{"model":"M6_anom_24m","response":"uWUE","n_predictors":397,"n_pairs":395,"RMSE":0.877,"MAE":0.669,"R2":0.226},{"model":"M7_raw_12m","response":"uWUE","n_predictors":165,"n_pairs":395,"RMSE":0.604,"MAE":0.436,"R2":0.632},{"model":"M7_raw_24m","response":"uWUE","n_predictors":308,"n_pairs":395,"RMSE":0.613,"MAE":0.446,"R2":0.622},{"model":"M7_anom_12m","response":"uWUE","n_predictors":165,"n_pairs":395,"RMSE":0.968,"MAE":0.738,"R2":0.058},{"model":"M7_anom_24m","response":"uWUE","n_predictors":308,"n_pairs":395,"RMSE":0.978,"MAE":0.748,"R2":0.037},{"model":"M8_raw_12m","response":"uWUE","n_predictors":265,"n_pairs":395,"RMSE":0.61,"MAE":0.438,"R2":0.625},{"model":"M8_raw_24m","response":"uWUE","n_predictors":418,"n_pairs":395,"RMSE":0.603,"MAE":0.437,"R2":0.633},{"model":"M8_anom_12m","response":"uWUE","n_predictors":265,"n_pairs":395,"RMSE":0.935,"MAE":0.718,"R2":0.12},{"model":"M8_anom_24m","response":"uWUE","n_predictors":418,"n_pairs":395,"RMSE":0.919,"MAE":0.703,"R2":0.149},{"model":"M1_12m","response":"WUE","n_predictors":143,"n_pairs":395,"RMSE":0.951,"MAE":0.722,"R2":0.223},{"model":"M1_24m","response":"WUE","n_predictors":286,"n_pairs":395,"RMSE":0.951,"MAE":0.734,"R2":0.223},{"model":"M2_12m","response":"WUE","n_predictors":243,"n_pairs":395,"RMSE":0.866,"MAE":0.665,"R2":0.356},{"model":"M2_24m","response":"WUE","n_predictors":396,"n_pairs":395,"RMSE":0.882,"MAE":0.672,"R2":0.332},{"model":"M3_12m","response":"WUE","n_predictors":164,"n_pairs":395,"RMSE":1.016,"MAE":0.771,"R2":0.113},{"model":"M3_24m","response":"WUE","n_predictors":307,"n_pairs":395,"RMSE":1.039,"MAE":0.792,"R2":0.073},{"model":"M4_12m","response":"WUE","n_predictors":264,"n_pairs":395,"RMSE":0.914,"MAE":0.699,"R2":0.282},{"model":"M4_24m","response":"WUE","n_predictors":417,"n_pairs":395,"RMSE":0.943,"MAE":0.713,"R2":0.236},{"model":"M5_raw_12m","response":"WUE","n_predictors":144,"n_pairs":395,"RMSE":0.639,"MAE":0.474,"R2":0.649},{"model":"M5_raw_24m","response":"WUE","n_predictors":287,"n_pairs":395,"RMSE":0.659,"MAE":0.488,"R2":0.627},{"model":"M5_anom_12m","response":"WUE","n_predictors":144,"n_pairs":395,"RMSE":0.955,"MAE":0.729,"R2":0.218},{"model":"M5_anom_24m","response":"WUE","n_predictors":287,"n_pairs":395,"RMSE":0.95,"MAE":0.732,"R2":0.224},{"model":"M6_raw_12m","response":"WUE","n_predictors":244,"n_pairs":395,"RMSE":0.617,"MAE":0.457,"R2":0.673},{"model":"M6_raw_24m","response":"WUE","n_predictors":397,"n_pairs":395,"RMSE":0.639,"MAE":0.48,"R2":0.649},{"model":"M6_anom_12m","response":"WUE","n_predictors":244,"n_pairs":395,"RMSE":0.871,"MAE":0.671,"R2":0.348},{"model":"M6_anom_24m","response":"WUE","n_predictors":397,"n_pairs":395,"RMSE":0.876,"MAE":0.664,"R2":0.341},{"model":"M7_raw_12m","response":"WUE","n_predictors":165,"n_pairs":395,"RMSE":0.645,"MAE":0.478,"R2":0.643},{"model":"M7_raw_24m","response":"WUE","n_predictors":308,"n_pairs":395,"RMSE":0.664,"MAE":0.489,"R2":0.621},{"model":"M7_anom_12m","response":"WUE","n_predictors":165,"n_pairs":395,"RMSE":1.013,"MAE":0.766,"R2":0.119},{"model":"M7_anom_24m","response":"WUE","n_predictors":308,"n_pairs":395,"RMSE":1.048,"MAE":0.798,"R2":0.056},{"model":"M8_raw_12m","response":"WUE","n_predictors":265,"n_pairs":395,"RMSE":0.627,"MAE":0.469,"R2":0.662},{"model":"M8_raw_24m","response":"WUE","n_predictors":418,"n_pairs":395,"RMSE":0.645,"MAE":0.484,"R2":0.643},{"model":"M8_anom_12m","response":"WUE","n_predictors":265,"n_pairs":395,"RMSE":0.901,"MAE":0.682,"R2":0.302},{"model":"M8_anom_24m","response":"WUE","n_predictors":418,"n_pairs":395,"RMSE":0.943,"MAE":0.716,"R2":0.236}]},"lgbopt":{"sites_with_high_Tcover":[{"model":"M1_12m","response":"GPPsat","n_predictors":143,"n_pairs":395,"RMSE":8.034,"MAE":6.314,"R2":0.149},{"model":"M1_24m","response":"GPPsat","n_predictors":286,"n_pairs":395,"RMSE":7.711,"MAE":6.148,"R2":0.216},{"model":"M2_12m","response":"GPPsat","n_predictors":243,"n_pairs":395,"RMSE":6.859,"MAE":5.377,"R2":0.38},{"model":"M2_24m","response":"GPPsat","n_predictors":396,"n_pairs":395,"RMSE":6.945,"MAE":5.432,"R2":0.364},{"model":"M3_12m","response":"GPPsat","n_predictors":164,"n_pairs":395,"RMSE":7.996,"MAE":6.244,"R2":0.157},{"model":"M3_24m","response":"GPPsat","n_predictors":307,"n_pairs":395,"RMSE":7.8,"MAE":6.151,"R2":0.198},{"model":"M4_12m","response":"GPPsat","n_predictors":264,"n_pairs":395,"RMSE":6.989,"MAE":5.388,"R2":0.356},{"model":"M4_24m","response":"GPPsat","n_predictors":417,"n_pairs":395,"RMSE":6.99,"MAE":5.36,"R2":0.356},{"model":"M5_raw_12m","response":"GPPsat","n_predictors":144,"n_pairs":395,"RMSE":4.835,"MAE":3.599,"R2":0.692},{"model":"M5_raw_24m","response":"GPPsat","n_predictors":287,"n_pairs":395,"RMSE":4.734,"MAE":3.471,"R2":0.704},{"model":"M5_anom_12m","response":"GPPsat","n_predictors":144,"n_pairs":395,"RMSE":7.966,"MAE":6.292,"R2":0.163},{"model":"M5_anom_24m","response":"GPPsat","n_predictors":287,"n_pairs":395,"RMSE":7.724,"MAE":6.136,"R2":0.213},{"model":"M6_raw_12m","response":"GPPsat","n_predictors":244,"n_pairs":395,"RMSE":4.776,"MAE":3.523,"R2":0.699},{"model":"M6_raw_24m","response":"GPPsat","n_predictors":397,"n_pairs":395,"RMSE":4.726,"MAE":3.502,"R2":0.706},{"model":"M6_anom_12m","response":"GPPsat","n_predictors":244,"n_pairs":395,"RMSE":6.899,"MAE":5.42,"R2":0.373},{"model":"M6_anom_24m","response":"GPPsat","n_predictors":397,"n_pairs":395,"RMSE":6.896,"MAE":5.365,"R2":0.373},{"model":"M7_raw_12m","response":"GPPsat","n_predictors":165,"n_pairs":395,"RMSE":4.938,"MAE":3.655,"R2":0.678},{"model":"M7_raw_24m","response":"GPPsat","n_predictors":308,"n_pairs":395,"RMSE":4.796,"MAE":3.494,"R2":0.697},{"model":"M7_anom_12m","response":"GPPsat","n_predictors":165,"n_pairs":395,"RMSE":8.038,"MAE":6.193,"R2":0.148},{"model":"M7_anom_24m","response":"GPPsat","n_predictors":308,"n_pairs":395,"RMSE":7.783,"MAE":6.138,"R2":0.201},{"model":"M8_raw_12m","response":"GPPsat","n_predictors":265,"n_pairs":395,"RMSE":4.711,"MAE":3.464,"R2":0.707},{"model":"M8_raw_24m","response":"GPPsat","n_predictors":418,"n_pairs":395,"RMSE":4.748,"MAE":3.479,"R2":0.703},{"model":"M8_anom_12m","response":"GPPsat","n_predictors":265,"n_pairs":395,"RMSE":7.033,"MAE":5.421,"R2":0.348},{"model":"M8_anom_24m","response":"GPPsat","n_predictors":418,"n_pairs":395,"RMSE":6.994,"MAE":5.358,"R2":0.355},{"model":"M1_12m","response":"NEPmax","n_predictors":143,"n_pairs":395,"RMSE":7.853,"MAE":6.03,"R2":0.186},{"model":"M1_24m","response":"NEPmax","n_predictors":286,"n_pairs":395,"RMSE":7.855,"MAE":5.914,"R2":0.185},{"model":"M2_12m","response":"NEPmax","n_predictors":243,"n_pairs":395,"RMSE":6.445,"MAE":4.811,"R2":0.452},{"model":"M2_24m","response":"NEPmax","n_predictors":396,"n_pairs":395,"RMSE":6.503,"MAE":4.849,"R2":0.442},{"model":"M3_12m","response":"NEPmax","n_predictors":164,"n_pairs":395,"RMSE":7.885,"MAE":5.98,"R2":0.179},{"model":"M3_24m","response":"NEPmax","n_predictors":307,"n_pairs":395,"RMSE":7.948,"MAE":5.964,"R2":0.166},{"model":"M4_12m","response":"NEPmax","n_predictors":264,"n_pairs":395,"RMSE":6.768,"MAE":4.99,"R2":0.395},{"model":"M4_24m","response":"NEPmax","n_predictors":417,"n_pairs":395,"RMSE":6.758,"MAE":5.023,"R2":0.397},{"model":"M5_raw_12m","response":"NEPmax","n_predictors":144,"n_pairs":395,"RMSE":4.425,"MAE":3.123,"R2":0.742},{"model":"M5_raw_24m","response":"NEPmax","n_predictors":287,"n_pairs":395,"RMSE":4.409,"MAE":3.052,"R2":0.743},{"model":"M5_anom_12m","response":"NEPmax","n_predictors":144,"n_pairs":395,"RMSE":7.82,"MAE":5.991,"R2":0.193},{"model":"M5_anom_24m","response":"NEPmax","n_predictors":287,"n_pairs":395,"RMSE":7.848,"MAE":5.943,"R2":0.187},{"model":"M6_raw_12m","response":"NEPmax","n_predictors":244,"n_pairs":395,"RMSE":4.36,"MAE":3.019,"R2":0.749},{"model":"M6_raw_24m","response":"NEPmax","n_predictors":397,"n_pairs":395,"RMSE":4.297,"MAE":2.929,"R2":0.756},{"model":"M6_anom_12m","response":"NEPmax","n_predictors":244,"n_pairs":395,"RMSE":6.48,"MAE":4.848,"R2":0.446},{"model":"M6_anom_24m","response":"NEPmax","n_predictors":397,"n_pairs":395,"RMSE":6.453,"MAE":4.834,"R2":0.45},{"model":"M7_raw_12m","response":"NEPmax","n_predictors":165,"n_pairs":395,"RMSE":4.536,"MAE":3.249,"R2":0.728},{"model":"M7_raw_24m","response":"NEPmax","n_predictors":308,"n_pairs":395,"RMSE":4.449,"MAE":3.089,"R2":0.739},{"model":"M7_anom_12m","response":"NEPmax","n_predictors":165,"n_pairs":395,"RMSE":7.874,"MAE":6.023,"R2":0.181},{"model":"M7_anom_24m","response":"NEPmax","n_predictors":308,"n_pairs":395,"RMSE":7.9,"MAE":5.925,"R2":0.176},{"model":"M8_raw_12m","response":"NEPmax","n_predictors":265,"n_pairs":395,"RMSE":4.366,"MAE":3.028,"R2":0.748},{"model":"M8_raw_24m","response":"NEPmax","n_predictors":418,"n_pairs":395,"RMSE":4.371,"MAE":3.012,"R2":0.748},{"model":"M8_anom_12m","response":"NEPmax","n_predictors":265,"n_pairs":395,"RMSE":6.697,"MAE":4.951,"R2":0.408},{"model":"M8_anom_24m","response":"NEPmax","n_predictors":418,"n_pairs":395,"RMSE":6.813,"MAE":5.021,"R2":0.387},{"model":"M1_12m","response":"ETmax","n_predictors":143,"n_pairs":395,"RMSE":0.053,"MAE":0.04,"R2":0.337},{"model":"M1_24m","response":"ETmax","n_predictors":286,"n_pairs":395,"RMSE":0.053,"MAE":0.04,"R2":0.347},{"model":"M2_12m","response":"ETmax","n_predictors":243,"n_pairs":395,"RMSE":0.052,"MAE":0.04,"R2":0.363},{"model":"M2_24m","response":"ETmax","n_predictors":396,"n_pairs":395,"RMSE":0.052,"MAE":0.04,"R2":0.362},{"model":"M3_12m","response":"ETmax","n_predictors":164,"n_pairs":395,"RMSE":0.049,"MAE":0.036,"R2":0.445},{"model":"M3_24m","response":"ETmax","n_predictors":307,"n_pairs":395,"RMSE":0.05,"MAE":0.037,"R2":0.418},{"model":"M4_12m","response":"ETmax","n_predictors":264,"n_pairs":395,"RMSE":0.05,"MAE":0.036,"R2":0.43},{"model":"M4_24m","response":"ETmax","n_predictors":417,"n_pairs":395,"RMSE":0.051,"MAE":0.037,"R2":0.403},{"model":"M5_raw_12m","response":"ETmax","n_predictors":144,"n_pairs":395,"RMSE":0.037,"MAE":0.027,"R2":0.678},{"model":"M5_raw_24m","response":"ETmax","n_predictors":287,"n_pairs":395,"RMSE":0.038,"MAE":0.027,"R2":0.673},{"model":"M5_anom_12m","response":"ETmax","n_predictors":144,"n_pairs":395,"RMSE":0.053,"MAE":0.04,"R2":0.337},{"model":"M5_anom_24m","response":"ETmax","n_predictors":287,"n_pairs":395,"RMSE":0.053,"MAE":0.04,"R2":0.348},{"model":"M6_raw_12m","response":"ETmax","n_predictors":244,"n_pairs":395,"RMSE":0.037,"MAE":0.026,"R2":0.689},{"model":"M6_raw_24m","response":"ETmax","n_predictors":397,"n_pairs":395,"RMSE":0.037,"MAE":0.026,"R2":0.679},{"model":"M6_anom_12m","response":"ETmax","n_predictors":244,"n_pairs":395,"RMSE":0.053,"MAE":0.04,"R2":0.356},{"model":"M6_anom_24m","response":"ETmax","n_predictors":397,"n_pairs":395,"RMSE":0.053,"MAE":0.04,"R2":0.359},{"model":"M7_raw_12m","response":"ETmax","n_predictors":165,"n_pairs":395,"RMSE":0.037,"MAE":0.026,"R2":0.688},{"model":"M7_raw_24m","response":"ETmax","n_predictors":308,"n_pairs":395,"RMSE":0.038,"MAE":0.026,"R2":0.672},{"model":"M7_anom_12m","response":"ETmax","n_predictors":165,"n_pairs":395,"RMSE":0.05,"MAE":0.037,"R2":0.423},{"model":"M7_anom_24m","response":"ETmax","n_predictors":308,"n_pairs":395,"RMSE":0.05,"MAE":0.037,"R2":0.414},{"model":"M8_raw_12m","response":"ETmax","n_predictors":265,"n_pairs":395,"RMSE":0.037,"MAE":0.026,"R2":0.683},{"model":"M8_raw_24m","response":"ETmax","n_predictors":418,"n_pairs":395,"RMSE":0.038,"MAE":0.027,"R2":0.667},{"model":"M8_anom_12m","response":"ETmax","n_predictors":265,"n_pairs":395,"RMSE":0.05,"MAE":0.037,"R2":0.419},{"model":"M8_anom_24m","response":"ETmax","n_predictors":418,"n_pairs":395,"RMSE":0.05,"MAE":0.037,"R2":0.41},{"model":"M1_12m","response":"uWUE","n_predictors":143,"n_pairs":395,"RMSE":0.914,"MAE":0.706,"R2":0.158},{"model":"M1_24m","response":"uWUE","n_predictors":286,"n_pairs":395,"RMSE":0.935,"MAE":0.709,"R2":0.119},{"model":"M2_12m","response":"uWUE","n_predictors":243,"n_pairs":395,"RMSE":0.85,"MAE":0.662,"R2":0.273},{"model":"M2_24m","response":"uWUE","n_predictors":396,"n_pairs":395,"RMSE":0.865,"MAE":0.667,"R2":0.247},{"model":"M3_12m","response":"uWUE","n_predictors":164,"n_pairs":395,"RMSE":0.989,"MAE":0.759,"R2":0.015},{"model":"M3_24m","response":"uWUE","n_predictors":307,"n_pairs":395,"RMSE":0.98,"MAE":0.757,"R2":0.033},{"model":"M4_12m","response":"uWUE","n_predictors":264,"n_pairs":395,"RMSE":0.913,"MAE":0.699,"R2":0.161},{"model":"M4_24m","response":"uWUE","n_predictors":417,"n_pairs":395,"RMSE":0.917,"MAE":0.707,"R2":0.154},{"model":"M5_raw_12m","response":"uWUE","n_predictors":144,"n_pairs":395,"RMSE":0.602,"MAE":0.43,"R2":0.636},{"model":"M5_raw_24m","response":"uWUE","n_predictors":287,"n_pairs":395,"RMSE":0.61,"MAE":0.44,"R2":0.625},{"model":"M5_anom_12m","response":"uWUE","n_predictors":144,"n_pairs":395,"RMSE":0.913,"MAE":0.702,"R2":0.16},{"model":"M5_anom_24m","response":"uWUE","n_predictors":287,"n_pairs":395,"RMSE":0.929,"MAE":0.71,"R2":0.131},{"model":"M6_raw_12m","response":"uWUE","n_predictors":244,"n_pairs":395,"RMSE":0.607,"MAE":0.443,"R2":0.629},{"model":"M6_raw_24m","response":"uWUE","n_predictors":397,"n_pairs":395,"RMSE":0.608,"MAE":0.435,"R2":0.627},{"model":"M6_anom_12m","response":"uWUE","n_predictors":244,"n_pairs":395,"RMSE":0.855,"MAE":0.66,"R2":0.264},{"model":"M6_anom_24m","response":"uWUE","n_predictors":397,"n_pairs":395,"RMSE":0.869,"MAE":0.666,"R2":0.239},{"model":"M7_raw_12m","response":"uWUE","n_predictors":165,"n_pairs":395,"RMSE":0.609,"MAE":0.439,"R2":0.627},{"model":"M7_raw_24m","response":"uWUE","n_predictors":308,"n_pairs":395,"RMSE":0.621,"MAE":0.449,"R2":0.611},{"model":"M7_anom_12m","response":"uWUE","n_predictors":165,"n_pairs":395,"RMSE":0.987,"MAE":0.757,"R2":0.02},{"model":"M7_anom_24m","response":"uWUE","n_predictors":308,"n_pairs":395,"RMSE":0.973,"MAE":0.749,"R2":0.047},{"model":"M8_raw_12m","response":"uWUE","n_predictors":265,"n_pairs":395,"RMSE":0.615,"MAE":0.448,"R2":0.62},{"model":"M8_raw_24m","response":"uWUE","n_predictors":418,"n_pairs":395,"RMSE":0.622,"MAE":0.451,"R2":0.61},{"model":"M8_anom_12m","response":"uWUE","n_predictors":265,"n_pairs":395,"RMSE":0.919,"MAE":0.703,"R2":0.15},{"model":"M8_anom_24m","response":"uWUE","n_predictors":418,"n_pairs":395,"RMSE":0.92,"MAE":0.713,"R2":0.148},{"model":"M1_12m","response":"WUE","n_predictors":143,"n_pairs":395,"RMSE":0.949,"MAE":0.732,"R2":0.227},{"model":"M1_24m","response":"WUE","n_predictors":286,"n_pairs":395,"RMSE":0.962,"MAE":0.745,"R2":0.206},{"model":"M2_12m","response":"WUE","n_predictors":243,"n_pairs":395,"RMSE":0.858,"MAE":0.66,"R2":0.368},{"model":"M2_24m","response":"WUE","n_predictors":396,"n_pairs":395,"RMSE":0.892,"MAE":0.686,"R2":0.317},{"model":"M3_12m","response":"WUE","n_predictors":164,"n_pairs":395,"RMSE":1.018,"MAE":0.776,"R2":0.11},{"model":"M3_24m","response":"WUE","n_predictors":307,"n_pairs":395,"RMSE":1.027,"MAE":0.786,"R2":0.094},{"model":"M4_12m","response":"WUE","n_predictors":264,"n_pairs":395,"RMSE":0.913,"MAE":0.7,"R2":0.285},{"model":"M4_24m","response":"WUE","n_predictors":417,"n_pairs":395,"RMSE":0.929,"MAE":0.711,"R2":0.258},{"model":"M5_raw_12m","response":"WUE","n_predictors":144,"n_pairs":395,"RMSE":0.662,"MAE":0.492,"R2":0.624},{"model":"M5_raw_24m","response":"WUE","n_predictors":287,"n_pairs":395,"RMSE":0.649,"MAE":0.478,"R2":0.639},{"model":"M5_anom_12m","response":"WUE","n_predictors":144,"n_pairs":395,"RMSE":0.951,"MAE":0.731,"R2":0.223},{"model":"M5_anom_24m","response":"WUE","n_predictors":287,"n_pairs":395,"RMSE":0.963,"MAE":0.742,"R2":0.203},{"model":"M6_raw_12m","response":"WUE","n_predictors":244,"n_pairs":395,"RMSE":0.64,"MAE":0.478,"R2":0.648},{"model":"M6_raw_24m","response":"WUE","n_predictors":397,"n_pairs":395,"RMSE":0.637,"MAE":0.474,"R2":0.652},{"model":"M6_anom_12m","response":"WUE","n_predictors":244,"n_pairs":395,"RMSE":0.854,"MAE":0.661,"R2":0.373},{"model":"M6_anom_24m","response":"WUE","n_predictors":397,"n_pairs":395,"RMSE":0.889,"MAE":0.681,"R2":0.322},{"model":"M7_raw_12m","response":"WUE","n_predictors":165,"n_pairs":395,"RMSE":0.69,"MAE":0.515,"R2":0.591},{"model":"M7_raw_24m","response":"WUE","n_predictors":308,"n_pairs":395,"RMSE":0.659,"MAE":0.487,"R2":0.627},{"model":"M7_anom_12m","response":"WUE","n_predictors":165,"n_pairs":395,"RMSE":1.021,"MAE":0.78,"R2":0.105},{"model":"M7_anom_24m","response":"WUE","n_predictors":308,"n_pairs":395,"RMSE":1.02,"MAE":0.78,"R2":0.107},{"model":"M8_raw_12m","response":"WUE","n_predictors":265,"n_pairs":395,"RMSE":0.652,"MAE":0.489,"R2":0.634},{"model":"M8_raw_24m","response":"WUE","n_predictors":418,"n_pairs":395,"RMSE":0.635,"MAE":0.471,"R2":0.653},{"model":"M8_anom_12m","response":"WUE","n_predictors":265,"n_pairs":395,"RMSE":0.92,"MAE":0.706,"R2":0.273},{"model":"M8_anom_24m","response":"WUE","n_predictors":418,"n_pairs":395,"RMSE":0.934,"MAE":0.716,"R2":0.252}]}};
+const METRICS_REP={"rfopt":{"sites_with_high_Tcover":[{"model":"M1_12m","response":"GPPsat","n_predictors":143,"n_pairs":395,"RMSE":7.611,"MAE":6.052,"R2":0.236,"pred_sd":0.9698},{"model":"M1_24m","response":"GPPsat","n_predictors":286,"n_pairs":395,"RMSE":7.67,"MAE":6.115,"R2":0.224,"pred_sd":0.972},{"model":"M2_12m","response":"GPPsat","n_predictors":243,"n_pairs":395,"RMSE":7.044,"MAE":5.547,"R2":0.346,"pred_sd":0.9871},{"model":"M2_24m","response":"GPPsat","n_predictors":396,"n_pairs":395,"RMSE":7.087,"MAE":5.589,"R2":0.338,"pred_sd":0.9982},{"model":"M3_12m","response":"GPPsat","n_predictors":164,"n_pairs":395,"RMSE":7.838,"MAE":6.155,"R2":0.19,"pred_sd":1.1901},{"model":"M3_24m","response":"GPPsat","n_predictors":307,"n_pairs":395,"RMSE":7.865,"MAE":6.16,"R2":0.184,"pred_sd":1.1565},{"model":"M4_12m","response":"GPPsat","n_predictors":264,"n_pairs":395,"RMSE":7.424,"MAE":5.776,"R2":0.273,"pred_sd":1.0693},{"model":"M4_24m","response":"GPPsat","n_predictors":417,"n_pairs":395,"RMSE":7.448,"MAE":5.809,"R2":0.269,"pred_sd":1.1042},{"model":"M5_raw_12m","response":"GPPsat","n_predictors":144,"n_pairs":395,"RMSE":4.735,"MAE":3.43,"R2":0.704,"pred_sd":0.7329},{"model":"M5_raw_24m","response":"GPPsat","n_predictors":287,"n_pairs":395,"RMSE":4.776,"MAE":3.465,"R2":0.699,"pred_sd":0.7411},{"model":"M5_anom_12m","response":"GPPsat","n_predictors":144,"n_pairs":395,"RMSE":7.614,"MAE":6.046,"R2":0.236,"pred_sd":0.9576},{"model":"M5_anom_24m","response":"GPPsat","n_predictors":287,"n_pairs":395,"RMSE":7.661,"MAE":6.109,"R2":0.226,"pred_sd":0.9699},{"model":"M6_raw_12m","response":"GPPsat","n_predictors":244,"n_pairs":395,"RMSE":4.781,"MAE":3.48,"R2":0.699,"pred_sd":0.7018},{"model":"M6_raw_24m","response":"GPPsat","n_predictors":397,"n_pairs":395,"RMSE":4.817,"MAE":3.509,"R2":0.694,"pred_sd":0.7142},{"model":"M6_anom_12m","response":"GPPsat","n_predictors":244,"n_pairs":395,"RMSE":7.046,"MAE":5.544,"R2":0.345,"pred_sd":0.9999},{"model":"M6_anom_24m","response":"GPPsat","n_predictors":397,"n_pairs":395,"RMSE":7.085,"MAE":5.586,"R2":0.338,"pred_sd":1.0012},{"model":"M7_raw_12m","response":"GPPsat","n_predictors":165,"n_pairs":395,"RMSE":4.759,"MAE":3.45,"R2":0.701,"pred_sd":0.7653},{"model":"M7_raw_24m","response":"GPPsat","n_predictors":308,"n_pairs":395,"RMSE":4.816,"MAE":3.506,"R2":0.694,"pred_sd":0.7694},{"model":"M7_anom_12m","response":"GPPsat","n_predictors":165,"n_pairs":395,"RMSE":7.859,"MAE":6.178,"R2":0.186,"pred_sd":1.1781},{"model":"M7_anom_24m","response":"GPPsat","n_predictors":308,"n_pairs":395,"RMSE":7.85,"MAE":6.152,"R2":0.188,"pred_sd":1.1673},{"model":"M8_raw_12m","response":"GPPsat","n_predictors":265,"n_pairs":395,"RMSE":4.776,"MAE":3.465,"R2":0.699,"pred_sd":0.7289},{"model":"M8_raw_24m","response":"GPPsat","n_predictors":418,"n_pairs":395,"RMSE":4.832,"MAE":3.513,"R2":0.692,"pred_sd":0.7448},{"model":"M8_anom_12m","response":"GPPsat","n_predictors":265,"n_pairs":395,"RMSE":7.419,"MAE":5.773,"R2":0.274,"pred_sd":1.0786},{"model":"M8_anom_24m","response":"GPPsat","n_predictors":418,"n_pairs":395,"RMSE":7.448,"MAE":5.798,"R2":0.269,"pred_sd":1.0955},{"model":"M1_12m","response":"NEPmax","n_predictors":143,"n_pairs":395,"RMSE":7.56,"MAE":5.831,"R2":0.246,"pred_sd":1.1462},{"model":"M1_24m","response":"NEPmax","n_predictors":286,"n_pairs":395,"RMSE":7.588,"MAE":5.835,"R2":0.24,"pred_sd":1.0236},{"model":"M2_12m","response":"NEPmax","n_predictors":243,"n_pairs":395,"RMSE":6.561,"MAE":5.003,"R2":0.432,"pred_sd":1.0992},{"model":"M2_24m","response":"NEPmax","n_predictors":396,"n_pairs":395,"RMSE":6.627,"MAE":5.065,"R2":0.42,"pred_sd":1.0216},{"model":"M3_12m","response":"NEPmax","n_predictors":164,"n_pairs":395,"RMSE":7.903,"MAE":6.065,"R2":0.175,"pred_sd":1.4333},{"model":"M3_24m","response":"NEPmax","n_predictors":307,"n_pairs":395,"RMSE":7.846,"MAE":5.989,"R2":0.187,"pred_sd":1.3093},{"model":"M4_12m","response":"NEPmax","n_predictors":264,"n_pairs":395,"RMSE":7.141,"MAE":5.387,"R2":0.327,"pred_sd":1.2752},{"model":"M4_24m","response":"NEPmax","n_predictors":417,"n_pairs":395,"RMSE":7.148,"MAE":5.412,"R2":0.326,"pred_sd":1.201},{"model":"M5_raw_12m","response":"NEPmax","n_predictors":144,"n_pairs":395,"RMSE":4.439,"MAE":2.879,"R2":0.74,"pred_sd":0.7061},{"model":"M5_raw_24m","response":"NEPmax","n_predictors":287,"n_pairs":395,"RMSE":4.432,"MAE":2.917,"R2":0.741,"pred_sd":0.6526},{"model":"M5_anom_12m","response":"NEPmax","n_predictors":144,"n_pairs":395,"RMSE":7.558,"MAE":5.8,"R2":0.246,"pred_sd":1.1302},{"model":"M5_anom_24m","response":"NEPmax","n_predictors":287,"n_pairs":395,"RMSE":7.588,"MAE":5.832,"R2":0.24,"pred_sd":1.0351},{"model":"M6_raw_12m","response":"NEPmax","n_predictors":244,"n_pairs":395,"RMSE":4.415,"MAE":2.894,"R2":0.743,"pred_sd":0.696},{"model":"M6_raw_24m","response":"NEPmax","n_predictors":397,"n_pairs":395,"RMSE":4.43,"MAE":2.924,"R2":0.741,"pred_sd":0.6377},{"model":"M6_anom_12m","response":"NEPmax","n_predictors":244,"n_pairs":395,"RMSE":6.534,"MAE":4.988,"R2":0.436,"pred_sd":1.0968},{"model":"M6_anom_24m","response":"NEPmax","n_predictors":397,"n_pairs":395,"RMSE":6.625,"MAE":5.068,"R2":0.421,"pred_sd":1.0292},{"model":"M7_raw_12m","response":"NEPmax","n_predictors":165,"n_pairs":395,"RMSE":4.45,"MAE":2.927,"R2":0.739,"pred_sd":0.7635},{"model":"M7_raw_24m","response":"NEPmax","n_predictors":308,"n_pairs":395,"RMSE":4.446,"MAE":2.955,"R2":0.739,"pred_sd":0.6709},{"model":"M7_anom_12m","response":"NEPmax","n_predictors":165,"n_pairs":395,"RMSE":7.877,"MAE":6.038,"R2":0.181,"pred_sd":1.402},{"model":"M7_anom_24m","response":"NEPmax","n_predictors":308,"n_pairs":395,"RMSE":7.831,"MAE":5.975,"R2":0.191,"pred_sd":1.3018},{"model":"M8_raw_12m","response":"NEPmax","n_predictors":265,"n_pairs":395,"RMSE":4.426,"MAE":2.919,"R2":0.741,"pred_sd":0.7295},{"model":"M8_raw_24m","response":"NEPmax","n_predictors":418,"n_pairs":395,"RMSE":4.432,"MAE":2.948,"R2":0.741,"pred_sd":0.6664},{"model":"M8_anom_12m","response":"NEPmax","n_predictors":265,"n_pairs":395,"RMSE":7.15,"MAE":5.416,"R2":0.325,"pred_sd":1.2797},{"model":"M8_anom_24m","response":"NEPmax","n_predictors":418,"n_pairs":395,"RMSE":7.149,"MAE":5.401,"R2":0.325,"pred_sd":1.1812},{"model":"M1_12m","response":"ETmax","n_predictors":143,"n_pairs":395,"RMSE":0.052,"MAE":0.039,"R2":0.369,"pred_sd":0.0084},{"model":"M1_24m","response":"ETmax","n_predictors":286,"n_pairs":395,"RMSE":0.052,"MAE":0.039,"R2":0.366,"pred_sd":0.0064},{"model":"M2_12m","response":"ETmax","n_predictors":243,"n_pairs":395,"RMSE":0.052,"MAE":0.039,"R2":0.374,"pred_sd":0.0088},{"model":"M2_24m","response":"ETmax","n_predictors":396,"n_pairs":395,"RMSE":0.052,"MAE":0.039,"R2":0.373,"pred_sd":0.0066},{"model":"M3_12m","response":"ETmax","n_predictors":164,"n_pairs":395,"RMSE":0.051,"MAE":0.038,"R2":0.398,"pred_sd":0.0103},{"model":"M3_24m","response":"ETmax","n_predictors":307,"n_pairs":395,"RMSE":0.051,"MAE":0.038,"R2":0.398,"pred_sd":0.008},{"model":"M4_12m","response":"ETmax","n_predictors":264,"n_pairs":395,"RMSE":0.051,"MAE":0.038,"R2":0.401,"pred_sd":0.0103},{"model":"M4_24m","response":"ETmax","n_predictors":417,"n_pairs":395,"RMSE":0.051,"MAE":0.038,"R2":0.393,"pred_sd":0.0081},{"model":"M5_raw_12m","response":"ETmax","n_predictors":144,"n_pairs":395,"RMSE":0.039,"MAE":0.027,"R2":0.653,"pred_sd":0.0063},{"model":"M5_raw_24m","response":"ETmax","n_predictors":287,"n_pairs":395,"RMSE":0.039,"MAE":0.027,"R2":0.649,"pred_sd":0.0048},{"model":"M5_anom_12m","response":"ETmax","n_predictors":144,"n_pairs":395,"RMSE":0.052,"MAE":0.039,"R2":0.369,"pred_sd":0.0086},{"model":"M5_anom_24m","response":"ETmax","n_predictors":287,"n_pairs":395,"RMSE":0.052,"MAE":0.039,"R2":0.366,"pred_sd":0.0063},{"model":"M6_raw_12m","response":"ETmax","n_predictors":244,"n_pairs":395,"RMSE":0.039,"MAE":0.027,"R2":0.651,"pred_sd":0.006},{"model":"M6_raw_24m","response":"ETmax","n_predictors":397,"n_pairs":395,"RMSE":0.039,"MAE":0.027,"R2":0.648,"pred_sd":0.0048},{"model":"M6_anom_12m","response":"ETmax","n_predictors":244,"n_pairs":395,"RMSE":0.052,"MAE":0.039,"R2":0.374,"pred_sd":0.0086},{"model":"M6_anom_24m","response":"ETmax","n_predictors":397,"n_pairs":395,"RMSE":0.052,"MAE":0.039,"R2":0.372,"pred_sd":0.0066},{"model":"M7_raw_12m","response":"ETmax","n_predictors":165,"n_pairs":395,"RMSE":0.039,"MAE":0.027,"R2":0.65,"pred_sd":0.0064},{"model":"M7_raw_24m","response":"ETmax","n_predictors":308,"n_pairs":395,"RMSE":0.039,"MAE":0.027,"R2":0.649,"pred_sd":0.0049},{"model":"M7_anom_12m","response":"ETmax","n_predictors":165,"n_pairs":395,"RMSE":0.051,"MAE":0.038,"R2":0.4,"pred_sd":0.0106},{"model":"M7_anom_24m","response":"ETmax","n_predictors":308,"n_pairs":395,"RMSE":0.051,"MAE":0.038,"R2":0.398,"pred_sd":0.008},{"model":"M8_raw_12m","response":"ETmax","n_predictors":265,"n_pairs":395,"RMSE":0.039,"MAE":0.027,"R2":0.649,"pred_sd":0.0062},{"model":"M8_raw_24m","response":"ETmax","n_predictors":418,"n_pairs":395,"RMSE":0.039,"MAE":0.027,"R2":0.648,"pred_sd":0.0047},{"model":"M8_anom_12m","response":"ETmax","n_predictors":265,"n_pairs":395,"RMSE":0.051,"MAE":0.038,"R2":0.399,"pred_sd":0.0102},{"model":"M8_anom_24m","response":"ETmax","n_predictors":418,"n_pairs":395,"RMSE":0.051,"MAE":0.038,"R2":0.393,"pred_sd":0.0081},{"model":"M1_12m","response":"uWUE","n_predictors":143,"n_pairs":395,"RMSE":0.934,"MAE":0.702,"R2":0.121,"pred_sd":0.1268},{"model":"M1_24m","response":"uWUE","n_predictors":286,"n_pairs":395,"RMSE":0.934,"MAE":0.707,"R2":0.121,"pred_sd":0.1314},{"model":"M2_12m","response":"uWUE","n_predictors":243,"n_pairs":395,"RMSE":0.912,"MAE":0.684,"R2":0.163,"pred_sd":0.119},{"model":"M2_24m","response":"uWUE","n_predictors":396,"n_pairs":395,"RMSE":0.913,"MAE":0.683,"R2":0.16,"pred_sd":0.1222},{"model":"M3_12m","response":"uWUE","n_predictors":164,"n_pairs":395,"RMSE":0.96,"MAE":0.721,"R2":0.071,"pred_sd":0.1468},{"model":"M3_24m","response":"uWUE","n_predictors":307,"n_pairs":395,"RMSE":0.96,"MAE":0.722,"R2":0.073,"pred_sd":0.1521},{"model":"M4_12m","response":"uWUE","n_predictors":264,"n_pairs":395,"RMSE":0.94,"MAE":0.695,"R2":0.11,"pred_sd":0.1267},{"model":"M4_24m","response":"uWUE","n_predictors":417,"n_pairs":395,"RMSE":0.938,"MAE":0.693,"R2":0.113,"pred_sd":0.13},{"model":"M5_raw_12m","response":"uWUE","n_predictors":144,"n_pairs":395,"RMSE":0.587,"MAE":0.423,"R2":0.653,"pred_sd":0.0846},{"model":"M5_raw_24m","response":"uWUE","n_predictors":287,"n_pairs":395,"RMSE":0.585,"MAE":0.421,"R2":0.656,"pred_sd":0.0886},{"model":"M5_anom_12m","response":"uWUE","n_predictors":144,"n_pairs":395,"RMSE":0.934,"MAE":0.703,"R2":0.121,"pred_sd":0.1306},{"model":"M5_anom_24m","response":"uWUE","n_predictors":287,"n_pairs":395,"RMSE":0.933,"MAE":0.706,"R2":0.123,"pred_sd":0.1315},{"model":"M6_raw_12m","response":"uWUE","n_predictors":244,"n_pairs":395,"RMSE":0.597,"MAE":0.432,"R2":0.641,"pred_sd":0.0849},{"model":"M6_raw_24m","response":"uWUE","n_predictors":397,"n_pairs":395,"RMSE":0.592,"MAE":0.427,"R2":0.647,"pred_sd":0.0875},{"model":"M6_anom_12m","response":"uWUE","n_predictors":244,"n_pairs":395,"RMSE":0.914,"MAE":0.687,"R2":0.159,"pred_sd":0.1174},{"model":"M6_anom_24m","response":"uWUE","n_predictors":397,"n_pairs":395,"RMSE":0.914,"MAE":0.684,"R2":0.159,"pred_sd":0.1207},{"model":"M7_raw_12m","response":"uWUE","n_predictors":165,"n_pairs":395,"RMSE":0.594,"MAE":0.426,"R2":0.644,"pred_sd":0.0864},{"model":"M7_raw_24m","response":"uWUE","n_predictors":308,"n_pairs":395,"RMSE":0.589,"MAE":0.425,"R2":0.65,"pred_sd":0.0888},{"model":"M7_anom_12m","response":"uWUE","n_predictors":165,"n_pairs":395,"RMSE":0.962,"MAE":0.721,"R2":0.068,"pred_sd":0.1441},{"model":"M7_anom_24m","response":"uWUE","n_predictors":308,"n_pairs":395,"RMSE":0.959,"MAE":0.722,"R2":0.073,"pred_sd":0.1523},{"model":"M8_raw_12m","response":"uWUE","n_predictors":265,"n_pairs":395,"RMSE":0.603,"MAE":0.434,"R2":0.634,"pred_sd":0.0876},{"model":"M8_raw_24m","response":"uWUE","n_predictors":418,"n_pairs":395,"RMSE":0.596,"MAE":0.429,"R2":0.643,"pred_sd":0.0894},{"model":"M8_anom_12m","response":"uWUE","n_predictors":265,"n_pairs":395,"RMSE":0.937,"MAE":0.693,"R2":0.116,"pred_sd":0.1285},{"model":"M8_anom_24m","response":"uWUE","n_predictors":418,"n_pairs":395,"RMSE":0.939,"MAE":0.693,"R2":0.113,"pred_sd":0.1299},{"model":"M1_12m","response":"WUE","n_predictors":143,"n_pairs":395,"RMSE":0.972,"MAE":0.722,"R2":0.189,"pred_sd":0.1455},{"model":"M1_24m","response":"WUE","n_predictors":286,"n_pairs":395,"RMSE":0.975,"MAE":0.724,"R2":0.184,"pred_sd":0.1385},{"model":"M2_12m","response":"WUE","n_predictors":243,"n_pairs":395,"RMSE":0.928,"MAE":0.692,"R2":0.26,"pred_sd":0.129},{"model":"M2_24m","response":"WUE","n_predictors":396,"n_pairs":395,"RMSE":0.937,"MAE":0.695,"R2":0.247,"pred_sd":0.1227},{"model":"M3_12m","response":"WUE","n_predictors":164,"n_pairs":395,"RMSE":0.997,"MAE":0.737,"R2":0.146,"pred_sd":0.1519},{"model":"M3_24m","response":"WUE","n_predictors":307,"n_pairs":395,"RMSE":0.991,"MAE":0.732,"R2":0.156,"pred_sd":0.1448},{"model":"M4_12m","response":"WUE","n_predictors":264,"n_pairs":395,"RMSE":0.957,"MAE":0.709,"R2":0.214,"pred_sd":0.139},{"model":"M4_24m","response":"WUE","n_predictors":417,"n_pairs":395,"RMSE":0.955,"MAE":0.706,"R2":0.217,"pred_sd":0.1284},{"model":"M5_raw_12m","response":"WUE","n_predictors":144,"n_pairs":395,"RMSE":0.621,"MAE":0.455,"R2":0.668,"pred_sd":0.0881},{"model":"M5_raw_24m","response":"WUE","n_predictors":287,"n_pairs":395,"RMSE":0.62,"MAE":0.457,"R2":0.67,"pred_sd":0.0875},{"model":"M5_anom_12m","response":"WUE","n_predictors":144,"n_pairs":395,"RMSE":0.973,"MAE":0.722,"R2":0.187,"pred_sd":0.1415},{"model":"M5_anom_24m","response":"WUE","n_predictors":287,"n_pairs":395,"RMSE":0.975,"MAE":0.725,"R2":0.184,"pred_sd":0.1407},{"model":"M6_raw_12m","response":"WUE","n_predictors":244,"n_pairs":395,"RMSE":0.624,"MAE":0.46,"R2":0.666,"pred_sd":0.0893},{"model":"M6_raw_24m","response":"WUE","n_predictors":397,"n_pairs":395,"RMSE":0.622,"MAE":0.461,"R2":0.667,"pred_sd":0.0879},{"model":"M6_anom_12m","response":"WUE","n_predictors":244,"n_pairs":395,"RMSE":0.929,"MAE":0.693,"R2":0.259,"pred_sd":0.1318},{"model":"M6_anom_24m","response":"WUE","n_predictors":397,"n_pairs":395,"RMSE":0.937,"MAE":0.696,"R2":0.247,"pred_sd":0.1244},{"model":"M7_raw_12m","response":"WUE","n_predictors":165,"n_pairs":395,"RMSE":0.619,"MAE":0.452,"R2":0.671,"pred_sd":0.0907},{"model":"M7_raw_24m","response":"WUE","n_predictors":308,"n_pairs":395,"RMSE":0.619,"MAE":0.457,"R2":0.671,"pred_sd":0.0898},{"model":"M7_anom_12m","response":"WUE","n_predictors":165,"n_pairs":395,"RMSE":0.994,"MAE":0.736,"R2":0.151,"pred_sd":0.1498},{"model":"M7_anom_24m","response":"WUE","n_predictors":308,"n_pairs":395,"RMSE":0.991,"MAE":0.733,"R2":0.157,"pred_sd":0.1453},{"model":"M8_raw_12m","response":"WUE","n_predictors":265,"n_pairs":395,"RMSE":0.622,"MAE":0.46,"R2":0.668,"pred_sd":0.0904},{"model":"M8_raw_24m","response":"WUE","n_predictors":418,"n_pairs":395,"RMSE":0.623,"MAE":0.462,"R2":0.667,"pred_sd":0.0902},{"model":"M8_anom_12m","response":"WUE","n_predictors":265,"n_pairs":395,"RMSE":0.957,"MAE":0.709,"R2":0.214,"pred_sd":0.1399},{"model":"M8_anom_24m","response":"WUE","n_predictors":418,"n_pairs":395,"RMSE":0.955,"MAE":0.707,"R2":0.216,"pred_sd":0.1281}]},"xgbopt":{"sites_with_high_Tcover":[{"model":"M1_12m","response":"GPPsat","n_predictors":143,"n_pairs":395,"RMSE":7.656,"MAE":6.073,"R2":0.227,"pred_sd":1.389},{"model":"M1_24m","response":"GPPsat","n_predictors":286,"n_pairs":395,"RMSE":7.802,"MAE":6.225,"R2":0.198,"pred_sd":1.6031},{"model":"M2_12m","response":"GPPsat","n_predictors":243,"n_pairs":395,"RMSE":6.819,"MAE":5.314,"R2":0.387,"pred_sd":1.3673},{"model":"M2_24m","response":"GPPsat","n_predictors":396,"n_pairs":395,"RMSE":6.894,"MAE":5.398,"R2":0.373,"pred_sd":1.5124},{"model":"M3_12m","response":"GPPsat","n_predictors":164,"n_pairs":395,"RMSE":7.836,"MAE":6.104,"R2":0.191,"pred_sd":1.4852},{"model":"M3_24m","response":"GPPsat","n_predictors":307,"n_pairs":395,"RMSE":7.935,"MAE":6.235,"R2":0.17,"pred_sd":1.6281},{"model":"M4_12m","response":"GPPsat","n_predictors":264,"n_pairs":395,"RMSE":7.02,"MAE":5.371,"R2":0.35,"pred_sd":1.3869},{"model":"M4_24m","response":"GPPsat","n_predictors":417,"n_pairs":395,"RMSE":7.128,"MAE":5.536,"R2":0.33,"pred_sd":1.5296},{"model":"M5_raw_12m","response":"GPPsat","n_predictors":144,"n_pairs":395,"RMSE":4.782,"MAE":3.577,"R2":0.699,"pred_sd":0.8524},{"model":"M5_raw_24m","response":"GPPsat","n_predictors":287,"n_pairs":395,"RMSE":5.008,"MAE":3.822,"R2":0.669,"pred_sd":1.1322},{"model":"M5_anom_12m","response":"GPPsat","n_predictors":144,"n_pairs":395,"RMSE":7.642,"MAE":6.081,"R2":0.23,"pred_sd":1.3939},{"model":"M5_anom_24m","response":"GPPsat","n_predictors":287,"n_pairs":395,"RMSE":7.759,"MAE":6.208,"R2":0.206,"pred_sd":1.6209},{"model":"M6_raw_12m","response":"GPPsat","n_predictors":244,"n_pairs":395,"RMSE":4.751,"MAE":3.551,"R2":0.702,"pred_sd":0.8302},{"model":"M6_raw_24m","response":"GPPsat","n_predictors":397,"n_pairs":395,"RMSE":4.861,"MAE":3.701,"R2":0.688,"pred_sd":1.0222},{"model":"M6_anom_12m","response":"GPPsat","n_predictors":244,"n_pairs":395,"RMSE":6.793,"MAE":5.309,"R2":0.392,"pred_sd":1.3216},{"model":"M6_anom_24m","response":"GPPsat","n_predictors":397,"n_pairs":395,"RMSE":6.887,"MAE":5.42,"R2":0.375,"pred_sd":1.4941},{"model":"M7_raw_12m","response":"GPPsat","n_predictors":165,"n_pairs":395,"RMSE":4.9,"MAE":3.653,"R2":0.683,"pred_sd":0.8997},{"model":"M7_raw_24m","response":"GPPsat","n_predictors":308,"n_pairs":395,"RMSE":5.144,"MAE":3.867,"R2":0.651,"pred_sd":1.0812},{"model":"M7_anom_12m","response":"GPPsat","n_predictors":165,"n_pairs":395,"RMSE":7.855,"MAE":6.129,"R2":0.186,"pred_sd":1.5155},{"model":"M7_anom_24m","response":"GPPsat","n_predictors":308,"n_pairs":395,"RMSE":7.88,"MAE":6.174,"R2":0.181,"pred_sd":1.6641},{"model":"M8_raw_12m","response":"GPPsat","n_predictors":265,"n_pairs":395,"RMSE":4.816,"MAE":3.591,"R2":0.694,"pred_sd":0.8581},{"model":"M8_raw_24m","response":"GPPsat","n_predictors":418,"n_pairs":395,"RMSE":5.084,"MAE":3.846,"R2":0.659,"pred_sd":1.1219},{"model":"M8_anom_12m","response":"GPPsat","n_predictors":265,"n_pairs":395,"RMSE":7.034,"MAE":5.391,"R2":0.348,"pred_sd":1.413},{"model":"M8_anom_24m","response":"GPPsat","n_predictors":418,"n_pairs":395,"RMSE":7.028,"MAE":5.404,"R2":0.349,"pred_sd":1.5477},{"model":"M1_12m","response":"NEPmax","n_predictors":143,"n_pairs":395,"RMSE":7.714,"MAE":5.97,"R2":0.214,"pred_sd":1.5051},{"model":"M1_24m","response":"NEPmax","n_predictors":286,"n_pairs":395,"RMSE":7.683,"MAE":5.899,"R2":0.221,"pred_sd":1.3056},{"model":"M2_12m","response":"NEPmax","n_predictors":243,"n_pairs":395,"RMSE":6.324,"MAE":4.762,"R2":0.472,"pred_sd":1.3044},{"model":"M2_24m","response":"NEPmax","n_predictors":396,"n_pairs":395,"RMSE":6.671,"MAE":5.051,"R2":0.413,"pred_sd":1.2077},{"model":"M3_12m","response":"NEPmax","n_predictors":164,"n_pairs":395,"RMSE":7.832,"MAE":6.024,"R2":0.19,"pred_sd":1.6009},{"model":"M3_24m","response":"NEPmax","n_predictors":307,"n_pairs":395,"RMSE":7.866,"MAE":5.919,"R2":0.183,"pred_sd":1.4852},{"model":"M4_12m","response":"NEPmax","n_predictors":264,"n_pairs":395,"RMSE":6.736,"MAE":5.038,"R2":0.401,"pred_sd":1.3329},{"model":"M4_24m","response":"NEPmax","n_predictors":417,"n_pairs":395,"RMSE":7.003,"MAE":5.283,"R2":0.353,"pred_sd":1.2932},{"model":"M5_raw_12m","response":"NEPmax","n_predictors":144,"n_pairs":395,"RMSE":4.428,"MAE":3.112,"R2":0.741,"pred_sd":0.8985},{"model":"M5_raw_24m","response":"NEPmax","n_predictors":287,"n_pairs":395,"RMSE":4.283,"MAE":2.895,"R2":0.758,"pred_sd":0.6586},{"model":"M5_anom_12m","response":"NEPmax","n_predictors":144,"n_pairs":395,"RMSE":7.685,"MAE":5.936,"R2":0.22,"pred_sd":1.4832},{"model":"M5_anom_24m","response":"NEPmax","n_predictors":287,"n_pairs":395,"RMSE":7.7,"MAE":5.909,"R2":0.217,"pred_sd":1.3027},{"model":"M6_raw_12m","response":"NEPmax","n_predictors":244,"n_pairs":395,"RMSE":4.344,"MAE":2.991,"R2":0.751,"pred_sd":0.8601},{"model":"M6_raw_24m","response":"NEPmax","n_predictors":397,"n_pairs":395,"RMSE":4.221,"MAE":2.855,"R2":0.765,"pred_sd":0.6688},{"model":"M6_anom_12m","response":"NEPmax","n_predictors":244,"n_pairs":395,"RMSE":6.339,"MAE":4.761,"R2":0.47,"pred_sd":1.3411},{"model":"M6_anom_24m","response":"NEPmax","n_predictors":397,"n_pairs":395,"RMSE":6.65,"MAE":5.031,"R2":0.416,"pred_sd":1.1996},{"model":"M7_raw_12m","response":"NEPmax","n_predictors":165,"n_pairs":395,"RMSE":4.492,"MAE":3.177,"R2":0.734,"pred_sd":0.9228},{"model":"M7_raw_24m","response":"NEPmax","n_predictors":308,"n_pairs":395,"RMSE":4.403,"MAE":2.993,"R2":0.744,"pred_sd":0.7526},{"model":"M7_anom_12m","response":"NEPmax","n_predictors":165,"n_pairs":395,"RMSE":7.795,"MAE":6.028,"R2":0.198,"pred_sd":1.5961},{"model":"M7_anom_24m","response":"NEPmax","n_predictors":308,"n_pairs":395,"RMSE":7.908,"MAE":5.958,"R2":0.174,"pred_sd":1.5014},{"model":"M8_raw_12m","response":"NEPmax","n_predictors":265,"n_pairs":395,"RMSE":4.382,"MAE":3.013,"R2":0.747,"pred_sd":0.9187},{"model":"M8_raw_24m","response":"NEPmax","n_predictors":418,"n_pairs":395,"RMSE":4.303,"MAE":2.928,"R2":0.756,"pred_sd":0.7514},{"model":"M8_anom_12m","response":"NEPmax","n_predictors":265,"n_pairs":395,"RMSE":6.692,"MAE":5.026,"R2":0.409,"pred_sd":1.374},{"model":"M8_anom_24m","response":"NEPmax","n_predictors":418,"n_pairs":395,"RMSE":7.01,"MAE":5.294,"R2":0.351,"pred_sd":1.3077},{"model":"M1_12m","response":"ETmax","n_predictors":143,"n_pairs":395,"RMSE":0.054,"MAE":0.041,"R2":0.333,"pred_sd":0.0124},{"model":"M1_24m","response":"ETmax","n_predictors":286,"n_pairs":395,"RMSE":0.052,"MAE":0.039,"R2":0.37,"pred_sd":0.0081},{"model":"M2_12m","response":"ETmax","n_predictors":243,"n_pairs":395,"RMSE":0.053,"MAE":0.04,"R2":0.357,"pred_sd":0.013},{"model":"M2_24m","response":"ETmax","n_predictors":396,"n_pairs":395,"RMSE":0.052,"MAE":0.039,"R2":0.372,"pred_sd":0.0086},{"model":"M3_12m","response":"ETmax","n_predictors":164,"n_pairs":395,"RMSE":0.051,"MAE":0.038,"R2":0.391,"pred_sd":0.0133},{"model":"M3_24m","response":"ETmax","n_predictors":307,"n_pairs":395,"RMSE":0.05,"MAE":0.037,"R2":0.411,"pred_sd":0.0088},{"model":"M4_12m","response":"ETmax","n_predictors":264,"n_pairs":395,"RMSE":0.051,"MAE":0.038,"R2":0.386,"pred_sd":0.0136},{"model":"M4_24m","response":"ETmax","n_predictors":417,"n_pairs":395,"RMSE":0.051,"MAE":0.038,"R2":0.397,"pred_sd":0.009},{"model":"M5_raw_12m","response":"ETmax","n_predictors":144,"n_pairs":395,"RMSE":0.038,"MAE":0.027,"R2":0.667,"pred_sd":0.0082},{"model":"M5_raw_24m","response":"ETmax","n_predictors":287,"n_pairs":395,"RMSE":0.038,"MAE":0.027,"R2":0.662,"pred_sd":0.0057},{"model":"M5_anom_12m","response":"ETmax","n_predictors":144,"n_pairs":395,"RMSE":0.053,"MAE":0.041,"R2":0.338,"pred_sd":0.0123},{"model":"M5_anom_24m","response":"ETmax","n_predictors":287,"n_pairs":395,"RMSE":0.052,"MAE":0.039,"R2":0.364,"pred_sd":0.0082},{"model":"M6_raw_12m","response":"ETmax","n_predictors":244,"n_pairs":395,"RMSE":0.038,"MAE":0.027,"R2":0.665,"pred_sd":0.0085},{"model":"M6_raw_24m","response":"ETmax","n_predictors":397,"n_pairs":395,"RMSE":0.038,"MAE":0.027,"R2":0.662,"pred_sd":0.0057},{"model":"M6_anom_12m","response":"ETmax","n_predictors":244,"n_pairs":395,"RMSE":0.052,"MAE":0.04,"R2":0.36,"pred_sd":0.0131},{"model":"M6_anom_24m","response":"ETmax","n_predictors":397,"n_pairs":395,"RMSE":0.052,"MAE":0.039,"R2":0.377,"pred_sd":0.0086},{"model":"M7_raw_12m","response":"ETmax","n_predictors":165,"n_pairs":395,"RMSE":0.039,"MAE":0.027,"R2":0.651,"pred_sd":0.0087},{"model":"M7_raw_24m","response":"ETmax","n_predictors":308,"n_pairs":395,"RMSE":0.039,"MAE":0.027,"R2":0.655,"pred_sd":0.0057},{"model":"M7_anom_12m","response":"ETmax","n_predictors":165,"n_pairs":395,"RMSE":0.051,"MAE":0.038,"R2":0.389,"pred_sd":0.0133},{"model":"M7_anom_24m","response":"ETmax","n_predictors":308,"n_pairs":395,"RMSE":0.051,"MAE":0.037,"R2":0.406,"pred_sd":0.009},{"model":"M8_raw_12m","response":"ETmax","n_predictors":265,"n_pairs":395,"RMSE":0.039,"MAE":0.028,"R2":0.654,"pred_sd":0.0089},{"model":"M8_raw_24m","response":"ETmax","n_predictors":418,"n_pairs":395,"RMSE":0.039,"MAE":0.027,"R2":0.654,"pred_sd":0.0058},{"model":"M8_anom_12m","response":"ETmax","n_predictors":265,"n_pairs":395,"RMSE":0.052,"MAE":0.038,"R2":0.383,"pred_sd":0.0135},{"model":"M8_anom_24m","response":"ETmax","n_predictors":418,"n_pairs":395,"RMSE":0.051,"MAE":0.037,"R2":0.403,"pred_sd":0.0093},{"model":"M1_12m","response":"uWUE","n_predictors":143,"n_pairs":395,"RMSE":0.936,"MAE":0.708,"R2":0.118,"pred_sd":0.1733},{"model":"M1_24m","response":"uWUE","n_predictors":286,"n_pairs":395,"RMSE":0.936,"MAE":0.709,"R2":0.117,"pred_sd":0.1703},{"model":"M2_12m","response":"uWUE","n_predictors":243,"n_pairs":395,"RMSE":0.891,"MAE":0.677,"R2":0.202,"pred_sd":0.1636},{"model":"M2_24m","response":"uWUE","n_predictors":396,"n_pairs":395,"RMSE":0.888,"MAE":0.676,"R2":0.206,"pred_sd":0.1629},{"model":"M3_12m","response":"uWUE","n_predictors":164,"n_pairs":395,"RMSE":0.976,"MAE":0.737,"R2":0.04,"pred_sd":0.1775},{"model":"M3_24m","response":"uWUE","n_predictors":307,"n_pairs":395,"RMSE":0.964,"MAE":0.728,"R2":0.065,"pred_sd":0.1751},{"model":"M4_12m","response":"uWUE","n_predictors":264,"n_pairs":395,"RMSE":0.929,"MAE":0.704,"R2":0.131,"pred_sd":0.1687},{"model":"M4_24m","response":"uWUE","n_predictors":417,"n_pairs":395,"RMSE":0.922,"MAE":0.688,"R2":0.144,"pred_sd":0.1673},{"model":"M5_raw_12m","response":"uWUE","n_predictors":144,"n_pairs":395,"RMSE":0.616,"MAE":0.436,"R2":0.618,"pred_sd":0.108},{"model":"M5_raw_24m","response":"uWUE","n_predictors":287,"n_pairs":395,"RMSE":0.61,"MAE":0.437,"R2":0.626,"pred_sd":0.112},{"model":"M5_anom_12m","response":"uWUE","n_predictors":144,"n_pairs":395,"RMSE":0.942,"MAE":0.71,"R2":0.106,"pred_sd":0.1678},{"model":"M5_anom_24m","response":"uWUE","n_predictors":287,"n_pairs":395,"RMSE":0.932,"MAE":0.705,"R2":0.125,"pred_sd":0.1634},{"model":"M6_raw_12m","response":"uWUE","n_predictors":244,"n_pairs":395,"RMSE":0.623,"MAE":0.446,"R2":0.609,"pred_sd":0.1045},{"model":"M6_raw_24m","response":"uWUE","n_predictors":397,"n_pairs":395,"RMSE":0.607,"MAE":0.432,"R2":0.629,"pred_sd":0.1093},{"model":"M6_anom_12m","response":"uWUE","n_predictors":244,"n_pairs":395,"RMSE":0.89,"MAE":0.676,"R2":0.202,"pred_sd":0.1671},{"model":"M6_anom_24m","response":"uWUE","n_predictors":397,"n_pairs":395,"RMSE":0.891,"MAE":0.673,"R2":0.2,"pred_sd":0.1623},{"model":"M7_raw_12m","response":"uWUE","n_predictors":165,"n_pairs":395,"RMSE":0.621,"MAE":0.44,"R2":0.612,"pred_sd":0.1121},{"model":"M7_raw_24m","response":"uWUE","n_predictors":308,"n_pairs":395,"RMSE":0.619,"MAE":0.445,"R2":0.614,"pred_sd":0.1196},{"model":"M7_anom_12m","response":"uWUE","n_predictors":165,"n_pairs":395,"RMSE":0.976,"MAE":0.739,"R2":0.042,"pred_sd":0.1814},{"model":"M7_anom_24m","response":"uWUE","n_predictors":308,"n_pairs":395,"RMSE":0.958,"MAE":0.725,"R2":0.077,"pred_sd":0.1845},{"model":"M8_raw_12m","response":"uWUE","n_predictors":265,"n_pairs":395,"RMSE":0.628,"MAE":0.449,"R2":0.602,"pred_sd":0.1099},{"model":"M8_raw_24m","response":"uWUE","n_predictors":418,"n_pairs":395,"RMSE":0.615,"MAE":0.438,"R2":0.62,"pred_sd":0.116},{"model":"M8_anom_12m","response":"uWUE","n_predictors":265,"n_pairs":395,"RMSE":0.928,"MAE":0.702,"R2":0.132,"pred_sd":0.1666},{"model":"M8_anom_24m","response":"uWUE","n_predictors":418,"n_pairs":395,"RMSE":0.922,"MAE":0.689,"R2":0.144,"pred_sd":0.1724},{"model":"M1_12m","response":"WUE","n_predictors":143,"n_pairs":395,"RMSE":0.964,"MAE":0.721,"R2":0.202,"pred_sd":0.1654},{"model":"M1_24m","response":"WUE","n_predictors":286,"n_pairs":395,"RMSE":0.965,"MAE":0.74,"R2":0.2,"pred_sd":0.1888},{"model":"M2_12m","response":"WUE","n_predictors":243,"n_pairs":395,"RMSE":0.888,"MAE":0.674,"R2":0.323,"pred_sd":0.151},{"model":"M2_24m","response":"WUE","n_predictors":396,"n_pairs":395,"RMSE":0.896,"MAE":0.678,"R2":0.31,"pred_sd":0.1776},{"model":"M3_12m","response":"WUE","n_predictors":164,"n_pairs":395,"RMSE":1.004,"MAE":0.75,"R2":0.134,"pred_sd":0.1822},{"model":"M3_24m","response":"WUE","n_predictors":307,"n_pairs":395,"RMSE":1.016,"MAE":0.768,"R2":0.114,"pred_sd":0.2064},{"model":"M4_12m","response":"WUE","n_predictors":264,"n_pairs":395,"RMSE":0.925,"MAE":0.694,"R2":0.265,"pred_sd":0.1569},{"model":"M4_24m","response":"WUE","n_predictors":417,"n_pairs":395,"RMSE":0.945,"MAE":0.71,"R2":0.232,"pred_sd":0.1876},{"model":"M5_raw_12m","response":"WUE","n_predictors":144,"n_pairs":395,"RMSE":0.647,"MAE":0.473,"R2":0.641,"pred_sd":0.1069},{"model":"M5_raw_24m","response":"WUE","n_predictors":287,"n_pairs":395,"RMSE":0.648,"MAE":0.476,"R2":0.639,"pred_sd":0.1261},{"model":"M5_anom_12m","response":"WUE","n_predictors":144,"n_pairs":395,"RMSE":0.967,"MAE":0.729,"R2":0.197,"pred_sd":0.1663},{"model":"M5_anom_24m","response":"WUE","n_predictors":287,"n_pairs":395,"RMSE":0.967,"MAE":0.74,"R2":0.197,"pred_sd":0.1897},{"model":"M6_raw_12m","response":"WUE","n_predictors":244,"n_pairs":395,"RMSE":0.638,"MAE":0.47,"R2":0.651,"pred_sd":0.1036},{"model":"M6_raw_24m","response":"WUE","n_predictors":397,"n_pairs":395,"RMSE":0.642,"MAE":0.473,"R2":0.646,"pred_sd":0.12},{"model":"M6_anom_12m","response":"WUE","n_predictors":244,"n_pairs":395,"RMSE":0.886,"MAE":0.673,"R2":0.326,"pred_sd":0.151},{"model":"M6_anom_24m","response":"WUE","n_predictors":397,"n_pairs":395,"RMSE":0.9,"MAE":0.682,"R2":0.305,"pred_sd":0.172},{"model":"M7_raw_12m","response":"WUE","n_predictors":165,"n_pairs":395,"RMSE":0.653,"MAE":0.476,"R2":0.633,"pred_sd":0.1074},{"model":"M7_raw_24m","response":"WUE","n_predictors":308,"n_pairs":395,"RMSE":0.648,"MAE":0.473,"R2":0.639,"pred_sd":0.1275},{"model":"M7_anom_12m","response":"WUE","n_predictors":165,"n_pairs":395,"RMSE":1.003,"MAE":0.749,"R2":0.137,"pred_sd":0.1756},{"model":"M7_anom_24m","response":"WUE","n_predictors":308,"n_pairs":395,"RMSE":1.02,"MAE":0.773,"R2":0.107,"pred_sd":0.2105},{"model":"M8_raw_12m","response":"WUE","n_predictors":265,"n_pairs":395,"RMSE":0.645,"MAE":0.476,"R2":0.643,"pred_sd":0.1046},{"model":"M8_raw_24m","response":"WUE","n_predictors":418,"n_pairs":395,"RMSE":0.647,"MAE":0.477,"R2":0.641,"pred_sd":0.1182},{"model":"M8_anom_12m","response":"WUE","n_predictors":265,"n_pairs":395,"RMSE":0.925,"MAE":0.695,"R2":0.265,"pred_sd":0.1537},{"model":"M8_anom_24m","response":"WUE","n_predictors":418,"n_pairs":395,"RMSE":0.945,"MAE":0.71,"R2":0.232,"pred_sd":0.1913}],"v41":[{"model":"M3_12m","response":"GPPsat","n_predictors":143,"n_pairs":388,"RMSE":7.258,"MAE":5.662,"R2":0.332,"pred_sd":1.3159},{"model":"M4_12m","response":"GPPsat","n_predictors":213,"n_pairs":388,"RMSE":6.928,"MAE":5.316,"R2":0.391,"pred_sd":1.3001},{"model":"M3_12m","response":"NEPmax","n_predictors":143,"n_pairs":388,"RMSE":4.016,"MAE":3.116,"R2":0.402,"pred_sd":0.7876},{"model":"M4_12m","response":"NEPmax","n_predictors":213,"n_pairs":388,"RMSE":3.694,"MAE":2.805,"R2":0.494,"pred_sd":0.7275},{"model":"M3_12m","response":"ETmax","n_predictors":143,"n_pairs":388,"RMSE":0.05048,"MAE":0.03766,"R2":0.41,"pred_sd":0.0095},{"model":"M4_12m","response":"ETmax","n_predictors":213,"n_pairs":388,"RMSE":0.04908,"MAE":0.03632,"R2":0.442,"pred_sd":0.0095},{"model":"M3_12m","response":"WUE","n_predictors":143,"n_pairs":388,"RMSE":1.695,"MAE":0.9344,"R2":0.443,"pred_sd":0.4294},{"model":"M4_12m","response":"WUE","n_predictors":213,"n_pairs":388,"RMSE":1.633,"MAE":0.8492,"R2":0.484,"pred_sd":0.4483},{"model":"M3_24m","response":"GPPsat","n_predictors":263,"n_pairs":388,"RMSE":7.268,"MAE":5.596,"R2":0.33,"pred_sd":1.4672},{"model":"M4_24m","response":"GPPsat","n_predictors":368,"n_pairs":388,"RMSE":6.969,"MAE":5.332,"R2":0.384,"pred_sd":1.4744},{"model":"M3_24m","response":"NEPmax","n_predictors":263,"n_pairs":388,"RMSE":3.97,"MAE":3.099,"R2":0.415,"pred_sd":0.7252},{"model":"M4_24m","response":"NEPmax","n_predictors":368,"n_pairs":388,"RMSE":3.674,"MAE":2.789,"R2":0.499,"pred_sd":0.7289},{"model":"M3_24m","response":"ETmax","n_predictors":263,"n_pairs":388,"RMSE":0.04926,"MAE":0.03686,"R2":0.438,"pred_sd":0.0074},{"model":"M4_24m","response":"ETmax","n_predictors":368,"n_pairs":388,"RMSE":0.0483,"MAE":0.03605,"R2":0.46,"pred_sd":0.0075},{"model":"M3_24m","response":"WUE","n_predictors":263,"n_pairs":388,"RMSE":1.745,"MAE":0.9154,"R2":0.411,"pred_sd":0.3247},{"model":"M4_24m","response":"WUE","n_predictors":368,"n_pairs":388,"RMSE":1.734,"MAE":0.8968,"R2":0.418,"pred_sd":0.3545}],"v41f":[{"model":"M3_12m","response":"GPP_gs","n_predictors":143,"n_pairs":362,"RMSE":371.7,"MAE":287.4,"R2":0.565,"pred_sd":74.7967},{"model":"M4_12m","response":"GPP_gs","n_predictors":213,"n_pairs":362,"RMSE":362.8,"MAE":274.8,"R2":0.586,"pred_sd":69.6068},{"model":"M3_12m","response":"NEP_gs","n_predictors":143,"n_pairs":362,"RMSE":273.9,"MAE":201.1,"R2":0.211,"pred_sd":44.336},{"model":"M4_12m","response":"NEP_gs","n_predictors":213,"n_pairs":362,"RMSE":266.2,"MAE":191.5,"R2":0.255,"pred_sd":43.9982},{"model":"M3_12m","response":"ET_gs","n_predictors":143,"n_pairs":362,"RMSE":114.7,"MAE":81.1,"R2":0.465,"pred_sd":21.5622},{"model":"M4_12m","response":"ET_gs","n_predictors":213,"n_pairs":362,"RMSE":116.5,"MAE":83.28,"R2":0.449,"pred_sd":22.6345},{"model":"M3_12m","response":"WUE_gs","n_predictors":143,"n_pairs":362,"RMSE":1.044,"MAE":0.7476,"R2":0.409,"pred_sd":0.1679},{"model":"M4_12m","response":"WUE_gs","n_predictors":213,"n_pairs":362,"RMSE":1.033,"MAE":0.7397,"R2":0.422,"pred_sd":0.1684},{"model":"M3_24m","response":"GPP_gs","n_predictors":263,"n_pairs":362,"RMSE":375.4,"MAE":292.7,"R2":0.557,"pred_sd":83.5815},{"model":"M4_24m","response":"GPP_gs","n_predictors":368,"n_pairs":362,"RMSE":362.2,"MAE":272.1,"R2":0.587,"pred_sd":75.2502},{"model":"M3_24m","response":"NEP_gs","n_predictors":263,"n_pairs":362,"RMSE":262.8,"MAE":190.8,"R2":0.274,"pred_sd":50.1273},{"model":"M4_24m","response":"NEP_gs","n_predictors":368,"n_pairs":362,"RMSE":255.1,"MAE":182.7,"R2":0.316,"pred_sd":49.0457},{"model":"M3_24m","response":"ET_gs","n_predictors":263,"n_pairs":362,"RMSE":115.8,"MAE":82.22,"R2":0.455,"pred_sd":17.902},{"model":"M4_24m","response":"ET_gs","n_predictors":368,"n_pairs":362,"RMSE":118.6,"MAE":83.79,"R2":0.428,"pred_sd":17.9491},{"model":"M3_24m","response":"WUE_gs","n_predictors":263,"n_pairs":362,"RMSE":1.047,"MAE":0.7659,"R2":0.406,"pred_sd":0.1963},{"model":"M4_24m","response":"WUE_gs","n_predictors":368,"n_pairs":362,"RMSE":1.008,"MAE":0.7207,"R2":0.449,"pred_sd":0.1964}],"v10f":[{"model":"M3_12m","response":"GPP_gs","n_predictors":164,"n_pairs":372,"RMSE":416.6,"MAE":321.1,"R2":0.31,"pred_sd":83.9523},{"model":"M4_12m","response":"GPP_gs","n_predictors":264,"n_pairs":372,"RMSE":378.7,"MAE":291.6,"R2":0.43,"pred_sd":79.569},{"model":"M3_12m","response":"NEP_gs","n_predictors":164,"n_pairs":372,"RMSE":299.7,"MAE":218.1,"R2":0.006,"pred_sd":25.9773},{"model":"M4_12m","response":"NEP_gs","n_predictors":264,"n_pairs":372,"RMSE":289.6,"MAE":209.5,"R2":0.072,"pred_sd":27.4832},{"model":"M3_12m","response":"ET_gs","n_predictors":164,"n_pairs":372,"RMSE":119.5,"MAE":81.74,"R2":0.519,"pred_sd":21.1676},{"model":"M4_12m","response":"ET_gs","n_predictors":264,"n_pairs":372,"RMSE":120.7,"MAE":82.85,"R2":0.509,"pred_sd":21.855},{"model":"M3_12m","response":"WUE_gs","n_predictors":164,"n_pairs":372,"RMSE":1.043,"MAE":0.7717,"R2":0.201,"pred_sd":0.198},{"model":"M4_12m","response":"WUE_gs","n_predictors":264,"n_pairs":372,"RMSE":0.9794,"MAE":0.7127,"R2":0.295,"pred_sd":0.1877},{"model":"M3_24m","response":"GPP_gs","n_predictors":307,"n_pairs":372,"RMSE":422.9,"MAE":326.3,"R2":0.289,"pred_sd":71.6085},{"model":"M4_24m","response":"GPP_gs","n_predictors":417,"n_pairs":372,"RMSE":388.2,"MAE":294.9,"R2":0.401,"pred_sd":69.2658},{"model":"M3_24m","response":"NEP_gs","n_predictors":307,"n_pairs":372,"RMSE":302.0,"MAE":220.6,"R2":-0.008,"pred_sd":43.8317},{"model":"M4_24m","response":"NEP_gs","n_predictors":417,"n_pairs":372,"RMSE":286.4,"MAE":205.5,"R2":0.093,"pred_sd":40.7678},{"model":"M3_24m","response":"ET_gs","n_predictors":307,"n_pairs":372,"RMSE":118.6,"MAE":82.43,"R2":0.527,"pred_sd":26.3559},{"model":"M4_24m","response":"ET_gs","n_predictors":417,"n_pairs":372,"RMSE":120.6,"MAE":83.19,"R2":0.51,"pred_sd":26.7675},{"model":"M3_24m","response":"WUE_gs","n_predictors":307,"n_pairs":372,"RMSE":1.072,"MAE":0.7983,"R2":0.155,"pred_sd":0.2272},{"model":"M4_24m","response":"WUE_gs","n_predictors":417,"n_pairs":372,"RMSE":1.013,"MAE":0.746,"R2":0.246,"pred_sd":0.209}]},"lgbopt":{"sites_with_high_Tcover":[{"model":"M1_12m","response":"GPPsat","n_predictors":143,"n_pairs":395,"RMSE":7.8,"MAE":6.193,"R2":0.198,"pred_sd":1.6246},{"model":"M1_24m","response":"GPPsat","n_predictors":286,"n_pairs":395,"RMSE":7.687,"MAE":6.129,"R2":0.221,"pred_sd":1.3429},{"model":"M2_12m","response":"GPPsat","n_predictors":243,"n_pairs":395,"RMSE":6.8,"MAE":5.341,"R2":0.39,"pred_sd":1.5222},{"model":"M2_24m","response":"GPPsat","n_predictors":396,"n_pairs":395,"RMSE":6.847,"MAE":5.358,"R2":0.382,"pred_sd":1.3769},{"model":"M3_12m","response":"GPPsat","n_predictors":164,"n_pairs":395,"RMSE":7.967,"MAE":6.204,"R2":0.163,"pred_sd":1.5806},{"model":"M3_24m","response":"GPPsat","n_predictors":307,"n_pairs":395,"RMSE":7.839,"MAE":6.101,"R2":0.19,"pred_sd":1.413},{"model":"M4_12m","response":"GPPsat","n_predictors":264,"n_pairs":395,"RMSE":7.122,"MAE":5.489,"R2":0.331,"pred_sd":1.4321},{"model":"M4_24m","response":"GPPsat","n_predictors":417,"n_pairs":395,"RMSE":7.09,"MAE":5.458,"R2":0.337,"pred_sd":1.3429},{"model":"M5_raw_12m","response":"GPPsat","n_predictors":144,"n_pairs":395,"RMSE":4.842,"MAE":3.594,"R2":0.691,"pred_sd":1.096},{"model":"M5_raw_24m","response":"GPPsat","n_predictors":287,"n_pairs":395,"RMSE":4.684,"MAE":3.434,"R2":0.711,"pred_sd":0.7944},{"model":"M5_anom_12m","response":"GPPsat","n_predictors":144,"n_pairs":395,"RMSE":7.794,"MAE":6.204,"R2":0.199,"pred_sd":1.6182},{"model":"M5_anom_24m","response":"GPPsat","n_predictors":287,"n_pairs":395,"RMSE":7.677,"MAE":6.125,"R2":0.223,"pred_sd":1.3391},{"model":"M6_raw_12m","response":"GPPsat","n_predictors":244,"n_pairs":395,"RMSE":4.796,"MAE":3.544,"R2":0.697,"pred_sd":1.0343},{"model":"M6_raw_24m","response":"GPPsat","n_predictors":397,"n_pairs":395,"RMSE":4.684,"MAE":3.475,"R2":0.711,"pred_sd":0.8086},{"model":"M6_anom_12m","response":"GPPsat","n_predictors":244,"n_pairs":395,"RMSE":6.789,"MAE":5.35,"R2":0.392,"pred_sd":1.5123},{"model":"M6_anom_24m","response":"GPPsat","n_predictors":397,"n_pairs":395,"RMSE":6.865,"MAE":5.365,"R2":0.379,"pred_sd":1.3676},{"model":"M7_raw_12m","response":"GPPsat","n_predictors":165,"n_pairs":395,"RMSE":4.894,"MAE":3.62,"R2":0.684,"pred_sd":1.1461},{"model":"M7_raw_24m","response":"GPPsat","n_predictors":308,"n_pairs":395,"RMSE":4.759,"MAE":3.502,"R2":0.701,"pred_sd":0.8093},{"model":"M7_anom_12m","response":"GPPsat","n_predictors":165,"n_pairs":395,"RMSE":7.99,"MAE":6.192,"R2":0.158,"pred_sd":1.5893},{"model":"M7_anom_24m","response":"GPPsat","n_predictors":308,"n_pairs":395,"RMSE":7.815,"MAE":6.088,"R2":0.195,"pred_sd":1.4453},{"model":"M8_raw_12m","response":"GPPsat","n_predictors":265,"n_pairs":395,"RMSE":4.82,"MAE":3.563,"R2":0.694,"pred_sd":1.0419},{"model":"M8_raw_24m","response":"GPPsat","n_predictors":418,"n_pairs":395,"RMSE":4.726,"MAE":3.485,"R2":0.706,"pred_sd":0.8332},{"model":"M8_anom_12m","response":"GPPsat","n_predictors":265,"n_pairs":395,"RMSE":7.086,"MAE":5.463,"R2":0.338,"pred_sd":1.4374},{"model":"M8_anom_24m","response":"GPPsat","n_predictors":418,"n_pairs":395,"RMSE":7.095,"MAE":5.452,"R2":0.336,"pred_sd":1.3566},{"model":"M1_12m","response":"NEPmax","n_predictors":143,"n_pairs":395,"RMSE":7.699,"MAE":5.913,"R2":0.217,"pred_sd":1.5025},{"model":"M1_24m","response":"NEPmax","n_predictors":286,"n_pairs":395,"RMSE":7.84,"MAE":6.024,"R2":0.189,"pred_sd":1.529},{"model":"M2_12m","response":"NEPmax","n_predictors":243,"n_pairs":395,"RMSE":6.28,"MAE":4.758,"R2":0.479,"pred_sd":1.3054},{"model":"M2_24m","response":"NEPmax","n_predictors":396,"n_pairs":395,"RMSE":6.364,"MAE":4.791,"R2":0.465,"pred_sd":1.4091},{"model":"M3_12m","response":"NEPmax","n_predictors":164,"n_pairs":395,"RMSE":7.863,"MAE":6.05,"R2":0.184,"pred_sd":1.5269},{"model":"M3_24m","response":"NEPmax","n_predictors":307,"n_pairs":395,"RMSE":7.91,"MAE":6.073,"R2":0.174,"pred_sd":1.5933},{"model":"M4_12m","response":"NEPmax","n_predictors":264,"n_pairs":395,"RMSE":6.661,"MAE":5.042,"R2":0.414,"pred_sd":1.3419},{"model":"M4_24m","response":"NEPmax","n_predictors":417,"n_pairs":395,"RMSE":6.722,"MAE":5.116,"R2":0.403,"pred_sd":1.3892},{"model":"M5_raw_12m","response":"NEPmax","n_predictors":144,"n_pairs":395,"RMSE":4.472,"MAE":3.171,"R2":0.736,"pred_sd":0.8939},{"model":"M5_raw_24m","response":"NEPmax","n_predictors":287,"n_pairs":395,"RMSE":4.415,"MAE":3.056,"R2":0.743,"pred_sd":0.8455},{"model":"M5_anom_12m","response":"NEPmax","n_predictors":144,"n_pairs":395,"RMSE":7.72,"MAE":5.966,"R2":0.213,"pred_sd":1.4754},{"model":"M5_anom_24m","response":"NEPmax","n_predictors":287,"n_pairs":395,"RMSE":7.831,"MAE":6.019,"R2":0.19,"pred_sd":1.5578},{"model":"M6_raw_12m","response":"NEPmax","n_predictors":244,"n_pairs":395,"RMSE":4.345,"MAE":2.979,"R2":0.751,"pred_sd":0.8938},{"model":"M6_raw_24m","response":"NEPmax","n_predictors":397,"n_pairs":395,"RMSE":4.313,"MAE":2.921,"R2":0.754,"pred_sd":0.8491},{"model":"M6_anom_12m","response":"NEPmax","n_predictors":244,"n_pairs":395,"RMSE":6.285,"MAE":4.731,"R2":0.478,"pred_sd":1.3058},{"model":"M6_anom_24m","response":"NEPmax","n_predictors":397,"n_pairs":395,"RMSE":6.416,"MAE":4.836,"R2":0.457,"pred_sd":1.4588},{"model":"M7_raw_12m","response":"NEPmax","n_predictors":165,"n_pairs":395,"RMSE":4.539,"MAE":3.239,"R2":0.728,"pred_sd":0.9041},{"model":"M7_raw_24m","response":"NEPmax","n_predictors":308,"n_pairs":395,"RMSE":4.435,"MAE":3.067,"R2":0.74,"pred_sd":0.8863},{"model":"M7_anom_12m","response":"NEPmax","n_predictors":165,"n_pairs":395,"RMSE":7.851,"MAE":6.037,"R2":0.186,"pred_sd":1.5331},{"model":"M7_anom_24m","response":"NEPmax","n_predictors":308,"n_pairs":395,"RMSE":7.882,"MAE":6.043,"R2":0.18,"pred_sd":1.4986},{"model":"M8_raw_12m","response":"NEPmax","n_predictors":265,"n_pairs":395,"RMSE":4.399,"MAE":3.019,"R2":0.745,"pred_sd":0.9434},{"model":"M8_raw_24m","response":"NEPmax","n_predictors":418,"n_pairs":395,"RMSE":4.357,"MAE":2.961,"R2":0.749,"pred_sd":0.8747},{"model":"M8_anom_12m","response":"NEPmax","n_predictors":265,"n_pairs":395,"RMSE":6.663,"MAE":5.037,"R2":0.414,"pred_sd":1.3852},{"model":"M8_anom_24m","response":"NEPmax","n_predictors":418,"n_pairs":395,"RMSE":6.676,"MAE":5.075,"R2":0.412,"pred_sd":1.3632},{"model":"M1_12m","response":"ETmax","n_predictors":143,"n_pairs":395,"RMSE":0.052,"MAE":0.039,"R2":0.368,"pred_sd":0.0117},{"model":"M1_24m","response":"ETmax","n_predictors":286,"n_pairs":395,"RMSE":0.053,"MAE":0.04,"R2":0.351,"pred_sd":0.009},{"model":"M2_12m","response":"ETmax","n_predictors":243,"n_pairs":395,"RMSE":0.052,"MAE":0.039,"R2":0.38,"pred_sd":0.0116},{"model":"M2_24m","response":"ETmax","n_predictors":396,"n_pairs":395,"RMSE":0.052,"MAE":0.039,"R2":0.37,"pred_sd":0.0092},{"model":"M3_12m","response":"ETmax","n_predictors":164,"n_pairs":395,"RMSE":0.05,"MAE":0.037,"R2":0.411,"pred_sd":0.0123},{"model":"M3_24m","response":"ETmax","n_predictors":307,"n_pairs":395,"RMSE":0.051,"MAE":0.037,"R2":0.407,"pred_sd":0.0097},{"model":"M4_12m","response":"ETmax","n_predictors":264,"n_pairs":395,"RMSE":0.05,"MAE":0.036,"R2":0.416,"pred_sd":0.0124},{"model":"M4_24m","response":"ETmax","n_predictors":417,"n_pairs":395,"RMSE":0.051,"MAE":0.038,"R2":0.395,"pred_sd":0.0101},{"model":"M5_raw_12m","response":"ETmax","n_predictors":144,"n_pairs":395,"RMSE":0.037,"MAE":0.026,"R2":0.681,"pred_sd":0.0079},{"model":"M5_raw_24m","response":"ETmax","n_predictors":287,"n_pairs":395,"RMSE":0.038,"MAE":0.027,"R2":0.656,"pred_sd":0.006},{"model":"M5_anom_12m","response":"ETmax","n_predictors":144,"n_pairs":395,"RMSE":0.053,"MAE":0.04,"R2":0.357,"pred_sd":0.0114},{"model":"M5_anom_24m","response":"ETmax","n_predictors":287,"n_pairs":395,"RMSE":0.053,"MAE":0.04,"R2":0.351,"pred_sd":0.0091},{"model":"M6_raw_12m","response":"ETmax","n_predictors":244,"n_pairs":395,"RMSE":0.037,"MAE":0.026,"R2":0.677,"pred_sd":0.008},{"model":"M6_raw_24m","response":"ETmax","n_predictors":397,"n_pairs":395,"RMSE":0.038,"MAE":0.027,"R2":0.657,"pred_sd":0.0061},{"model":"M6_anom_12m","response":"ETmax","n_predictors":244,"n_pairs":395,"RMSE":0.052,"MAE":0.04,"R2":0.377,"pred_sd":0.0115},{"model":"M6_anom_24m","response":"ETmax","n_predictors":397,"n_pairs":395,"RMSE":0.052,"MAE":0.039,"R2":0.371,"pred_sd":0.0091},{"model":"M7_raw_12m","response":"ETmax","n_predictors":165,"n_pairs":395,"RMSE":0.037,"MAE":0.026,"R2":0.674,"pred_sd":0.0082},{"model":"M7_raw_24m","response":"ETmax","n_predictors":308,"n_pairs":395,"RMSE":0.039,"MAE":0.027,"R2":0.65,"pred_sd":0.0062},{"model":"M7_anom_12m","response":"ETmax","n_predictors":165,"n_pairs":395,"RMSE":0.05,"MAE":0.036,"R2":0.427,"pred_sd":0.0126},{"model":"M7_anom_24m","response":"ETmax","n_predictors":308,"n_pairs":395,"RMSE":0.051,"MAE":0.037,"R2":0.403,"pred_sd":0.0098},{"model":"M8_raw_12m","response":"ETmax","n_predictors":265,"n_pairs":395,"RMSE":0.038,"MAE":0.027,"R2":0.672,"pred_sd":0.0081},{"model":"M8_raw_24m","response":"ETmax","n_predictors":418,"n_pairs":395,"RMSE":0.039,"MAE":0.027,"R2":0.651,"pred_sd":0.0061},{"model":"M8_anom_12m","response":"ETmax","n_predictors":265,"n_pairs":395,"RMSE":0.05,"MAE":0.037,"R2":0.412,"pred_sd":0.0124},{"model":"M8_anom_24m","response":"ETmax","n_predictors":418,"n_pairs":395,"RMSE":0.051,"MAE":0.038,"R2":0.394,"pred_sd":0.0101},{"model":"M1_12m","response":"uWUE","n_predictors":143,"n_pairs":395,"RMSE":0.934,"MAE":0.707,"R2":0.121,"pred_sd":0.1588},{"model":"M1_24m","response":"uWUE","n_predictors":286,"n_pairs":395,"RMSE":0.942,"MAE":0.72,"R2":0.106,"pred_sd":0.1773},{"model":"M2_12m","response":"uWUE","n_predictors":243,"n_pairs":395,"RMSE":0.882,"MAE":0.671,"R2":0.217,"pred_sd":0.1526},{"model":"M2_24m","response":"uWUE","n_predictors":396,"n_pairs":395,"RMSE":0.886,"MAE":0.67,"R2":0.209,"pred_sd":0.1698},{"model":"M3_12m","response":"uWUE","n_predictors":164,"n_pairs":395,"RMSE":0.971,"MAE":0.735,"R2":0.05,"pred_sd":0.1732},{"model":"M3_24m","response":"uWUE","n_predictors":307,"n_pairs":395,"RMSE":0.969,"MAE":0.739,"R2":0.055,"pred_sd":0.1855},{"model":"M4_12m","response":"uWUE","n_predictors":264,"n_pairs":395,"RMSE":0.92,"MAE":0.699,"R2":0.147,"pred_sd":0.1542},{"model":"M4_24m","response":"uWUE","n_predictors":417,"n_pairs":395,"RMSE":0.918,"MAE":0.694,"R2":0.151,"pred_sd":0.1576},{"model":"M5_raw_12m","response":"uWUE","n_predictors":144,"n_pairs":395,"RMSE":0.612,"MAE":0.434,"R2":0.623,"pred_sd":0.1011},{"model":"M5_raw_24m","response":"uWUE","n_predictors":287,"n_pairs":395,"RMSE":0.624,"MAE":0.441,"R2":0.608,"pred_sd":0.1111},{"model":"M5_anom_12m","response":"uWUE","n_predictors":144,"n_pairs":395,"RMSE":0.933,"MAE":0.709,"R2":0.123,"pred_sd":0.1604},{"model":"M5_anom_24m","response":"uWUE","n_predictors":287,"n_pairs":395,"RMSE":0.945,"MAE":0.723,"R2":0.101,"pred_sd":0.1844},{"model":"M6_raw_12m","response":"uWUE","n_predictors":244,"n_pairs":395,"RMSE":0.622,"MAE":0.447,"R2":0.61,"pred_sd":0.103},{"model":"M6_raw_24m","response":"uWUE","n_predictors":397,"n_pairs":395,"RMSE":0.625,"MAE":0.445,"R2":0.607,"pred_sd":0.114},{"model":"M6_anom_12m","response":"uWUE","n_predictors":244,"n_pairs":395,"RMSE":0.885,"MAE":0.676,"R2":0.211,"pred_sd":0.15},{"model":"M6_anom_24m","response":"uWUE","n_predictors":397,"n_pairs":395,"RMSE":0.886,"MAE":0.672,"R2":0.209,"pred_sd":0.1683},{"model":"M7_raw_12m","response":"uWUE","n_predictors":165,"n_pairs":395,"RMSE":0.62,"MAE":0.441,"R2":0.612,"pred_sd":0.1032},{"model":"M7_raw_24m","response":"uWUE","n_predictors":308,"n_pairs":395,"RMSE":0.633,"MAE":0.452,"R2":0.596,"pred_sd":0.1091},{"model":"M7_anom_12m","response":"uWUE","n_predictors":165,"n_pairs":395,"RMSE":0.97,"MAE":0.735,"R2":0.053,"pred_sd":0.1772},{"model":"M7_anom_24m","response":"uWUE","n_predictors":308,"n_pairs":395,"RMSE":0.964,"MAE":0.736,"R2":0.064,"pred_sd":0.1826},{"model":"M8_raw_12m","response":"uWUE","n_predictors":265,"n_pairs":395,"RMSE":0.627,"MAE":0.451,"R2":0.604,"pred_sd":0.1039},{"model":"M8_raw_24m","response":"uWUE","n_predictors":418,"n_pairs":395,"RMSE":0.634,"MAE":0.451,"R2":0.596,"pred_sd":0.1143},{"model":"M8_anom_12m","response":"uWUE","n_predictors":265,"n_pairs":395,"RMSE":0.918,"MAE":0.697,"R2":0.151,"pred_sd":0.1522},{"model":"M8_anom_24m","response":"uWUE","n_predictors":418,"n_pairs":395,"RMSE":0.91,"MAE":0.689,"R2":0.166,"pred_sd":0.1598},{"model":"M1_12m","response":"WUE","n_predictors":143,"n_pairs":395,"RMSE":0.968,"MAE":0.731,"R2":0.196,"pred_sd":0.2004},{"model":"M1_24m","response":"WUE","n_predictors":286,"n_pairs":395,"RMSE":0.98,"MAE":0.742,"R2":0.175,"pred_sd":0.1735},{"model":"M2_12m","response":"WUE","n_predictors":243,"n_pairs":395,"RMSE":0.875,"MAE":0.67,"R2":0.342,"pred_sd":0.1715},{"model":"M2_24m","response":"WUE","n_predictors":396,"n_pairs":395,"RMSE":0.902,"MAE":0.689,"R2":0.301,"pred_sd":0.1596},{"model":"M3_12m","response":"WUE","n_predictors":164,"n_pairs":395,"RMSE":1.014,"MAE":0.761,"R2":0.117,"pred_sd":0.196},{"model":"M3_24m","response":"WUE","n_predictors":307,"n_pairs":395,"RMSE":1.021,"MAE":0.774,"R2":0.105,"pred_sd":0.1829},{"model":"M4_12m","response":"WUE","n_predictors":264,"n_pairs":395,"RMSE":0.924,"MAE":0.696,"R2":0.267,"pred_sd":0.1769},{"model":"M4_24m","response":"WUE","n_predictors":417,"n_pairs":395,"RMSE":0.94,"MAE":0.712,"R2":0.242,"pred_sd":0.1692},{"model":"M5_raw_12m","response":"WUE","n_predictors":144,"n_pairs":395,"RMSE":0.663,"MAE":0.486,"R2":0.622,"pred_sd":0.1357},{"model":"M5_raw_24m","response":"WUE","n_predictors":287,"n_pairs":395,"RMSE":0.656,"MAE":0.479,"R2":0.63,"pred_sd":0.1179},{"model":"M5_anom_12m","response":"WUE","n_predictors":144,"n_pairs":395,"RMSE":0.972,"MAE":0.737,"R2":0.189,"pred_sd":0.1934},{"model":"M5_anom_24m","response":"WUE","n_predictors":287,"n_pairs":395,"RMSE":0.977,"MAE":0.742,"R2":0.18,"pred_sd":0.1759},{"model":"M6_raw_12m","response":"WUE","n_predictors":244,"n_pairs":395,"RMSE":0.652,"MAE":0.483,"R2":0.635,"pred_sd":0.1267},{"model":"M6_raw_24m","response":"WUE","n_predictors":397,"n_pairs":395,"RMSE":0.649,"MAE":0.479,"R2":0.639,"pred_sd":0.1137},{"model":"M6_anom_12m","response":"WUE","n_predictors":244,"n_pairs":395,"RMSE":0.878,"MAE":0.671,"R2":0.338,"pred_sd":0.1708},{"model":"M6_anom_24m","response":"WUE","n_predictors":397,"n_pairs":395,"RMSE":0.901,"MAE":0.688,"R2":0.302,"pred_sd":0.1648},{"model":"M7_raw_12m","response":"WUE","n_predictors":165,"n_pairs":395,"RMSE":0.679,"MAE":0.496,"R2":0.605,"pred_sd":0.1387},{"model":"M7_raw_24m","response":"WUE","n_predictors":308,"n_pairs":395,"RMSE":0.666,"MAE":0.486,"R2":0.619,"pred_sd":0.1142},{"model":"M7_anom_12m","response":"WUE","n_predictors":165,"n_pairs":395,"RMSE":1.015,"MAE":0.763,"R2":0.116,"pred_sd":0.1999},{"model":"M7_anom_24m","response":"WUE","n_predictors":308,"n_pairs":395,"RMSE":1.028,"MAE":0.776,"R2":0.093,"pred_sd":0.1855},{"model":"M8_raw_12m","response":"WUE","n_predictors":265,"n_pairs":395,"RMSE":0.661,"MAE":0.486,"R2":0.625,"pred_sd":0.1313},{"model":"M8_raw_24m","response":"WUE","n_predictors":418,"n_pairs":395,"RMSE":0.65,"MAE":0.481,"R2":0.637,"pred_sd":0.111},{"model":"M8_anom_12m","response":"WUE","n_predictors":265,"n_pairs":395,"RMSE":0.922,"MAE":0.696,"R2":0.27,"pred_sd":0.1855},{"model":"M8_anom_24m","response":"WUE","n_predictors":418,"n_pairs":395,"RMSE":0.937,"MAE":0.71,"R2":0.246,"pred_sd":0.1729}],"v41":[{"model":"M3_12m","response":"GPPsat","n_predictors":143,"n_pairs":388,"RMSE":7.351,"MAE":5.695,"R2":0.315,"pred_sd":1.4519},{"model":"M4_12m","response":"GPPsat","n_predictors":213,"n_pairs":388,"RMSE":6.919,"MAE":5.265,"R2":0.393,"pred_sd":1.3605},{"model":"M3_12m","response":"NEPmax","n_predictors":143,"n_pairs":388,"RMSE":4.001,"MAE":3.102,"R2":0.406,"pred_sd":0.7294},{"model":"M4_12m","response":"NEPmax","n_predictors":213,"n_pairs":388,"RMSE":3.65,"MAE":2.751,"R2":0.506,"pred_sd":0.6878},{"model":"M3_12m","response":"ETmax","n_predictors":143,"n_pairs":388,"RMSE":0.0495,"MAE":0.03679,"R2":0.432,"pred_sd":0.0076},{"model":"M4_12m","response":"ETmax","n_predictors":213,"n_pairs":388,"RMSE":0.04871,"MAE":0.03617,"R2":0.451,"pred_sd":0.0069},{"model":"M3_12m","response":"WUE","n_predictors":143,"n_pairs":388,"RMSE":1.719,"MAE":0.9473,"R2":0.428,"pred_sd":0.4573},{"model":"M4_12m","response":"WUE","n_predictors":213,"n_pairs":388,"RMSE":1.68,"MAE":0.9218,"R2":0.454,"pred_sd":0.468},{"model":"M3_24m","response":"GPPsat","n_predictors":263,"n_pairs":388,"RMSE":7.192,"MAE":5.577,"R2":0.344,"pred_sd":1.2545},{"model":"M4_24m","response":"GPPsat","n_predictors":368,"n_pairs":388,"RMSE":6.843,"MAE":5.222,"R2":0.406,"pred_sd":1.1853},{"model":"M3_24m","response":"NEPmax","n_predictors":263,"n_pairs":388,"RMSE":3.924,"MAE":3.022,"R2":0.429,"pred_sd":0.8061},{"model":"M4_24m","response":"NEPmax","n_predictors":368,"n_pairs":388,"RMSE":3.607,"MAE":2.734,"R2":0.517,"pred_sd":0.7321},{"model":"M3_24m","response":"ETmax","n_predictors":263,"n_pairs":388,"RMSE":0.04985,"MAE":0.03721,"R2":0.424,"pred_sd":0.009},{"model":"M4_24m","response":"ETmax","n_predictors":368,"n_pairs":388,"RMSE":0.0487,"MAE":0.0363,"R2":0.451,"pred_sd":0.0081},{"model":"M3_24m","response":"WUE","n_predictors":263,"n_pairs":388,"RMSE":1.714,"MAE":0.9311,"R2":0.431,"pred_sd":0.3887},{"model":"M4_24m","response":"WUE","n_predictors":368,"n_pairs":388,"RMSE":1.672,"MAE":0.8886,"R2":0.459,"pred_sd":0.3921}],"v41f":[{"model":"M3_12m","response":"GPP_gs","n_predictors":143,"n_pairs":362,"RMSE":371.9,"MAE":291.6,"R2":0.565,"pred_sd":86.0679},{"model":"M4_12m","response":"GPP_gs","n_predictors":213,"n_pairs":362,"RMSE":367.8,"MAE":280.2,"R2":0.574,"pred_sd":85.0167},{"model":"M3_12m","response":"NEP_gs","n_predictors":143,"n_pairs":362,"RMSE":269.2,"MAE":196.6,"R2":0.238,"pred_sd":45.2789},{"model":"M4_12m","response":"NEP_gs","n_predictors":213,"n_pairs":362,"RMSE":263.2,"MAE":189.0,"R2":0.272,"pred_sd":42.4475},{"model":"M3_12m","response":"ET_gs","n_predictors":143,"n_pairs":362,"RMSE":115.6,"MAE":82.11,"R2":0.456,"pred_sd":27.8732},{"model":"M4_12m","response":"ET_gs","n_predictors":213,"n_pairs":362,"RMSE":116.1,"MAE":82.6,"R2":0.452,"pred_sd":26.3818},{"model":"M3_12m","response":"WUE_gs","n_predictors":143,"n_pairs":362,"RMSE":1.068,"MAE":0.7864,"R2":0.383,"pred_sd":0.2461},{"model":"M4_12m","response":"WUE_gs","n_predictors":213,"n_pairs":362,"RMSE":1.015,"MAE":0.7382,"R2":0.442,"pred_sd":0.2632},{"model":"M3_24m","response":"GPP_gs","n_predictors":263,"n_pairs":362,"RMSE":378.9,"MAE":294.0,"R2":0.548,"pred_sd":74.8682},{"model":"M4_24m","response":"GPP_gs","n_predictors":368,"n_pairs":362,"RMSE":359.7,"MAE":271.5,"R2":0.593,"pred_sd":73.5663},{"model":"M3_24m","response":"NEP_gs","n_predictors":263,"n_pairs":362,"RMSE":268.0,"MAE":194.0,"R2":0.245,"pred_sd":56.8929},{"model":"M4_24m","response":"NEP_gs","n_predictors":368,"n_pairs":362,"RMSE":260.5,"MAE":186.8,"R2":0.287,"pred_sd":55.6328},{"model":"M3_24m","response":"ET_gs","n_predictors":263,"n_pairs":362,"RMSE":116.8,"MAE":83.15,"R2":0.446,"pred_sd":20.088},{"model":"M4_24m","response":"ET_gs","n_predictors":368,"n_pairs":362,"RMSE":118.8,"MAE":84.11,"R2":0.426,"pred_sd":20.3114},{"model":"M3_24m","response":"WUE_gs","n_predictors":263,"n_pairs":362,"RMSE":1.069,"MAE":0.7898,"R2":0.381,"pred_sd":0.3154},{"model":"M4_24m","response":"WUE_gs","n_predictors":368,"n_pairs":362,"RMSE":1.022,"MAE":0.7424,"R2":0.434,"pred_sd":0.3161}],"v10f":[{"model":"M3_12m","response":"GPP_gs","n_predictors":164,"n_pairs":372,"RMSE":427.7,"MAE":332.0,"R2":0.272,"pred_sd":82.8542},{"model":"M4_12m","response":"GPP_gs","n_predictors":264,"n_pairs":372,"RMSE":378.4,"MAE":290.8,"R2":0.43,"pred_sd":78.5584},{"model":"M3_12m","response":"NEP_gs","n_predictors":164,"n_pairs":372,"RMSE":301.4,"MAE":222.9,"R2":-0.005,"pred_sd":38.7418},{"model":"M4_12m","response":"NEP_gs","n_predictors":264,"n_pairs":372,"RMSE":287.1,"MAE":209.7,"R2":0.088,"pred_sd":34.9308},{"model":"M3_12m","response":"ET_gs","n_predictors":164,"n_pairs":372,"RMSE":118.1,"MAE":81.02,"R2":0.531,"pred_sd":23.3531},{"model":"M4_12m","response":"ET_gs","n_predictors":264,"n_pairs":372,"RMSE":118.9,"MAE":81.96,"R2":0.524,"pred_sd":24.8514},{"model":"M3_12m","response":"WUE_gs","n_predictors":164,"n_pairs":372,"RMSE":1.047,"MAE":0.7678,"R2":0.194,"pred_sd":0.2017},{"model":"M4_12m","response":"WUE_gs","n_predictors":264,"n_pairs":372,"RMSE":0.9959,"MAE":0.7248,"R2":0.271,"pred_sd":0.1856},{"model":"M3_24m","response":"GPP_gs","n_predictors":307,"n_pairs":372,"RMSE":428.3,"MAE":330.1,"R2":0.27,"pred_sd":86.4891},{"model":"M4_24m","response":"GPP_gs","n_predictors":417,"n_pairs":372,"RMSE":387.5,"MAE":298.4,"R2":0.403,"pred_sd":81.9352},{"model":"M3_24m","response":"NEP_gs","n_predictors":307,"n_pairs":372,"RMSE":297.9,"MAE":216.8,"R2":0.019,"pred_sd":31.6038},{"model":"M4_24m","response":"NEP_gs","n_predictors":417,"n_pairs":372,"RMSE":286.5,"MAE":205.6,"R2":0.092,"pred_sd":30.9395},{"model":"M3_24m","response":"ET_gs","n_predictors":307,"n_pairs":372,"RMSE":120.6,"MAE":84.07,"R2":0.51,"pred_sd":22.2963},{"model":"M4_24m","response":"ET_gs","n_predictors":417,"n_pairs":372,"RMSE":121.5,"MAE":84.89,"R2":0.503,"pred_sd":23.3979},{"model":"M3_24m","response":"WUE_gs","n_predictors":307,"n_pairs":372,"RMSE":1.082,"MAE":0.7939,"R2":0.139,"pred_sd":0.1867},{"model":"M4_24m","response":"WUE_gs","n_predictors":417,"n_pairs":372,"RMSE":1.005,"MAE":0.7352,"R2":0.257,"pred_sd":0.1756}]}};
+const V41_MODEL_FAMS=['M3','M4'];
+let CFG='xgbopt';
+let CV='loo';
+let DS='sites_with_high_Tcover';
+const V10PATH={loo:{rfopt:'true_24m/RF_optuna/',xgbopt:'true_24m/XGB_optuna/',lgbopt:'true_24m/LGB_optuna/'},
+  rep:{rfopt:'true_24m/repeatedCV/RF_optuna/',xgbopt:'true_24m/repeatedCV/XGB_optuna/',lgbopt:'true_24m/repeatedCV/LGB_optuna/'}};
+// P(): RMSE / prediction figures depend on the resampling structure.
+function P(){return V10PATH[CV][CFG];}
+// PS(): SHAP figures come from a full-data model, identical under both structures.
+function PS(){return V10PATH.loo[CFG];}
+const V41P='../paper_v41/', V41F='../paper_v41_fluxes/', V10F='../paper_v10_fluxes/', V10E='../paper_v10_efp/';
+const V41=()=>({v41:V41P,v41f:V41F,v10f:V10F})[DS];   // image root of the active paper-pipeline dataset
+const LFAM={rfopt:'RF',xgbopt:'XGB',lgbopt:'LGB'};
+const is41=()=>DS==='v41'||DS==='v41f'||DS==='v10f';   // datasets run through the paper_v41 pipeline
+
+const META={
+  sites_with_high_Tcover:{sites:93,siteyears:395,igbp:'ENF 45 · DBF 26 · WET 10 · MF 6 · CSH 2 · OSH 2 · WSA 1 · EBF 1'},
+  v10f:{sites:93,siteyears:372,igbp:'ENF 45 · DBF 26 · WET 10 · MF 6 · CSH 2 · OSH 2 · WSA 1 · EBF 1'},
+  v41:{sites:106,siteyears:388,igbp:'ENF 51 · DBF 30 · WET 8 · MF 7 · CSH 3 · OSH 3 · EBF 3 · DNF 1'},
+  v41f:{sites:102,siteyears:362,igbp:'ENF 48 · DBF 30 · WET 8 · MF 7 · CSH 3 · EBF 3 · OSH 2 · DNF 1'}
+};
+const enc=p=>encodeURI(p);
+const setImg=(id,path,capId)=>{const el=document.getElementById(id);el.src=enc(path);
+  if(capId)document.getElementById(capId).textContent=path;};
+
+function opt(val,label){const o=document.createElement('option');o.value=val;o.textContent=label||val;return o;}
+function fill(sel,items){sel.innerHTML='';items.forEach(it=>{if(Array.isArray(it))sel.appendChild(opt(it[0],it[1]));else sel.appendChild(opt(it));});}
+const V41_METRICS=[['rel_mort','Relative mortality'],['rel_dist','Relative disturbance']];   // absolute mortality not shown
+const D_VIEWS=[['family','Metric by metric'],['concept','Three sub-blocks (share and per variable)']];
+
+fill(document.getElementById('sel5_efp'),EFPS);
+fill(document.getElementById('sel5_view'),[['m34','M3 vs M4 · XGBoost + LightGBM'],['all','All model pairs (per learner and CV)']]);
+fill(document.getElementById('sel5_metric'),[['reldist','Relative disturbance'],['relmort','Relative mortality']]);
+const showCtl=(id,on)=>{document.getElementById(id).closest('.ctrl').style.display=on?'':'none';};
+fill(document.getElementById('sel6_unit'),DELTA_UNITS);
+fill(document.getElementById('sel6_method'),METHODS);
+fill(document.getElementById('sel7_model'),SHAP_MODELS);
+fill(document.getElementById('sel7_efp'),EFPS);
+fill(document.getElementById('sel7_win'),WINDOWS);
+fill(document.getElementById('sel7_view'),[['comp','Composition (driver groups)'],['signed','Signed disturbance SHAP (M4)']]);
+fill(document.getElementById('sel7_metric10'),V41_METRICS);
+fill(document.getElementById('sel7v_metric'),V41_METRICS);
+fill(document.getElementById('sel7v_win'),WINDOWS);
+fill(document.getElementById('sel7v_style'),[['comp','Composition (relative |SHAP|)'],['signed','Signed disturbance SHAP']]);
+fill(document.getElementById('sel8_model'),SHAP_MODELS);
+fill(document.getElementById('sel8_win'),WINDOWS);
+fill(document.getElementById('sel8_method'),METHODS);
+fill(document.getElementById('sel8v_metric'),[['relmort','Relative mortality'],['reldist','Relative disturbance']]);
+fill(document.getElementById('sel9v_win'),WINDOWS);
+fill(document.getElementById('sel10_view'),D_VIEWS);
+fill(document.getElementById('sel3_sites'),[['all','All sites'],['high_reldist','High disturbance only (relative disturbance)'],['high_relmort','High disturbance only (relative mortality)']]);
+const RESP_OF={sites_with_high_Tcover:EFPS,v41:['GPPsat','NEPmax','ETmax','WUE'],v41f:['GPP_gs','NEP_gs','ET_gs','WUE_gs'],
+  v10f:['GPP_gs','NEP_gs','ET_gs','WUE_gs']};
+function fillResp(){const sel=document.getElementById('selm_resp'),prev=sel.value;fill(sel,['All',...RESP_OF[DS]]);
+  if([...sel.options].some(o=>o.value===prev))sel.value=prev;}
+
+function pickMetrics(){const src=(CV==='rep'?METRICS_REP:METRICS_LOO)[CFG]||{};return src[DS]||[];}
+let mSort={k:'response',dir:1};
+function r2color(v){const t=Math.max(0,Math.min(1,v/0.6));const h=Math.round(t*125);return `hsl(${h} 45% 22%)`;}
+function fillFam(){const sel=document.getElementById('selm_fam'),prev=sel.value;
+  fill(sel,['All',...(is41()?V41_MODEL_FAMS:MODEL_FAMS)]);
+  if([...sel.options].some(o=>o.value===prev))sel.value=prev;}
+function renderMetrics(){
+  const resp=document.getElementById('selm_resp').value,fam=document.getElementById('selm_fam').value;
+  let rows=pickMetrics().slice();
+  if(resp!=='All')rows=rows.filter(r=>r.response===resp);
+  if(fam!=='All')rows=rows.filter(r=>r.model.split('_')[0]===fam);
+  const k=mSort.k,d=mSort.dir;
+  rows.sort((a,b)=>{let x=a[k],y=b[k];return typeof x==='string'?d*x.localeCompare(y):d*(x-y);});
+  document.getElementById('metricsBody').innerHTML=rows.map(r=>`<tr>
+    <td class="txt mono">${r.model}</td><td class="txt">${r.response}</td>
+    <td>${r.n_predictors}</td><td>${r.n_pairs}</td>
+    <td>${r.RMSE}</td><td>${r.MAE}</td>
+    <td style="background:${r2color(r.R2)};color:#fff">${r.R2.toFixed(3)}</td>
+    ${CV==='rep'?`<td>${r.pred_sd!=null?r.pred_sd:''}</td>`:''}</tr>`).join('');
+  document.getElementById('th_predsd').style.display = (CV==='rep') ? '' : 'none';
+  document.getElementById('cap_metrics').textContent=`${rows.length} rows · dataset: ${dsName()} · learner: ${LFAM[CFG]} Optuna · CV: `+(CV==='rep'?'repeated (3 x 80% of sites, mean of reps; pred SD = stability across reps)':'leave-one-site-out');
+  document.querySelectorAll('#metricsTbl th').forEach(th=>{th.classList.remove('sorted','desc');
+    if(th.dataset.k===k){th.classList.add('sorted');if(d<0)th.classList.add('desc');}});
+}
+const DSLABEL={sites_with_high_Tcover:'V2.2 EFP (93)',v10f:'V2.2 Flux (93)',v41:'V4.1 EFP (106)',v41f:'V4.1 Flux (102)'};
+function dsName(){return DSLABEL[DS]||DS;}
+function rMeta(){const m=META[DS];document.getElementById('metaBar').innerHTML=
+  `<span class="chip"><b>${m.sites}</b> sites</span>`+
+  `<span class="chip"><b>${m.siteyears}</b> site-years</span>`+
+  `<span class="chip">IGBP: ${m.igbp}</span>`;}
+const val=id=>document.getElementById(id).value;
+function r1(){setImg('img_fig1',is41()?`${V41()}fig1_site_map.png`:`${DS}/fig1_site_map_EFP_distributions.png`);}
+function r2(){if(!is41())setImg('img_bar',`${DS}/bar_sites_per_IGBP.png`);}
+function r3(){const v=val('sel3_sites'),root=is41()?V41():V10E;
+  document.getElementById('note3_high').style.display=(v==='all')?'none':'';
+  setImg('img_rmse',`${root}fig2${v==='all'?'':'_'+v}_disturbance_effect_M3M4.png`,'cap_rmse');}
+function r4(){if(is41())return;setImg('img_thr1',`${DS}/01_abs_mort_comparison.png`);
+  setImg('img_thr2',`${DS}/02_rel_mort_comparison.png`);
+  setImg('img_thr3',`${DS}/03_rel_dist_comparison.png`);}
+function r5(){const allv=!is41()&&val('sel5_view')==='all';
+  showCtl('sel5_efp',allv);showCtl('sel5_metric',!allv);
+  document.getElementById('note5_all').style.display=allv?'':'none';
+  if(allv){setImg('img_dbar',`${P()}${DS}/RMSE/delta_RMSE_bars_${val('sel5_efp')}.png`,'cap_dbar');return;}
+  setImg('img_dbar',`${is41()?V41():V10E}fig_site_dRMSE_${val('sel5_metric')}.png`,'cap_dbar');}
+function r6(){if(is41())return;const mg=document.getElementById('sel6_merged').checked;
+  const sub=mg?'delta_RMSE_category/merged_low_disturbance/':'delta_RMSE_category/';
+  setImg('img_dcat',`${P()}${DS}/RMSE/${sub}delta_RMSE_${val('sel6_unit')}_${val('sel6_method')}.png`,'cap_dcat');}
+function r7(){
+  const im=document.getElementById('img_sshap'),sig=val('sel7_view')==='signed';
+  im.style.display='';
+  const show=(id,on)=>{document.getElementById(id).closest('.ctrl').style.display=on?'':'none';};
+  show('sel7_metric10',sig);show('sel7_model',!sig);show('sel7_efp',!sig);
+  document.getElementById('note7_signed').style.display=(sig&&!is41())?'':'none';
+  if(!is41()&&sig){
+    if(CFG==='rfopt'){im.style.display='none';document.getElementById('cap_sshap').textContent='Signed disturbance SHAP was computed for XGBoost and LightGBM only - switch the learner.';return;}
+    setImg('img_sshap',`${V10E}fig3b_signed_${val('sel7_metric10')}_${val('sel7_win')}_${LFAM[CFG]}.png`,'cap_sshap');return;}
+  if(is41()){const m=val('sel7v_metric'),w=val('sel7v_win'),L=LFAM[CFG];
+    const f=val('sel7v_style')==='signed'?`fig3b_signed_${m}_${w}_${L}.png`:`fig3_${m}_${w}_${L}.png`;
+    setImg('img_sshap',V41()+f,'cap_sshap');return;}
+  setImg('img_sshap',`${PS()}${DS}/site_SHAP/site_shap_${val('sel7_model')}_${val('sel7_efp')}_${val('sel7_win')}_distmetrics.png`,'cap_sshap');}
+function r8(){
+  if(is41()){setImg('img_gshap',`${V41()}fig4_signed_shap_${val('sel8v_metric')}.png`,'cap_gshap');return;}
+  const mg=document.getElementById('sel8_merged').checked;
+  const sub=mg?'SHAP_percent/merged_low_disturbance/':'SHAP_percent/';
+  setImg('img_gshap',`${PS()}${DS}/${sub}SHAP_percent_${val('sel8_model')}_${val('sel8_win')}_${val('sel8_method')}.png`,'cap_gshap');}
+function r9(){
+  if(is41()){setImg('img_igbp',`${V41()}fig5_igbp_board_${val('sel9v_win')}_${LFAM[CFG]}.png`,'cap_igbp');return;}
+  const t=val('sel9_type'),id=val('sel9_id');
+  let path;
+  if(t==='board')path=`${PS()}${DS}/IGBP_boards/board_IGBP_${id}.png`;
+  else if(t==='shap_igbp')path=`${PS()}${DS}/SHAP_percent/IGBP/IGBP_SHAP_${id}.png`;
+  else if(t==='shap_tc')path=`${PS()}${DS}/SHAP_percent/treecover/treecover_SHAP_${id}.png`;
+  else if(t==='rmse_igbp')path=`${P()}${DS}/RMSE/IGBP/IGBP_deltaRMSE_${id}.png`;
+  else path=`${P()}${DS}/RMSE/treecover/treecover_deltaRMSE_${id}.png`;
+  setImg('img_igbp',path,'cap_igbp');}
+function repop9(){const t=val('sel9_type'),sel=document.getElementById('sel9_id');
+  const prev=sel.value;
+  if(t==='rmse_igbp'||t==='rmse_tc'){fill(sel,DELTA_UNITS);document.getElementById('lbl9').textContent='Comparison';}
+  else{fill(sel,MODEL_WIN);document.getElementById('lbl9').textContent='Model';}
+  if([...sel.options].some(o=>o.value===prev))sel.value=prev;
+  r9();}
+function r10(){const v=val('sel10_view'),L=LFAM[CFG];
+  setImg('img_dcomp',is41()?`${V41()}disturbance_split/D_composition_${v}_${L}.png`:`disturbance_split_v2/D_composition_${v}_${L}.png`,'cap_dcomp');}
+
+// dataset-dependent availability: v4.1 and both flux sets have no RF and (here) no LOSO
+function syncAvail(){
+  const lim=is41();
+  document.body.classList.toggle('ds-v41',is41());
+  const rf=document.querySelector('#cfgToggle button[data-cfg="rfopt"]'),
+        loo=document.querySelector('#cvToggle button[data-cv="loo"]');
+  rf.classList.toggle('off',lim);loo.classList.toggle('off',lim);
+  rf.title=lim?'Not run for this dataset':'';loo.title=lim?'Repeated CV only for this dataset':'';
+  if(lim&&CFG==='rfopt')CFG='xgbopt';
+  if(lim&&CV==='loo')CV='rep';
+  document.querySelectorAll('#cfgToggle button').forEach(x=>x.classList.toggle('active',x.dataset.cfg===CFG));
+  document.querySelectorAll('#cvToggle button').forEach(x=>x.classList.toggle('active',x.dataset.cv===CV));
+  fillFam();fillResp();
+}
+function renderAll(){syncAvail();[rMeta,renderMetrics,r1,r2,r3,r4,r5,r6,r7,r8,r9,r10]
+  .forEach(f=>{try{f();}catch(e){console.error('renderAll: '+f.name+' failed',e);}});}
+
+document.querySelectorAll('#cvToggle button').forEach(b=>b.addEventListener('click',()=>{
+  if(b.classList.contains('off'))return;CV=b.dataset.cv;renderAll();}));
+document.querySelectorAll('#dsToggle button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('#dsToggle button').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');DS=b.dataset.ds;renderAll();}));
+document.querySelectorAll('#cfgToggle button').forEach(b=>b.addEventListener('click',()=>{
+  if(b.classList.contains('off'))return;CFG=b.dataset.cfg;renderAll();}));
+['selm_resp','selm_fam'].forEach(id=>document.getElementById(id).addEventListener('change',renderMetrics));
+document.querySelectorAll('#metricsTbl th').forEach(th=>th.addEventListener('click',()=>{
+  const k=th.dataset.k;if(mSort.k===k)mSort.dir*=-1;else{mSort.k=k;mSort.dir=(k==='R2')?-1:1;}renderMetrics();}));
+['sel3_sites'].forEach(id=>document.getElementById(id).addEventListener('change',r3));
+['sel5_efp','sel5_view','sel5_metric'].forEach(id=>document.getElementById(id).addEventListener('change',r5));
+['sel6_unit','sel6_method','sel6_merged'].forEach(id=>document.getElementById(id).addEventListener('change',r6));
+['sel7_view','sel7_metric10','sel7_model','sel7_efp','sel7_win','sel7v_metric','sel7v_win','sel7v_style'].forEach(id=>document.getElementById(id).addEventListener('change',r7));
+['sel8_model','sel8_win','sel8_method','sel8_merged','sel8v_metric'].forEach(id=>document.getElementById(id).addEventListener('change',r8));
+['sel9v_win'].forEach(id=>document.getElementById(id).addEventListener('change',r9));
+['sel10_view'].forEach(id=>document.getElementById(id).addEventListener('change',r10));
+document.getElementById('sel9_type').addEventListener('change',repop9);
+document.getElementById('sel9_id').addEventListener('change',r9);
+
+const lb=document.getElementById('lb'),lbimg=document.getElementById('lbimg');
+document.querySelectorAll('.imgwrap img').forEach(im=>im.addEventListener('click',()=>{
+  if(!im.src)return;lbimg.src=im.src;lb.classList.add('open');}));
+lb.addEventListener('click',()=>lb.classList.remove('open'));
+
+repop9();
+renderAll();
+</script>
+</body>
+</html>

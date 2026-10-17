@@ -1,0 +1,10 @@
+# fitted predictors, per-site caches, model outputs (data, like derived_tables/), logs, generated script copies
+models/
+cache/
+outputs/
+logs/
+fig_scripts/
+__pycache__/
+# backup of the first run (with CN-Sb1/2): keep only its results table
+with_CNSb_2026-10-01/*
+!with_CNSb_2026-10-01/RESULTS_efp.md

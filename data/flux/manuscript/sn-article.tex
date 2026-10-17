@@ -1,0 +1,457 @@
+%Version 3.1 December 2024
+% See section 11 of the User Manual for version history
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                                                                 %%
+%% Please do not use \input{...} to include other tex files.       %%
+%% Submit your LaTeX manuscript as one .tex document.              %%
+%%                                                                 %%
+%% All additional figures and files should be attached             %%
+%% separately and not embedded in the \TeX\ document itself.       %%
+%%                                                                 %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%\documentclass[referee,sn-basic]{sn-jnl}% referee option is meant for double line spacing
+
+%%=======================================================%%
+%% to print line numbers in the margin use lineno option %%
+%%=======================================================%%
+
+%%\documentclass[lineno,pdflatex,sn-basic]{sn-jnl}% Basic Springer Nature Reference Style/Chemistry Reference Style
+
+%%=========================================================================================%%
+%% the documentclass is set to pdflatex as default. You can delete it if not appropriate.  %%
+%%=========================================================================================%%
+
+%%\documentclass[sn-basic]{sn-jnl}% Basic Springer Nature Reference Style/Chemistry Reference Style
+
+%%Note: the following reference styles support Namedate and Numbered referencing. By default the style follows the most common style. To switch between the options you can add or remove Numbered in the optional parenthesis. 
+%%The option is available for: sn-basic.bst, sn-chicago.bst%  
+ 
+%%\documentclass[pdflatex,sn-nature]{sn-jnl}% Style for submissions to Nature Portfolio journals
+\documentclass[pdflatex,sn-nature]{sn-jnl}% Standard Nature Research Reference Style (Nature Climate Change)
+%%\documentclass[pdflatex,sn-mathphys-num]{sn-jnl}% Math and Physical Sciences Numbered Reference Style
+%%\documentclass[pdflatex,sn-mathphys-ay]{sn-jnl}% Math and Physical Sciences Author Year Reference Style
+%%\documentclass[pdflatex,sn-aps]{sn-jnl}% American Physical Society (APS) Reference Style
+%%\documentclass[pdflatex,sn-vancouver-num]{sn-jnl}% Vancouver Numbered Reference Style
+%%\documentclass[pdflatex,sn-vancouver-ay]{sn-jnl}% Vancouver Author Year Reference Style
+%%\documentclass[pdflatex,sn-apa]{sn-jnl}% APA Reference Style
+%%\documentclass[pdflatex,sn-chicago]{sn-jnl}% Chicago-based Humanities Reference Style
+
+%%%% Standard Packages
+%%<additional latex packages if required can be included here>
+
+\usepackage{graphicx}%
+\usepackage{multirow}%
+\usepackage{amsmath,amssymb,amsfonts}%
+\usepackage{amsthm}%
+%\usepackage{mathrsfs}  % removed: unused (NCC: avoid non-standard packages)
+\usepackage[title]{appendix}%
+%\usepackage{xcolor}  % removed: unused (NCC: avoid non-standard packages)
+%\usepackage{textcomp}  % removed: unused (NCC: avoid non-standard packages)
+%\usepackage{manyfoot}  % removed: unused (NCC: avoid non-standard packages)
+\usepackage{booktabs}%
+%\usepackage{algorithm}  % removed: unused (NCC: avoid non-standard packages)
+%\usepackage{algorithmicx}  % removed: unused (NCC: avoid non-standard packages)
+%\usepackage{algpseudocode}  % removed: unused (NCC: avoid non-standard packages)
+%\usepackage{listings}  % removed: unused (NCC: avoid non-standard packages)
+\usepackage{booktabs,rotating}
+%%%%
+
+%%%%%=============================================================================%%%%
+%%%%  Remarks: This template is provided to aid authors with the preparation
+%%%%  of original research articles intended for submission to journals published 
+%%%%  by Springer Nature. The guidance has been prepared in partnership with 
+%%%%  production teams to conform to Springer Nature technical requirements. 
+%%%%  Editorial and presentation requirements differ among journal portfolios and 
+%%%%  research disciplines. You may find sections in this template are irrelevant 
+%%%%  to your work and are empowered to omit any such section if allowed by the 
+%%%%  journal you intend to submit to. The submission guidelines and policies 
+%%%%  of the journal take precedence. A detailed User Manual is available in the 
+%%%%  template package for technical guidance.
+%%%%%=============================================================================%%%%
+
+%% as per the requirement new theorem styles can be included as shown below
+\theoremstyle{thmstyleone}%
+\newtheorem{theorem}{Theorem}%  meant for continuous numbers
+%%\newtheorem{theorem}{Theorem}[section]% meant for sectionwise numbers
+%% optional argument [theorem] produces theorem numbering sequence instead of independent numbers for Proposition
+\newtheorem{proposition}[theorem]{Proposition}% 
+%%\newtheorem{proposition}{Proposition}% to get separate numbers for theorem and proposition etc.
+
+\theoremstyle{thmstyletwo}%
+\newtheorem{example}{Example}%
+\newtheorem{remark}{Remark}%
+
+\theoremstyle{thmstylethree}%
+\newtheorem{definition}{Definition}%
+
+\raggedbottom
+%%\unnumbered% uncomment this for unnumbered level heads
+
+\begin{document}
+
+\title[Article Title]{Assessing the role of tree mortality in shaping ecosystem functional properties}
+
+
+
+%%=============================================================%%
+%% GivenName	-> \fnm{Joergen W.}
+%% Particle	-> \spfx{van der} -> surname prefix
+%% FamilyName	-> \sur{Ploeg}
+%% Suffix	-> \sfx{IV}
+%% \author*[1,2]{\fnm{Joergen W.} \spfx{van der} \sur{Ploeg} 
+%%  \sfx{IV}}\email{iauthor@gmail.com}
+%%=============================================================%%
+
+\author*[1,2]{\fnm{Negin} \sur{Katal}}\email{negin.katal@geosense.uni-freiburg.de}
+
+\author[2,3]{\fnm{Second} \sur{Author}}\email{iiauthor@gmail.com}
+% \equalcont{These authors contributed equally to this work.}
+
+\author[1,2]{\fnm{Teja} \sur{Kattenborn}}\email{teja.kattenborn@geosense.uni-freiburg.de}
+% \equalcont{These authors contributed equally to this work.}
+
+\affil*[1]{\orgdiv{Department}, \orgname{Organization}, \orgaddress{\street{Street}, \city{City}, \postcode{100190}, \state{State}, \country{Country}}}
+
+\affil[2]{\orgdiv{Department}, \orgname{Organization}, \orgaddress{\street{Street}, \city{City}, \postcode{10587}, \state{State}, \country{Country}}}
+
+\affil[3]{\orgdiv{Department}, \orgname{Organization}, \orgaddress{\street{Street}, \city{City}, \postcode{610101}, \state{State}, \country{Country}}}
+
+%%==================================%%
+%% Sample for unstructured abstract %%
+%%==================================%%
+
+\abstract{Tree mortality is rising globally under climate extremes and biotic stress, yet how canopy loss propagates into ecosystem-scale functioning remains poorly quantified. We combined annual ecosystem functional properties from 93 forested eddy covariance sites with satellite-derived canopy mortality, testing whether mortality information improves prediction beyond climate and plant traits. Disturbance roughly doubled the explained variance of light-saturated productivity ($R^2$ 0.19 to 0.36) and maximum net ecosystem production (0.19 to 0.41), but did not improve evapotranspiration or water-use efficiency: canopy loss informs carbon uptake, not water partitioning. The benefit largely vanished once the previous year's flux was known, indicating that ecosystem memory already encodes the functional consequences of past disturbance. Because such memory requires a flux tower whereas satellite mortality does not, mortality observations are most informative precisely where flux history is unavailable. These results held across three tree-cover subsets, nine learner configurations and two cross-validation structures.
+}
+
+
+\keywords{ecosystem functioning, tree mortality, eddy covariance, deadtrees.earth}
+
+%%\pacs[JEL Classification]{D8, H51}
+
+%%\pacs[MSC Classification]{35A01, 65L10, 65L12, 65L20, 65L70}
+
+\maketitle
+
+\section{Introduction}\label{sec1}
+Terrestrial ecosystems play a fundamental role in regulating global carbon, water, and energy balances through complex interactions between vegetation structure, physiological processes, and environmental drivers (\cite{bonan2008forests, fisher2018vegetation}). Forest ecosystems, in particular, represent critical components of the global climate system, storing approximately 45\% of terrestrial carbon and influencing regional precipitation patterns through evapotranspiration processes (\cite{pan2011large, ellison2017trees}). The functional properties of these ecosystems, including carbon sequestration rates, water use efficiency, and energy partitioning, are intrinsically linked to vegetation characteristics such as leaf area index, canopy structure, and plant functional traits (\cite{wright2004worldwide, diazGlobalSpectrumPlant2016}). However, increasing frequencies of drought, heat stress, and biotic disturbances under changing climatic conditions have led to widespread tree mortality events globally, fundamentally altering ecosystem structure and potentially disrupting these critical ecosystem services (\cite{allen2010global, anderegg2013consequences}).
+
+Tree mortality represents a key ecological process that can dramatically reshape ecosystem functional properties through multiple pathways. Following mortality events, immediate changes occur in canopy structure and leaf area, directly affecting light interception, evapotranspiration rates, and carbon uptake capacity (\cite{hicke2012effects, edburg2012cascading}). These structural changes cascade through the ecosystem, influencing soil microclimate, decomposition rates, and nutrient cycling patterns (\cite{breshears2005regional, adams2009temperature}). Furthermore, the replacement of dead trees by understory vegetation or different plant functional types can lead to long-term shifts in ecosystem functioning, as different vegetation types exhibit distinct physiological characteristics and resource use strategies (\cite{hartmann2018research, hammond2022global}). The magnitude and direction of these changes likely depend on the dominant vegetation type affected, as coniferous and deciduous forests, grasslands, and shrublands exhibit fundamentally different functional trait profiles and responses to disturbance (\cite{franklin1987tree, flower2015responses}).
+
+Despite the recognized importance of tree mortality for ecosystem functioning, significant knowledge gaps persist regarding the quantitative relationships between mortality events and subsequent changes in carbon, water, and energy balances across different vegetation types. Traditional ecological studies have been limited by the spatial and temporal scales of field observations, making it challenging to capture the full spectrum of mortality impacts across diverse ecosystems (\cite{mcdowell2008mechanisms, larson2012tree }). Moreover, the lack of comprehensive datasets linking tree mortality events to plant functional traits has hindered our ability to predict ecosystem responses and develop mechanistic understanding of post-mortality functional changes (\cite{breshears2005regional}). This data limitation has been particularly pronounced for understanding how different plant functional trait combinations influence the magnitude and trajectory of ecosystem recovery following mortality events.
+
+Recent advances in remote sensing technology, machine learning algorithms, and crowd-sourced data collection have opened unprecedented opportunities to address these knowledge gaps at landscape to global scales. The emergence of citizen science platforms and collaborative monitoring networks has dramatically increased the availability of field observations, enabling researchers to document mortality events across diverse ecosystems with greater spatial and temporal resolution than previously possible. In this context, the deadtrees.earth platform represents a significant advancement in mortality monitoring capabilities, providing a standardized framework for collecting and sharing tree mortality data across multiple vegetation types and geographical regions. This platform integrates crowd-sourced field observations with remote sensing data, creating comprehensive datasets that enable large-scale analyses of mortality patterns and their ecosystem consequences.
+
+Building upon these technological advances, recent modeling efforts have begun to incorporate plant functional trait data to better predict ecosystem responses to environmental changes. Notably, Lusk et al. (\cite{lusk2026crowdsourced}) demonstrated how integrating plant functional trait databases with mortality observations can improve predictions of post-disturbance ecosystem functioning, revealing that trait diversity and functional redundancy play critical roles in determining ecosystem resilience following tree mortality events. Their work highlighted the importance of considering plant functional trait composition when assessing vulnerability to mortality and predicting subsequent ecosystem changes, providing a mechanistic framework for understanding functional consequences across different vegetation types.
+
+Given these recent advances in data availability and modeling approaches, there is now an unprecedented opportunity to comprehensively assess the impacts of tree mortality on ecosystem functional properties across diverse vegetation types. The central questions driving this research are: What are the quantitative impacts of tree mortality on ecosystem carbon, water, and energy balances? Do these impacts vary systematically among different vegetation types based on their functional trait composition? And can we identify vegetation types that exhibit greater sensitivity or resilience?
+ 
+
+\section{Results}\label{sec2}
+
+\subsection{Ecosystem functional properties across the site network}
+
+The analysis covers 93 sites and 395 site-years with mean tree cover of at least 30\,\% within a 500\,m buffer, spanning evergreen needleleaf ($n=45$ sites) and deciduous broadleaf forest ($n=26$), wetland ($n=10$), mixed forest ($n=6$), shrubland ($n=4$), evergreen broadleaf forest ($n=1$) and woody savanna ($n=1$), with a median of four years per site (Fig.~\ref{fig:efp_overview}).
+
+All five ecosystem functional properties (EFPs) vary widely both among sites and among years within a site. Between-site variation dominates, and the two carbon-flux properties are the most variable: across the network, GPP$_{sat}$ has a standard deviation of 8.7\,$\mu$mol\,m$^{-2}$\,s$^{-1}$ about a mean of 26.2. This partitioning matters for interpretation, because leave-one-site-out validation asks models to predict an unobserved site rather than an unobserved year.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{fig1_site_map_EFP_distributions}
+\caption{\textbf{Study sites and ecosystem functional property distributions.}
+(\textbf{a}) The 93 eddy covariance sites with mean tree cover $\geq$30\,\% within a 500\,m buffer, coloured by IGBP land-cover class.
+(\textbf{b--f}) Distributions of annual ecosystem functional properties across IGBP classes, over all 600 site-years with valid EFP estimates at these sites (modelling uses the 395 site-years that additionally have complete predictor coverage; see Methods):
+gross primary productivity at light saturation (GPP$_{sat}$),
+maximum net ecosystem production (NEP$_{max}$),
+maximum evapotranspiration (ET$_{max}$),
+underlying water-use efficiency (uWUE), and water-use efficiency (WUE).
+Horizontal violins show the full distribution; inner boxplots indicate the interquartile range and median.}
+\label{fig:efp_overview}
+\end{figure}
+
+\subsection{Disturbance improves prediction of carbon fluxes, but not water fluxes}
+
+Adding the disturbance block to a model already containing climate and traits (M3\,$\rightarrow$\,M4) substantially improves prediction of both carbon-flux properties. For GPP$_{sat}$, cross-validated $R^2$ rises from 0.19 to 0.36 and site-level RMSE falls by a median of 10.2\,\% ($q<0.001$); for NEP$_{max}$, $R^2$ rises from 0.19 to 0.41 with a median RMSE reduction of 8.9\,\% ($q<0.001$). Disturbance information therefore roughly doubles the explained variance of both properties.
+
+The water-flux properties behave differently. ET$_{max}$ shows no detectable response in any configuration ($-0.1$\,\% at the 12-month window, $+1.6$\,\% at 24 months; $q>0.7$ in both). uWUE and WUE improve modestly and inconsistently, reaching significance at the 24-month window ($-5.3$\,\% and $-3.8$\,\%, $q<0.05$) but not at 12 months. Across all four disturbance contrasts and five EFPs, 7 of the 10 tests without memory are significant, and the significant ones are concentrated in the carbon fluxes.
+
+This asymmetry is the clearest signal in the analysis: canopy mortality carries information about how much carbon an ecosystem can fix, but little about how it partitions water.
+
+\input{tables/table_XGBoptuna_LOSO_v10.tex}
+
+\subsection{Ecosystem memory absorbs most of the disturbance signal}
+
+The previous year's value of an EFP is by far the strongest single predictor available. Adding it to a climate-only model raises $R^2$ for GPP$_{sat}$ from 0.20 to 0.70 and for NEP$_{max}$ from 0.18 to 0.74 --- a larger gain than any other predictor block produces.
+
+Once that memory term is present, the benefit of disturbance largely disappears. In the M7\,$\rightarrow$\,M8 contrast, which adds disturbance to a model already containing climate, traits and raw memory, GPP$_{sat}$ improves by only 2.2\,\% and NEP$_{max}$ not at all; none of the ten tests in this family is significant after correction for multiple comparisons under repeated cross-validation, and only two are under leave-one-site-out. Those two do not replicate between the two cross-validation structures and we do not interpret them as evidence of an effect.
+
+The SHAP decomposition shows the same displacement directly. Without memory (M4), disturbance is the second-largest predictor block, accounting for 32\,\% of total attribution against 41\,\% for climate and 27\,\% for traits. With raw memory present (M8), disturbance falls to 18\,\% while memory alone takes 36\,\%.
+
+The interpretation is not that disturbance is unimportant, but that its effect on ecosystem function is already encoded in the previous year's flux. A stand that lost canopy is a stand whose productivity was already reduced, and the lagged EFP captures that state without needing to observe the mortality itself. Disturbance data are therefore most valuable precisely where flux history is unavailable --- which is the situation at the great majority of forested locations.
+
+\subsection{The disturbance effect is highly heterogeneous among sites}
+
+The network-level medians conceal substantial site-to-site variation. For GPP$_{sat}$ (M3\,$\rightarrow$\,M4), 66\,\% of sites improve when disturbance is added, but the interquartile range of the per-site change spans $-25.3$\,\% to $+3.7$\,\%, and the 10th--90th percentile range spans $-45.9$\,\% to $+39.2$\,\%. Individual sites range from a 79.5\,\% error reduction to a 106.3\,\% degradation. NEP$_{max}$ behaves similarly (66\,\% of sites improving; interquartile range $-29.9$\,\% to $+5.8$\,\%).
+
+The disturbance block therefore helps at roughly two sites in three and is neutral or harmful at the remainder. This is consistent with disturbance information being informative only where disturbance actually occurred: at sites with stable canopies the block adds 100 predictors of noise.
+
+\subsection{The effect does not scale with tree cover}
+
+Because canopy mortality is a forest process, one might expect its predictive value to increase with tree cover. It does not. Repeating the full analysis on the unfiltered network (112 sites) and on a more strictly forested subset ($\geq$50\,\% tree cover, 65 sites) gives median RMSE changes of $-2.1$\,\% and $-0.8$\,\% respectively, against $-4.7$\,\% for the reported $\geq$30\,\% dataset --- a non-monotonic pattern in which the most forested subset shows the weakest effect.
+
+Tested directly at site level, the disturbance benefit is unrelated to tree cover (Spearman $\rho = 0.04$, $p = 0.65$) and does not differ between forest and non-forest sites ($p = 0.16$). We caution against reading the weak result on the $\geq$50\,\% subset as evidence that mortality matters less in dense forest: that subset also contains 42\,\% less variance in mortality rate (standard deviation 3.18 against 5.46 for the full network) and fewer site-years, so it offers less signal to detect. The available evidence supports an effect that is specific to which function is being predicted, not to which ecosystem type it is predicted in.
+
+\subsection{Robustness}
+
+The findings above are invariant to the analytical choices that could plausibly have produced them. Repeating the entire analysis across nine learner configurations --- random forests, XGBoost and LightGBM, each with default, hand-tuned and Optuna-tuned hyperparameters --- changes the magnitude of the disturbance effect (median RMSE change from $-1.3$\,\% to $-3.6$\,\%) but not its direction, its concentration in the carbon fluxes, or its displacement by memory. The reported configuration yields a mid-range estimate rather than the largest.
+
+Repeating the analysis under repeated leave-one-site-out cross-validation, in which each site is predicted three times from independent 80\,\% subsamples of the remaining sites, likewise leaves the conclusions unchanged: model rankings correlate at Spearman $\rho = 0.85$--0.96 and the estimated disturbance effect at $r = 0.97$ across all 1{,}620 model comparisons. Full results for both sensitivity analyses are reported in the Supplementary Information.
+
+\section{Discussion}\label{sec12}
+
+\subsection{Canopy mortality informs carbon uptake, not water partitioning}
+
+Adding satellite-derived canopy mortality to models of ecosystem functional properties roughly doubles the explained variance of light-saturated productivity and maximum net ecosystem production, while leaving evapotranspiration and water-use efficiency essentially unchanged. This asymmetry is consistent with the mechanisms through which tree death alters ecosystem function. Mortality removes photosynthesising leaf area directly, so the capacity for carbon uptake declines in proportion to the canopy lost \cite{hicke2012effects,edburg2012cascading}. Its effect on water fluxes is more equivocal: transpiration from the remaining canopy declines, but evaporation from a more exposed soil surface and transpiration from released understorey vegetation both increase, and these terms partially offset one another \cite{edburg2012cascading}. Stand-level evapotranspiration can therefore remain close to its pre-disturbance value even where a substantial fraction of the overstorey has died.
+
+Our results are consistent with that compensation. ET$_{max}$ shows no detectable response to disturbance information in any of the configurations tested, across three datasets, nine learner configurations and two cross-validation structures. Given the number of independent opportunities for an effect to appear, we interpret this as a genuine null rather than a limitation of statistical power. The two water-use efficiency metrics, which combine carbon and water terms, respond weakly and only at the longer climate window --- as expected if their carbon numerator carries the signal and their water denominator dilutes it.
+
+\subsection{Ecosystem memory encodes the disturbance history}
+
+The most consequential result is that the benefit of disturbance information largely disappears once the previous year's value of the ecosystem functional property is available to the model. The lagged EFP is by far the strongest single predictor we tested, and with it present the disturbance block adds no consistent improvement and its share of SHAP attribution falls from 32\,\% to 18\,\%.
+
+We do not read this as evidence that mortality is unimportant. The more parsimonious interpretation is that the ecological effect of disturbance is slow relative to the annual time step and is therefore already expressed in the previous year's flux. Tree death is a pulse whose functional consequences persist for years to decades \cite{jentsch_theory_2019,gough_disturbance_2024}, propagating through altered stand structure, microclimate and decomposition long after the mortality event itself \cite{edburg2012cascading}. A stand that lost canopy last year is a stand whose productivity was already depressed last year. Conditioned on that state, knowing the cause adds little.
+
+This has a practical implication that we consider the main contribution of this work. Ecosystem memory is only available where flux observations already exist --- a few hundred towers globally. Satellite-derived mortality is available essentially everywhere forests occur. The regime in which disturbance data carry the most information is therefore precisely the regime that matters for extrapolation: locations with no flux history. Our M3\,$\rightarrow$\,M4 contrast, in which disturbance roughly doubles explained variance for both carbon fluxes, is the operationally relevant one, and the M7\,$\rightarrow$\,M8 null is a statement about what flux towers already tell us rather than about what mortality does.
+
+\subsection{The effect is functional, not ecosystem-specific}
+
+We found no evidence that disturbance matters more in more densely forested sites. The predictive benefit is unrelated to tree cover at site level, does not differ between forest and non-forest sites, and is not monotonic across the three tree-cover subsets we analysed. This was contrary to our expectation, and it deserves care in interpretation: the most strictly forested subset also contains substantially less variance in mortality rate, so it offers less signal for any model to exploit. A null result under range restriction is weak evidence of no effect.
+
+What the data support more strongly is that the effect is specific to which function is predicted rather than to where it is predicted. Across every stratification we examined --- dataset, ecosystem type, tree-cover band --- the carbon fluxes respond and the water fluxes do not. If mortality does interact with ecosystem type, detecting it will require stratifying by disturbance severity within forest types rather than by cover alone, and a network with more heavily disturbed sites than ours contains.
+
+\subsection{Site-level heterogeneity and its interpretation}
+
+Disturbance information improves prediction at roughly two sites in three and is neutral or harmful at the rest, with per-site effects ranging from a 79\,\% error reduction to a 106\,\% degradation. Heterogeneity of this magnitude is expected when a predictor block is informative only where the underlying process occurred: at sites with stable canopies, 100 disturbance predictors contribute noise rather than signal. It is also consistent with the broader observation that ecosystem responses to disturbance depend strongly on severity, type and antecedent condition \cite{gough_disturbance_2024,flower2015responses}. Reporting only the network median would misrepresent this; the distribution is the result.
+
+\subsection{Limitations}
+
+Three limitations bound our conclusions. First, the analysis is annual, while mortality is episodic; a stand that died in spring and one that died in autumn are indistinguishable in our data, which likely attenuates the estimated effect. Second, the deadtrees.earth product resolves standing deadwood and canopy loss but not their cause, so drought-induced dieback \cite{allen2010global,hammond2022global}, bark beetle outbreaks \cite{edburg2012cascading} and management are pooled --- agents with different functional consequences \cite{flower2015responses}. Third, our network is skewed towards relatively undisturbed sites: eddy covariance towers are rarely sited in stands undergoing severe mortality, and the resulting restriction in disturbance severity is likely to make our estimates conservative.
+
+We also note that the analysis is correlative. Models that predict better with disturbance information demonstrate that mortality carries statistical information about ecosystem function; they do not establish the causal pathway.
+
+\subsection{Implications}
+
+Forest disturbance is projected to intensify across Europe and other temperate regions through this century \cite{grunig_climate_2026,besnard_natural_2025}, with consequences for the persistence of the forest carbon sink \cite{pan2011large,migliavacca_securing_2025}. Our results indicate that openly available, centimetre-scale mortality maps \cite{mosig2026deadtrees} carry usable information about ecosystem carbon uptake capacity, and that this information is most valuable where it is most needed --- for the vast majority of forested land where no flux tower exists. They also suggest that models seeking to represent disturbance effects on the water cycle will need mechanisms beyond canopy loss, since canopy loss alone does not predict changes in evapotranspiration in our data.
+
+\section{Conclusion}\label{sec13}
+
+Satellite-derived canopy mortality substantially improves prediction of light-saturated productivity and maximum net ecosystem production across a network of 93 forested eddy covariance sites, roughly doubling explained variance relative to models informed only by climate and plant traits. It does not improve prediction of evapotranspiration or water-use efficiency. The benefit is largely superseded once the previous year's flux is known, indicating that ecosystem memory already encodes the functional consequences of past disturbance --- and that mortality data are therefore most valuable precisely where flux history is unavailable. These conclusions are invariant across three tree-cover subsets, nine learner configurations and two cross-validation structures.
+
+\section{Methods}\label{sec11}
+
+\subsection*{Study sites and data selection}
+
+We assembled a multi-network eddy covariance dataset drawing from FLUXNET, ICOS, AmeriFlux, NEON and OzFlux, covering the period 2019--2025. Sites entered the analysis if they met three criteria: (i) at least four consecutive years of valid half-hourly flux observations within the study window, (ii) availability of co-located forest cover and disturbance data from the deadtrees.earth platform \cite{mosig2026deadtrees}, and (iii) complete data across all predictor columns after benchmark harmonisation (below). This yielded 112 sites and 414 site-years.
+
+Because the disturbance product characterises canopy mortality, we defined a tree-cover gradient by screening on mean tree cover within a 500\,m buffer, computed per site as the multi-year mean of \texttt{tree\_cover\_mean\_pct\_500m}. Three nested datasets were analysed (Table~\ref{tab:datasets}). The $\geq$30\,\% subset is used for all analyses reported in the main text; it retains the forest and woodland sites for which canopy mortality is a meaningful predictor while preserving sufficient sample size and disturbance variability. The unfiltered and $\geq$50\,\% datasets are reported in the Supplementary Information as sensitivity analyses.
+
+\begin{table}[h!]
+\centering
+\small
+\begin{tabular}{lccl}
+\hline
+Dataset & Sites & Site-years & Tree-cover filter (500\,m buffer) \\
+\hline
+All sites & 112 & 414 & none \\
+\textbf{Tree cover $\geq$30\,\%} & \textbf{93} & \textbf{395} & mean tree cover $\geq$ 30\,\% \\
+Tree cover $\geq$50\,\% & 65 & 287 & mean tree cover $\geq$ 50\,\% \\
+\hline
+\end{tabular}
+\caption{The three nested datasets. All are constructed through an identical pipeline and share the same predictor structure, differing only in which sites they contain. The $\geq$30\,\% dataset is reported in the main text.}
+\label{tab:datasets}
+\end{table}
+
+The reported dataset comprises evergreen needleleaf forest (ENF, $n=45$ sites), deciduous broadleaf forest (DBF, $n=26$), wetland (WET, $n=10$), mixed forest (MF, $n=6$), closed and open shrubland (CSH, $n=2$; OSH, $n=2$), evergreen broadleaf forest (EBF, $n=1$) and woody savanna (WSA, $n=1$), with a median of four site-years per site.
+
+\subsection*{Ecosystem functional properties}
+
+Annual ecosystem functional properties (EFPs) were derived from half-hourly eddy covariance observations following \cite{musavi2015imprint} and \cite{migliavacca_three_2021}. For each site-year we computed light-saturated gross primary productivity (GPP$_\mathrm{sat}$; $\mu$mol\,m$^{-2}$\,s$^{-1}$), maximum net ecosystem production (NEP$_\mathrm{max}$; $\mu$mol\,m$^{-2}$\,s$^{-1}$), maximum evapotranspiration (ET$_\mathrm{max}$; mm\,d$^{-1}$), underlying water-use efficiency (uWUE $=\mathrm{GPP}\cdot\sqrt{\mathrm{VPD}}/\mathrm{ET}$; g\,C\,mm$^{-1}$) and water-use efficiency (WUE $=\mathrm{GPP}/\mathrm{ET}$; g\,C\,mm$^{-1}$).
+
+EFP estimation was anchored to the centre of the growing season (CGS), defined as the date of maximum daily GPP after smoothing, so that predictors describe antecedent conditions relative to peak carbon uptake rather than to an arbitrary calendar boundary.
+
+\subsection*{Predictor blocks}
+
+Predictors were organised into four blocks whose sizes are fixed across all models and datasets (Table~\ref{tab:blocks}).
+
+\textit{Climate} (C). Monthly aggregates of vapour pressure deficit, air temperature, precipitation and incoming shortwave radiation, computed from on-site observations for each calendar month preceding the CGS peak (mean and 5th/95th percentiles for VPD and $T_\mathrm{air}$; mean and cumulative sum for precipitation; mean for radiation). Two window lengths were evaluated: the 12 months immediately preceding the CGS (143 predictors) and the full 24-month window (286 predictors). Both are reported.
+
+\textit{Traits} (T). Twenty-one site-level community-weighted mean plant functional traits from the planttraits.earth database \cite{lusk2026crowdsourced}, covering hydraulic traits ($P_{12}$, $P_{50}$, $P_{88}$, $g_\mathrm{s,max}$, maximum rooting depth), wood structure (specific stem density, conduit density and diameter) and leaf morphology and chemistry (specific leaf area, leaf area, thickness, width, dry mass, C, N by mass and area, P, C:N, $\delta^{15}$N). Traits are time-invariant and capture baseline differences in functioning independent of recent disturbance.
+
+\textit{Disturbance} (D). One hundred predictors derived from annual Sentinel-2--based forest cover and deadwood maps (deadtrees.earth v2-2 \cite{mosig2026deadtrees}). Eleven metric families --- absolute mortality, relative mortality, relative disturbance, new mortality rate, new deadwood gain, relative tree loss, and thresholded variants of the latter four --- were computed within circular buffers of five radii (100, 200, 300, 400 and 500\,m) delineated in the local UTM projection, at the current year and at a one-year lag.
+
+\textit{EFP memory} (M). The previous year's value of the response variable itself, in two encodings: the raw lagged value (raw memory) and its $z$-score anomaly relative to the site mean (anomaly memory). Both are single predictors and are evaluated as alternatives, never jointly.
+
+\begin{table}[h!]
+\centering
+\small
+\begin{tabular}{llr}
+\hline
+Block & Contents & Predictors \\
+\hline
+C (12\,m) & monthly climate, 12 months pre-CGS & 143 \\
+C (24\,m) & monthly climate, 24 months pre-CGS & 286 \\
+T & community-weighted mean plant traits & 21 \\
+D & mortality/deadwood metrics, 5 buffers, 2 time points & 100 \\
+M & lagged EFP (raw or anomaly encoding) & 1 \\
+\hline
+\end{tabular}
+\caption{Predictor block sizes. Blocks are identical across datasets, learners and cross-validation structures, so differences between models reflect only which blocks are present.}
+\label{tab:blocks}
+\end{table}
+
+\subsection*{Model configurations}
+
+Eight model structures (M1--M8) were defined by the presence or absence of the trait, disturbance and memory blocks over a climate baseline (Table~\ref{tab:models}). Crossing these with two climate windows (12\,m, 24\,m) and, for the memory-containing structures, two memory encodings gives 24 configurations per response variable, each trained independently for all five EFPs.
+
+\begin{table}[h!]
+\centering
+\small
+\begin{tabular}{lcccc}
+\hline
+Model & Climate (C) & Traits (T) & Disturbance (D) & EFP memory (M) \\
+\hline
+M1 & \checkmark & & & \\
+M2 & \checkmark & & \checkmark & \\
+M3 & \checkmark & \checkmark & & \\
+M4 & \checkmark & \checkmark & \checkmark & \\
+M5 & \checkmark & & & \checkmark \\
+M6 & \checkmark & & \checkmark & \checkmark \\
+M7 & \checkmark & \checkmark & & \checkmark \\
+M8 & \checkmark & \checkmark & \checkmark & \checkmark \\
+\hline
+\end{tabular}
+\caption{The eight model structures. The four pairs differing only in the disturbance block (M1$\rightarrow$M2, M3$\rightarrow$M4, M5$\rightarrow$M6, M7$\rightarrow$M8) isolate its contribution.}
+\label{tab:models}
+\end{table}
+
+The main text reports M3$\rightarrow$M4 (climate and traits, without memory) and M7$\rightarrow$M8 with raw memory. These form a factorial contrast in which traits are always present and disturbance and memory vary independently, allowing the disturbance effect to be evaluated both in the absence of ecosystem memory and conditional on it.
+
+To ensure that all models within a response variable are compared on identical data, the 12- and 24-month benchmark tables were harmonised to their common set of complete site-years before training; three variables with $>$85\,\% missingness ($R_b$, $R_{b,\max}$, aCUE) were excluded, as they are not predictors of interest and their retention would have discarded most site-years.
+
+\subsection*{Model training and tuning}
+
+Results in the main text use gradient-boosted regression trees (\texttt{xgboost} \cite{chen2016xgboost}) with hyperparameters selected by Tree-structured Parzen Estimator search (Optuna \cite{akiba2019optuna}; 50 trials per response variable) over grouped five-fold cross-validation, in which folds comprise disjoint groups of sites so that tuning cannot leak information across the site boundary used for evaluation. The search space covered learning rate ($10^{-2}$--0.3, log scale), number of boosting rounds (100--1000), maximum depth (1--8), minimum child weight (1--20), row subsampling (0.5--1.0), column subsampling (0.2--1.0) and L2 regularisation ($10^{-3}$--50, log scale). Selected configurations varied by response, with maximum depth between 2 and 8 and learning rates between 0.011 and 0.039.
+
+To establish that our conclusions do not depend on this choice, the identical analysis --- same data, same predictor blocks, same folds --- was repeated for nine learner configurations: random forests (\texttt{ranger} \cite{wright2017ranger}), XGBoost and LightGBM \cite{ke2017lightgbm}, each with default settings, a hand-tuned configuration and an Optuna-tuned configuration. These are reported in the Supplementary Information.
+
+We note that the highest overall accuracy was obtained by a random-forest configuration that forces the raw memory predictor into every tree split (\texttt{always.split.variables}), which raises mean $R^2$ of the memory-containing models from 0.404 to 0.648. This configuration was not adopted, because such forcing imposes a structural privilege on one predictor block that is not applied to the others. An Optuna-tuned random forest attains statistically indistinguishable performance on the same models ($R^2 = 0.644$) without any forcing, by selecting \texttt{mtry} between 0.72 and 0.91 of available predictors rather than the $\sqrt{p}$ default ($\approx$0.05 at $p \approx 449$); the forcing therefore compensated for a hyperparameter setting rather than expressing a modelling decision.
+
+\subsection*{Cross-validation}
+
+Models were validated by leave-one-site-out cross-validation (LOSO-CV): all observations from one site are withheld while the remaining sites form the training set, repeated for every site. This preserves spatial independence between training and test data and estimates transferability to unseen sites \cite{roberts2017cross}. Performance was quantified by root mean square error (RMSE) and the coefficient of determination ($R^2$).
+
+As a robustness check, every model was additionally evaluated under repeated leave-one-site-out cross-validation, in which each held-out site is predicted three times from independent random 80\,\% subsamples of the remaining sites and the predictions averaged. The two structures agree on every conclusion drawn here: model rankings correlate at Spearman $\rho = 0.85$--0.96 within dataset and response, the estimated disturbance effect correlates at $r = 0.966$ across all 1{,}620 model comparisons, and the same learner configuration is best under both structures in all three datasets. Repeated CV is marginally more optimistic, as averaging three predictions reduces variance, and has lower statistical power; LOSO-CV is therefore reported as the primary structure.
+
+Because $R^2$ depends on the variance of the response, it is not comparable across the three datasets: screening to higher tree cover reduces between-site variance, so $R^2$ falls even where absolute error improves. Cross-dataset comparisons are therefore made on RMSE, and $R^2$ is used only to rank models within a dataset.
+
+\subsection*{Statistics}
+
+The contribution of the disturbance block was assessed by comparing model pairs that differ only in its inclusion. For each site $i$ and each pair, we computed the per-site RMSE with and without disturbance and expressed the difference in relative terms,
+\begin{equation}
+\Delta\mathrm{RMSE}_i \;=\; 100 \times \frac{\mathrm{RMSE}_{i,\,\mathrm{with\,D}} - \mathrm{RMSE}_{i,\,\mathrm{without\,D}}}{\mathrm{RMSE}_{i,\,\mathrm{without\,D}}},
+\end{equation}
+so that negative values denote improvement. Relative rather than absolute differences are used because the five EFPs differ by orders of magnitude in units.
+
+Significance was assessed by a one-sided Wilcoxon signed-rank test on the site-level paired RMSE values, testing whether including disturbance reduces error. Sites are the unit of replication; tests were paired by site identifier. Because each response variable and model pair constitutes a separate test, $p$-values were adjusted within each figure by the Benjamini--Hochberg procedure controlling the false discovery rate at $q < 0.05$. We report the median paired relative change and the proportion of sites improving alongside each test, since a small median shift can reach significance with a large number of sites.
+
+Effect sizes are reported as the median of the paired per-site differences rather than the difference of medians. The two are not equivalent and disagreed in sign for 10 of 20 comparisons in preliminary analyses; only the former is consistent with the paired test.
+
+\subsection*{Variable importance}
+
+To identify which predictors drive model behaviour, SHapley Additive exPlanations \cite{lundberg2017unified} were computed with the \texttt{treeshap} package \cite{kozmarski2021treeshap} for models M4 and M8 under both memory encodings and both climate windows, from models fitted to the complete dataset. Predictors were assigned to the four blocks (Climate, Traits, Disturbance, Memory) and block-level importance was summarised as the share of total mean absolute SHAP value. Because these models are fitted to all sites rather than to cross-validation folds, SHAP results are independent of the cross-validation structure.
+
+
+\backmatter
+
+\section*{Supplementary information}
+
+Supplementary Information accompanies this paper. It reports the sensitivity analyses referenced in the Methods: results for the unfiltered (112-site) and $\geq$50\,\% tree-cover (65-site) datasets, for all nine learner configurations, and for the repeated leave-one-site-out cross-validation.
+
+\section*{Data availability}
+
+The eddy covariance flux data used in this study are available from the FLUXNET2015, ICOS, AmeriFlux, NEON and OzFlux networks under their respective data policies. Annual forest cover and deadwood maps are available from the deadtrees.earth platform \cite{mosig2026deadtrees}. Community-weighted mean plant functional traits are available from the planttraits.earth database \cite{lusk2026crowdsourced}. The derived site-year tables underlying all analyses, including the harmonised benchmark datasets for all three tree-cover subsets, are archived at [repository DOI to be inserted on acceptance].
+
+\section*{Code availability}
+
+All code used to construct the datasets, train and validate the models, compute SHAP values and generate the figures is archived at [repository DOI to be inserted on acceptance]. An interactive browser presenting every figure across all three datasets, both cross-validation structures and all nine learner configurations accompanies this work at [URL].
+
+\section*{Acknowledgements}
+
+[To be completed.]
+
+\section*{Author contributions}
+
+[To be completed.]
+
+\section*{Funding}
+
+[Funding statement to be completed. Recommended format: A.B.C. discloses support for the research of this work from Funder [grant number xxxx]. D.E.F. declares no relevant funding.]
+
+\section*{Competing interests}
+
+The authors declare no competing interests.
+
+\begin{appendices}
+
+\section{Section title of first appendix}\label{secA1}
+
+An appendix contains supplementary information that is not an essential part of the text itself but which may be helpful in providing a more comprehensive understanding of the research problem or it is information that is too cumbersome to be included in the body of the paper.
+
+%%=============================================%%
+%% For submissions to Nature Portfolio Journals %%
+%% please use the heading ``Extended Data''.   %%
+%%=============================================%%
+
+%%=============================================================%%
+%% Sample for another appendix section			       %%
+%%=============================================================%%
+
+%% \section{Example of another appendix section}\label{secA2}%
+%% Appendices may be used for helpful, supporting or essential material that would otherwise 
+%% clutter, break up or be distracting to the text. Appendices can consist of sections, figures, 
+%% tables and equations etc.
+
+\end{appendices}
+
+%%===========================================================================================%%
+%% If you are submitting to one of the Nature Portfolio journals, using the eJP submission   %%
+%% system, please include the references within the manuscript file itself. You may do this  %%
+%% by copying the reference list from your .bbl file, paste it into the main manuscript .tex %%
+%% file, and delete the associated \verb+\bibliography+ commands.                            %%
+%%===========================================================================================%%
+
+\bibliography{sn-bibliography}% common bib file
+%% if required, the content of .bbl file can be included here once bbl is generated
+%%\input sn-article.bbl
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Appendix
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\appendix
+
+\section{Supplementary Tables}\label{sec:appendix-tables}
+
+\setcounter{table}{0}
+\renewcommand{\thetable}{A\arabic{table}}
+
+%% Table A1: RMSE ratio per biome × EFP
+\input{tables/table_RMSE_ratio_v3.tex}
+
+%% Table A2: LOSO performance — wetland sites excluded
+\input{tables/table_RF_LOSO_24mbench_noWET}
+
+\end{document}

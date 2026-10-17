@@ -1,0 +1,2870 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>Flux Tower Data Quality Report</title><style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0D0D0D;color:#E0E0E0;font-family:Arial,Helvetica,sans-serif;line-height:1.6;padding:28px 18px 60px}
+a{color:#22D4EB;text-decoration:none} a:hover{text-decoration:underline}
+.wrap{max-width:900px;margin:0 auto}
+.nav{font-size:.85em;color:#6B7280;margin-bottom:22px} .nav a{margin-right:14px}
+h1{font-size:1.65em;color:#fff;line-height:1.25;margin-bottom:6px;letter-spacing:-.01em}
+.article h1{display:none}
+.article h2{font-size:1.3em;color:#22D4EB;margin:34px 0 12px;padding-bottom:6px;border-bottom:1px solid #22D4EB55}
+.article h3{font-size:1.1em;color:#E5E7EB;margin:24px 0 8px}
+.article h4{font-size:1em;color:#9CA3AF;margin:18px 0 6px}
+.article p{margin:10px 0} .article ul,.article ol{margin:8px 0 8px 24px} .article li{margin:4px 0}
+.article hr{border:0;border-top:1px solid #2A2A3A;margin:26px 0}
+.article blockquote{border-left:3px solid #22D4EB;padding:2px 14px;color:#9CA3AF;margin:12px 0}
+.article code{background:#1F2937;border-radius:4px;padding:1px 5px;font-size:.88em;color:#A7F3D0;font-family:Consolas,Menlo,monospace}
+.article pre{background:#111827;border:1px solid #2A2A3A;border-radius:8px;padding:12px 14px;overflow-x:auto;margin:12px 0}
+.article pre code{background:none;padding:0;color:#E5E7EB}
+.tw{overflow-x:auto;margin:14px 0}
+.article table{border-collapse:collapse;font-size:.88em;min-width:60%}
+.article th{background:#1F2937;color:#22D4EB;text-align:left}
+.article th,.article td{border:1px solid #2A2A3A;padding:6px 10px;vertical-align:top}
+.article tr:nth-child(even) td{background:#111827}
+.article img{max-width:100%;height:auto;background:#fff;border-radius:6px;margin:12px 0 4px;display:block}
+.article em{color:#9CA3AF}
+.badge{display:inline-block;font-size:.75em;background:#1F2937;border:1px solid #374151;border-radius:4px;padding:2px 8px;color:#9CA3AF;margin-right:6px}
+.meta{margin:6px 0 22px}
+.footer{margin-top:50px;font-size:.75em;color:#4B5563;text-align:center}
+
+.month{font-size:1.05em;color:#22D4EB;margin:34px 0 12px;padding-bottom:6px;border-bottom:1px solid #22D4EB55}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.card{display:flex;flex-direction:column;gap:8px;background:#111827;border:1px solid #2A2A3A;border-radius:12px;padding:20px 20px;color:#E0E0E0;transition:border-color .2s,transform .15s}
+.card:hover{border-color:#22D4EB;transform:translateY(-2px);text-decoration:none}
+.card-title{font-size:1.02em;font-weight:bold;color:#22D4EB;line-height:1.3}
+.card-desc{font-size:.83em;color:#9CA3AF;line-height:1.5}
+.card-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto;padding-top:4px}
+.tag{font-size:.72em;background:#1F2937;border:1px solid #374151;border-radius:4px;padding:2px 8px;color:#6B7280}
+#q{width:100%;background:#111827;border:1px solid #2A2A3A;border-radius:8px;color:#E0E0E0;padding:10px 14px;font-size:.95em;margin:14px 0 4px}
+#q:focus{outline:none;border-color:#22D4EB}
+.sub{color:#9CA3AF;font-size:.9em}
+</style></head>
+<body><div class="wrap">
+<div class="nav"><a href="index.html">&larr; Daily reports</a><a href="../index.html">Hub</a></div>
+<h1>Flux Tower Data Quality Report</h1><div class="meta"><span class="badge">Reference</span><span class="badge">31 tables</span></div>
+<div class="article"><h1 id="flux-tower-data-quality-report">Flux Tower Data Quality Report</h1>
+<p><strong>Generated:</strong> 2026-06-29 15:37 UTC<br />
+<strong>Dataset:</strong> FLUXNET 2017–2025 V02<br />
+<strong>EFP file:</strong> 233 sites, 1535 site-years<br />
+<strong>Meteo file:</strong> 329 sites, 20664 site-months<br />
+<strong>Years (EFP):</strong> 2017–2025</p>
+<hr />
+<h2 id="1-executive-summary">1. Executive Summary</h2>
+<h3 id="rotating_light-red-flags">🚨 Red Flags</h3>
+<ul>
+<li>🚨 EFP <code>GPPsat</code>: 21.5% missing</li>
+<li>🚨 EFP <code>NEPmax</code>: 13.7% missing</li>
+<li>🚨 EFP <code>uWUE</code>: 21.6% missing</li>
+<li>🚨 EFP <code>WUE</code>: 21.6% missing</li>
+<li>🚨 Physically impossible <code>uWUE</code> values: 6 site-year(s)</li>
+<li>🚨 Physically impossible <code>WUE</code> values: 6 site-year(s)</li>
+<li>🚨 Meteo <code>VPD_mean</code> failed <code>&gt; 80 hPa (possible Pa units?)</code>: 60 records</li>
+<li>🚨 Meteo <code>P_sum</code> failed <code>&gt; 2000 mm/month</code>: 6 records</li>
+<li>🚨 JPF: <code>JPF_JP-Tak_FLUXNET_1998-2021_v1.3_r1.zip</code> is corrupted (listed in bad_or_corrupted_zip_files.csv). Total 9 corrupted/bad zips in the dataset (1 ICOS, 8 JPF/TERN).</li>
+<li>🚨 ICOS <code>CD-Ygb</code>: VPD_mean in monthly meteo up to 2109 hPa — values are in Pa (divide by 100).</li>
+<li>🚨 AMF <code>US-HB4</code>: P_sum monthly values up to 39,140 mm/month — physically impossible, likely instrument error.</li>
+</ul>
+<h3 id="key-numbers">Key Numbers</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sites in EFP file</td>
+<td>233</td>
+</tr>
+<tr>
+<td>Sites in meteo file</td>
+<td>329</td>
+</tr>
+<tr>
+<td>Total EFP site-years</td>
+<td>1535</td>
+</tr>
+<tr>
+<td>Total meteo site-months</td>
+<td>20664</td>
+</tr>
+<tr>
+<td>Year range (EFP)</td>
+<td>2017–2025</td>
+</tr>
+<tr>
+<td>Outlier site-years (|z|&gt;3) across all EFPs</td>
+<td>45</td>
+</tr>
+<tr>
+<td>Physically impossible EFP values</td>
+<td>12</td>
+</tr>
+<tr>
+<td>Sites with any missing EFP</td>
+<td>72</td>
+</tr>
+<tr>
+<td>VPD&gt;80 hPa site-months (unit suspect)</td>
+<td>60</td>
+</tr>
+<tr>
+<td>P_sum&gt;2000 mm/month (anomalous)</td>
+<td>6</td>
+</tr>
+<tr>
+<td>Corrupted ZIP files</td>
+<td>9 (1 ICOS-DE-RuW, 1 JPF-JP-Tak + 7 others)</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="2-efp-quality-processed-annual-efps">2. EFP Quality (Processed Annual EFPs)</h2>
+<p>Source: <code>EFP_outputs_corrected/ALL_SITES_YEARLY_EFP_min4continuousYears.csv</code><br />
+Shape: 1535 rows × 22 columns | columns: <code>SITE_ID</code>, <code>YEAR</code>, <code>uWUE</code>, <code>WUE</code>, <code>ETmax</code>, <code>precipAvail</code>, <code>Gavail</code>, <code>GSmax</code>, <code>CO2avail</code>, <code>G1</code>, <code>EF</code>, <code>EFampl</code>, <code>GPPsat</code>, <code>NEPmax</code>, <code>Rb</code>, <code>Rbmax</code>, <code>aCUE</code>, <code>TZ</code>, <code>nyears</code>, <code>status</code>, <code>igbp</code>, <code>network</code></p>
+<h3 id="21-descriptive-statistics">2.1 Descriptive Statistics</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>status</th>
+<th>variable</th>
+<th>n_total</th>
+<th>n_missing</th>
+<th>pct_missing</th>
+<th>mean</th>
+<th>median</th>
+<th>std</th>
+<th>variance</th>
+<th>min</th>
+<th>max</th>
+<th>p5</th>
+<th>p25</th>
+<th>p75</th>
+<th>p95</th>
+<th>n_outliers</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>🚨</td>
+<td>GPPsat</td>
+<td>1535</td>
+<td>330</td>
+<td>21.5</td>
+<td>19.9</td>
+<td>19.41</td>
+<td>10.45</td>
+<td>109.2</td>
+<td>0.0015</td>
+<td>57.24</td>
+<td>4.562</td>
+<td>11.09</td>
+<td>28.46</td>
+<td>37.56</td>
+<td>1</td>
+</tr>
+<tr>
+<td>🚨</td>
+<td>NEPmax</td>
+<td>1535</td>
+<td>210</td>
+<td>13.68</td>
+<td>18.27</td>
+<td>17.26</td>
+<td>10.31</td>
+<td>106.2</td>
+<td>-0.0948</td>
+<td>64.28</td>
+<td>4.457</td>
+<td>9.302</td>
+<td>26.14</td>
+<td>36.22</td>
+<td>3</td>
+</tr>
+<tr>
+<td>✓</td>
+<td>ETmax</td>
+<td>1535</td>
+<td>48</td>
+<td>3.13</td>
+<td>0.1973</td>
+<td>0.1931</td>
+<td>0.0835</td>
+<td>0.007</td>
+<td>0.0026</td>
+<td>0.6022</td>
+<td>0.0775</td>
+<td>0.1332</td>
+<td>0.247</td>
+<td>0.3366</td>
+<td>14</td>
+</tr>
+<tr>
+<td>🚨</td>
+<td>uWUE</td>
+<td>1535</td>
+<td>331</td>
+<td>21.56</td>
+<td>3.01</td>
+<td>2.944</td>
+<td>1.647</td>
+<td>2.712</td>
+<td>-0.0993</td>
+<td>17.15</td>
+<td>0.8507</td>
+<td>2.086</td>
+<td>3.771</td>
+<td>4.997</td>
+<td>14</td>
+</tr>
+<tr>
+<td>🚨</td>
+<td>WUE</td>
+<td>1535</td>
+<td>331</td>
+<td>21.56</td>
+<td>2.892</td>
+<td>2.646</td>
+<td>2.208</td>
+<td>4.874</td>
+<td>-0.1784</td>
+<td>34.09</td>
+<td>0.8974</td>
+<td>1.74</td>
+<td>3.609</td>
+<td>5.083</td>
+<td>13</td>
+</tr>
+</tbody>
+</table></div>
+<p><em>Units: GPPsat &amp; NEPmax in µmol m⁻² s⁻¹; ETmax in mm s⁻¹ (derived from LE); uWUE in µmol m⁻² s⁻¹ hPa⁻⁰·⁵; WUE in µmol J⁻¹</em></p>
+<h3 id="22-outlier-site-years-z--3">2.2 Outlier Site-Years (|z| &gt; 3)</h3>
+<p><strong>45 outlier site-years</strong> across all EFP variables:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>variable</th>
+<th>SITE_ID</th>
+<th>YEAR</th>
+<th>value</th>
+<th>mu</th>
+<th>sd</th>
+<th>z</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GPPsat</td>
+<td>IT-BFt</td>
+<td>2019</td>
+<td>57.24</td>
+<td>19.9</td>
+<td>10.45</td>
+<td>3.57</td>
+</tr>
+<tr>
+<td>NEPmax</td>
+<td>BE-Bra</td>
+<td>2018</td>
+<td>64.28</td>
+<td>18.27</td>
+<td>10.31</td>
+<td>4.46</td>
+</tr>
+<tr>
+<td>NEPmax</td>
+<td>DE-Msr</td>
+<td>2023</td>
+<td>52.6</td>
+<td>18.27</td>
+<td>10.31</td>
+<td>3.33</td>
+</tr>
+<tr>
+<td>NEPmax</td>
+<td>DE-Msr</td>
+<td>2024</td>
+<td>50.93</td>
+<td>18.27</td>
+<td>10.31</td>
+<td>3.17</td>
+</tr>
+<tr>
+<td>ETmax</td>
+<td>CN-HeM</td>
+<td>2021</td>
+<td>0.4851</td>
+<td>0.1973</td>
+<td>0.0835</td>
+<td>3.44</td>
+</tr>
+<tr>
+<td>ETmax</td>
+<td>CN-Sdq</td>
+<td>2017</td>
+<td>0.4751</td>
+<td>0.1973</td>
+<td>0.0835</td>
+<td>3.33</td>
+</tr>
+<tr>
+<td>ETmax</td>
+<td>CN-Zha</td>
+<td>2017</td>
+<td>0.4704</td>
+<td>0.1973</td>
+<td>0.0835</td>
+<td>3.27</td>
+</tr>
+<tr>
+<td>ETmax</td>
+<td>CN-Zha</td>
+<td>2018</td>
+<td>0.5875</td>
+<td>0.1973</td>
+<td>0.0835</td>
+<td>4.67</td>
+</tr>
+<tr>
+<td>ETmax</td>
+<td>CN-Zha</td>
+<td>2019</td>
+<td>0.5424</td>
+<td>0.1973</td>
+<td>0.0835</td>
+<td>4.13</td>
+</tr>
+<tr>
+<td>ETmax</td>
+<td>CN-Zha</td>
+<td>2020</td>
+<td>0.4859</td>
+<td>0.1973</td>
+<td>0.0835</td>
+<td>3.45</td>
+</tr>
+<tr>
+<td>ETmax</td>
+<td>CN-Zha</td>
+<td>2022</td>
+<td>0.6022</td>
+<td>0.1973</td>
+<td>0.0835</td>
+<td>4.85</td>
+</tr>
+<tr>
+<td>ETmax</td>
+<td>CN-Zha</td>
+<td>2023</td>
+<td>0.5868</td>
+<td>0.1973</td>
+<td>0.0835</td>
+<td>4.66</td>
+</tr>
+<tr>
+<td>ETmax</td>
+<td>CN-Zha</td>
+<td>2024</td>
+<td>0.5402</td>
+<td>0.1973</td>
+<td>0.0835</td>
+<td>4.1</td>
+</tr>
+<tr>
+<td>ETmax</td>
+<td>ID-JOP</td>
+<td>2021</td>
+<td>0.4876</td>
+<td>0.1973</td>
+<td>0.0835</td>
+<td>3.48</td>
+</tr>
+<tr>
+<td>ETmax</td>
+<td>US-NC2</td>
+<td>2018</td>
+<td>0.4711</td>
+<td>0.1973</td>
+<td>0.0835</td>
+<td>3.28</td>
+</tr>
+<tr>
+<td>ETmax</td>
+<td>US-NC3</td>
+<td>2018</td>
+<td>0.4923</td>
+<td>0.1973</td>
+<td>0.0835</td>
+<td>3.53</td>
+</tr>
+<tr>
+<td>ETmax</td>
+<td>US-NC3</td>
+<td>2019</td>
+<td>0.5002</td>
+<td>0.1973</td>
+<td>0.0835</td>
+<td>3.63</td>
+</tr>
+<tr>
+<td>ETmax</td>
+<td>US-NC4</td>
+<td>2019</td>
+<td>0.4482</td>
+<td>0.1973</td>
+<td>0.0835</td>
+<td>3</td>
+</tr>
+<tr>
+<td>uWUE</td>
+<td>AU-ASM</td>
+<td>2022</td>
+<td>8.205</td>
+<td>3.01</td>
+<td>1.647</td>
+<td>3.15</td>
+</tr>
+<tr>
+<td>uWUE</td>
+<td>CN-Sb1</td>
+<td>2020</td>
+<td>13.37</td>
+<td>3.01</td>
+<td>1.647</td>
+<td>6.29</td>
+</tr>
+<tr>
+<td>uWUE</td>
+<td>CN-Sb1</td>
+<td>2021</td>
+<td>15.38</td>
+<td>3.01</td>
+<td>1.647</td>
+<td>7.51</td>
+</tr>
+<tr>
+<td>uWUE</td>
+<td>CN-Sb1</td>
+<td>2022</td>
+<td>17.15</td>
+<td>3.01</td>
+<td>1.647</td>
+<td>8.58</td>
+</tr>
+<tr>
+<td>uWUE</td>
+<td>CN-Sb1</td>
+<td>2023</td>
+<td>15.76</td>
+<td>3.01</td>
+<td>1.647</td>
+<td>7.75</td>
+</tr>
+<tr>
+<td>uWUE</td>
+<td>CN-Sb1</td>
+<td>2024</td>
+<td>14.4</td>
+<td>3.01</td>
+<td>1.647</td>
+<td>6.92</td>
+</tr>
+<tr>
+<td>uWUE</td>
+<td>CN-Sb2</td>
+<td>2020</td>
+<td>9.241</td>
+<td>3.01</td>
+<td>1.647</td>
+<td>3.78</td>
+</tr>
+<tr>
+<td>uWUE</td>
+<td>CN-Sb2</td>
+<td>2021</td>
+<td>12.29</td>
+<td>3.01</td>
+<td>1.647</td>
+<td>5.63</td>
+</tr>
+<tr>
+<td>uWUE</td>
+<td>CN-Sb2</td>
+<td>2022</td>
+<td>13.89</td>
+<td>3.01</td>
+<td>1.647</td>
+<td>6.61</td>
+</tr>
+<tr>
+<td>uWUE</td>
+<td>CN-Sb2</td>
+<td>2023</td>
+<td>15.37</td>
+<td>3.01</td>
+<td>1.647</td>
+<td>7.5</td>
+</tr>
+<tr>
+<td>uWUE</td>
+<td>CN-Sb2</td>
+<td>2024</td>
+<td>11.27</td>
+<td>3.01</td>
+<td>1.647</td>
+<td>5.01</td>
+</tr>
+<tr>
+<td>uWUE</td>
+<td>CN-Sdq</td>
+<td>2020</td>
+<td>12.66</td>
+<td>3.01</td>
+<td>1.647</td>
+<td>5.86</td>
+</tr>
+<tr>
+<td>uWUE</td>
+<td>UK-AMo</td>
+<td>2020</td>
+<td>9.286</td>
+<td>3.01</td>
+<td>1.647</td>
+<td>3.81</td>
+</tr>
+<tr>
+<td>uWUE</td>
+<td>UK-AMo</td>
+<td>2024</td>
+<td>8.359</td>
+<td>3.01</td>
+<td>1.647</td>
+<td>3.25</td>
+</tr>
+<tr>
+<td>WUE</td>
+<td>CN-Sb1</td>
+<td>2020</td>
+<td>34.09</td>
+<td>2.892</td>
+<td>2.208</td>
+<td>14.13</td>
+</tr>
+<tr>
+<td>WUE</td>
+<td>CN-Sb1</td>
+<td>2021</td>
+<td>21.05</td>
+<td>2.892</td>
+<td>2.208</td>
+<td>8.23</td>
+</tr>
+<tr>
+<td>WUE</td>
+<td>CN-Sb1</td>
+<td>2022</td>
+<td>23.98</td>
+<td>2.892</td>
+<td>2.208</td>
+<td>9.55</td>
+</tr>
+<tr>
+<td>WUE</td>
+<td>CN-Sb1</td>
+<td>2023</td>
+<td>22.83</td>
+<td>2.892</td>
+<td>2.208</td>
+<td>9.03</td>
+</tr>
+<tr>
+<td>WUE</td>
+<td>CN-Sb1</td>
+<td>2024</td>
+<td>18.3</td>
+<td>2.892</td>
+<td>2.208</td>
+<td>6.98</td>
+</tr>
+<tr>
+<td>WUE</td>
+<td>CN-Sb2</td>
+<td>2020</td>
+<td>23.96</td>
+<td>2.892</td>
+<td>2.208</td>
+<td>9.54</td>
+</tr>
+<tr>
+<td>WUE</td>
+<td>CN-Sb2</td>
+<td>2021</td>
+<td>19.79</td>
+<td>2.892</td>
+<td>2.208</td>
+<td>7.65</td>
+</tr>
+<tr>
+<td>WUE</td>
+<td>CN-Sb2</td>
+<td>2022</td>
+<td>19.02</td>
+<td>2.892</td>
+<td>2.208</td>
+<td>7.31</td>
+</tr>
+<tr>
+<td>WUE</td>
+<td>CN-Sb2</td>
+<td>2023</td>
+<td>19.33</td>
+<td>2.892</td>
+<td>2.208</td>
+<td>7.44</td>
+</tr>
+<tr>
+<td>WUE</td>
+<td>CN-Sb2</td>
+<td>2024</td>
+<td>12.67</td>
+<td>2.892</td>
+<td>2.208</td>
+<td>4.43</td>
+</tr>
+<tr>
+<td>WUE</td>
+<td>CN-Sdq</td>
+<td>2020</td>
+<td>10.51</td>
+<td>2.892</td>
+<td>2.208</td>
+<td>3.45</td>
+</tr>
+<tr>
+<td>WUE</td>
+<td>UK-AMo</td>
+<td>2020</td>
+<td>11.58</td>
+<td>2.892</td>
+<td>2.208</td>
+<td>3.93</td>
+</tr>
+<tr>
+<td>WUE</td>
+<td>UK-AMo</td>
+<td>2024</td>
+<td>10.55</td>
+<td>2.892</td>
+<td>2.208</td>
+<td>3.47</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="23-physically-impossible-values">2.3 Physically Impossible Values</h3>
+<p><strong>12 records with impossible values (sample of up to 10 per variable):</strong></p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>variable</th>
+<th>condition</th>
+<th>SITE_ID</th>
+<th>YEAR</th>
+<th>value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>uWUE</td>
+<td>uWUE&lt;0</td>
+<td>CA-PB1</td>
+<td>2023</td>
+<td>-0.0419</td>
+</tr>
+<tr>
+<td>uWUE</td>
+<td>uWUE&lt;0</td>
+<td>US-EML</td>
+<td>2023</td>
+<td>-0.0614</td>
+</tr>
+<tr>
+<td>uWUE</td>
+<td>uWUE&lt;0</td>
+<td>US-xMB</td>
+<td>2019</td>
+<td>-0.026</td>
+</tr>
+<tr>
+<td>uWUE</td>
+<td>uWUE&lt;0</td>
+<td>US-xML</td>
+<td>2021</td>
+<td>-0.0471</td>
+</tr>
+<tr>
+<td>uWUE</td>
+<td>uWUE&lt;0</td>
+<td>US-xNW</td>
+<td>2020</td>
+<td>-0.0193</td>
+</tr>
+<tr>
+<td>uWUE</td>
+<td>uWUE&lt;0</td>
+<td>US-xYE</td>
+<td>2020</td>
+<td>-0.0993</td>
+</tr>
+<tr>
+<td>WUE</td>
+<td>WUE&lt;0</td>
+<td>CA-PB1</td>
+<td>2023</td>
+<td>-0.1102</td>
+</tr>
+<tr>
+<td>WUE</td>
+<td>WUE&lt;0</td>
+<td>US-EML</td>
+<td>2023</td>
+<td>-0.0874</td>
+</tr>
+<tr>
+<td>WUE</td>
+<td>WUE&lt;0</td>
+<td>US-xMB</td>
+<td>2019</td>
+<td>-0.0396</td>
+</tr>
+<tr>
+<td>WUE</td>
+<td>WUE&lt;0</td>
+<td>US-xML</td>
+<td>2021</td>
+<td>-0.0738</td>
+</tr>
+<tr>
+<td>WUE</td>
+<td>WUE&lt;0</td>
+<td>US-xNW</td>
+<td>2020</td>
+<td>-0.0464</td>
+</tr>
+<tr>
+<td>WUE</td>
+<td>WUE&lt;0</td>
+<td>US-xYE</td>
+<td>2020</td>
+<td>-0.1784</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Total count by variable:</strong> <code>NEPmax</code>: 1; <code>uWUE</code>: 6; <code>WUE</code>: 6</p>
+<hr />
+<h2 id="3-meteorological-variable-quality-monthly-aggregates">3. Meteorological Variable Quality (Monthly Aggregates)</h2>
+<p>Source: <code>EFP_outputs_corrected/ALL_SITES_MONTHLY_METEO_corrected.csv</code><br />
+Shape: 20664 rows × 16 columns</p>
+<h3 id="31-descriptive-statistics">3.1 Descriptive Statistics</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>status</th>
+<th>variable</th>
+<th>n_total</th>
+<th>n_missing</th>
+<th>pct_missing</th>
+<th>mean</th>
+<th>median</th>
+<th>std</th>
+<th>variance</th>
+<th>min</th>
+<th>max</th>
+<th>p5</th>
+<th>p25</th>
+<th>p75</th>
+<th>p95</th>
+<th>n_outliers</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>✓</td>
+<td>TA_mean</td>
+<td>20664</td>
+<td>0</td>
+<td>0</td>
+<td>10.05</td>
+<td>11.37</td>
+<td>11.31</td>
+<td>127.9</td>
+<td>-38.76</td>
+<td>33.77</td>
+<td>-11.16</td>
+<td>3.173</td>
+<td>18.25</td>
+<td>26.34</td>
+<td>121</td>
+</tr>
+<tr>
+<td>✓</td>
+<td>VPD_mean</td>
+<td>20664</td>
+<td>0</td>
+<td>0</td>
+<td>9.796</td>
+<td>4.34</td>
+<td>77.78</td>
+<td>6050</td>
+<td>0.0023</td>
+<td>2109</td>
+<td>0.4218</td>
+<td>2.003</td>
+<td>7.54</td>
+<td>17.62</td>
+<td>60</td>
+</tr>
+<tr>
+<td>✓</td>
+<td>SW_IN_mean</td>
+<td>20664</td>
+<td>0</td>
+<td>0</td>
+<td>163.1</td>
+<td>169</td>
+<td>87.3</td>
+<td>7622</td>
+<td>0</td>
+<td>401</td>
+<td>18.11</td>
+<td>93.6</td>
+<td>231.1</td>
+<td>300.2</td>
+<td>0</td>
+</tr>
+<tr>
+<td>✓</td>
+<td>P_sum</td>
+<td>20664</td>
+<td>0</td>
+<td>0</td>
+<td>97.51</td>
+<td>50.32</td>
+<td>405.3</td>
+<td>1.643e+05</td>
+<td>0</td>
+<td>3.914e+04</td>
+<td>0.046</td>
+<td>18.05</td>
+<td>108.4</td>
+<td>340.3</td>
+<td>23</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="32-unit-plausibility-checks">3.2 Unit Plausibility Checks</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>variable</th>
+<th>check</th>
+<th>n_flagged</th>
+<th>flag</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TA_mean</td>
+<td>&lt; -60°C</td>
+<td>0</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>TA_mean</td>
+<td>&gt; +55°C</td>
+<td>0</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>VPD_mean</td>
+<td>&lt; 0 hPa</td>
+<td>0</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>VPD_mean</td>
+<td>&gt; 80 hPa (possible Pa units?)</td>
+<td>60</td>
+<td>🚨</td>
+</tr>
+<tr>
+<td>SW_IN_mean</td>
+<td>&lt; 0 W/m²</td>
+<td>0</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>SW_IN_mean</td>
+<td>&gt; 1000 W/m²</td>
+<td>0</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>P_sum</td>
+<td>&lt; 0 mm</td>
+<td>0</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>P_sum</td>
+<td>&gt; 2000 mm/month</td>
+<td>6</td>
+<td>🚨</td>
+</tr>
+<tr>
+<td>n_obs</td>
+<td>&lt; 500 obs/month (sparse)</td>
+<td>0</td>
+<td>✓</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Sites with VPD_mean &gt; 80 hPa (N=1):</strong></p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>SITE_ID</th>
+<th>n_months</th>
+<th>VPD_mean_mean</th>
+<th>VPD_max</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CD-Ygb</td>
+<td>60</td>
+<td>1400</td>
+<td>2109</td>
+</tr>
+</tbody>
+</table></div>
+<p>Note: Values of 1600–2100 in ICOS site <code>CD-Ygb</code> are consistent with Pa units (divide by 100 → 16–21 hPa, plausible for tropical DRC). 🚨 This site's VPD must be divided by 100 before use.</p>
+<p><strong>Site-months with P_sum &gt; 2000 mm/month (N=6):</strong></p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>SITE_ID</th>
+<th>YEAR</th>
+<th>MONTH</th>
+<th>P_sum</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>US-HB4</td>
+<td>2021</td>
+<td>1</td>
+<td>3.914e+04</td>
+</tr>
+<tr>
+<td>US-HB4</td>
+<td>2023</td>
+<td>8</td>
+<td>2.739e+04</td>
+</tr>
+<tr>
+<td>US-HB4</td>
+<td>2021</td>
+<td>2</td>
+<td>2.332e+04</td>
+</tr>
+<tr>
+<td>US-HB4</td>
+<td>2022</td>
+<td>8</td>
+<td>1.231e+04</td>
+</tr>
+<tr>
+<td>US-HB4</td>
+<td>2022</td>
+<td>12</td>
+<td>7974</td>
+</tr>
+<tr>
+<td>US-HB4</td>
+<td>2024</td>
+<td>4</td>
+<td>2145</td>
+</tr>
+</tbody>
+</table></div>
+<p>Note: AMF <code>US-HB4</code> P_sum values of 2,000–39,000 mm/month are physically impossible (world record monthly ~2,500 mm). 🚨 Likely instrument/aggregation error — these months should be excluded.</p>
+<p><strong>VPD_mean median (excluding CD-Ygb outliers):</strong> 4.325 hPa — ✓ consistent with hPa</p>
+<hr />
+<h2 id="4-raw-half-hourlyhourly-spot-check-by-network">4. Raw Half-Hourly/Hourly Spot Check by Network</h2>
+<p>One representative site per network, data filtered to 2017–2019 where available.<br />
+Note: AMF zips contain <code>_HR_</code> (1-hourly) files rather than <code>_HH_</code> (30-min); all other networks use <code>_HH_</code>.<br />
+JPF_JP-Tak is in the corrupted zips list; <code>JPF_JP-Yms</code> was used instead.</p>
+<h3 id="41-amf--amf_us-ha1_fluxnet_1991-2025_v13_r1zip">4.1 AMF — <code>AMF_US-Ha1_FLUXNET_1991-2025_v1.3_r1.zip</code></h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Resolution</td>
+<td>HR (hourly)</td>
+</tr>
+<tr>
+<td>HH/HR file</td>
+<td><code>AMF_US-Ha1_FLUXNET_FLUXMET_HR_1991-2025_v1.3_r1.csv</code></td>
+</tr>
+<tr>
+<td>Date range checked</td>
+<td>2017–2019</td>
+</tr>
+<tr>
+<td>n observations</td>
+<td>26,280</td>
+</tr>
+<tr>
+<td>Total columns</td>
+<td>234</td>
+</tr>
+<tr>
+<td>GPP columns present</td>
+<td><code>GPP_NT_VUT_REF</code>, <code>GPP_DT_VUT_REF</code></td>
+</tr>
+<tr>
+<td>VPD unit check</td>
+<td>✓ median=2.1 hPa</td>
+</tr>
+</tbody>
+</table></div>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>variable</th>
+<th>present</th>
+<th>pct_missing</th>
+<th>min</th>
+<th>median</th>
+<th>max</th>
+<th>note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NEE_VUT_REF</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>-42.5</td>
+<td>1.048</td>
+<td>26.45</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>GPP_NT_VUT_REF</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>-16.42</td>
+<td>0.483</td>
+<td>43.85</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>GPP_DT_VUT_REF</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>0</td>
+<td>0.026</td>
+<td>47.1</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>GPP_F_MDS</td>
+<td>✗</td>
+<td>N/A</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>not in file</td>
+</tr>
+<tr>
+<td>LE_F_MDS</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>-41.42</td>
+<td>7.912</td>
+<td>767.6</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>VPD_F</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>0</td>
+<td>2.141</td>
+<td>34.05</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>TA_F</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>-23.94</td>
+<td>8.921</td>
+<td>32.03</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>P_F</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>0</td>
+<td>0</td>
+<td>34.6</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>SW_IN_F</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>0</td>
+<td>6.111</td>
+<td>1082</td>
+<td>✓</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="42-icos--icos_de-hai_fluxnet_2000-2024_v13_r2zip">4.2 ICOS — <code>ICOS_DE-Hai_FLUXNET_2000-2024_v1.3_r2.zip</code></h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Resolution</td>
+<td>HH (half-hourly)</td>
+</tr>
+<tr>
+<td>HH/HR file</td>
+<td><code>ICOS_DE-Hai_FLUXNET_FLUXMET_HH_2000-2024_v1.3_r2.csv</code></td>
+</tr>
+<tr>
+<td>Date range checked</td>
+<td>2017–2019</td>
+</tr>
+<tr>
+<td>n observations</td>
+<td>52,560</td>
+</tr>
+<tr>
+<td>Total columns</td>
+<td>244</td>
+</tr>
+<tr>
+<td>GPP columns present</td>
+<td><code>GPP_NT_VUT_REF</code>, <code>GPP_DT_VUT_REF</code></td>
+</tr>
+<tr>
+<td>VPD unit check</td>
+<td>✓ median=2.8 hPa</td>
+</tr>
+</tbody>
+</table></div>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>variable</th>
+<th>present</th>
+<th>pct_missing</th>
+<th>min</th>
+<th>median</th>
+<th>max</th>
+<th>note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NEE_VUT_REF</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>-42.07</td>
+<td>1.071</td>
+<td>28.28</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>GPP_NT_VUT_REF</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>-23.57</td>
+<td>0.559</td>
+<td>46.88</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>GPP_DT_VUT_REF</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>0</td>
+<td>0.006</td>
+<td>42.3</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>GPP_F_MDS</td>
+<td>✗</td>
+<td>N/A</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>not in file</td>
+</tr>
+<tr>
+<td>LE_F_MDS</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>-99.01</td>
+<td>4.817</td>
+<td>496.1</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>VPD_F</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>0</td>
+<td>2.771</td>
+<td>41.12</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>TA_F</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>-14.87</td>
+<td>9.28</td>
+<td>33.6</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>P_F</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>0</td>
+<td>0</td>
+<td>15.8</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>SW_IN_F</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>0</td>
+<td>3.985</td>
+<td>989.3</td>
+<td>✓</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="43-euf--euf_es-lju_fluxnet_2004-2024_v13_r1zip">4.3 EUF — <code>EUF_ES-LJu_FLUXNET_2004-2024_v1.3_r1.zip</code></h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Resolution</td>
+<td>HH (half-hourly)</td>
+</tr>
+<tr>
+<td>HH/HR file</td>
+<td><code>EUF_ES-LJu_FLUXNET_FLUXMET_HH_2004-2024_v1.3_r1.csv</code></td>
+</tr>
+<tr>
+<td>Date range checked</td>
+<td>2017–2019</td>
+</tr>
+<tr>
+<td>n observations</td>
+<td>52,560</td>
+</tr>
+<tr>
+<td>Total columns</td>
+<td>177</td>
+</tr>
+<tr>
+<td>GPP columns present</td>
+<td><code>GPP_DT_VUT_REF</code></td>
+</tr>
+<tr>
+<td>VPD unit check</td>
+<td>✓ median=6.9 hPa</td>
+</tr>
+</tbody>
+</table></div>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>variable</th>
+<th>present</th>
+<th>pct_missing</th>
+<th>min</th>
+<th>median</th>
+<th>max</th>
+<th>note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NEE_VUT_REF</td>
+<td>✓</td>
+<td>14.8%</td>
+<td>-11.66</td>
+<td>0.076</td>
+<td>9.289</td>
+<td>⚠️ &gt;10% missing</td>
+</tr>
+<tr>
+<td>GPP_NT_VUT_REF</td>
+<td>✗</td>
+<td>N/A</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>not in file</td>
+</tr>
+<tr>
+<td>GPP_DT_VUT_REF</td>
+<td>✓</td>
+<td>14.8%</td>
+<td>0</td>
+<td>0.029</td>
+<td>8.146</td>
+<td>⚠️ &gt;10% missing</td>
+</tr>
+<tr>
+<td>GPP_F_MDS</td>
+<td>✗</td>
+<td>N/A</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>not in file</td>
+</tr>
+<tr>
+<td>LE_F_MDS</td>
+<td>✓</td>
+<td>11.8%</td>
+<td>-246.6</td>
+<td>7.207</td>
+<td>338.8</td>
+<td>⚠️ &gt;10% missing</td>
+</tr>
+<tr>
+<td>VPD_F</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>0.359</td>
+<td>6.91</td>
+<td>45.22</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>TA_F</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>-5.398</td>
+<td>11.54</td>
+<td>33.66</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>P_F</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>0</td>
+<td>0</td>
+<td>14.73</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>SW_IN_F</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>0</td>
+<td>2.152</td>
+<td>930.1</td>
+<td>✓</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="44-cnf--cnf_cn-zha_fluxnet_2012-2024_v13_r1zip">4.4 CNF — <code>CNF_CN-Zha_FLUXNET_2012-2024_v1.3_r1.zip</code></h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Resolution</td>
+<td>HH (half-hourly)</td>
+</tr>
+<tr>
+<td>HH/HR file</td>
+<td><code>CNF_CN-Zha_FLUXNET_FLUXMET_HH_2012-2024_v1.3_r1.csv</code></td>
+</tr>
+<tr>
+<td>Date range checked</td>
+<td>2017–2019</td>
+</tr>
+<tr>
+<td>n observations</td>
+<td>52,560</td>
+</tr>
+<tr>
+<td>Total columns</td>
+<td>229</td>
+</tr>
+<tr>
+<td>GPP columns present</td>
+<td><code>GPP_NT_VUT_REF</code>, <code>GPP_DT_VUT_REF</code></td>
+</tr>
+<tr>
+<td>VPD unit check</td>
+<td>✓ median=6.5 hPa</td>
+</tr>
+</tbody>
+</table></div>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>variable</th>
+<th>present</th>
+<th>pct_missing</th>
+<th>min</th>
+<th>median</th>
+<th>max</th>
+<th>note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NEE_VUT_REF</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>-46.6</td>
+<td>0.099</td>
+<td>33.27</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>GPP_NT_VUT_REF</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>-30.01</td>
+<td>0.572</td>
+<td>52.85</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>GPP_DT_VUT_REF</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>0</td>
+<td>0.084</td>
+<td>50.91</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>GPP_F_MDS</td>
+<td>✗</td>
+<td>N/A</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>not in file</td>
+</tr>
+<tr>
+<td>LE_F_MDS</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>-136.2</td>
+<td>35.81</td>
+<td>999.6</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>VPD_F</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>0.275</td>
+<td>6.499</td>
+<td>52.29</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>TA_F</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>-20.89</td>
+<td>11.12</td>
+<td>35.37</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>P_F</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>0</td>
+<td>0</td>
+<td>5.703</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>SW_IN_F</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>0</td>
+<td>6.101</td>
+<td>1064</td>
+<td>✓</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="45-jpf--jpf_jp-yms_fluxnet_2000-2023_v13_r1zip">4.5 JPF — <code>JPF_JP-Yms_FLUXNET_2000-2023_v1.3_r1.zip</code></h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Resolution</td>
+<td>HH (half-hourly)</td>
+</tr>
+<tr>
+<td>HH/HR file</td>
+<td><code>JPF_JP-Yms_FLUXNET_FLUXMET_HH_2000-2023_v1.3_r1.csv</code></td>
+</tr>
+<tr>
+<td>Date range checked</td>
+<td>2017–2019</td>
+</tr>
+<tr>
+<td>n observations</td>
+<td>52,560</td>
+</tr>
+<tr>
+<td>Total columns</td>
+<td>178</td>
+</tr>
+<tr>
+<td>GPP columns present</td>
+<td><code>GPP_NT_VUT_REF</code></td>
+</tr>
+<tr>
+<td>VPD unit check</td>
+<td>✓ median=4.3 hPa</td>
+</tr>
+</tbody>
+</table></div>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>variable</th>
+<th>present</th>
+<th>pct_missing</th>
+<th>min</th>
+<th>median</th>
+<th>max</th>
+<th>note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NEE_VUT_REF</td>
+<td>✓</td>
+<td>3.3%</td>
+<td>-40.78</td>
+<td>1.551</td>
+<td>18.82</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>GPP_NT_VUT_REF</td>
+<td>✓</td>
+<td>3.3%</td>
+<td>-13.8</td>
+<td>1.206</td>
+<td>48.76</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>GPP_DT_VUT_REF</td>
+<td>✗</td>
+<td>N/A</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>not in file</td>
+</tr>
+<tr>
+<td>GPP_F_MDS</td>
+<td>✗</td>
+<td>N/A</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>not in file</td>
+</tr>
+<tr>
+<td>LE_F_MDS</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>-50.18</td>
+<td>30.09</td>
+<td>760.8</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>VPD_F</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>0.061</td>
+<td>4.294</td>
+<td>34.53</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>TA_F</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>-5.872</td>
+<td>15.75</td>
+<td>35.88</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>P_F</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>0</td>
+<td>0</td>
+<td>31.54</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>SW_IN_F</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>0</td>
+<td>4.258</td>
+<td>1116</td>
+<td>✓</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="46-kof--kof_kr-smm_fluxnet_2015-2021_v13_r1zip">4.6 KOF — <code>KOF_KR-SmM_FLUXNET_2015-2021_v1.3_r1.zip</code></h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Resolution</td>
+<td>HH (half-hourly)</td>
+</tr>
+<tr>
+<td>HH/HR file</td>
+<td><code>KOF_KR-SmM_FLUXNET_FLUXMET_HH_2015-2021_v1.3_r1.csv</code></td>
+</tr>
+<tr>
+<td>Date range checked</td>
+<td>2017–2019</td>
+</tr>
+<tr>
+<td>n observations</td>
+<td>52,560</td>
+</tr>
+<tr>
+<td>Total columns</td>
+<td>219</td>
+</tr>
+<tr>
+<td>GPP columns present</td>
+<td><code>GPP_NT_VUT_REF</code>, <code>GPP_DT_VUT_REF</code></td>
+</tr>
+<tr>
+<td>VPD unit check</td>
+<td>✓ median=4.1 hPa</td>
+</tr>
+</tbody>
+</table></div>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>variable</th>
+<th>present</th>
+<th>pct_missing</th>
+<th>min</th>
+<th>median</th>
+<th>max</th>
+<th>note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NEE_VUT_REF</td>
+<td>✓</td>
+<td>5.9%</td>
+<td>-74.22</td>
+<td>-0.595</td>
+<td>49.07</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>GPP_NT_VUT_REF</td>
+<td>✓</td>
+<td>100.0%</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>🚨 &gt;30% missing</td>
+</tr>
+<tr>
+<td>GPP_DT_VUT_REF</td>
+<td>✓</td>
+<td>5.9%</td>
+<td>0</td>
+<td>0.259</td>
+<td>37.14</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>GPP_F_MDS</td>
+<td>✗</td>
+<td>N/A</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>not in file</td>
+</tr>
+<tr>
+<td>LE_F_MDS</td>
+<td>✓</td>
+<td>5.8%</td>
+<td>-299.9</td>
+<td>16.09</td>
+<td>981.7</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>VPD_F</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>0.391</td>
+<td>4.13</td>
+<td>30.77</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>TA_F</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>-20.73</td>
+<td>12.13</td>
+<td>35.18</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>P_F</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>0</td>
+<td>0</td>
+<td>26.66</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>SW_IN_F</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>0</td>
+<td>4.197</td>
+<td>1087</td>
+<td>✓</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="47-tern--tern_au-how_fluxnet_2002-2025_v13_r1zip">4.7 TERN — <code>TERN_AU-How_FLUXNET_2002-2025_v1.3_r1.zip</code></h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Resolution</td>
+<td>HH (half-hourly)</td>
+</tr>
+<tr>
+<td>HH/HR file</td>
+<td><code>TERN_AU-How_FLUXNET_FLUXMET_HH_2002-2025_v1.3_r1.csv</code></td>
+</tr>
+<tr>
+<td>Date range checked</td>
+<td>2017–2019</td>
+</tr>
+<tr>
+<td>n observations</td>
+<td>52,560</td>
+</tr>
+<tr>
+<td>Total columns</td>
+<td>221</td>
+</tr>
+<tr>
+<td>GPP columns present</td>
+<td><code>GPP_NT_VUT_REF</code>, <code>GPP_DT_VUT_REF</code></td>
+</tr>
+<tr>
+<td>VPD unit check</td>
+<td>✓ median=11.3 hPa</td>
+</tr>
+</tbody>
+</table></div>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>variable</th>
+<th>present</th>
+<th>pct_missing</th>
+<th>min</th>
+<th>median</th>
+<th>max</th>
+<th>note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NEE_VUT_REF</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>-64.61</td>
+<td>1.201</td>
+<td>51.89</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>GPP_NT_VUT_REF</td>
+<td>✓</td>
+<td>33.3%</td>
+<td>-41.91</td>
+<td>1.268</td>
+<td>65.86</td>
+<td>🚨 &gt;30% missing</td>
+</tr>
+<tr>
+<td>GPP_DT_VUT_REF</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>0</td>
+<td>0.323</td>
+<td>44.01</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>GPP_F_MDS</td>
+<td>✗</td>
+<td>N/A</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>not in file</td>
+</tr>
+<tr>
+<td>LE_F_MDS</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>-94</td>
+<td>18</td>
+<td>1076</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>VPD_F</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>0</td>
+<td>11.27</td>
+<td>55.45</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>TA_F</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>11.49</td>
+<td>27.02</td>
+<td>38.71</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>P_F</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>0</td>
+<td>0</td>
+<td>41.2</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>SW_IN_F</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>0</td>
+<td>7</td>
+<td>1201</td>
+<td>✓</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="48-flx--flx_it-sr2_fluxnet_2013-2024_v13_r1zip">4.8 FLX — <code>FLX_IT-SR2_FLUXNET_2013-2024_v1.3_r1.zip</code></h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Resolution</td>
+<td>HH (half-hourly)</td>
+</tr>
+<tr>
+<td>HH/HR file</td>
+<td><code>FLX_IT-SR2_FLUXNET_FLUXMET_HH_2013-2024_v1.3_r1.csv</code></td>
+</tr>
+<tr>
+<td>Date range checked</td>
+<td>2017–2019</td>
+</tr>
+<tr>
+<td>n observations</td>
+<td>52,560</td>
+</tr>
+<tr>
+<td>Total columns</td>
+<td>242</td>
+</tr>
+<tr>
+<td>GPP columns present</td>
+<td><code>GPP_NT_VUT_REF</code>, <code>GPP_DT_VUT_REF</code></td>
+</tr>
+<tr>
+<td>VPD unit check</td>
+<td>✓ median=4.0 hPa</td>
+</tr>
+</tbody>
+</table></div>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>variable</th>
+<th>present</th>
+<th>pct_missing</th>
+<th>min</th>
+<th>median</th>
+<th>max</th>
+<th>note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NEE_VUT_REF</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>-53.37</td>
+<td>2.669</td>
+<td>46.44</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>GPP_NT_VUT_REF</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>-41.17</td>
+<td>1.957</td>
+<td>63.13</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>GPP_DT_VUT_REF</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>0</td>
+<td>0.231</td>
+<td>33.86</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>GPP_F_MDS</td>
+<td>✗</td>
+<td>N/A</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>not in file</td>
+</tr>
+<tr>
+<td>LE_F_MDS</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>-276.7</td>
+<td>12.7</td>
+<td>853.7</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>VPD_F</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>0</td>
+<td>3.99</td>
+<td>40.47</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>TA_F</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>-5.465</td>
+<td>15.38</td>
+<td>35.33</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>P_F</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>0</td>
+<td>0</td>
+<td>33.13</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>SW_IN_F</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>0</td>
+<td>4.249</td>
+<td>997.6</td>
+<td>✓</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="49-saeon--saeon_za-bfk_fluxnet_2020-2024_v13_r1zip">4.9 SAEON — <code>SAEON_ZA-BfK_FLUXNET_2020-2024_v1.3_r1.zip</code></h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Resolution</td>
+<td>HH (half-hourly)</td>
+</tr>
+<tr>
+<td>HH/HR file</td>
+<td><code>SAEON_ZA-BfK_FLUXNET_FLUXMET_HH_2020-2024_v1.3_r1.csv</code></td>
+</tr>
+<tr>
+<td>Date range checked</td>
+<td>2020–2024 (2017-19 not available)</td>
+</tr>
+<tr>
+<td>n observations</td>
+<td>87,696</td>
+</tr>
+<tr>
+<td>Total columns</td>
+<td>221</td>
+</tr>
+<tr>
+<td>GPP columns present</td>
+<td><code>GPP_NT_VUT_REF</code>, <code>GPP_DT_VUT_REF</code></td>
+</tr>
+<tr>
+<td>VPD unit check</td>
+<td>✓ median=12.6 hPa</td>
+</tr>
+</tbody>
+</table></div>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>variable</th>
+<th>present</th>
+<th>pct_missing</th>
+<th>min</th>
+<th>median</th>
+<th>max</th>
+<th>note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NEE_VUT_REF</td>
+<td>✓</td>
+<td>5.3%</td>
+<td>-28.82</td>
+<td>0.379</td>
+<td>31.12</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>GPP_NT_VUT_REF</td>
+<td>✓</td>
+<td>5.3%</td>
+<td>-27.62</td>
+<td>0.44</td>
+<td>31.72</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>GPP_DT_VUT_REF</td>
+<td>✓</td>
+<td>5.3%</td>
+<td>0</td>
+<td>0</td>
+<td>24.64</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>GPP_F_MDS</td>
+<td>✗</td>
+<td>N/A</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>not in file</td>
+</tr>
+<tr>
+<td>LE_F_MDS</td>
+<td>✓</td>
+<td>5.3%</td>
+<td>-96.5</td>
+<td>18.55</td>
+<td>592.8</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>VPD_F</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>0.001</td>
+<td>12.57</td>
+<td>69.87</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>TA_F</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>-10.25</td>
+<td>18.52</td>
+<td>40.32</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>P_F</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>0</td>
+<td>0</td>
+<td>46.23</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>SW_IN_F</td>
+<td>✓</td>
+<td>0.0%</td>
+<td>0</td>
+<td>3.693</td>
+<td>1199</td>
+<td>✓</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="5-cross-network-consistency-monthly-meteo">5. Cross-Network Consistency (Monthly Meteo)</h2>
+<p>Network-level means and IQR for key meteorological variables. Systematic outliers may indicate unit errors.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>network</th>
+<th>n_sites</th>
+<th>n_site_months</th>
+<th>TA_mean(°C)</th>
+<th>TA_p25</th>
+<th>TA_p75</th>
+<th>VPD_mean(hPa)</th>
+<th>VPD_p25</th>
+<th>VPD_p75</th>
+<th>SW_mean(W/m²)</th>
+<th>SW_p25</th>
+<th>SW_p75</th>
+<th>P_sum_mean(mm)</th>
+<th>P_p25</th>
+<th>P_p75</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AMF</td>
+<td>170</td>
+<td>10884</td>
+<td>8.9</td>
+<td>1.29</td>
+<td>17.94</td>
+<td>5.73</td>
+<td>2</td>
+<td>7.55</td>
+<td>169.5</td>
+<td>99.66</td>
+<td>237.7</td>
+<td>94.45</td>
+<td>13.02</td>
+<td>104.4</td>
+</tr>
+<tr>
+<td>CNF</td>
+<td>14</td>
+<td>708</td>
+<td>10.8</td>
+<td>1.01</td>
+<td>20.49</td>
+<td>8.24</td>
+<td>2.98</td>
+<td>11.43</td>
+<td>178.5</td>
+<td>121.4</td>
+<td>235.3</td>
+<td>80.49</td>
+<td>3.81</td>
+<td>87.24</td>
+</tr>
+<tr>
+<td>EUF</td>
+<td>57</td>
+<td>3396</td>
+<td>10.91</td>
+<td>4.74</td>
+<td>17.71</td>
+<td>6.13</td>
+<td>1.87</td>
+<td>8.22</td>
+<td>154.6</td>
+<td>82.83</td>
+<td>226.4</td>
+<td>87.28</td>
+<td>19.48</td>
+<td>107.6</td>
+</tr>
+<tr>
+<td>FLX</td>
+<td>9</td>
+<td>420</td>
+<td>15.84</td>
+<td>9.93</td>
+<td>26.05</td>
+<td>6.82</td>
+<td>3.9</td>
+<td>8.01</td>
+<td>198.6</td>
+<td>167.9</td>
+<td>237</td>
+<td>132.4</td>
+<td>27.56</td>
+<td>189.1</td>
+</tr>
+<tr>
+<td>ICOS</td>
+<td>51</td>
+<td>3876</td>
+<td>9.44</td>
+<td>3.62</td>
+<td>15.77</td>
+<td>25.48</td>
+<td>1.4</td>
+<td>5.56</td>
+<td>134.8</td>
+<td>55.62</td>
+<td>207</td>
+<td>78.9</td>
+<td>32.44</td>
+<td>95.84</td>
+</tr>
+<tr>
+<td>JPF</td>
+<td>8</td>
+<td>348</td>
+<td>15.36</td>
+<td>9.03</td>
+<td>25.84</td>
+<td>5.02</td>
+<td>3.27</td>
+<td>6.71</td>
+<td>162.4</td>
+<td>118.6</td>
+<td>200.6</td>
+<td>419</td>
+<td>214.5</td>
+<td>528.3</td>
+</tr>
+<tr>
+<td>KOF</td>
+<td>11</td>
+<td>324</td>
+<td>11.24</td>
+<td>2.9</td>
+<td>19.75</td>
+<td>5.01</td>
+<td>2.87</td>
+<td>6.65</td>
+<td>162.5</td>
+<td>115.7</td>
+<td>202.1</td>
+<td>130.4</td>
+<td>22.98</td>
+<td>158.2</td>
+</tr>
+<tr>
+<td>SAEON</td>
+<td>2</td>
+<td>120</td>
+<td>18.32</td>
+<td>13.55</td>
+<td>22.85</td>
+<td>14.69</td>
+<td>10.9</td>
+<td>17.9</td>
+<td>243.2</td>
+<td>190.2</td>
+<td>294.9</td>
+<td>45.22</td>
+<td>2.54</td>
+<td>74.42</td>
+</tr>
+<tr>
+<td>TERN</td>
+<td>7</td>
+<td>588</td>
+<td>19.7</td>
+<td>15.14</td>
+<td>25.96</td>
+<td>11.34</td>
+<td>4.4</td>
+<td>15.87</td>
+<td>221.9</td>
+<td>182.4</td>
+<td>266.4</td>
+<td>133.8</td>
+<td>5.95</td>
+<td>187.8</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>VPD network-mean assessment:</strong></p>
+<ul>
+<li>✓ OK <strong>AMF</strong>: VPD monthly mean = 5.7 hPa</li>
+<li>✓ OK <strong>CNF</strong>: VPD monthly mean = 8.2 hPa</li>
+<li>✓ OK <strong>EUF</strong>: VPD monthly mean = 6.1 hPa</li>
+<li>✓ OK <strong>FLX</strong>: VPD monthly mean = 6.8 hPa</li>
+<li>✓ OK <strong>ICOS</strong>: VPD monthly mean = 25.5 hPa</li>
+<li>✓ OK <strong>JPF</strong>: VPD monthly mean = 5.0 hPa</li>
+<li>✓ OK <strong>KOF</strong>: VPD monthly mean = 5.0 hPa</li>
+<li>✓ OK <strong>SAEON</strong>: VPD monthly mean = 14.7 hPa</li>
+<li>✓ OK <strong>TERN</strong>: VPD monthly mean = 11.3 hPa</li>
+</ul>
+<p><strong>Interpretation:</strong> ICOS VPD mean is elevated (25.5 hPa) because <code>CD-Ygb</code> (Congo Basin EBF) is in the ICOS network and has Pa-unit VPD. After fixing CD-Ygb, ICOS values should be consistent with other European networks (typically 3–15 hPa). All other networks show plausible VPD ranges.</p>
+<p><strong>P_sum network-mean assessment:</strong></p>
+<ul>
+<li>✓ <strong>AMF</strong>: P_sum monthly mean = 94.5 mm</li>
+<li>✓ <strong>CNF</strong>: P_sum monthly mean = 80.5 mm</li>
+<li>✓ <strong>EUF</strong>: P_sum monthly mean = 87.3 mm</li>
+<li>✓ <strong>FLX</strong>: P_sum monthly mean = 132.4 mm</li>
+<li>✓ <strong>ICOS</strong>: P_sum monthly mean = 78.9 mm</li>
+<li>⚠️ High (tropical) <strong>JPF</strong>: P_sum monthly mean = 419.0 mm</li>
+<li>✓ <strong>KOF</strong>: P_sum monthly mean = 130.4 mm</li>
+<li>✓ <strong>SAEON</strong>: P_sum monthly mean = 45.2 mm</li>
+<li>✓ <strong>TERN</strong>: P_sum monthly mean = 133.8 mm</li>
+</ul>
+<hr />
+<h2 id="6-data-coverage">6. Data Coverage</h2>
+<h3 id="61-igbp-class-summary">6.1 IGBP Class Summary</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>IGBP</th>
+<th>n_sites</th>
+<th>n_site_years</th>
+<th>pct_miss_GPPsat(%)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CSH</td>
+<td>6</td>
+<td>41</td>
+<td>0</td>
+</tr>
+<tr>
+<td>DBF</td>
+<td>36</td>
+<td>235</td>
+<td>15.3</td>
+</tr>
+<tr>
+<td>DNF</td>
+<td>2</td>
+<td>13</td>
+<td>61.5</td>
+</tr>
+<tr>
+<td>EBF</td>
+<td>12</td>
+<td>74</td>
+<td>62.2</td>
+</tr>
+<tr>
+<td>ENF</td>
+<td>66</td>
+<td>446</td>
+<td>15</td>
+</tr>
+<tr>
+<td>MF</td>
+<td>11</td>
+<td>69</td>
+<td>33.3</td>
+</tr>
+<tr>
+<td>OSH</td>
+<td>25</td>
+<td>165</td>
+<td>16.4</td>
+</tr>
+<tr>
+<td>SAV</td>
+<td>8</td>
+<td>54</td>
+<td>7.4</td>
+</tr>
+<tr>
+<td>WET</td>
+<td>59</td>
+<td>378</td>
+<td>30.2</td>
+</tr>
+<tr>
+<td>WSA</td>
+<td>8</td>
+<td>60</td>
+<td>8.3</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="62-annual-site-year-count-efp-file">6.2 Annual Site-Year Count (EFP file)</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>YEAR</th>
+<th>n_site_years</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2017</td>
+<td>139</td>
+</tr>
+<tr>
+<td>2018</td>
+<td>152</td>
+</tr>
+<tr>
+<td>2019</td>
+<td>200</td>
+</tr>
+<tr>
+<td>2020</td>
+<td>220</td>
+</tr>
+<tr>
+<td>2021</td>
+<td>213</td>
+</tr>
+<tr>
+<td>2022</td>
+<td>205</td>
+</tr>
+<tr>
+<td>2023</td>
+<td>194</td>
+</tr>
+<tr>
+<td>2024</td>
+<td>174</td>
+</tr>
+<tr>
+<td>2025</td>
+<td>38</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="63-sites-with-1-missing-efp-value">6.3 Sites with ≥1 Missing EFP Value</h3>
+<p><strong>72 sites</strong> have at least one missing EFP in at least one year (out of 233 total).</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>SITE_ID</th>
+<th>missing_EFPs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AT-Zoe</td>
+<td>GPPsat(12.5%); uWUE(12.5%); WUE(12.5%)</td>
+</tr>
+<tr>
+<td>AU-How</td>
+<td>uWUE(11.1%); WUE(11.1%)</td>
+</tr>
+<tr>
+<td>AU-Rob</td>
+<td>GPPsat(100.0%); uWUE(100.0%); WUE(100.0%)</td>
+</tr>
+<tr>
+<td>CA-ARB</td>
+<td>GPPsat(12.5%); NEPmax(12.5%); ETmax(12.5%); uWUE(12.5%); WUE(12.5%)</td>
+</tr>
+<tr>
+<td>CA-Ca3</td>
+<td>GPPsat(100.0%); NEPmax(100.0%); uWUE(100.0%); WUE(100.0%)</td>
+</tr>
+<tr>
+<td>CA-DB2</td>
+<td>GPPsat(16.7%); NEPmax(16.7%); ETmax(16.7%); uWUE(16.7%); WUE(16.7%)</td>
+</tr>
+<tr>
+<td>CA-DBB</td>
+<td>GPPsat(12.5%); NEPmax(12.5%); ETmax(12.5%); uWUE(12.5%); WUE(12.5%)</td>
+</tr>
+<tr>
+<td>CA-LP1</td>
+<td>GPPsat(100.0%); NEPmax(100.0%); uWUE(100.0%); WUE(100.0%)</td>
+</tr>
+<tr>
+<td>CA-PB1</td>
+<td>GPPsat(25.0%); NEPmax(12.5%); ETmax(12.5%); uWUE(25.0%); WUE(25.0%)</td>
+</tr>
+<tr>
+<td>CA-PB2</td>
+<td>GPPsat(12.5%); NEPmax(12.5%); ETmax(12.5%); uWUE(12.5%); WUE(12.5%)</td>
+</tr>
+<tr>
+<td>CA-SCC</td>
+<td>GPPsat(100.0%); NEPmax(100.0%); ETmax(37.5%); uWUE(100.0%); WUE(100.0%)</td>
+</tr>
+<tr>
+<td>CD-Ygb</td>
+<td>GPPsat(100.0%); uWUE(100.0%); WUE(100.0%)</td>
+</tr>
+<tr>
+<td>CL-SDF</td>
+<td>GPPsat(100.0%); uWUE(100.0%); WUE(100.0%)</td>
+</tr>
+<tr>
+<td>CN-Din</td>
+<td>GPPsat(100.0%); NEPmax(100.0%); ETmax(50.0%); uWUE(100.0%); WUE(100.0%)</td>
+</tr>
+<tr>
+<td>CN-Dzo</td>
+<td>GPPsat(25.0%); NEPmax(25.0%); ETmax(25.0%); uWUE(25.0%); WUE(25.0%)</td>
+</tr>
+<tr>
+<td>DE-Akm</td>
+<td>GPPsat(12.5%); NEPmax(12.5%); ETmax(12.5%); uWUE(12.5%); WUE(12.5%)</td>
+</tr>
+<tr>
+<td>DE-Lnf</td>
+<td>GPPsat(100.0%); NEPmax(100.0%); uWUE(100.0%); WUE(100.0%)</td>
+</tr>
+<tr>
+<td>ES-Agu</td>
+<td>GPPsat(100.0%); NEPmax(100.0%); ETmax(50.0%); uWUE(100.0%); WUE(100.0%)</td>
+</tr>
+<tr>
+<td>ES-Cnd</td>
+<td>GPPsat(100.0%); uWUE(100.0%); WUE(100.0%)</td>
+</tr>
+<tr>
+<td>ES-Gdn</td>
+<td>GPPsat(60.0%); uWUE(60.0%); WUE(60.0%)</td>
+</tr>
+<tr>
+<td>ES-LJu</td>
+<td>GPPsat(100.0%); uWUE(100.0%); WUE(100.0%)</td>
+</tr>
+<tr>
+<td>FR-Hes</td>
+<td>GPPsat(100.0%); NEPmax(100.0%); ETmax(12.5%); uWUE(100.0%); WUE(100.0%)</td>
+</tr>
+<tr>
+<td>FR-LGt</td>
+<td>GPPsat(100.0%); NEPmax(100.0%); ETmax(12.5%); uWUE(100.0%); WUE(100.0%)</td>
+</tr>
+<tr>
+<td>GF-Guy</td>
+<td>GPPsat(100.0%); uWUE(100.0%); WUE(100.0%)</td>
+</tr>
+<tr>
+<td>GL-NuF</td>
+<td>GPPsat(33.3%); NEPmax(16.7%); ETmax(16.7%); uWUE(33.3%); WUE(33.3%)</td>
+</tr>
+<tr>
+<td>ID-JOP</td>
+<td>GPPsat(100.0%); uWUE(100.0%); WUE(100.0%)</td>
+</tr>
+<tr>
+<td>IE-Cra</td>
+<td>GPPsat(100.0%); NEPmax(100.0%); ETmax(60.0%); uWUE(100.0%); WUE(100.0%)</td>
+</tr>
+<tr>
+<td>IL-RmH</td>
+<td>GPPsat(100.0%); NEPmax(100.0%); uWUE(100.0%); WUE(100.0%)</td>
+</tr>
+<tr>
+<td>IT-BFt</td>
+<td>GPPsat(16.7%); NEPmax(16.7%); ETmax(16.7%); uWUE(16.7%); WUE(16.7%)</td>
+</tr>
+<tr>
+<td>IT-Cp2</td>
+<td>GPPsat(12.5%); uWUE(12.5%); WUE(12.5%)</td>
+</tr>
+<tr>
+<td>IT-Ren</td>
+<td>GPPsat(12.5%); NEPmax(12.5%); ETmax(12.5%); uWUE(12.5%); WUE(12.5%)</td>
+</tr>
+<tr>
+<td>IT-TrF</td>
+<td>GPPsat(100.0%); uWUE(100.0%); WUE(100.0%)</td>
+</tr>
+<tr>
+<td>JP-Ynf</td>
+<td>GPPsat(16.7%); uWUE(16.7%); WUE(16.7%)</td>
+</tr>
+<tr>
+<td>KR-SmM</td>
+<td>GPPsat(100.0%); uWUE(100.0%); WUE(100.0%)</td>
+</tr>
+<tr>
+<td>NO-Ikr</td>
+<td>GPPsat(25.0%); NEPmax(25.0%); ETmax(25.0%); uWUE(25.0%); WUE(25.0%)</td>
+</tr>
+<tr>
+<td>PE-QFR</td>
+<td>GPPsat(100.0%); NEPmax(40.0%); ETmax(40.0%); uWUE(100.0%); WUE(100.0%)</td>
+</tr>
+<tr>
+<td>RU-Che</td>
+<td>GPPsat(100.0%); NEPmax(20.0%); uWUE(100.0%); WUE(100.0%)</td>
+</tr>
+<tr>
+<td>SE-Deg</td>
+<td>GPPsat(16.7%); NEPmax(16.7%); ETmax(16.7%); uWUE(16.7%); WUE(16.7%)</td>
+</tr>
+<tr>
+<td>SE-Nor</td>
+<td>GPPsat(14.3%); NEPmax(14.3%); ETmax(14.3%); uWUE(14.3%); WUE(14.3%)</td>
+</tr>
+<tr>
+<td>SE-Svb</td>
+<td>GPPsat(12.5%); NEPmax(12.5%); ETmax(12.5%); uWUE(12.5%); WUE(12.5%)</td>
+</tr>
+<tr>
+<td>US-ALQ</td>
+<td>GPPsat(100.0%); NEPmax(100.0%); uWUE(100.0%); WUE(100.0%)</td>
+</tr>
+<tr>
+<td>US-Akn</td>
+<td>GPPsat(100.0%); NEPmax(100.0%); uWUE(100.0%); WUE(100.0%)</td>
+</tr>
+<tr>
+<td>US-EA4</td>
+<td>GPPsat(100.0%); NEPmax(100.0%); uWUE(100.0%); WUE(100.0%)</td>
+</tr>
+<tr>
+<td>US-Elm</td>
+<td>GPPsat(12.5%); uWUE(12.5%); WUE(12.5%)</td>
+</tr>
+<tr>
+<td>US-Esm</td>
+<td>GPPsat(100.0%); uWUE(100.0%); WUE(100.0%)</td>
+</tr>
+<tr>
+<td>US-EvM</td>
+<td>GPPsat(25.0%); uWUE(25.0%); WUE(25.0%)</td>
+</tr>
+<tr>
+<td>US-Fo1</td>
+<td>GPPsat(100.0%); NEPmax(100.0%); ETmax(75.0%); uWUE(100.0%); WUE(100.0%)</td>
+</tr>
+<tr>
+<td>US-Ho2</td>
+<td>GPPsat(100.0%); NEPmax(100.0%); uWUE(100.0%); WUE(100.0%)</td>
+</tr>
+<tr>
+<td>US-LA2</td>
+<td>GPPsat(100.0%); NEPmax(100.0%); ETmax(57.1%); uWUE(100.0%); WUE(100.0%)</td>
+</tr>
+<tr>
+<td>US-LA3</td>
+<td>GPPsat(100.0%); uWUE(100.0%); WUE(100.0%)</td>
+</tr>
+<tr>
+<td>US-Los</td>
+<td>GPPsat(100.0%); NEPmax(100.0%); uWUE(100.0%); WUE(100.0%)</td>
+</tr>
+<tr>
+<td>US-NC3</td>
+<td>GPPsat(20.0%); ETmax(20.0%); uWUE(20.0%); WUE(20.0%)</td>
+</tr>
+<tr>
+<td>US-NC4</td>
+<td>GPPsat(100.0%); NEPmax(100.0%); ETmax(22.2%); uWUE(100.0%); WUE(100.0%)</td>
+</tr>
+<tr>
+<td>US-NR1</td>
+<td>GPPsat(100.0%); NEPmax(100.0%); uWUE(100.0%); WUE(100.0%)</td>
+</tr>
+<tr>
+<td>US-OWC</td>
+<td>GPPsat(100.0%); NEPmax(100.0%); ETmax(22.2%); uWUE(100.0%); WUE(100.0%)</td>
+</tr>
+<tr>
+<td>US-SSH</td>
+<td>GPPsat(20.0%); uWUE(20.0%); WUE(20.0%)</td>
+</tr>
+<tr>
+<td>US-Ses</td>
+<td>GPPsat(11.1%); NEPmax(11.1%); uWUE(11.1%); WUE(11.1%)</td>
+</tr>
+<tr>
+<td>US-Uaf</td>
+<td>GPPsat(100.0%); NEPmax(100.0%); uWUE(100.0%); WUE(100.0%)</td>
+</tr>
+<tr>
+<td>US-WCr</td>
+<td>GPPsat(100.0%); NEPmax(100.0%); uWUE(100.0%); WUE(100.0%)</td>
+</tr>
+<tr>
+<td>US-Whs</td>
+<td>GPPsat(100.0%); NEPmax(100.0%); uWUE(100.0%); WUE(100.0%)</td>
+</tr>
+</tbody>
+</table></div>
+<p><em>(12 more sites omitted; see CSV for full list)</em></p>
+<hr />
+<h2 id="7-recommendations">7. Recommendations</h2>
+<h3 id="71-critical-actions-required">7.1 Critical Actions Required</h3>
+<ul>
+<li>🚨 <strong>Fix ICOS CD-Ygb VPD units</strong>: <code>VPD_mean</code> and raw <code>VPD_F</code> are in Pa, not hPa. Divide all VPD values for this site by 100 before computing EFPs (or before entering the monthly meteo table). 60 site-months affected.</li>
+<li>🚨 <strong>Remove/flag AMF US-HB4 P_sum anomalies</strong>: 6 site-months have P_sum = 2,000–39,000 mm/month. World record monthly precipitation is ~2,500 mm (Cherrapunji). Values &gt;2,500 are instrument/aggregation errors and should be excluded from analyses using precipitation.</li>
+<li>🚨 <strong>Re-download or fix 9 corrupted ZIP files</strong>: <code>bad_or_corrupted_zip_files.csv</code> lists 1 ICOS (DE-RuW), 8 JPF (JP-BBY, JP-Fhk, JP-Fjy, JP-Fmt, JP-Khw, JP-Shn, JP-Spp, JP-Tak), and several TERN sites. No HH data can be read from these.</li>
+<li>🚨 <strong>Investigate GPPsat &amp; uWUE/WUE &gt;20% missing</strong>: Both are 21.5% missing — check if this is driven by Gavail=no or other EFP prerequisite flags, and document the cause.</li>
+</ul>
+<h3 id="72-warnings--minor-issues">7.2 Warnings / Minor Issues</h3>
+<ul>
+<li>⚠️ <strong>NEPmax 13.7% missing</strong> — investigate which sites consistently lack NEPmax; may be due to Rb fitting failures.</li>
+<li>⚠️ <strong>Negative uWUE/WUE values</strong> in a small number of site-years (physically possible if NEE&gt;0 or LE&lt;0 but unusual) — verify these are not sign convention artifacts.</li>
+<li>⚠️ <strong>AMF uses hourly (<em>HR</em>) resolution</strong>, not half-hourly (<em>HH</em>). Ensure EFP processing scripts handle both resolutions correctly (n_obs threshold for quality filtering should be halved for hourly: ~744 obs/month instead of 1488).</li>
+<li>⚠️ <strong>45 outlier site-years</strong> (|z|&gt;3) across EFP variables. Most are extreme but plausible (e.g. very high GPPsat in tropical sites). Review the largest outliers per variable.</li>
+</ul>
+<h3 id="73-variables--sites-needing-attention">7.3 Variables / Sites Needing Attention</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Priority</th>
+<th>Variable/Site</th>
+<th>Issue</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>🚨 High</td>
+<td>ICOS CD-Ygb VPD_mean</td>
+<td>Pa units in hPa column (~2000 instead of ~20)</td>
+</tr>
+<tr>
+<td>🚨 High</td>
+<td>AMF US-HB4 P_sum</td>
+<td>Impossible monthly precipitation (up to 39,140 mm)</td>
+</tr>
+<tr>
+<td>🚨 High</td>
+<td>9 corrupted ZIPs</td>
+<td>Cannot read HH data</td>
+</tr>
+<tr>
+<td>🚨 High</td>
+<td>GPPsat, uWUE, WUE</td>
+<td>&gt;21% missing values</td>
+</tr>
+<tr>
+<td>⚠️ Med</td>
+<td>NEPmax</td>
+<td>~14% missing</td>
+</tr>
+<tr>
+<td>⚠️ Med</td>
+<td>uWUE, WUE negative</td>
+<td>Check sign conventions</td>
+</tr>
+<tr>
+<td>⚠️ Med</td>
+<td>AMF hourly resolution</td>
+<td>Confirm EFP scripts handle n_obs threshold</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<p><em>Report generated by <code>flux_dq_analysis_v2.py</code> · 2026-06-29 15:37</em></p>
+</div>
+<div class="footer">FluxNet &times; Mortality &middot; generated from daily_reports/*.md</div>
+</div></body></html>

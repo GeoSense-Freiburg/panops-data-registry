@@ -1,0 +1,557 @@
+#!/usr/bin/env python
+"""
+Report for https://negin-katal.github.io/fluxVSmortality/v10/  (fluxVSmortality/v10/index.html), rebuilt 2026-10-06.
+
+Replaces the earlier V10/V4.1 report (27_build_report_v10_v41.py). Three datasets, switchable at the top:
+  V5    deadtrees v5 maps - the paper dataset from 2026-10-07 (101 sites / 361 site-years)
+  V4.1  deadtrees v4.1 maps - the previous paper dataset, now a comparison (104 sites / 381 site-years)
+  V5    deadtrees v5 maps, same build rules (101 / 361)
+  V2.2  deadtrees v2-2 maps (the analysis earlier called V10; 93 / 395) - only the figures that exist in the
+        same form as for V4.1 / V5
+Paper structure and naming (memory: paper_naming_mortality): models C+T vs C+T+M; metrics "relative mortality"
+(relative_disturbance) and "relative deadwood" (relative_mortality); absolute deadwood is not reported.
+Fig 3 is the landscape signed-SHAP figure. Table 1 = the Fig 2 summary table (also linked as .tex).
+Figures are copied into fluxVSmortality/v10/fig_<ds>/ so the page is self-contained.
+Publish afterwards with:  bash scripts/push_fluxVSmortality.sh "message" v10
+    python 35_build_report_paper.py
+"""
+import os, re, shutil, html, datetime
+import numpy as np, pandas as pd
+
+ROOT = "/mnt/gsdata/projects/panops/panops-data-registry/data/flux"
+SITE = f"{ROOT}/fluxVSmortality/v10"
+EFP = ["GPPsat", "NEPmax", "ETmax", "WUE"]
+# V4.1 and V5 are shown WITHOUT the thresholded mortality metrics (user, 2026-10-06; runs <sub>_nothresh).
+# Set REPORT_SUFFIX="" to show the earlier runs with thresholds.
+SFX = os.environ.get("REPORT_SUFFIX", "_nothresh")
+EFPH = {"GPPsat": "GPP<sub>sat</sub>", "NEPmax": "NEP<sub>max</sub>", "ETmax": "ET<sub>max</sub>", "WUE": "WUE"}
+DS = {
+    "v5": dict(label="V5", maps="deadtrees v5", plots=f"{ROOT}/plots/paper_v5{SFX}", models=f"{ROOT}/derived_tables/paper_v5{SFX}/models",
+               data=f"{ROOT}/derived_tables/paper_v5/paper_dataset_full_lags_monthly_tc30_minrun2_buf100-200-300-400-500.csv",
+               tag="", cls="mean of the five buffers (100-500 m)", tex=f"table_fig2_dRMSE_total_mort_v5{SFX}.tex",
+               note="The paper dataset (from 2026-10-07): newest deadtrees maps (delivered 2026-10-06), mortality block without thresholded metrics."),
+    "v41": dict(label="V4.1", maps="deadtrees v4.1", plots=f"{ROOT}/plots/paper_v41{SFX}", models=f"{ROOT}/derived_tables/paper_v41{SFX}/models",
+                data=f"{ROOT}/derived_tables/paper_v41/paper_dataset_full_lags_monthly_tc30_minrun2_buf100-200-300-400-500.csv",
+                tag="", cls="mean of the five buffers (100-500 m)", tex=f"table_fig2_dRMSE_total_mort_v41{SFX}.tex",
+                note="Previous paper dataset (deadtrees v4.1); kept for comparison."),
+    "v22": dict(label="V2.2", maps="deadtrees v2-2", plots=f"{ROOT}/plots/paper_v10_efp", models=f"{ROOT}/derived_tables/paper_v10_efp/models",
+                data=f"{ROOT}/derived_tables/paper_v10_efp/paper_dataset_v10_efp.csv",
+                tag="_cls500m", cls="500 m buffer (the only buffer stored for V2.2)", tex="table_fig2_dRMSE_total_mort_v22.tex",
+                note="The earlier analysis (called V10): deadtrees v2-2 maps, V10 predictors. Only figures that exist in the same form as for V4.1 and V5 are shown."),
+}
+
+
+# ---------------------------------------------------------------- helpers
+def copy_fig(ds, name):
+    """Copy plots/<ds>/<name> into the site folder; return the relative path or None."""
+    src = f"{DS[ds]['plots']}/{name}"
+    if not os.path.exists(src):
+        return None
+    dst = f"{SITE}/fig_{ds}/{name}"
+    os.makedirs(os.path.dirname(dst), exist_ok=True)
+    for attempt in range(5):   # the network drive occasionally drops for a moment
+        try:
+            shutil.copyfile(src, dst); break
+        except OSError:
+            import time; time.sleep(5)
+    else:
+        raise
+    return f"fig_{ds}/{name}"
+
+
+def fig(ds, name, caption):
+    rel = copy_fig(ds, name)
+    if rel is None:
+        return ""   # figure does not exist for this dataset (V2.2 has only the paper-style figures)
+    return (f'<figure><a href="{rel}"><img src="{rel}" loading="lazy" alt="{html.escape(caption)}"></a>'
+            f'<figcaption>{caption}</figcaption></figure>')
+
+
+def per_ds(make):
+    """One block per dataset; only the active dataset is shown."""
+    out = []
+    for k in DS:
+        b = make(k)
+        if "<img" not in b and "<table" not in b:
+            b = f'<p class="na">Not available for {DS[k]["label"]}: this figure was not produced in the same form.</p>'
+        out.append(f'<div class="ds ds-{k}">{b}</div>')
+    return "".join(out)
+
+
+def table_html(df, caption=""):
+    h = df.to_html(escape=False, border=0, classes="tbl")
+    return f'<figure class="tw">{h}<figcaption>{caption}</figcaption></figure>'
+
+
+def counts(ds):
+    d = pd.read_csv(DS[ds]["data"], usecols=["SITE_ID"])
+    return d.SITE_ID.nunique(), len(d)
+
+
+def r2_table(ds):
+    rows = []
+    for L, lab in (("XGB", "XGBoost"), ("LGB", "LightGBM")):
+        p = pd.read_csv(f"{DS[ds]['models']}/{L}_predictions_repCV.csv")
+        p = p[p.response.isin(EFP) & p.model.str.match(r"^M[34]_(12m|24m)$")]
+        for (m, r), s in p.groupby(["model", "response"]):
+            r2 = 1 - ((s.observed - s.predicted) ** 2).sum() / ((s.observed - s.observed.mean()) ** 2).sum()
+            rows.append(dict(learner=lab, window=m[3:].replace("m", " months"), model="C+T+M" if m[:2] == "M4" else "C+T",
+                             EFP=EFPH[r], R2=r2))
+    t = pd.DataFrame(rows).pivot_table(index=["learner", "window", "model"], columns="EFP", values="R2")
+    t = t[[EFPH[e] for e in EFP]]
+    t["mean"] = t.mean(axis=1)
+    t = t.reindex(sorted(t.index, key=lambda i: (i[0], i[1], i[2] != "C+T")))
+    t.index = [f"{a} · {b} · {c}" for a, b, c in t.index]
+    return t.round(3)
+
+
+# statistical test of Tables 1-2 (2026-10-08, advisor): "permlog" = paired sign-flip permutation test on the per-site
+# log error ratio log(err C+T+M / err C+T), cell = geometric-mean change (main); "wilcoxon" = one-sided paired Wilcoxon,
+# cell = median change (robustness); "perm" = permutation test on the mean % change (only counted in the comparison)
+TSUF = {"permlog": "_permlog", "wilcoxon": "", "perm": "_perm"}
+TCOL = {"permlog": "geomean_pct", "wilcoxon": "median_pct", "perm": "mean_pct"}
+
+
+def fig2_stats(ds, plots=None, metric="RMSE", test="permlog"):
+    return pd.read_csv(f"{plots or DS[ds]['plots']}/table_fig2_d{metric}_total_mort{TSUF[test]}_statistics.csv")
+
+
+def fig2_table(ds, plots=None, metric="RMSE", test="permlog"):
+    st = fig2_stats(ds, plots, metric, test)
+    st["median_pct"] = st[TCOL[test]]
+    lab = {"XGB": "XGBoost", "LGB": "LightGBM", "AG": "AutoGluon"}
+    st["cell"] = [f"{m:+.1f}{'<sup>' + s + '</sup>' if isinstance(s, str) and s else ''} <span class='muted'>({i:.0f}%)</span>"
+                  for m, s, i in zip(st.median_pct, st.sig, st.improved_pct)]
+    t = st.pivot_table(index=["learner", "window", "response"], columns="subset", values="cell", aggfunc="first")
+    t = t[["all", "midhigh", "high"]]
+    n = st.groupby("subset").n.max()
+    t.columns = [f"All sites (n = {n['all']})", f"Mid + High (n = {n['midhigh']})", f"High (n = {n['high']})"]
+    order = [(L, w, e) for L in ("XGB", "LGB", "AG") for w in ("12m", "24m") for e in EFP if (L, w, e) in t.index]
+    t = t.reindex(order)
+    t.index = [f"{lab[L]} · {w.replace('m', ' months')} · {EFPH[e]}" for L, w, e in t.index]
+    return t
+
+
+def tex_link(name):
+    os.makedirs(f"{SITE}/tables", exist_ok=True)
+    shutil.copyfile(f"{ROOT}/manuscript/tables/{name}", f"{SITE}/tables/{name}")
+    return f"<a href='tables/{name}'>{name}</a>"
+
+
+def tex_name(ds, metric="RMSE", test="permlog"):
+    return DS[ds]["tex"].replace("_dRMSE_", f"_d{metric}_").replace(".tex", f"{TSUF[test]}.tex")
+
+
+def test_counts(ds):   # significant cells (q < 0.05) per test and metric
+    rows = []
+    for t, lab in (("permlog", "Permutation, log ratio (main)"), ("wilcoxon", "Wilcoxon signed-rank"), ("perm", "Permutation, mean % change")):
+        r = {"Test": lab}
+        for m in ("RMSE", "MAE"):
+            try:
+                st = fig2_stats(ds, metric=m, test=t); r[m] = f"{(st.q < 0.05).sum()} / {len(st)}"
+            except FileNotFoundError:
+                r[m] = "-"
+        rows.append(r)
+    return pd.DataFrame(rows).set_index("Test")
+
+
+T = lambda ds: DS[ds]["tag"]
+
+# ---------------------------------------------------------------- sections
+for k in DS:
+    shutil.rmtree(f"{SITE}/fig_{k}", ignore_errors=True)
+sections = []
+
+about = f"""
+<p>How does tree mortality shape ecosystem functional properties (EFPs)? For every flux site-year the EFPs
+GPP<sub>sat</sub>, NEP<sub>max</sub>, ET<sub>max</sub> and WUE are predicted from <b>climate + traits (C+T)</b> and from
+<b>climate + traits + mortality (C+T+M)</b>. The difference between the two models isolates what mortality adds.</p>
+<ul>
+<li><b>Learners:</b> AutoGluon (AutoML ensemble, Section 1; planned for the paper) and, for comparison, XGBoost and LightGBM tuned with Optuna (TPE, 50 trials, grouped 5-fold CV on disjoint sites; Sections 2-8).</li>
+<li><b>Evaluation:</b> repeated leave-one-site-out (3 × 80 % of the remaining sites per held-out site).</li>
+<li><b>Windows:</b> climate in the 12 or 24 months before the growing season; mortality of the current year plus lag 1 (12 months) or lags 1-2 (24 months).</li>
+<li><b>Sites:</b> tree cover ≥ 30 %.</li>
+</ul>
+<h3>Naming</h3>
+<table class="tbl gl"><tr><th>Name</th><th>Definition</th></tr>
+<tr><td>Relative mortality</td><td>(standing deadwood + tree-cover loss) / (tree cover + tree-cover loss) × 100 - dead and lost canopy relative to the canopy present</td></tr>
+<tr><td>Relative deadwood</td><td>standing deadwood / tree cover × 100 (where tree cover ≥ 10 %, capped at 100)</td></tr>
+<tr><td>Mortality block (M)</td><td>standing deadwood (cover and relative to tree cover), deadwood gain, relative tree-cover loss and relative mortality, at all five buffers and lags (V4.1 / V5: no thresholded gain or loss metrics)</td></tr>
+<tr><td>Low / Mid / High</td><td>site maximum of the metric across years; breaks mean − 0.5 SD and mean + 0.5 SD over sites</td></tr>
+</table>
+<h3>Datasets</h3>
+<table class="tbl gl"><tr><th>Dataset</th><th>Maps</th><th>Sites / site-years</th><th>Site classes from</th><th>Note</th></tr>
+{''.join(f"<tr><td><b>{d['label']}</b></td><td>{d['maps']}</td><td>{counts(k)[0]} / {counts(k)[1]}</td><td>{d['cls']}</td><td>{d['note']}</td></tr>" for k, d in DS.items())}
+</table>"""
+sections.append(("about", "About this report", about))
+
+sections.append(("sites", "1. Sites and EFP distributions",
+                 per_ds(lambda k: fig(k, "fig1_site_map.png", f"Fig 1 ({DS[k]['label']}): site map and EFP distributions."))))
+
+sections.append(("skill", "2. Model skill",
+                 per_ds(lambda k: table_html(r2_table(k), f"R² under repeated leave-one-site-out ({DS[k]['label']})."))))
+
+s3 = per_ds(lambda k: fig(k, "fig2_mortality_effect.png",
+            f"Fig 2 ({DS[k]['label']}): per-site RMSE without (C+T) and with mortality (C+T+M); % = median paired change, "
+            "stars = one-sided paired Wilcoxon, BH-corrected; %↓ = share of sites improved."))
+TEST_NOTE = ("<p><b>Statistical test.</b> Tables 1 and 2 use a paired sign-flip permutation test on the per-site log error ratio, "
+             "log(error C+T+M / error C+T): the signs of the site ratios are flipped at random 100 000 times, one-sided (C+T+M better), "
+             "Benjamini-Hochberg corrected across the table. Cells show the geometric-mean change "
+             "(exp(mean log ratio) − 1) × 100. The log ratio treats &lsquo;error halved&rsquo; and &lsquo;error doubled&rsquo; alike, "
+             "so a few sites cannot dominate. A permutation test on the plain mean % change was tried first, but sites with "
+             "only one site-year and an almost perfect C+T prediction get huge % changes from tiny differences (e.g. KR-Kw1 +275 %), "
+             "which dominate the mean. The Wilcoxon signed-rank test (Tables 1b, 2b) asks whether most sites improve "
+             "consistently, regardless of how much; it catches small but consistent gains (e.g. ET<sub>max</sub>, WUE) and is kept "
+             "as a robustness check.</p>")
+s3 += "<h3>Statistical tests compared</h3>" + TEST_NOTE
+s3 += per_ds(lambda k: table_html(test_counts(k), f"Significant cells (q < 0.05) per test, all learners, windows, EFPs and site classes ({DS[k]['label']})."))
+s3 += "<h3>Table 1 - summary of Fig 2 by relative-mortality class (RMSE, permutation test on log ratios)</h3>"
+s3 += per_ds(lambda k: table_html(fig2_table(k),
+             f"Geometric-mean per-site change in RMSE when mortality is added (%), stars = one-sided paired permutation test on the "
+             f"log RMSE ratios, BH-corrected across the table; (share of sites improved). Classes by relative mortality, {DS[k]['cls']}. "
+             f"LaTeX: {tex_link(tex_name(k))}."))
+s3 += "<h3>Table 2 - as Table 1, with MAE instead of RMSE</h3>"
+s3 += per_ds(lambda k: table_html(fig2_table(k, metric="MAE"),
+             f"Geometric-mean per-site change in MAE (mean absolute error) when mortality is added (%), stars = one-sided paired "
+             f"permutation test on the log MAE ratios, BH-corrected across the table; (share of sites improved). MAE weighs large "
+             f"errors less than RMSE. Classes by relative mortality, {DS[k]['cls']}. LaTeX: {tex_link(tex_name(k, 'MAE'))}."))
+s3 += "<h3>Table 1b - as Table 1, Wilcoxon test (robustness)</h3>"
+s3 += per_ds(lambda k: table_html(fig2_table(k, test="wilcoxon"),
+             f"Median per-site change in RMSE when mortality is added (%), stars = one-sided paired Wilcoxon signed-rank test, "
+             f"BH-corrected across the table; (share of sites improved). Classes by relative mortality, {DS[k]['cls']}. "
+             f"LaTeX: {tex_link(tex_name(k, test='wilcoxon'))}."))
+s3 += "<h3>Table 2b - as Table 2, Wilcoxon test (robustness)</h3>"
+s3 += per_ds(lambda k: table_html(fig2_table(k, metric="MAE", test="wilcoxon"),
+             f"Median per-site change in MAE when mortality is added (%), stars = one-sided paired Wilcoxon signed-rank test, "
+             f"BH-corrected across the table; (share of sites improved). Classes by relative mortality, {DS[k]['cls']}. "
+             f"LaTeX: {tex_link(tex_name(k, 'MAE', 'wilcoxon'))}."))
+s3 += "<h3>High-mortality sites</h3>"
+s3 += per_ds(lambda k: fig(k, f"fig2_high_total_mort{T(k)}_mortality_effect.png", f"Fig 2b ({DS[k]['label']}): high relative-mortality sites only (models trained on all sites).")
+             + fig(k, f"fig2_high_rel_deadwood{T(k)}_mortality_effect.png", f"Fig 2b ({DS[k]['label']}): high relative-deadwood sites only."))
+s3 += "<h3>Per-site ΔRMSE</h3>"
+s3 += per_ds(lambda k: fig(k, f"fig_site_dRMSE_total_mort{T(k)}.png", f"Per-site ΔRMSE ({DS[k]['label']}), bars coloured by relative-mortality class."))
+
+
+# paired bootstrap + block permutation (2026-10-08, advisor): V5 only, from 39_paired_bootstrap.R
+def boot_table(metric, level, subsets):
+    st = pd.read_csv(f"{DS['v5']['plots']}/paired_bootstrap_statistics.csv")
+    st = st[(st.metric == metric) & (st.level == level) & st.subset.isin(subsets)].copy()
+    lab = {"XGB": "XGBoost", "LGB": "LightGBM", "AG": "AutoGluon"}
+    st["cell"] = [f"{p:+.1f} <span class='muted'>[{lo:+.1f}, {hi:+.1f}]</span>{'<sup>' + g + '</sup>' if isinstance(g, str) and g else ''}"
+                  f"<br><span class='muted'>Δ {d:+.3f}</span>" for p, lo, hi, g, d in zip(st.pct, st.pct_lo, st.pct_hi, st.sig, st["diff"])]
+    t = st.pivot_table(index=["learner", "window", "response"], columns="subset", values="cell", aggfunc="first")[subsets]
+    nu = st.groupby("subset").n_units.max(); no = st.groupby("subset").n_obs.max()
+    name = {"all": "All sites", "midhigh": "Mid + High sites", "high": "High sites",
+            "yr_midhigh": "Years with Mid + High mortality", "yr_high": "Years with High mortality"}
+    t.columns = [f"{name[c]} ({nu[c]} sites" + (f", {no[c]} site-years)" if level == "siteyear" else ")") for c in subsets]
+    order = [(L, w, e) for L in ("AG", "XGB", "LGB") for w in ("12m", "24m") for e in EFP if (L, w, e) in t.index]
+    t = t.reindex(order)
+    t.index = [f"{lab[L]} · {w.replace('m', ' months')} · {EFPH[e]}" for L, w, e in t.index]
+    return t
+
+
+if os.path.exists(f"{DS['v5']['plots']}/paired_bootstrap_statistics.csv"):
+    _b = pd.read_csv(f"{DS['v5']['plots']}/paired_bootstrap_statistics.csv")
+    _cnt = _b.assign(s=_b.q < 0.05).groupby(["metric", "level"]).agg(significant=("s", "sum"), tests=("s", "size"))
+    s3 += ("<h3>Paired bootstrap and block permutation (V5)</h3>"
+           "<p>Suggested by the advisor (via Codex): instead of averaging per-site ratios, compare the errors directly. "
+           "<b>Site level</b>: one MAE per site and model over its years, Δ = mean over sites of "
+           "MAE<sub>C+T+M</sub> − MAE<sub>C+T</sub> (EFP units), % = 100 × (mean MAE<sub>C+T+M</sub> / mean MAE<sub>C+T</sub> − 1). "
+           "<b>Site-year level</b>: every site-year is an observation (no averaging over years, so years without mortality do "
+           "not dilute years with mortality): pooled MAE over the site-years. Years of one site are not independent, so at both "
+           "levels <b>whole sites</b> are resampled (bootstrap, 10 000 draws, 95 % percentile interval in brackets) and the "
+           "C+T / C+T+M labels are swapped per site (paired permutation, 10 000 draws, one-sided, stars = BH-corrected per table). "
+           "The site-year level also selects site-years by their <b>own</b> relative mortality (above the Mid or High break), "
+           "which tests the effect in the years when mortality happened.</p>"
+           + table_html(_cnt.reset_index().set_index(["metric", "level"]), "Significant cells (permutation q &lt; 0.05). Every significant cell also has a bootstrap interval entirely below 0.")
+           + "<h4>Table 3a - MAE, site level</h4>"
+           + table_html(boot_table("MAE", "site", ["all", "midhigh", "high"]),
+                        "% change of the mean site MAE when mortality is added [95 % bootstrap interval], stars = paired permutation (sites); Δ = mean site MAE difference in EFP units. Sites classed by their maximum relative mortality.")
+           + "<h4>Table 3b - MAE, site-year level</h4>"
+           + table_html(boot_table("MAE", "siteyear", ["all", "midhigh", "high", "yr_midhigh", "yr_high"]),
+                        "% change of the pooled site-year MAE [95 % bootstrap interval over sites], stars = paired permutation with whole sites swapped; Δ = pooled MAE difference in EFP units. Last two columns: only site-years whose own relative mortality is above the Mid or High break.")
+           + "<details><summary>Same with RMSE (Tables 3c, 3d)</summary>"
+           + table_html(boot_table("RMSE", "site", ["all", "midhigh", "high"]), "Table 3c - RMSE, site level.")
+           + table_html(boot_table("RMSE", "siteyear", ["all", "midhigh", "high", "yr_midhigh", "yr_high"]), "Table 3d - RMSE, site-year level (pooled RMSE).")
+           + "</details>")
+
+sections.append(("effect", "3. Does mortality reduce prediction error?", s3))
+
+
+def fig3(k):
+    out = fig(k, f"fig3b_signed_total_mort_24m_LGB{T(k)}_landscape.png",
+              f"Fig 3 ({DS[k]['label']}): net signed mortality SHAP per site, C+T+M, LightGBM, 24 months. Sites sorted by relative mortality "
+              "(highest left); below zero = mortality lowers the predicted EFP.")
+    more = "".join(fig(k, f"fig3b_signed_total_mort_{w}_{L}{T(k)}_landscape.png", f"{DS[k]['label']}: {lab}, {w.replace('m', ' months')}.")
+                   for L, lab in (("LGB", "LightGBM"), ("XGB", "XGBoost")) for w in ("12m", "24m") if not (L == "LGB" and w == "24m"))
+    comp = fig(k, f"fig3_total_mort_24m_LGB{T(k)}_landscape.png", f"{DS[k]['label']}: driver composition (relative |SHAP|), LightGBM, 24 months.")
+    return out + f"<details><summary>LightGBM 12 months, XGBoost 12 and 24 months{', driver composition' if comp else ''}</summary>{more}{comp}</details>"
+
+
+sections.append(("shap", "4. Direction of the mortality effect at each site (Fig 3)", per_ds(fig3)))
+
+sections.append(("direction", "5. High vs Low+Mid mortality sites (Fig 4)",
+                 per_ds(lambda k: fig(k, f"fig4_signed_shap_total_mort{T(k)}.png", f"Fig 4 ({DS[k]['label']}): net signed mortality SHAP, High vs Low+Mid relative-mortality sites; Mann-Whitney U, BH-corrected.")
+                        + fig(k, f"fig4_signed_shap_rel_deadwood{T(k)}.png", f"Fig 4 ({DS[k]['label']}): split by relative deadwood."))))
+
+sections.append(("igbp", "6. Ecosystem type and tree cover (Fig 5)",
+                 per_ds(lambda k: fig(k, "fig5_igbp_board_24m_XGB.png", f"Fig 5 ({DS[k]['label']}): benefit and direction by IGBP class, tree cover and relative mortality; XGBoost, 24 months.")
+                        + (lambda m: f"<details><summary>12 months and LightGBM</summary>{m}</details>" if m else "")(
+                            "".join(fig(k, f"fig5_igbp_board_{w}_{L}.png", f"{DS[k]['label']}: {L}, {w}.") for L in ("XGB", "LGB") for w in ("12m", "24m") if not (L == "XGB" and w == "24m")))
+                        + fig(k, "mortality_split/mortality_composition_concept_LGB.png", f"{DS[k]['label']}: what kind of mortality information the model uses (LightGBM)."))))
+
+# dose-response with mortality as a continuous variable (2026-10-09): V5 only, scripts 41 / 42
+def dose_table():
+    rows = []
+    lab = {"AG": "AutoGluon", "XGB": "XGBoost", "LGB": "LightGBM"}
+    for L in ("AG", "XGB", "LGB"):
+        f = f"{DS['v5']['plots']}/dose_response/dose_response_robustness_{L}.csv"
+        if not os.path.exists(f):
+            continue
+        R = pd.read_csv(f)
+        for _, r in R[R.test != "t1a"].iterrows():
+            st = lambda q: "*" if q < 0.05 else ""
+            rows.append({"learner": lab[L], "EFP": EFPH[r.response], "window": r.window.replace("m", " months"),
+                         "model": "without mortality (C+T)" if r.test == "t2a_CT" else "with mortality (C+T+M)",
+                         "cell": f"{r.slope:+.3f}{st(r.q_boot)} <span class='muted'>[{r.boot_lo:+.3f}, {r.boot_hi:+.3f}]</span>"})
+    t = pd.DataFrame(rows).pivot_table(index=["learner", "window", "EFP"], columns="model", values="cell", aggfunc="first")
+    order = [(l, w, EFPH[e]) for l in ("AutoGluon", "XGBoost", "LightGBM") for w in ("12 months", "24 months") for e in EFP if (l, w, EFPH[e]) in t.index]
+    t = t.reindex(order)[["without mortality (C+T)", "with mortality (C+T+M)"]]
+    t.index = [f"{a} · {b} · {c}" for a, b, c in t.index]
+    return t
+
+
+if os.path.exists(f"{DS['v5']['plots']}/dose_response/dose_response_robustness_AG.csv"):
+    dose = ("<p>The Low / Mid / High comparison loses power because the High group is small (22 sites). Here every "
+            "<b>site-year</b> is an observation (361) and relative mortality of that year is used directly. The question: "
+            "<b>is the model without mortality wrong in the years with high mortality, and does adding mortality fix it?</b></p>"
+            + fig("v5", "dose_response/residual_by_mortality_AG_24m.png",
+                  "AutoGluon, 24 months: mean residual (observed − predicted) per class of the site-year's relative mortality; "
+                  "below 0 = the model predicts too high. Cyan = without mortality (C+T), pink = with mortality (C+T+M); bars = 95 % "
+                  "site-block bootstrap interval; numbers = site-years (sites); stars at the top = adding mortality lowers the prediction significantly in that class (paired permutation, BH-FDR).")
+            + "<p><b>Result:</b> without mortality the model predicts the EFPs <b>too high in high-mortality years</b>: in the "
+            "&gt; 30 % class (21 site-years, 10 sites) NEP<sub>max</sub> by about 4 µmol m<sup>−2</sup> s<sup>−1</sup>, "
+            "GPP<sub>sat</sub> by 3.4–4.4 and WUE by 0.75–0.9 g C mm<sup>−1</sup> (all learners, intervals below 0). Adding "
+            "mortality <b>reduces</b> this bias: AutoGluon by about two-thirds (NEP<sub>max</sub> −4.0 → −1.3), XGBoost and "
+            "LightGBM by about a third to a half (−3.6 to −4.0 → −1.8 to −2.4, still below 0). ET<sub>max</sub> shows no pattern.</p>"
+            "<p><b>Is the correction significant?</b> Per site-year, correction = residual with − residual without mortality "
+            "(= how much adding mortality lowers the prediction); one-sided paired permutation with the two models swapped per site. "
+            "In the &gt; 30 % class the correction is significant for GPP<sub>sat</sub>, NEP<sub>max</sub> and WUE with every "
+            "learner and window (AutoGluon 24 months: +3.2, +2.7 and +0.34; XGBoost / LightGBM about half of that; all q &lt; 0.05). "
+            "In the 0–10 % class mortality slightly <i>raises</i> the predictions. The correction grows with relative mortality "
+            "(mixed model, site-block bootstrap; AutoGluon +0.96, +0.75 and +0.10 per +10 %, all q &lt; 0.001).</p>"
+            "<p>The same with a <b>mixed model</b> (residual ~ relative mortality of the year, random intercept per site): the slope "
+            "without mortality is about −0.7 to −0.8 µmol m<sup>−2</sup> s<sup>−1</sup> (NEP<sub>max</sub>) and −0.18 g C "
+            "mm<sup>−1</sup> (WUE) per +10 % relative mortality; it holds with a site-block bootstrap, when leaving out any single "
+            "site and without the three most extreme sites (FI-Hyy, US-GLE, US-NC2, &gt; 50 %). With mortality the linear trend "
+            "is no longer significant for any learner. GPP<sub>sat</sub> goes the same way but depends more on single sites. "
+            "Whether the error <i>reduction</i> itself grows with mortality (test 1a) is the same direction but not robust in the "
+            "bootstrap.</p>"
+            + table_html(dose_table(), "Mixed model, slope of the residual per +10 % relative mortality of the site-year (EFP units) "
+                         "[95 % site-block bootstrap interval]; * = BH q &lt; 0.05 (bootstrap, across the 8 EFP × window tests).")
+            + "<details><summary>12 months, XGBoost and LightGBM</summary>"
+            + "".join(fig("v5", f"dose_response/residual_by_mortality_{L}_{W}.png", f"{lab}, {W.replace('m', ' months')}.")
+                      for L, lab in (("AG", "AutoGluon"), ("XGB", "XGBoost"), ("LGB", "LightGBM")) for W in ("24m", "12m")
+                      if not (L == "AG" and W == "24m"))
+            + "</details><details><summary>Supplement: mixed-model plots and robustness checks</summary>"
+            + "".join(fig("v5", f"dose_response/{n}_{L}.png", f"{lab}: {c}")
+                      for L, lab in (("AG", "AutoGluon"), ("XGB", "XGBoost"), ("LGB", "LightGBM"))
+                      for n, c in (("dose_response_siteyear", "every site-year; 1a error change and 2a residuals without (cyan) and with mortality (pink); line = mixed-model slope."),
+                                   ("dose_response_robustness", "slopes under each check (mixed model, site-block bootstrap, leave one site out, without the three extreme sites); filled = significant.")))
+            + fig("v5", "dose_response/dose_response_AG.png", "AutoGluon: the same at site level (one point per site); weaker because each site averages over years with and without mortality.")
+            + "</details>")
+    sections.append(("dose", "Mortality as a continuous variable: dose-response (V5)", dose))
+
+# circularity check: EFP-specific climate block (2026-10-12), AutoGluon run efp_v5_nothresh_efpclim
+_ec = f"{DS['v5']['plots']}/paired_bootstrap_statistics_efp_v5_nothresh_efpclim.csv"
+if os.path.exists(_ec):
+    st = pd.read_csv(_ec)
+    st = st[(st.metric == "MAE") & (st.level == "siteyear") & st.subset.isin(["all", "high", "yr_midhigh", "yr_high"])].copy()
+    st["cell"] = [f"{p:+.1f}{'<sup>' + g + '</sup>' if isinstance(g, str) and g else ''} <span class='muted'>[{lo:+.1f}, {hi:+.1f}]</span>"
+                  for p, g, lo, hi in zip(st.pct, st.sig, st.pct_lo, st.pct_hi)]
+    st["run"] = st.learner.map({"AG": "all climate", "AGx": "EFP-specific climate"})
+    ct = st.pivot_table(index=["window", "response", "run"], columns="subset", values="cell", aggfunc="first")[["all", "high", "yr_midhigh", "yr_high"]]
+    ct.columns = ["All site-years", "High sites", "Mid + High years", "High years"]
+    ct = ct.reindex([(w, e, r) for w in ("12m", "24m") for e in EFP for r in ("all climate", "EFP-specific climate")])
+    ct.index = [f"{w.replace('m', ' months')} · {EFPH[e]} · {r}" for w, e, r in ct.index]
+    circ = ("<p><b>Question (Miguel):</b> a climate variable that is part of an EFP's formula could make the prediction partly "
+            "circular. The climate predictors are already strictly pre-season; to be safe, each EFP was refitted with AutoGluon "
+            "(same data and design) <b>without the climate variables in its formula</b>: GPP<sub>sat</sub> without radiation "
+            "(light-response curve on PPFD = SW<sub>IN</sub> × 2.11), ET<sub>max</sub> and WUE without air temperature "
+            "(ET = LE / λ(T<sub>a</sub>)); NEP<sub>max</sub> has no climate variable in its formula and is unchanged. Filters "
+            "(SW<sub>IN</sub> thresholds, rain) are not part of the formulas and were kept.</p>"
+            "<p><b>Result:</b> skill hardly changes (R² of C+T+M: GPP<sub>sat</sub> 0.385 / 0.365 vs 0.367 / 0.370, "
+            "ET<sub>max</sub> 0.409 / 0.420 vs 0.425 / 0.433, WUE 0.281 / 0.302 vs 0.312 / 0.326 for 12 / 24 months) and the "
+            "mortality results stay: WUE still improves significantly at High sites and in high-mortality years; the "
+            "over-prediction without mortality and its correction remain significant for GPP<sub>sat</sub> (+3.6 to +3.7) and "
+            "WUE (+0.25 to +0.27) in the &gt; 30 % class. GPP<sub>sat</sub> is significant at 12 but not at 24 months in the "
+            "MAE table. <b>The mortality results do not depend on climate variables that enter the EFP formulas.</b></p>"
+            + table_html(ct, "Site-year MAE change when mortality is added (%) [95 % site-block bootstrap interval], AutoGluon with "
+                         "all climate vs the EFP-specific climate block; stars = paired permutation, BH across both runs.")
+            + fig("v5", "dose_response/residual_by_mortality_AG_efpclim_24m.png", "Residual by mortality class with the EFP-specific climate block (AutoGluon, 24 months); compare with the figure in the previous section.")
+            + "<details><summary>12 months</summary>" + fig("v5", "dose_response/residual_by_mortality_AG_efpclim_12m.png", "12 months.") + "</details>")
+    sections.append(("circ", "Circularity check: EFP-specific climate block (V5)", circ))
+
+# mortality block split by metric, V5 only (2026-10-08): AutoGluon first, then XGBoost and LightGBM
+sections.append(("msplit", "7. Mortality block, metric by metric (V5)",
+                 "<p>Share of the mortality-block |SHAP| per metric (C+T+M, V5 without thresholds, mean over the 101 sites, "
+                 "bars ± SE). Grey = relative mortality, red = deadwood metrics, green = tree-cover loss. The metrics are strongly "
+                 "correlated (relative mortality vs relative deadwood ρ = 0.91), so SHAP shares show which variables the model "
+                 "uses, not what each metric adds on its own. AutoGluon SHAP is permutation-based: compare shares, not magnitudes.</p>"
+                 + fig("v5", "mortality_split/mortality_composition_family_AG.png", "V5: mortality block by metric, AutoGluon.")
+                 + fig("v5", "mortality_split/mortality_composition_family_XGB.png", "V5: mortality block by metric, XGBoost.")
+                 + fig("v5", "mortality_split/mortality_composition_family_LGB.png", "V5: mortality block by metric, LightGBM.")))
+
+# V4.1 vs V5 comparison (always visible)
+C = f"{ROOT}/plots/paper_v5{SFX}/comparison_v41_v5"
+agree = pd.read_csv(f"{C}/1_metric_agreement.csv", index_col=0).drop(index="absolute deadwood", errors="ignore").round(3)
+hi = pd.read_csv(f"{C}/1_high_mortality_sites.csv", index_col=0)
+r2c = pd.read_csv(f"{C}/2_r2_all_sites.csv", header=[0, 1], index_col=[0, 1]).mean()
+r2s = pd.read_csv(f"{C}/2_r2_shared_site_years.csv", header=[0, 1], index_col=[0, 1]).mean()
+r2m = pd.DataFrame({"own sites": r2c, "shared site-years": r2s}).T.round(3)
+r2m.columns = [f"{'XGBoost' if a == 'XGB' else 'LightGBM'} {b.replace('v4.1', 'V4.1').replace('v5', 'V5')}" for a, b in r2m.columns]
+dr = pd.read_csv(f"{C}/3_dRMSE_pct.csv", header=[0, 1], index_col=[0, 1]).round(2)
+dr.columns = [f"{'XGBoost' if a == 'XGB' else 'LightGBM'} {b.replace('v4.1', 'V4.1').replace('v5', 'V5')}" for a, b in dr.columns]
+dr.index = [f"{EFPH[e]} · {w.replace('m', ' months')}" for e, w in dr.index]
+cmp = f"""<p>V5 (the paper dataset) was built from the newest maps with the same rules as V4.1. It keeps 101 of the 104 V4.1 sites
+(loses CA-DB2, CA-LU1, FI-Var, US-BZB through the tree-cover filter, gains AU-How).</p>
+{table_html(agree, "Mortality metrics (mean of the five buffers; tree cover at 500 m) on the site-years present in both datasets.")}
+{table_html(hi, "High-mortality sites in each version.")}
+{table_html(r2m, "Mean R² over the 16 tasks: each version on its own sites, and on the 357 site-years present in both.")}
+{table_html(dr, "Change in overall RMSE when mortality is added (%), negative = mortality helps.")}
+<ul><li><b>Robust:</b> the NEP<sub>max</sub> effect (−9 to −11 % overall in V4.1, −7 to −10 % in V5; −11 to −22 % at high-mortality sites, significant in both) and the direction of the effect (Fig 4).</li>
+<li><b>Map-dependent:</b> the GPP<sub>sat</sub> effect is weaker with V5 (about −3 % instead of −7 % overall) and at high-mortality sites no longer significant; WUE is also weaker overall.</li></ul>"""
+sections.append(("compare", "7. V4.1 vs V5", cmp))
+
+# AutoGluon (AutoML) check - AutoGluon/ ; same datasets, predictors, windows and repeated LOSO as XGB / LGB
+AGD = f"{ROOT}/AutoGluon"
+AG_SET = {"v41": "efp", "v5": "efp_v5"}                       # V2.2 was not run with AutoGluon
+AG_SFX = os.environ.get("AG_SUFFIX", "_nothresh")   # "_nothresh" (default, 2026-10-08) = without the thresholded metrics, as Sections 1-7; "" = earlier runs with them
+AGL = {"XGB": "XGBoost", "LGB": "LightGBM", "AutoGluon": "AutoGluon"}
+
+
+def ag_fig(k, name, caption):
+    src = f"{AGD}/plots/{AG_SET[k]}{AG_SFX}/{name}"
+    if not os.path.exists(src):
+        return ""
+    rel = f"fig_{k}/autogluon/{name}"
+    os.makedirs(os.path.dirname(f"{SITE}/{rel}"), exist_ok=True)
+    shutil.copyfile(src, f"{SITE}/{rel}")
+    return (f'<figure><a href="{rel}"><img src="{rel}" loading="lazy" alt="{html.escape(caption)}"></a>'
+            f'<figcaption>{caption}</figcaption></figure>')
+
+
+def ag_block(k):
+    if k not in AG_SET:
+        return ""
+    o = f"{AGD}/outputs/{AG_SET[k]}{AG_SFX}"
+    if not os.path.exists(f"{o}/comparison_repCV.csv"):
+        return ""
+    lab = DS[k]["label"]
+    rep = pd.read_csv(f"{o}/comparison_repCV.csv")
+    rep = rep[rep.learner.isin(AGL)]
+    rep["task"] = [f"{EFPH[r]} · {m[3:].replace('m', ' months')} · {'C+T+M' if m[:2] == 'M4' else 'C+T'}" for r, m in zip(rep.response, rep.model)]
+    order = [f"{EFPH[e]} · {w} · {c}" for e in EFP for w in ("12 months", "24 months") for c in ("C+T", "C+T+M")]
+    r2 = rep.pivot_table(index="task", columns="learner", values="R2").reindex(order)[list(AGL)]
+    r2.loc["mean"] = r2.mean()
+    r2.columns = [AGL[c] for c in r2.columns]
+    dist = pd.read_csv(f"{o}/comparison_disturbance.csv")
+    dist = dist[dist.learner.isin(AGL)]
+    dist["task"] = [f"{EFPH[r]} · {w.replace('m', ' months')}" for r, w in zip(dist.response, dist.window)]
+    dr = dist.pivot_table(index="task", columns="learner", values="dRMSE_pct").reindex(
+        [f"{EFPH[e]} · {w}" for e in EFP for w in ("12 months", "24 months")])[list(AGL)]
+    dr.columns = [AGL[c] for c in dr.columns]
+    sh = pd.read_csv(f"{o}/comparison_shap_groups.csv")
+    sh = sh[(sh.group == "Disturbance") & sh.learner.isin(AGL)]
+    sh["task"] = [f"{EFPH[r]} · {m[3:].replace('m', ' months')}" for r, m in zip(sh.response, sh.model)]
+    ms = sh.pivot_table(index="task", columns="learner", values="share_pct").reindex(dr.index)[list(AGL)]
+    ms.columns = [AGL[c] for c in ms.columns]
+    n_best = (r2.drop(index="mean").idxmax(axis=1) == "AutoGluon").sum()
+    m = r2.loc["mean"]
+    bullets = (f"<ul><li><b>Skill:</b> mean R² {m['AutoGluon']:.3f} (AutoGluon) vs {m['XGBoost']:.3f} (XGBoost) and {m['LightGBM']:.3f} "
+               f"(LightGBM); AutoGluon is best in {n_best} of 16 tasks.</li>"
+               f"<li><b>Effect of mortality:</b> overall RMSE change when mortality is added, AutoGluon "
+               f"{dr['AutoGluon'].min():+.1f} to {dr['AutoGluon'].max():+.1f} % (XGBoost {dr['XGBoost'].min():+.1f} to {dr['XGBoost'].max():+.1f} %, "
+               f"LightGBM {dr['LightGBM'].min():+.1f} to {dr['LightGBM'].max():+.1f} %).</li>"
+               f"<li><b>Mortality share of |SHAP|</b> in C+T+M: AutoGluon {ms['AutoGluon'].min():.0f}-{ms['AutoGluon'].max():.0f} %, "
+               f"XGBoost {ms['XGBoost'].min():.0f}-{ms['XGBoost'].max():.0f} %, LightGBM {ms['LightGBM'].min():.0f}-{ms['LightGBM'].max():.0f} % "
+               "(AutoGluon SHAP is permutation-based, so compare shares and signs rather than magnitudes).</li></ul>")
+    # Table 1 with AutoGluon: from the run that matches the AutoGluon results (with / without thresholded metrics)
+    t1_dir = f"{ROOT}/plots/{'paper_v41' if k == 'v41' else 'paper_v5'}{AG_SFX}"
+    t1_tex = f"table_fig2_dRMSE_total_mort_{k}{AG_SFX}_permlog.tex"
+    t1 = ""
+    if os.path.exists(f"{t1_dir}/table_fig2_dRMSE_total_mort_permlog_statistics.csv"):
+        t1 = ("<h3>Table 1 with AutoGluon</h3>"
+              + table_html(fig2_table(k, t1_dir),
+                           f"As Table 1 (Section 4), with AutoGluon added ({lab}"
+                           + (", runs including the thresholded mortality metrics" if AG_SFX == "" else "")
+                           + "): geometric-mean per-site change in RMSE when mortality is added (%), stars = one-sided paired "
+                           "permutation test on the log RMSE ratios, BH-corrected across the table; (share of sites improved). "
+                           f"Classes by relative mortality, {DS[k]['cls']}. Wilcoxon version: Table 1b. LaTeX: {tex_link(t1_tex)}."))
+    return (bullets
+            + t1
+            + table_html(r2.round(3), f"R² under repeated leave-one-site-out ({lab}); AutoGluon = weighted ensemble rebuilt inside every fold.")
+            + table_html(dr.round(2), f"Change in overall RMSE when mortality is added (%), negative = mortality helps ({lab}).")
+            + table_html(ms.round(1), f"Mortality share of mean |SHAP| in C+T+M (%) ({lab}).")
+            + ag_fig(k, "fig2_mortality_effect.png", f"Fig 2 with AutoGluon ({lab}): per-site RMSE without and with mortality, XGBoost, LightGBM and AutoGluon.")
+            + ag_fig(k, "fig3b_signed_total_mort_24m_AG_landscape.png", f"Fig 3 with AutoGluon ({lab}): net signed mortality SHAP per site, C+T+M, 24 months.")
+            + ag_fig(k, "fig4_signed_shap_total_mort.png", f"Fig 4 with AutoGluon ({lab}): net signed mortality SHAP, High vs Low+Mid relative-mortality sites."))
+
+
+ag_intro = ("<p>AutoGluon-Tabular (AutoML) chooses the learner itself: in every fit it trains LightGBM (3 variants), CatBoost, XGBoost, "
+            "random forest, extra trees and two neural networks, each bagged over site-disjoint folds, and builds a weighted ensemble. "
+            "It is rerun from scratch inside every leave-one-site-out fit, so model choice never sees the held-out site. Datasets, "
+            "predictors, windows and the repeated leave-one-site-out evaluation are those of the XGBoost / LightGBM runs. "
+            "The ensembles are dominated by the neural networks.</p>"
+            + ("<p class='muted'><b>Note:</b> these AutoGluon runs use the full mortality block <b>including</b> the thresholded gain and "
+               "loss metrics (C+T+M with 213 / 368 predictors), unlike Sections 1-7, so they are compared here with the XGBoost / LightGBM "
+               "runs that also included them. A rerun without the thresholded metrics is in progress.</p>" if AG_SFX == "" else
+               "<p class='muted'>All runs here are without the thresholded mortality metrics (C+T+M with 193 / 338 predictors), "
+               "exactly as the XGBoost / LightGBM results in Sections 2-8, and use the same folds.</p>")
+            + "<p><b>TabPFN v2</b> was also tested (V5, all 16 tasks, site-grouped 5-fold CV, inside AutoGluon and on its own with "
+              "default settings and a 32-member ensemble). It never beat the other learners: median normalised RMSE 0.87 against 0.77 "
+              "for the best learner, ensemble weight ≤ 0.13 and zero in 12 of 16 tasks. It was therefore not used further.</p>")
+sections.append(("autogluon", "AutoGluon (AutoML) results", ag_intro + per_ds(ag_block)))
+# order (user, 2026-10-08): About, then AutoGluon first (the learner planned for the paper), then the XGBoost / LightGBM sections;
+# section numbers are assigned here so the order can change without editing titles
+_ag = [x for x in sections if x[0] == "autogluon"]
+sections = [x for x in sections if x[0] == "about"] + _ag + [x for x in sections if x[0] not in ("about", "autogluon")]
+sections = [(k, t if k == "about" else f"{i}. {re.sub(r'^[0-9]+[.] ', '', t)}", b) for i, (k, t, b) in enumerate(sections)]
+
+css = """
+:root{--bg:#ffffff;--fg:#1b1f24;--muted:#5b6470;--line:#d9dde3;--card:#f6f7f9;--accent:#0f6660;--on:#ffffff}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15181c;--fg:#e8eaed;--muted:#a3abb5;--line:#343a42;--card:#1e2227;--accent:#5fc4b8;--on:#10302d}}
+:root[data-theme="dark"]{--bg:#15181c;--fg:#e8eaed;--muted:#a3abb5;--line:#343a42;--card:#1e2227;--accent:#5fc4b8;--on:#10302d}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.55 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line);padding:8px 16px}
+.bar{max-width:1240px;margin:0 auto;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.bar nav{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:.88rem}.bar nav a{color:var(--accent);text-decoration:none}
+.toggle{display:flex;gap:4px;margin-left:auto}.toggle button{border:1px solid var(--accent);background:transparent;color:var(--accent);border-radius:6px;padding:4px 12px;font:inherit;cursor:pointer}
+.toggle button.on{background:var(--accent);color:var(--on)}
+main{max-width:1240px;margin:0 auto;padding:16px 16px 64px}h1{font-size:1.6rem;margin:.3em 0}h2{font-size:1.25rem;margin-top:2.2em;border-bottom:1px solid var(--line);padding-bottom:.3em}
+h3{font-size:1.05rem;margin-top:1.6em}p,li{max-width:85ch}.muted{color:var(--muted)}.na{color:var(--muted);font-style:italic}
+.tw{overflow-x:auto;margin:10px 0 18px}.tbl{border-collapse:collapse;font-size:.83rem;font-variant-numeric:tabular-nums}
+.tbl th,.tbl td{border-bottom:1px solid var(--line);padding:4px 9px;text-align:right;white-space:nowrap}.tbl th:first-child,.tbl td:first-child{text-align:left}
+.tbl.gl td,.tbl.gl th{text-align:left;white-space:normal;vertical-align:top}.tbl thead th{color:var(--muted);font-weight:600}
+figure{margin:12px 0 22px}figcaption{color:var(--muted);font-size:.85rem;margin-top:4px;max-width:110ch}
+img{max-width:100%;height:auto;border:1px solid var(--line);border-radius:4px;background:#fff}
+details{margin:8px 0 18px;border:1px solid var(--line);border-radius:6px;padding:6px 12px;background:var(--card)}summary{cursor:pointer;color:var(--accent)}
+.ds{display:none}body[data-ds="v41"] .ds-v41,body[data-ds="v5"] .ds-v5,body[data-ds="v22"] .ds-v22{display:block}
+"""
+js = """
+const KEY='fvm-ds2';function setDs(k){document.body.dataset.ds=k;document.querySelectorAll('.toggle button').forEach(b=>b.classList.toggle('on',b.dataset.k===k));try{localStorage.setItem(KEY,k)}catch(e){}}
+document.querySelectorAll('.toggle button').forEach(b=>b.addEventListener('click',()=>setDs(b.dataset.k)));
+let s='v5';try{s=localStorage.getItem('fvm-ds2')||s}catch(e){}if(!['v41','v5','v22'].includes(s))s='v5';setDs(s);
+"""
+page = f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mortality and EFPs</title><style>{css}</style></head><body data-ds="v5">
+<header><div class="bar"><nav>{''.join(f'<a href="#{k}">{t.split(". ", 1)[-1]}</a>' for k, t, _ in sections)}</nav>
+<div class="toggle" role="group" aria-label="Dataset">{''.join(f'<button data-k="{k}">{d["label"]}</button>' for k, d in DS.items())}</div></div></header>
+<main><h1>Tree mortality and ecosystem functional properties</h1>
+<p class="muted">Updated {datetime.date.today().isoformat()} · switch the dataset at the top right (V5 = paper dataset, V4.1 = previous maps, V2.2 = earlier analysis) ·
+built by scripts/paper_v41/35_build_report_paper.py</p>
+{''.join(f'<section id="{k}"><h2>{t}</h2>{b}</section>' for k, t, b in sections)}
+</main><script>{js}</script></body></html>"""
+open(f"{SITE}/index.html", "w").write(page)
+n = sum(len(fs) for dp, _, fs in os.walk(SITE) if dp.startswith(f"{SITE}/fig_"))
+print(f"written {SITE}/index.html ({len(page)/1e3:.0f} kB), {n} figure files copied")

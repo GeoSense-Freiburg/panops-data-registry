@@ -1,0 +1,15 @@
+{
+  "learner": "LGB",
+  "response": "GPP_gs",
+  "best_value": 0.7817666,
+  "n_trials": 50,
+  "params": {
+    "learning_rate": 0.03648902175816096,
+    "nrounds": 600,
+    "num_leaves": 58,
+    "min_data_in_leaf": 31,
+    "feature_fraction": 0.20123572331104217,
+    "bagging_fraction": 0.6918089617821368,
+    "lambda_l2": 0.43950138573660597
+  }
+}

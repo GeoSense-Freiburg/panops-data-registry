@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>Model structures — RF, RF exp01/exp02, XGBoost, LightGBM (V10)</title><style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0D0D0D;color:#E0E0E0;font-family:Arial,Helvetica,sans-serif;line-height:1.6;padding:28px 18px 60px}
+a{color:#22D4EB;text-decoration:none} a:hover{text-decoration:underline}
+.wrap{max-width:900px;margin:0 auto}
+.nav{font-size:.85em;color:#6B7280;margin-bottom:22px} .nav a{margin-right:14px}
+h1{font-size:1.65em;color:#fff;line-height:1.25;margin-bottom:6px;letter-spacing:-.01em}
+.article h1{display:none}
+.article h2{font-size:1.3em;color:#22D4EB;margin:34px 0 12px;padding-bottom:6px;border-bottom:1px solid #22D4EB55}
+.article h3{font-size:1.1em;color:#E5E7EB;margin:24px 0 8px}
+.article h4{font-size:1em;color:#9CA3AF;margin:18px 0 6px}
+.article p{margin:10px 0} .article ul,.article ol{margin:8px 0 8px 24px} .article li{margin:4px 0}
+.article hr{border:0;border-top:1px solid #2A2A3A;margin:26px 0}
+.article blockquote{border-left:3px solid #22D4EB;padding:2px 14px;color:#9CA3AF;margin:12px 0}
+.article code{background:#1F2937;border-radius:4px;padding:1px 5px;font-size:.88em;color:#A7F3D0;font-family:Consolas,Menlo,monospace}
+.article pre{background:#111827;border:1px solid #2A2A3A;border-radius:8px;padding:12px 14px;overflow-x:auto;margin:12px 0}
+.article pre code{background:none;padding:0;color:#E5E7EB}
+.tw{overflow-x:auto;margin:14px 0}
+.article table{border-collapse:collapse;font-size:.88em;min-width:60%}
+.article th{background:#1F2937;color:#22D4EB;text-align:left}
+.article th,.article td{border:1px solid #2A2A3A;padding:6px 10px;vertical-align:top}
+.article tr:nth-child(even) td{background:#111827}
+.article img{max-width:100%;height:auto;background:#fff;border-radius:6px;margin:12px 0 4px;display:block}
+.article em{color:#9CA3AF}
+.badge{display:inline-block;font-size:.75em;background:#1F2937;border:1px solid #374151;border-radius:4px;padding:2px 8px;color:#9CA3AF;margin-right:6px}
+.meta{margin:6px 0 22px}
+.footer{margin-top:50px;font-size:.75em;color:#4B5563;text-align:center}
+
+.month{font-size:1.05em;color:#22D4EB;margin:34px 0 12px;padding-bottom:6px;border-bottom:1px solid #22D4EB55}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.card{display:flex;flex-direction:column;gap:8px;background:#111827;border:1px solid #2A2A3A;border-radius:12px;padding:20px 20px;color:#E0E0E0;transition:border-color .2s,transform .15s}
+.card:hover{border-color:#22D4EB;transform:translateY(-2px);text-decoration:none}
+.card-title{font-size:1.02em;font-weight:bold;color:#22D4EB;line-height:1.3}
+.card-desc{font-size:.83em;color:#9CA3AF;line-height:1.5}
+.card-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto;padding-top:4px}
+.tag{font-size:.72em;background:#1F2937;border:1px solid #374151;border-radius:4px;padding:2px 8px;color:#6B7280}
+#q{width:100%;background:#111827;border:1px solid #2A2A3A;border-radius:8px;color:#E0E0E0;padding:10px 14px;font-size:.95em;margin:14px 0 4px}
+#q:focus{outline:none;border-color:#22D4EB}
+.sub{color:#9CA3AF;font-size:.9em}
+</style></head>
+<body><div class="wrap">
+<div class="nav"><a href="index.html">&larr; Daily reports</a><a href="../index.html">Hub</a></div>
+<h1>Model structures — RF, RF exp01/exp02, XGBoost, LightGBM (V10)</h1><div class="meta"><span class="badge">2026-08-05</span><span class="badge">7 tables</span></div>
+<div class="article"><h1 id="model-structures--rf-rf-exp01exp02-xgboost-lightgbm-v10">Model structures — RF, RF exp01/exp02, XGBoost, LightGBM (V10)</h1>
+<p><strong>Date:</strong> 2026-08-05 <strong>Scope:</strong> exact configuration of every learner and every model family used in the V10 disturbance-vs-EFP analysis. All learners share the same datasets, predictor blocks, 24 model configs, LOSO folds and seed — only the learner and its hyperparameters differ.</p>
+<hr />
+<h2 id="0-correction-rangers-default-mtry-is-p-not-p3">0. Correction: ranger's default <code>mtry</code> is √p, <strong>not</strong> p/3</h2>
+<p>Several project documents (<code>plots/V10/RF_tuning/exp01_hyperparams/README.md</code>, Section 10 of the HTML report, <code>plots/V10/{XGBoost,LightGBM}/metrics_comparison.md</code>) state that the RF default is <code>mtry ≈ p/3</code>. <strong>That is the <code>randomForest</code> package's default for regression. <code>ranger</code> uses <code>floor(sqrt(p))</code>.</strong> Verified empirically:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>p</th>
+<th>ranger default <code>mtry</code></th>
+<th>√p</th>
+<th>p/3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>143</td>
+<td><strong>11</strong></td>
+<td>12</td>
+<td>48</td>
+</tr>
+<tr>
+<td>279</td>
+<td><strong>16</strong></td>
+<td>17</td>
+<td>93</td>
+</tr>
+<tr>
+<td>444</td>
+<td><strong>21</strong></td>
+<td>21</td>
+<td>148</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Why it matters.</strong> For <code>M6_raw_12m</code> (p = 279, mtry = 16), the single raw-memory predictor <code>{resp}_lag1</code> is offered at only <strong>16/279 ≈ 5.7 %</strong> of splits — not ~33 % as documented. This does not overturn the exp01/exp02 conclusions; it <em>strengthens</em> the mechanism and explains why forcing that column into every split (exp02) bought so much. It also explains why exp01 improved at every grid point: the grid started at <code>mtry_frac = 0.20</code>, already ~4× above the true default of ≈0.05.</p>
+<p>Results are unaffected — only the explanatory text is wrong and should be corrected.</p>
+<hr />
+<h2 id="1-learner-configurations">1. Learner configurations</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th></th>
+<th>RF baseline</th>
+<th>RF exp01-tuned</th>
+<th>RF exp02 (adopted-then-reverted)</th>
+<th>XGBoost</th>
+<th>LightGBM</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Library</td>
+<td><code>ranger</code></td>
+<td><code>ranger</code></td>
+<td><code>ranger</code></td>
+<td><code>xgboost</code> 3.2.1.1</td>
+<td><code>lightgbm</code> 4.7.0</td>
+</tr>
+<tr>
+<td>Algorithm</td>
+<td>bagging</td>
+<td>bagging</td>
+<td>bagging</td>
+<td>boosting, depth-wise</td>
+<td>boosting, leaf-wise</td>
+</tr>
+<tr>
+<td>Ensemble size</td>
+<td><code>num.trees = 500</code></td>
+<td>500 or 1000 (per response)</td>
+<td><code>num.trees = 500</code></td>
+<td><code>nrounds = 500</code></td>
+<td><code>nrounds = 500</code></td>
+</tr>
+<tr>
+<td>Complexity cap</td>
+<td>grown to purity</td>
+<td>grown to purity</td>
+<td>grown to purity</td>
+<td><code>max_depth = 6</code></td>
+<td><code>num_leaves = 31</code></td>
+</tr>
+<tr>
+<td>Min node / leaf</td>
+<td><code>min.node.size = 5</code></td>
+<td>3 / 5 / 10 (per response)</td>
+<td><code>min.node.size = 5</code></td>
+<td><code>min_child_weight = 1</code></td>
+<td><code>min_data_in_leaf = 5</code></td>
+</tr>
+<tr>
+<td>Feature sampling</td>
+<td><code>mtry = floor(√p)</code> → 11–21</td>
+<td><code>mtry</code> = 310–444</td>
+<td><code>mtry = floor(√p)</code></td>
+<td><code>colsample_bytree = 0.8</code></td>
+<td><code>feature_fraction = 0.8</code></td>
+</tr>
+<tr>
+<td>Row sampling</td>
+<td>bootstrap</td>
+<td>bootstrap</td>
+<td>bootstrap</td>
+<td><code>subsample = 0.8</code></td>
+<td><code>bagging_fraction = 0.8</code>, <code>bagging_freq = 1</code></td>
+</tr>
+<tr>
+<td>Shrinkage</td>
+<td>none</td>
+<td>none</td>
+<td>none</td>
+<td><code>learning_rate = 0.05</code></td>
+<td><code>learning_rate = 0.05</code></td>
+</tr>
+<tr>
+<td>Split finding</td>
+<td>exact</td>
+<td>exact</td>
+<td>exact</td>
+<td>exact</td>
+<td>histogram</td>
+</tr>
+<tr>
+<td>Special</td>
+<td>—</td>
+<td>per-response hyperparameters</td>
+<td><code>always.split.variables = {resp}_lag1[/lag2]</code>, <strong>raw-memory models only</strong></td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Categoricals</td>
+<td><code>respect.unordered.factors = "order"</code></td>
+<td>same</td>
+<td>same</td>
+<td>numeric matrix</td>
+<td>numeric matrix</td>
+</tr>
+<tr>
+<td>Seed</td>
+<td>42</td>
+<td>42</td>
+<td>42</td>
+<td>42</td>
+<td>42</td>
+</tr>
+<tr>
+<td>Script</td>
+<td><code>run_v10_RF_ranger.R</code></td>
+<td><code>run_v10_RF_ranger_tuned.R</code></td>
+<td><code>run_v10_RF_ranger_exp02.R</code></td>
+<td><code>run_v10_XGB.R</code></td>
+<td><code>run_v10_LGB.R</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>Notes:</p>
+<ul>
+<li><strong>XGBoost and LightGBM are untuned</strong> — sensible defaults, matched to each other wherever a direct analogue exists, so the comparison isolates the algorithm rather than differing library defaults.</li>
+<li>The one deliberate LightGBM deviation was <code>min_data_in_leaf = 5</code> (library default is 20), chosen to match ranger's <code>min.node.size</code>. A later grouped-CV sweep showed this was <strong>under-regularised</strong> — see §4.</li>
+<li><code>exp02</code> differs from baseline in <em>exactly one</em> way: the forced split variable on raw-memory models. Everything else is identical, which is why RF and RF exp02 give identical numbers on every non-raw-memory model.</li>
+</ul>
+<h3 id="exp01-per-response-tuned-configurations-all-sites-p--444">exp01 per-response tuned configurations (all-sites, p = 444)</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Response</th>
+<th><code>mtry_frac</code></th>
+<th><code>mtry</code></th>
+<th><code>min.node.size</code></th>
+<th><code>num.trees</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GPPsat</td>
+<td>0.70</td>
+<td>310</td>
+<td>10</td>
+<td>1000</td>
+</tr>
+<tr>
+<td>NEPmax</td>
+<td>0.70</td>
+<td>310</td>
+<td>3</td>
+<td>1000</td>
+</tr>
+<tr>
+<td>ETmax</td>
+<td>1.00</td>
+<td>444</td>
+<td>10</td>
+<td>1000</td>
+</tr>
+<tr>
+<td>uWUE</td>
+<td>0.70</td>
+<td>310</td>
+<td>10</td>
+<td>500</td>
+</tr>
+<tr>
+<td>WUE</td>
+<td>1.00</td>
+<td>444</td>
+<td>5</td>
+<td>500</td>
+</tr>
+</tbody>
+</table></div>
+<p>Selected by <strong>grouped 5-fold CV</strong> (folds = disjoint groups of sites) on <code>M8_raw_24m</code>, so selection never touches the reported LOSO metric.</p>
+<hr />
+<h2 id="2-model-families-m1m8-and-predictor-counts">2. Model families (M1–M8) and predictor counts</h2>
+<p>Predictor blocks: <strong>C</strong> climate/meteorology · <strong>T</strong> plant traits · <strong>D</strong> disturbance · <strong>M</strong> memory (the response's own previous-year value, raw or anomaly).</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Blocks</th>
+<th>p (12m)</th>
+<th>p (24m)</th>
+<th>default <code>mtry</code> 12m / 24m</th>
+<th>Adds D vs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>M1</td>
+<td>C</td>
+<td>143</td>
+<td>286</td>
+<td>11 / 16</td>
+<td>—</td>
+</tr>
+<tr>
+<td>M2</td>
+<td>C + D</td>
+<td>278</td>
+<td>421</td>
+<td>16 / 20</td>
+<td>M1</td>
+</tr>
+<tr>
+<td>M3</td>
+<td>C + T</td>
+<td>164</td>
+<td>307</td>
+<td>12 / 17</td>
+<td>—</td>
+</tr>
+<tr>
+<td>M4</td>
+<td>C + T + D</td>
+<td>299</td>
+<td>442</td>
+<td>17 / 21</td>
+<td>M3</td>
+</tr>
+<tr>
+<td>M5 raw / anom</td>
+<td>C + M</td>
+<td>144</td>
+<td>288</td>
+<td>12 / 16</td>
+<td>—</td>
+</tr>
+<tr>
+<td>M6 raw / anom</td>
+<td>C + D + M</td>
+<td>279</td>
+<td>423</td>
+<td>16 / 20</td>
+<td>M5</td>
+</tr>
+<tr>
+<td>M7 raw / anom</td>
+<td>C + T + M</td>
+<td>165</td>
+<td>309</td>
+<td>12 / 17</td>
+<td>—</td>
+</tr>
+<tr>
+<td>M8 raw / anom</td>
+<td>C + T + D + M</td>
+<td>300</td>
+<td>444</td>
+<td>17 / 21</td>
+<td>M7</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="block-sizes">Block sizes</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Block</th>
+<th>Size</th>
+<th>Composition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>C</strong></td>
+<td>143 (12m) / 286 (24m)</td>
+<td>monthly climate/meteo aggregates, <code>lag1_*</code> (+ <code>lag2_*</code> for 24m)</td>
+</tr>
+<tr>
+<td><strong>T</strong></td>
+<td>21</td>
+<td><code>P12_</code>, <code>P50_</code>, <code>P88_</code>, <code>gsmax_</code>, <code>rdmax_</code>, <code>SSD</code>, <code>SLA</code>, <code>Leaf*</code>, <code>Stem*</code></td>
+</tr>
+<tr>
+<td><strong>D</strong></td>
+<td><strong>135</strong></td>
+<td><strong>9 metrics × 5 buffers × 3 time points</strong></td>
+</tr>
+<tr>
+<td><strong>M</strong></td>
+<td>1 (12m) / 2 (24m)</td>
+<td><code>{resp}_lag1</code> [+ <code>{resp}_lag2</code>], or the <code>_anom_</code> variant</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>D block detail</strong> — 9 metrics: <code>absolute_mortality</code>, <code>relative_mortality</code>, <code>relative_disturbance</code>, <code>new_deadwood_gain_pp</code>, <code>new_mortality_rate_pct</code>, <code>mortality_loss_severity_pct</code>, plus <code>_thresh</code> variants of the last three. × 5 buffers: <strong>100, 200, 300, 400, 500 m</strong>. × 3 time points: current, <code>_lag1</code>, <code>_lag2</code>.</p>
+<blockquote>
+<p><strong>Dilution implication.</strong> Adding D to M1 takes p from 143 → 278 (nearly doubling the model) while the default <code>mtry</code> rises only 11 → 16. With 135 largely-redundant columns (5 nested buffers; <code>_thresh</code> near-duplicates), the probability that any given split is offered a <em>useful</em> predictor falls sharply. This is the most likely reason <strong>RF — and only RF — shows negative ΔR² on the weak-signal EFPs (uWUE, WUE)</strong>: greedy learners simply ignore useless columns, whereas RF's random subsetting cannot. The lag dimension is genuine information and should be kept; the buffer and <code>_thresh</code> dimensions are the compressible ones.</p>
+</blockquote>
+<hr />
+<h2 id="3-shared--held-fixed-across-every-learner">3. Shared / held-fixed across every learner</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Datasets</td>
+<td>all sites <strong>112 sites / 414 site-years</strong>; high tree cover <strong>93 / 395</strong></td>
+</tr>
+<tr>
+<td>Responses</td>
+<td>GPPsat, NEPmax, ETmax, uWUE, WUE</td>
+</tr>
+<tr>
+<td>Model set</td>
+<td>24 configs (M1–M8 × raw/anom × 12m/24m)</td>
+</tr>
+<tr>
+<td>Predictor selection</td>
+<td><code>get_predictor_cols()</code>, copied verbatim across all learner scripts</td>
+</tr>
+<tr>
+<td>Evaluation</td>
+<td>leave-one-site-out (LOSO), identical folds, same RMSE / MAE / R² definitions</td>
+</tr>
+<tr>
+<td>SHAP</td>
+<td>TreeSHAP on M4 / M6 / M8 (raw + anom), same per-site scheme and driver groups</td>
+</tr>
+<tr>
+<td>Seed</td>
+<td>42</td>
+</tr>
+<tr>
+<td>Parallelism</td>
+<td><code>mclapply</code> over LOSO folds; <code>OMP_NUM_THREADS=1</code> per worker</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="4-lightgbm-regularisation-sweep-2026-08-05">4. LightGBM regularisation sweep (2026-08-05)</h2>
+<p>Grouped 5-fold CV over <code>min_data_in_leaf</code> × <code>num_leaves</code>, on <code>M2_12m</code> (no memory, weak diffuse signal) and <code>M6_raw_12m</code> (one dominant predictor), all 5 responses. Script: <code>scripts/lgb_tune_regularisation.R</code>.</p>
+<p><strong>The shipped setting (<code>min_data_in_leaf = 5</code>, <code>num_leaves = 31</code>) is under-regularised.</strong> Mean CV-R² gain from the CV-selected config:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Model</th>
+<th>mean gain</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>M2_12m</code> (weak signal)</td>
+<td><strong>+0.042</strong></td>
+</tr>
+<tr>
+<td><code>M6_raw_12m</code> (strong signal)</td>
+<td>+0.025</td>
+</tr>
+</tbody>
+</table></div>
+<p>Largest single gain: <strong>WUE / M2_12m 0.028 → 0.118</strong>. Every combination improved; none got worse. The dominant knob is <strong><code>num_leaves</code></strong> (7 or 15 beats 31 nearly everywhere), not <code>min_data_in_leaf</code>. <code>min_data_in_leaf = 40</code> is uniformly bad and makes <code>num_leaves</code> irrelevant — the constraint binds.</p>
+<p><strong>Caveat:</strong> <code>num_leaves = 7</code> won 8 of 10 combinations and 7 was the smallest value tested — the optimum sits on the grid edge (the same mistake exp01 made with <code>mtry</code>). The grid was extended downward to <code>num_leaves ∈ {3, 5, 7, 15}</code> before adopting anything.</p>
+<p><strong>Fairness note.</strong> XGBoost and RF are at library defaults. A CV-tuned LightGBM compared against untuned RF/XGBoost is <strong>not</strong> a fair learner ranking — it is a <em>sensitivity check on LightGBM's configuration</em>. A fair head-to-head would require the same grouped-CV treatment for all three.</p>
+<p><strong>Planned (does not overwrite anything):</strong> tuned LightGBM will be written to <code>LGB_v10_tuned{,_all_sites}/</code>, <code>plots/V10/LightGBM_tuned/</code>, <code>table_LGB_tuned_LOSO_v10.tex</code>, and a fifth report-toggle option. The existing LightGBM results stay exactly as they are.</p>
+<hr />
+<h2 id="5-open-items">5. Open items</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" checked="" /><strong>DONE 2026-08-05</strong> — corrected <code>mtry ≈ p/3</code> → <code>⌊√p⌋</code> across: <code>RF_baseline_structure.md</code>, <code>exp01_hyperparams/README.md</code>, <code>exp02_always_split/README.md</code>, <code>XGBoost/README.md</code>, <code>XGBoost/metrics_comparison.md</code>, <code>LightGBM/README.md</code>, <code>LightGBM/metrics_comparison.md</code>, <code>V10_report.html</code> (Sections 10/11/12 + figure caption), <code>tuned_exp02/V10_report_tuned.html</code>, <code>rf_tune_01_hyperparams.R</code>, <code>rf_tune_01_plot_grid.R</code>, and regenerated <code>tuning_curves_mtry.png</code> (its subtitle had the wrong text baked in). Results unchanged throughout.</label></li>
+<li><label><input type="checkbox" />Consider trimming the D block (135 → ~12 columns: keep 3–4 metrics × 1 buffer × 3 lags) and re-testing. Prediction: the disturbance effect gets <strong>larger and cleaner</strong>, and the negative ΔR² values largely disappear — especially for RF.</label></li>
+<li><label><input type="checkbox" /><code>nrounds = 500</code> is held fixed for both boosters. With stronger regularisation this may slightly underfit; proper early stopping needs a validation split inside the LOSO protocol.</label></li>
+</ul>
+</div>
+<div class="footer">FluxNet &times; Mortality &middot; generated from daily_reports/*.md</div>
+</div></body></html>

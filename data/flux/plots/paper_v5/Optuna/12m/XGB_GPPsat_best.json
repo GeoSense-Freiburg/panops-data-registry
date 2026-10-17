@@ -1,0 +1,15 @@
+{
+  "learner": "XGB",
+  "response": "GPPsat",
+  "best_value": 0.86372339,
+  "n_trials": 50,
+  "params": {
+    "learning_rate": 0.012806895073863065,
+    "nrounds": 700,
+    "max_depth": 2,
+    "min_child_weight": 6.643415922652247,
+    "subsample": 0.5008700920677737,
+    "colsample_bytree": 0.26076479640598155,
+    "reg_lambda": 42.3612386860679
+  }
+}

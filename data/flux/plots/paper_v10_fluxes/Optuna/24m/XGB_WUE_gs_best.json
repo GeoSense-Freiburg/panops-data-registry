@@ -1,0 +1,15 @@
+{
+  "learner": "XGB",
+  "response": "WUE_gs",
+  "best_value": 0.87002394,
+  "n_trials": 50,
+  "params": {
+    "learning_rate": 0.018940323030757548,
+    "nrounds": 800,
+    "max_depth": 2,
+    "min_child_weight": 4.233091577080821,
+    "subsample": 0.9870818623959783,
+    "colsample_bytree": 0.45036926577097525,
+    "reg_lambda": 14.008255631639827
+  }
+}

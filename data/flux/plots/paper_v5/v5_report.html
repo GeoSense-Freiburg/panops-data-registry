@@ -1,0 +1,790 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Deadtrees v5 Results</title><style>
+:root{--bg:#ffffff;--fg:#1b1f24;--muted:#5b6470;--line:#d9dde3;--card:#f6f7f9;--accent:#0f6660;--warn:#9a5b00}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15181c;--fg:#e8eaed;--muted:#a3abb5;--line:#343a42;--card:#1e2227;--accent:#5fc4b8;--warn:#f0b35a}}
+:root[data-theme="dark"]{--bg:#15181c;--fg:#e8eaed;--muted:#a3abb5;--line:#343a42;--card:#1e2227;--accent:#5fc4b8;--warn:#f0b35a}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.55 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+main{max-width:1180px;margin:0 auto;padding:24px 16px 64px}h1{font-size:1.6rem;margin:.2em 0}h2{font-size:1.25rem;margin-top:2.2em;border-bottom:1px solid var(--line);padding-bottom:.3em}
+h3{font-size:1.05rem;margin-top:1.6em}h4{margin:.2em 0;color:var(--muted);font-size:.9rem}p,li{max-width:80ch}.muted{color:var(--muted)}
+nav{position:sticky;top:0;background:var(--bg);border-bottom:1px solid var(--line);padding:8px 16px;z-index:5;overflow-x:auto;white-space:nowrap}
+nav a{color:var(--accent);margin-right:14px;text-decoration:none;font-size:.9rem}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;margin:16px 0}.kpi{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.kpi b{display:block;font-size:.8rem;color:var(--muted);font-weight:600}.kpi span{font-size:.98rem}
+.tw{overflow-x:auto;margin:10px 0 18px}.tbl{border-collapse:collapse;font-size:.83rem;font-variant-numeric:tabular-nums}
+.tbl th,.tbl td{border-bottom:1px solid var(--line);padding:4px 8px;text-align:right;white-space:nowrap}.tbl th:first-child,.tbl td:first-child{text-align:left}
+.tbl thead th{color:var(--muted);font-weight:600}figure{margin:12px 0 22px}figcaption{color:var(--muted);font-size:.85rem;margin-top:4px}
+img{max-width:100%;height:auto;border:1px solid var(--line);border-radius:4px;background:#fff}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:14px}@media (max-width:820px){.pair{grid-template-columns:1fr}}
+.note{border-left:3px solid var(--warn);padding:6px 12px;background:var(--card)}.missing{color:var(--warn)}
+</style></head><body>
+<nav><a href="#summary">Summary</a><a href="#data">1. Datasets</a><a href="#skill">2. Skill (R²)</a><a href="#effect">3. Effect of mortality on prediction error</a><a href="#shap">4. What the models use (Fig 3)</a><a href="#direction">5. Direction of the effect (Fig 4)</a><a href="#more">6. Ecosystem type and mortality block</a><a href="#files">7. All v5 figures</a></nav><main>
+<h1>Tree mortality and EFPs - results with deadtrees v5</h1>
+<p class="muted">Generated 2026-10-06 by scripts/paper_v41/34_build_v5_report.py · paper_v5 vs paper_v41 · C+T vs C+T+M · repeated leave-one-site-out (3 × 80 %)</p>
+<section id="summary"><h2>Summary</h2>
+<p>The full EFP analysis (XGBoost and LightGBM, Optuna-tuned, repeated leave-one-site-out, TreeSHAP) was rerun on the
+<b>deadtrees v5</b> maps with exactly the same build rules and code as the v4.1 paper dataset. This report shows every
+v5 result next to v4.1. Nothing in the paper or the coauthor draft was changed.</p>
+<div class="kpis"><div class="kpi"><b>Sites / site-years</b><span>v4.1 104 sites / 381 site-years · v5 101 sites / 361 site-years</span></div><div class="kpi"><b>Mean R², C+T+M (XGB / LGB)</b><span>v4.1 0.438 / 0.442 · v5 0.407 / 0.408</span></div><div class="kpi"><b>Total mortality, shared site-years</b><span>r = 0.88, median change -1.3 pp</span></div><div class="kpi"><b>High total-mortality sites</b><span>v4.1 21 · v5 22 · shared 16</span></div></div>
+<p class="note">v5 (model v5001): newer labels, fixed label-uncertainty loss, prediction date one day later. Standing deadwood is
+lower at most sites, tree cover nearly unchanged on average; year-to-year changes depend on the model version more than levels do.</p></section><section id="data"><h2>1. Datasets</h2><ul><li>v4.1: 104 sites / 381 site-years; v5: 101 sites / 361 site-years</li><li>shared: 100 sites / 357 site-years</li><li>only in v4.1: [&#x27;CA-DB2&#x27;, &#x27;CA-LU1&#x27;, &#x27;FI-Var&#x27;, &#x27;US-BZB&#x27;]</li><li>only in v5: [&#x27;AU-How&#x27;]</li></ul><figure class="tw"><table class="dataframe tbl">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>mean_v41</th>
+      <th>mean_v5</th>
+      <th>median_change</th>
+      <th>r_site_years</th>
+      <th>r_spearman</th>
+    </tr>
+    <tr>
+      <th>metric</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>total mortality</th>
+      <td>13.285</td>
+      <td>12.284</td>
+      <td>-1.298</td>
+      <td>0.883</td>
+      <td>0.870</td>
+    </tr>
+    <tr>
+      <th>relative deadwood</th>
+      <td>10.873</td>
+      <td>9.336</td>
+      <td>-1.497</td>
+      <td>0.880</td>
+      <td>0.877</td>
+    </tr>
+    <tr>
+      <th>absolute deadwood</th>
+      <td>7.137</td>
+      <td>5.863</td>
+      <td>-1.051</td>
+      <td>0.857</td>
+      <td>0.842</td>
+    </tr>
+    <tr>
+      <th>tree cover (500 m)</th>
+      <td>69.027</td>
+      <td>67.605</td>
+      <td>-0.731</td>
+      <td>0.979</td>
+      <td>0.979</td>
+    </tr>
+  </tbody>
+</table><figcaption>Mortality metrics (mean of the five buffers) on the site-years present in both datasets.</figcaption></figure><figure class="tw"><table class="dataframe tbl">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>high_v41</th>
+      <th>high_v5</th>
+      <th>both</th>
+      <th>only_v41</th>
+      <th>only_v5</th>
+    </tr>
+    <tr>
+      <th>metric</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>total mortality</th>
+      <td>21</td>
+      <td>22</td>
+      <td>16</td>
+      <td>CA-DB2, CA-LU1, US-BZB, US-BZo, US-Rpf</td>
+      <td>AU-How, FI-Ken, FR-Bil, SE-Htm, US-CMW, US-xBN</td>
+    </tr>
+    <tr>
+      <th>relative deadwood</th>
+      <td>23</td>
+      <td>22</td>
+      <td>18</td>
+      <td>CA-DB2, CA-LU1, CZ-BK1, CZ-RAJ, IT-Lav</td>
+      <td>AU-How, FI-Ken, US-CMW, US-MtB</td>
+    </tr>
+  </tbody>
+</table><figcaption>High-mortality sites: site maximum above mean + 0.5 SD (mean of the five buffers).</figcaption></figure><figure><a href="fig1_site_map.png"><img src="fig1_site_map.png" loading="lazy" alt="Fig 1 (v5): sites and EFP distributions."></a><figcaption>Fig 1 (v5): sites and EFP distributions.</figcaption></figure></section><section id="skill"><h2>2. Skill (R²)</h2><figure class="tw"><table class="dataframe tbl">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>LGB v4.1</th>
+      <th>LGB v5</th>
+      <th>XGB v4.1</th>
+      <th>XGB v5</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>GPPsat · M3_12m</th>
+      <td>0.320</td>
+      <td>0.310</td>
+      <td>0.298</td>
+      <td>0.326</td>
+    </tr>
+    <tr>
+      <th>GPPsat · M4_12m</th>
+      <td>0.415</td>
+      <td>0.352</td>
+      <td>0.403</td>
+      <td>0.372</td>
+    </tr>
+    <tr>
+      <th>GPPsat · M3_24m</th>
+      <td>0.341</td>
+      <td>0.327</td>
+      <td>0.336</td>
+      <td>0.324</td>
+    </tr>
+    <tr>
+      <th>GPPsat · M4_24m</th>
+      <td>0.420</td>
+      <td>0.374</td>
+      <td>0.421</td>
+      <td>0.358</td>
+    </tr>
+    <tr>
+      <th>NEPmax · M3_12m</th>
+      <td>0.420</td>
+      <td>0.400</td>
+      <td>0.421</td>
+      <td>0.410</td>
+    </tr>
+    <tr>
+      <th>NEPmax · M4_12m</th>
+      <td>0.528</td>
+      <td>0.517</td>
+      <td>0.531</td>
+      <td>0.526</td>
+    </tr>
+    <tr>
+      <th>NEPmax · M3_24m</th>
+      <td>0.428</td>
+      <td>0.434</td>
+      <td>0.412</td>
+      <td>0.394</td>
+    </tr>
+    <tr>
+      <th>NEPmax · M4_24m</th>
+      <td>0.534</td>
+      <td>0.541</td>
+      <td>0.524</td>
+      <td>0.514</td>
+    </tr>
+    <tr>
+      <th>ETmax · M3_12m</th>
+      <td>0.419</td>
+      <td>0.437</td>
+      <td>0.428</td>
+      <td>0.434</td>
+    </tr>
+    <tr>
+      <th>ETmax · M4_12m</th>
+      <td>0.451</td>
+      <td>0.442</td>
+      <td>0.446</td>
+      <td>0.442</td>
+    </tr>
+    <tr>
+      <th>ETmax · M3_24m</th>
+      <td>0.426</td>
+      <td>0.432</td>
+      <td>0.419</td>
+      <td>0.440</td>
+    </tr>
+    <tr>
+      <th>ETmax · M4_24m</th>
+      <td>0.449</td>
+      <td>0.457</td>
+      <td>0.433</td>
+      <td>0.449</td>
+    </tr>
+    <tr>
+      <th>WUE · M3_12m</th>
+      <td>0.278</td>
+      <td>0.226</td>
+      <td>0.285</td>
+      <td>0.239</td>
+    </tr>
+    <tr>
+      <th>WUE · M4_12m</th>
+      <td>0.359</td>
+      <td>0.309</td>
+      <td>0.355</td>
+      <td>0.300</td>
+    </tr>
+    <tr>
+      <th>WUE · M3_24m</th>
+      <td>0.302</td>
+      <td>0.217</td>
+      <td>0.278</td>
+      <td>0.227</td>
+    </tr>
+    <tr>
+      <th>WUE · M4_24m</th>
+      <td>0.377</td>
+      <td>0.276</td>
+      <td>0.393</td>
+      <td>0.294</td>
+    </tr>
+  </tbody>
+</table><figcaption>R² under repeated leave-one-site-out, each version on its own sites.</figcaption></figure><figure class="tw"><table class="dataframe tbl">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>LGB v4.1</th>
+      <th>LGB v5</th>
+      <th>XGB v4.1</th>
+      <th>XGB v5</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>GPPsat · M3_12m</th>
+      <td>0.273</td>
+      <td>0.309</td>
+      <td>0.233</td>
+      <td>0.325</td>
+    </tr>
+    <tr>
+      <th>GPPsat · M4_12m</th>
+      <td>0.366</td>
+      <td>0.351</td>
+      <td>0.338</td>
+      <td>0.372</td>
+    </tr>
+    <tr>
+      <th>GPPsat · M3_24m</th>
+      <td>0.299</td>
+      <td>0.326</td>
+      <td>0.286</td>
+      <td>0.324</td>
+    </tr>
+    <tr>
+      <th>GPPsat · M4_24m</th>
+      <td>0.372</td>
+      <td>0.372</td>
+      <td>0.368</td>
+      <td>0.358</td>
+    </tr>
+    <tr>
+      <th>NEPmax · M3_12m</th>
+      <td>0.372</td>
+      <td>0.403</td>
+      <td>0.374</td>
+      <td>0.413</td>
+    </tr>
+    <tr>
+      <th>NEPmax · M4_12m</th>
+      <td>0.481</td>
+      <td>0.517</td>
+      <td>0.482</td>
+      <td>0.525</td>
+    </tr>
+    <tr>
+      <th>NEPmax · M3_24m</th>
+      <td>0.390</td>
+      <td>0.436</td>
+      <td>0.368</td>
+      <td>0.394</td>
+    </tr>
+    <tr>
+      <th>NEPmax · M4_24m</th>
+      <td>0.492</td>
+      <td>0.540</td>
+      <td>0.479</td>
+      <td>0.517</td>
+    </tr>
+    <tr>
+      <th>ETmax · M3_12m</th>
+      <td>0.390</td>
+      <td>0.428</td>
+      <td>0.398</td>
+      <td>0.425</td>
+    </tr>
+    <tr>
+      <th>ETmax · M4_12m</th>
+      <td>0.421</td>
+      <td>0.434</td>
+      <td>0.415</td>
+      <td>0.434</td>
+    </tr>
+    <tr>
+      <th>ETmax · M3_24m</th>
+      <td>0.395</td>
+      <td>0.424</td>
+      <td>0.390</td>
+      <td>0.431</td>
+    </tr>
+    <tr>
+      <th>ETmax · M4_24m</th>
+      <td>0.419</td>
+      <td>0.448</td>
+      <td>0.400</td>
+      <td>0.441</td>
+    </tr>
+    <tr>
+      <th>WUE · M3_12m</th>
+      <td>0.222</td>
+      <td>0.215</td>
+      <td>0.228</td>
+      <td>0.231</td>
+    </tr>
+    <tr>
+      <th>WUE · M4_12m</th>
+      <td>0.311</td>
+      <td>0.295</td>
+      <td>0.300</td>
+      <td>0.286</td>
+    </tr>
+    <tr>
+      <th>WUE · M3_24m</th>
+      <td>0.251</td>
+      <td>0.210</td>
+      <td>0.223</td>
+      <td>0.219</td>
+    </tr>
+    <tr>
+      <th>WUE · M4_24m</th>
+      <td>0.322</td>
+      <td>0.263</td>
+      <td>0.340</td>
+      <td>0.280</td>
+    </tr>
+  </tbody>
+</table><figcaption>R² on the site-years present in both datasets only - removes the effect of the different site sets.</figcaption></figure><figure class="tw"><table class="dataframe tbl">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>LGB v4.1</th>
+      <th>LGB v5</th>
+      <th>XGB v4.1</th>
+      <th>XGB v5</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>all sites</th>
+      <td>0.404</td>
+      <td>0.378</td>
+      <td>0.399</td>
+      <td>0.378</td>
+    </tr>
+    <tr>
+      <th>shared site-years</th>
+      <td>0.361</td>
+      <td>0.373</td>
+      <td>0.351</td>
+      <td>0.373</td>
+    </tr>
+  </tbody>
+</table><figcaption>Mean R² over all 16 tasks.</figcaption></figure></section><section id="effect"><h2>3. Effect of mortality on prediction error</h2><figure class="tw"><table class="dataframe tbl">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>XGB v4.1</th>
+      <th>XGB v5</th>
+      <th>LGB v4.1</th>
+      <th>LGB v5</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>GPPsat · 12m</th>
+      <td>-7.78</td>
+      <td>-3.48</td>
+      <td>-7.27</td>
+      <td>-3.05</td>
+    </tr>
+    <tr>
+      <th>GPPsat · 24m</th>
+      <td>-6.62</td>
+      <td>-2.54</td>
+      <td>-6.24</td>
+      <td>-3.53</td>
+    </tr>
+    <tr>
+      <th>NEPmax · 12m</th>
+      <td>-9.97</td>
+      <td>-10.36</td>
+      <td>-9.81</td>
+      <td>-10.21</td>
+    </tr>
+    <tr>
+      <th>NEPmax · 24m</th>
+      <td>-10.03</td>
+      <td>-10.48</td>
+      <td>-9.76</td>
+      <td>-9.97</td>
+    </tr>
+    <tr>
+      <th>ETmax · 12m</th>
+      <td>-1.59</td>
+      <td>-0.73</td>
+      <td>-2.78</td>
+      <td>-0.45</td>
+    </tr>
+    <tr>
+      <th>ETmax · 24m</th>
+      <td>-1.21</td>
+      <td>-0.88</td>
+      <td>-2.07</td>
+      <td>-2.19</td>
+    </tr>
+    <tr>
+      <th>WUE · 12m</th>
+      <td>-5.01</td>
+      <td>-4.10</td>
+      <td>-5.79</td>
+      <td>-5.56</td>
+    </tr>
+    <tr>
+      <th>WUE · 24m</th>
+      <td>-8.27</td>
+      <td>-4.44</td>
+      <td>-5.50</td>
+      <td>-3.87</td>
+    </tr>
+  </tbody>
+</table><figcaption>Change in overall RMSE when mortality is added (C+T → C+T+M), %. Negative = mortality helps.</figcaption></figure><figure class="tw"><table class="dataframe tbl">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>LightGBM (Optuna) v4.1</th>
+      <th>LightGBM (Optuna) v5</th>
+      <th>XGBoost (Optuna) v4.1</th>
+      <th>XGBoost (Optuna) v5</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>GPPsat · 12m</th>
+      <td>-7.7** (64%)</td>
+      <td>-2.8* (56%)</td>
+      <td>-6.7** (62%)</td>
+      <td>-4.0* (57%)</td>
+    </tr>
+    <tr>
+      <th>GPPsat · 24m</th>
+      <td>-5.2* (62%)</td>
+      <td>-5.2* (55%)</td>
+      <td>-5.2** (60%)</td>
+      <td>-3.8* (58%)</td>
+    </tr>
+    <tr>
+      <th>NEPmax · 12m</th>
+      <td>-12.8*** (73%)</td>
+      <td>-9.5*** (74%)</td>
+      <td>-11.1*** (74%)</td>
+      <td>-15.3*** (68%)</td>
+    </tr>
+    <tr>
+      <th>NEPmax · 24m</th>
+      <td>-10.2*** (70%)</td>
+      <td>-9.4*** (68%)</td>
+      <td>-11.8*** (73%)</td>
+      <td>-12.0*** (70%)</td>
+    </tr>
+    <tr>
+      <th>ETmax · 12m</th>
+      <td>-3.0** (59%)</td>
+      <td>-1.3 (58%)</td>
+      <td>-1.2 (57%)</td>
+      <td>-2.0 (58%)</td>
+    </tr>
+    <tr>
+      <th>ETmax · 24m</th>
+      <td>-1.6 (53%)</td>
+      <td>-3.1* (57%)</td>
+      <td>-2.1 (56%)</td>
+      <td>-2.6* (64%)</td>
+    </tr>
+    <tr>
+      <th>WUE · 12m</th>
+      <td>-2.6 (57%)</td>
+      <td>-1.3* (54%)</td>
+      <td>-2.5 (54%)</td>
+      <td>-1.9 (54%)</td>
+    </tr>
+    <tr>
+      <th>WUE · 24m</th>
+      <td>-3.9 (55%)</td>
+      <td>-1.0 (52%)</td>
+      <td>-8.2** (67%)</td>
+      <td>-3.9* (58%)</td>
+    </tr>
+  </tbody>
+</table><figcaption>Fig 2, all sites: median per-site change in RMSE (%), stars = BH-corrected one-sided Wilcoxon, (share of sites improved).</figcaption></figure><div class="pair"><div><h4>v4.1</h4><figure><a href="../paper_v41/fig2_mortality_effect.png"><img src="../paper_v41/fig2_mortality_effect.png" loading="lazy" alt="v4.1 · Fig 2, all sites"></a><figcaption>v4.1 · Fig 2, all sites</figcaption></figure></div><div><h4>v5</h4><figure><a href="fig2_mortality_effect.png"><img src="fig2_mortality_effect.png" loading="lazy" alt="v5 · Fig 2, all sites"></a><figcaption>v5 · Fig 2, all sites</figcaption></figure></div></div><h3>High-mortality sites</h3><figure class="tw"><table class="dataframe tbl">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>LightGBM (Optuna) v4.1</th>
+      <th>LightGBM (Optuna) v5</th>
+      <th>XGBoost (Optuna) v4.1</th>
+      <th>XGBoost (Optuna) v5</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>GPPsat · 12m</th>
+      <td>-15.5** (86%)</td>
+      <td>-3.1 (64%)</td>
+      <td>-14.5** (86%)</td>
+      <td>-4.1 (59%)</td>
+    </tr>
+    <tr>
+      <th>GPPsat · 24m</th>
+      <td>-12.1** (76%)</td>
+      <td>-4.1 (54%)</td>
+      <td>-10.3** (86%)</td>
+      <td>-7.3 (59%)</td>
+    </tr>
+    <tr>
+      <th>NEPmax · 12m</th>
+      <td>-17.5*** (95%)</td>
+      <td>-21.1** (91%)</td>
+      <td>-19.7*** (90%)</td>
+      <td>-20.4** (86%)</td>
+    </tr>
+    <tr>
+      <th>NEPmax · 24m</th>
+      <td>-16.5*** (86%)</td>
+      <td>-15.5** (82%)</td>
+      <td>-18.4*** (86%)</td>
+      <td>-20.9* (77%)</td>
+    </tr>
+    <tr>
+      <th>ETmax · 12m</th>
+      <td>-2.9* (67%)</td>
+      <td>0.8 (32%)</td>
+      <td>-3.4* (62%)</td>
+      <td>-1.2 (54%)</td>
+    </tr>
+    <tr>
+      <th>ETmax · 24m</th>
+      <td>-4.2* (62%)</td>
+      <td>-1.8 (59%)</td>
+      <td>-5.3* (62%)</td>
+      <td>-3.7 (73%)</td>
+    </tr>
+    <tr>
+      <th>WUE · 12m</th>
+      <td>-2.6 (52%)</td>
+      <td>-13.8* (68%)</td>
+      <td>-8.3* (67%)</td>
+      <td>-7.2 (73%)</td>
+    </tr>
+    <tr>
+      <th>WUE · 24m</th>
+      <td>-3.7 (57%)</td>
+      <td>-9.8* (64%)</td>
+      <td>-5.8 (62%)</td>
+      <td>-7.8* (77%)</td>
+    </tr>
+  </tbody>
+</table><figcaption>Fig 2b, high total-mortality sites.</figcaption></figure><div class="pair"><div><h4>v4.1</h4><figure><a href="../paper_v41/fig2_high_total_mort_mortality_effect.png"><img src="../paper_v41/fig2_high_total_mort_mortality_effect.png" loading="lazy" alt="v4.1 · Fig 2b, high total-mortality sites"></a><figcaption>v4.1 · Fig 2b, high total-mortality sites</figcaption></figure></div><div><h4>v5</h4><figure><a href="fig2_high_total_mort_mortality_effect.png"><img src="fig2_high_total_mort_mortality_effect.png" loading="lazy" alt="v5 · Fig 2b, high total-mortality sites"></a><figcaption>v5 · Fig 2b, high total-mortality sites</figcaption></figure></div></div><figure class="tw"><table class="dataframe tbl">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>LightGBM (Optuna) v4.1</th>
+      <th>LightGBM (Optuna) v5</th>
+      <th>XGBoost (Optuna) v4.1</th>
+      <th>XGBoost (Optuna) v5</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>GPPsat · 12m</th>
+      <td>-15.6* (74%)</td>
+      <td>-1.2 (59%)</td>
+      <td>-14.5* (74%)</td>
+      <td>-3.7 (54%)</td>
+    </tr>
+    <tr>
+      <th>GPPsat · 24m</th>
+      <td>-12.1* (70%)</td>
+      <td>-1.3 (50%)</td>
+      <td>-10.3* (74%)</td>
+      <td>-6.4 (59%)</td>
+    </tr>
+    <tr>
+      <th>NEPmax · 12m</th>
+      <td>-17.5* (83%)</td>
+      <td>-20.0** (86%)</td>
+      <td>-19.3* (78%)</td>
+      <td>-20.2** (82%)</td>
+    </tr>
+    <tr>
+      <th>NEPmax · 24m</th>
+      <td>-20.2* (74%)</td>
+      <td>-12.9** (82%)</td>
+      <td>-19.4* (83%)</td>
+      <td>-19.2 (73%)</td>
+    </tr>
+    <tr>
+      <th>ETmax · 12m</th>
+      <td>-8.7* (74%)</td>
+      <td>0.3 (46%)</td>
+      <td>-4.1* (70%)</td>
+      <td>-2.2 (59%)</td>
+    </tr>
+    <tr>
+      <th>ETmax · 24m</th>
+      <td>-4.3* (65%)</td>
+      <td>-3.9* (73%)</td>
+      <td>-7.7* (65%)</td>
+      <td>-6.2** (86%)</td>
+    </tr>
+    <tr>
+      <th>WUE · 12m</th>
+      <td>-0.2 (52%)</td>
+      <td>-13.8 (64%)</td>
+      <td>-7.7* (61%)</td>
+      <td>-9.5 (64%)</td>
+    </tr>
+    <tr>
+      <th>WUE · 24m</th>
+      <td>-2.9 (52%)</td>
+      <td>-5.9 (64%)</td>
+      <td>-1.6 (61%)</td>
+      <td>-5.4 (73%)</td>
+    </tr>
+  </tbody>
+</table><figcaption>Fig 2b, high relative-deadwood sites.</figcaption></figure><div class="pair"><div><h4>v4.1</h4><figure><a href="../paper_v41/fig2_high_rel_deadwood_mortality_effect.png"><img src="../paper_v41/fig2_high_rel_deadwood_mortality_effect.png" loading="lazy" alt="v4.1 · Fig 2b, high relative-deadwood sites"></a><figcaption>v4.1 · Fig 2b, high relative-deadwood sites</figcaption></figure></div><div><h4>v5</h4><figure><a href="fig2_high_rel_deadwood_mortality_effect.png"><img src="fig2_high_rel_deadwood_mortality_effect.png" loading="lazy" alt="v5 · Fig 2b, high relative-deadwood sites"></a><figcaption>v5 · Fig 2b, high relative-deadwood sites</figcaption></figure></div></div><div class="pair"><div><h4>v4.1</h4><figure><a href="../paper_v41/fig_site_dRMSE_total_mort.png"><img src="../paper_v41/fig_site_dRMSE_total_mort.png" loading="lazy" alt="v4.1 · per-site ΔRMSE coloured by total-mortality class"></a><figcaption>v4.1 · per-site ΔRMSE coloured by total-mortality class</figcaption></figure></div><div><h4>v5</h4><figure><a href="fig_site_dRMSE_total_mort.png"><img src="fig_site_dRMSE_total_mort.png" loading="lazy" alt="v5 · per-site ΔRMSE coloured by total-mortality class"></a><figcaption>v5 · per-site ΔRMSE coloured by total-mortality class</figcaption></figure></div></div></section><section id="shap"><h2>4. What the models use (Fig 3)</h2><div class="pair"><div><h4>v4.1</h4><figure><a href="../paper_v41/fig3b_signed_total_mort_24m_LGB_landscape.png"><img src="../paper_v41/fig3b_signed_total_mort_24m_LGB_landscape.png" loading="lazy" alt="v4.1 · Fig 3, net signed mortality SHAP per site, LightGBM, 24 months"></a><figcaption>v4.1 · Fig 3, net signed mortality SHAP per site, LightGBM, 24 months</figcaption></figure></div><div><h4>v5</h4><figure><a href="fig3b_signed_total_mort_24m_LGB_landscape.png"><img src="fig3b_signed_total_mort_24m_LGB_landscape.png" loading="lazy" alt="v5 · Fig 3, net signed mortality SHAP per site, LightGBM, 24 months"></a><figcaption>v5 · Fig 3, net signed mortality SHAP per site, LightGBM, 24 months</figcaption></figure></div></div><div class="pair"><div><h4>v4.1</h4><figure><a href="../paper_v41/fig3b_signed_total_mort_12m_LGB_landscape.png"><img src="../paper_v41/fig3b_signed_total_mort_12m_LGB_landscape.png" loading="lazy" alt="v4.1 · Fig 3, LightGBM, 12 months"></a><figcaption>v4.1 · Fig 3, LightGBM, 12 months</figcaption></figure></div><div><h4>v5</h4><figure><a href="fig3b_signed_total_mort_12m_LGB_landscape.png"><img src="fig3b_signed_total_mort_12m_LGB_landscape.png" loading="lazy" alt="v5 · Fig 3, LightGBM, 12 months"></a><figcaption>v5 · Fig 3, LightGBM, 12 months</figcaption></figure></div></div><div class="pair"><div><h4>v4.1</h4><figure><a href="../paper_v41/fig3b_signed_total_mort_24m_XGB_landscape.png"><img src="../paper_v41/fig3b_signed_total_mort_24m_XGB_landscape.png" loading="lazy" alt="v4.1 · Fig 3, XGBoost, 24 months"></a><figcaption>v4.1 · Fig 3, XGBoost, 24 months</figcaption></figure></div><div><h4>v5</h4><figure><a href="fig3b_signed_total_mort_24m_XGB_landscape.png"><img src="fig3b_signed_total_mort_24m_XGB_landscape.png" loading="lazy" alt="v5 · Fig 3, XGBoost, 24 months"></a><figcaption>v5 · Fig 3, XGBoost, 24 months</figcaption></figure></div></div><div class="pair"><div><h4>v4.1</h4><figure><a href="../paper_v41/fig3_total_mort_24m_LGB_landscape.png"><img src="../paper_v41/fig3_total_mort_24m_LGB_landscape.png" loading="lazy" alt="v4.1 · driver composition (|SHAP|), LightGBM, 24 months"></a><figcaption>v4.1 · driver composition (|SHAP|), LightGBM, 24 months</figcaption></figure></div><div><h4>v5</h4><figure><a href="fig3_total_mort_24m_LGB_landscape.png"><img src="fig3_total_mort_24m_LGB_landscape.png" loading="lazy" alt="v5 · driver composition (|SHAP|), LightGBM, 24 months"></a><figcaption>v5 · driver composition (|SHAP|), LightGBM, 24 months</figcaption></figure></div></div></section><section id="direction"><h2>5. Direction of the effect (Fig 4)</h2><figure class="tw"><table class="dataframe tbl">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>LightGBM (Optuna) v4.1</th>
+      <th>LightGBM (Optuna) v5</th>
+      <th>XGBoost (Optuna) v4.1</th>
+      <th>XGBoost (Optuna) v5</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>relative deadwood · ETmax · 12m</th>
+      <td>-0.004 vs 0.001 ns</td>
+      <td>-0.002 vs 0.0 ns</td>
+      <td>-0.003 vs 0.001 ns</td>
+      <td>-0.002 vs 0.001 ns</td>
+    </tr>
+    <tr>
+      <th>relative deadwood · ETmax · 24m</th>
+      <td>-0.005 vs 0.002 ns</td>
+      <td>-0.003 vs 0.001 ns</td>
+      <td>-0.006 vs 0.002*</td>
+      <td>-0.003 vs 0.002 ns</td>
+    </tr>
+    <tr>
+      <th>relative deadwood · GPPsat · 12m</th>
+      <td>-1.56 vs 0.282**</td>
+      <td>-1.506 vs 0.297***</td>
+      <td>-1.771 vs 0.595***</td>
+      <td>-1.683 vs 0.654***</td>
+    </tr>
+    <tr>
+      <th>relative deadwood · GPPsat · 24m</th>
+      <td>-1.382 vs 0.464**</td>
+      <td>-1.792 vs 0.059***</td>
+      <td>-1.437 vs 0.522**</td>
+      <td>-1.582 vs 0.037***</td>
+    </tr>
+    <tr>
+      <th>relative deadwood · NEPmax · 12m</th>
+      <td>-0.722 vs 0.14**</td>
+      <td>-1.331 vs 0.183***</td>
+      <td>-0.924 vs 0.182**</td>
+      <td>-1.393 vs 0.204***</td>
+    </tr>
+    <tr>
+      <th>relative deadwood · NEPmax · 24m</th>
+      <td>-0.819 vs 0.215**</td>
+      <td>-1.503 vs 0.291***</td>
+      <td>-0.905 vs 0.443**</td>
+      <td>-1.532 vs 0.193***</td>
+    </tr>
+    <tr>
+      <th>relative deadwood · WUE · 12m</th>
+      <td>-0.2 vs 0.101**</td>
+      <td>-0.326 vs 0.113***</td>
+      <td>-0.249 vs 0.099***</td>
+      <td>-0.298 vs 0.115***</td>
+    </tr>
+    <tr>
+      <th>relative deadwood · WUE · 24m</th>
+      <td>-0.264 vs 0.111**</td>
+      <td>-0.333 vs 0.084***</td>
+      <td>-0.297 vs 0.098**</td>
+      <td>-0.326 vs 0.08***</td>
+    </tr>
+    <tr>
+      <th>total mortality · ETmax · 12m</th>
+      <td>-0.006 vs 0.002*</td>
+      <td>-0.003 vs 0.001*</td>
+      <td>-0.003 vs 0.001*</td>
+      <td>-0.002 vs 0.001 ns</td>
+    </tr>
+    <tr>
+      <th>total mortality · ETmax · 24m</th>
+      <td>-0.006 vs 0.002**</td>
+      <td>-0.004 vs 0.002*</td>
+      <td>-0.006 vs 0.002**</td>
+      <td>-0.005 vs 0.002**</td>
+    </tr>
+    <tr>
+      <th>total mortality · GPPsat · 12m</th>
+      <td>-1.955 vs 0.282***</td>
+      <td>-1.592 vs 0.268***</td>
+      <td>-2.051 vs 0.595***</td>
+      <td>-1.751 vs 0.497***</td>
+    </tr>
+    <tr>
+      <th>total mortality · GPPsat · 24m</th>
+      <td>-1.761 vs 0.464***</td>
+      <td>-1.896 vs -0.026***</td>
+      <td>-2.321 vs 0.522***</td>
+      <td>-1.736 vs 0.037***</td>
+    </tr>
+    <tr>
+      <th>total mortality · NEPmax · 12m</th>
+      <td>-1.353 vs 0.148***</td>
+      <td>-1.755 vs 0.127***</td>
+      <td>-1.549 vs 0.243***</td>
+      <td>-1.565 vs 0.204***</td>
+    </tr>
+    <tr>
+      <th>total mortality · NEPmax · 24m</th>
+      <td>-1.474 vs 0.215***</td>
+      <td>-1.852 vs 0.267***</td>
+      <td>-1.59 vs 0.443***</td>
+      <td>-1.871 vs 0.183***</td>
+    </tr>
+    <tr>
+      <th>total mortality · WUE · 12m</th>
+      <td>-0.2 vs 0.108***</td>
+      <td>-0.239 vs 0.113***</td>
+      <td>-0.238 vs 0.115***</td>
+      <td>-0.224 vs 0.115***</td>
+    </tr>
+    <tr>
+      <th>total mortality · WUE · 24m</th>
+      <td>-0.214 vs 0.111***</td>
+      <td>-0.203 vs 0.084***</td>
+      <td>-0.313 vs 0.111***</td>
+      <td>-0.214 vs 0.08***</td>
+    </tr>
+  </tbody>
+</table><figcaption>Fig 4: median net signed mortality SHAP, High vs Low+Mid sites; stars = BH-corrected Mann-Whitney U.</figcaption></figure><div class="pair"><div><h4>v4.1</h4><figure><a href="../paper_v41/fig4_signed_shap_total_mort.png"><img src="../paper_v41/fig4_signed_shap_total_mort.png" loading="lazy" alt="v4.1 · Fig 4, split by total mortality"></a><figcaption>v4.1 · Fig 4, split by total mortality</figcaption></figure></div><div><h4>v5</h4><figure><a href="fig4_signed_shap_total_mort.png"><img src="fig4_signed_shap_total_mort.png" loading="lazy" alt="v5 · Fig 4, split by total mortality"></a><figcaption>v5 · Fig 4, split by total mortality</figcaption></figure></div></div><div class="pair"><div><h4>v4.1</h4><figure><a href="../paper_v41/fig4_signed_shap_rel_deadwood.png"><img src="../paper_v41/fig4_signed_shap_rel_deadwood.png" loading="lazy" alt="v4.1 · Fig 4, split by relative deadwood"></a><figcaption>v4.1 · Fig 4, split by relative deadwood</figcaption></figure></div><div><h4>v5</h4><figure><a href="fig4_signed_shap_rel_deadwood.png"><img src="fig4_signed_shap_rel_deadwood.png" loading="lazy" alt="v5 · Fig 4, split by relative deadwood"></a><figcaption>v5 · Fig 4, split by relative deadwood</figcaption></figure></div></div></section><section id="more"><h2>6. Ecosystem type and mortality block</h2><div class="pair"><div><h4>v4.1</h4><figure><a href="../paper_v41/fig5_igbp_board_24m_XGB.png"><img src="../paper_v41/fig5_igbp_board_24m_XGB.png" loading="lazy" alt="v4.1 · Fig 5 IGBP board, XGBoost, 24 months"></a><figcaption>v4.1 · Fig 5 IGBP board, XGBoost, 24 months</figcaption></figure></div><div><h4>v5</h4><figure><a href="fig5_igbp_board_24m_XGB.png"><img src="fig5_igbp_board_24m_XGB.png" loading="lazy" alt="v5 · Fig 5 IGBP board, XGBoost, 24 months"></a><figcaption>v5 · Fig 5 IGBP board, XGBoost, 24 months</figcaption></figure></div></div><div class="pair"><div><h4>v4.1</h4><figure><a href="../paper_v41/mortality_split/mortality_composition_concept_LGB.png"><img src="../paper_v41/mortality_split/mortality_composition_concept_LGB.png" loading="lazy" alt="v4.1 · Composition of the mortality block, LightGBM"></a><figcaption>v4.1 · Composition of the mortality block, LightGBM</figcaption></figure></div><div><h4>v5</h4><figure><a href="mortality_split/mortality_composition_concept_LGB.png"><img src="mortality_split/mortality_composition_concept_LGB.png" loading="lazy" alt="v5 · Composition of the mortality block, LightGBM"></a><figcaption>v5 · Composition of the mortality block, LightGBM</figcaption></figure></div></div></section><section id="files"><h2>7. All v5 figures</h2><ul><li><a href="fig1_site_map.png">fig1_site_map.png</a></li><li><a href="fig2_high_rel_deadwood_mortality_effect.png">fig2_high_rel_deadwood_mortality_effect.png</a></li><li><a href="fig2_high_total_mort_mortality_effect.png">fig2_high_total_mort_mortality_effect.png</a></li><li><a href="fig2_mortality_effect.png">fig2_mortality_effect.png</a></li><li><a href="fig3_abs_deadwood_12m_LGB.png">fig3_abs_deadwood_12m_LGB.png</a></li><li><a href="fig3_abs_deadwood_12m_LGB_landscape.png">fig3_abs_deadwood_12m_LGB_landscape.png</a></li><li><a href="fig3_abs_deadwood_12m_XGB.png">fig3_abs_deadwood_12m_XGB.png</a></li><li><a href="fig3_abs_deadwood_12m_XGB_landscape.png">fig3_abs_deadwood_12m_XGB_landscape.png</a></li><li><a href="fig3_abs_deadwood_24m_LGB.png">fig3_abs_deadwood_24m_LGB.png</a></li><li><a href="fig3_abs_deadwood_24m_LGB_landscape.png">fig3_abs_deadwood_24m_LGB_landscape.png</a></li><li><a href="fig3_abs_deadwood_24m_XGB.png">fig3_abs_deadwood_24m_XGB.png</a></li><li><a href="fig3_abs_deadwood_24m_XGB_landscape.png">fig3_abs_deadwood_24m_XGB_landscape.png</a></li><li><a href="fig3_rel_deadwood_12m_LGB.png">fig3_rel_deadwood_12m_LGB.png</a></li><li><a href="fig3_rel_deadwood_12m_LGB_landscape.png">fig3_rel_deadwood_12m_LGB_landscape.png</a></li><li><a href="fig3_rel_deadwood_12m_XGB.png">fig3_rel_deadwood_12m_XGB.png</a></li><li><a href="fig3_rel_deadwood_12m_XGB_landscape.png">fig3_rel_deadwood_12m_XGB_landscape.png</a></li><li><a href="fig3_rel_deadwood_24m_LGB.png">fig3_rel_deadwood_24m_LGB.png</a></li><li><a href="fig3_rel_deadwood_24m_LGB_landscape.png">fig3_rel_deadwood_24m_LGB_landscape.png</a></li><li><a href="fig3_rel_deadwood_24m_XGB.png">fig3_rel_deadwood_24m_XGB.png</a></li><li><a href="fig3_rel_deadwood_24m_XGB_landscape.png">fig3_rel_deadwood_24m_XGB_landscape.png</a></li><li><a href="fig3_total_mort_12m_LGB.png">fig3_total_mort_12m_LGB.png</a></li><li><a href="fig3_total_mort_12m_LGB_landscape.png">fig3_total_mort_12m_LGB_landscape.png</a></li><li><a href="fig3_total_mort_12m_XGB.png">fig3_total_mort_12m_XGB.png</a></li><li><a href="fig3_total_mort_12m_XGB_landscape.png">fig3_total_mort_12m_XGB_landscape.png</a></li><li><a href="fig3_total_mort_24m_LGB.png">fig3_total_mort_24m_LGB.png</a></li><li><a href="fig3_total_mort_24m_LGB_landscape.png">fig3_total_mort_24m_LGB_landscape.png</a></li><li><a href="fig3_total_mort_24m_XGB.png">fig3_total_mort_24m_XGB.png</a></li><li><a href="fig3_total_mort_24m_XGB_landscape.png">fig3_total_mort_24m_XGB_landscape.png</a></li><li><a href="fig3b_signed_abs_deadwood_12m_LGB.png">fig3b_signed_abs_deadwood_12m_LGB.png</a></li><li><a href="fig3b_signed_abs_deadwood_12m_LGB_landscape.png">fig3b_signed_abs_deadwood_12m_LGB_landscape.png</a></li><li><a href="fig3b_signed_abs_deadwood_12m_XGB.png">fig3b_signed_abs_deadwood_12m_XGB.png</a></li><li><a href="fig3b_signed_abs_deadwood_12m_XGB_landscape.png">fig3b_signed_abs_deadwood_12m_XGB_landscape.png</a></li><li><a href="fig3b_signed_abs_deadwood_24m_LGB.png">fig3b_signed_abs_deadwood_24m_LGB.png</a></li><li><a href="fig3b_signed_abs_deadwood_24m_LGB_landscape.png">fig3b_signed_abs_deadwood_24m_LGB_landscape.png</a></li><li><a href="fig3b_signed_abs_deadwood_24m_XGB.png">fig3b_signed_abs_deadwood_24m_XGB.png</a></li><li><a href="fig3b_signed_abs_deadwood_24m_XGB_landscape.png">fig3b_signed_abs_deadwood_24m_XGB_landscape.png</a></li><li><a href="fig3b_signed_rel_deadwood_12m_LGB.png">fig3b_signed_rel_deadwood_12m_LGB.png</a></li><li><a href="fig3b_signed_rel_deadwood_12m_LGB_landscape.png">fig3b_signed_rel_deadwood_12m_LGB_landscape.png</a></li><li><a href="fig3b_signed_rel_deadwood_12m_XGB.png">fig3b_signed_rel_deadwood_12m_XGB.png</a></li><li><a href="fig3b_signed_rel_deadwood_12m_XGB_landscape.png">fig3b_signed_rel_deadwood_12m_XGB_landscape.png</a></li><li><a href="fig3b_signed_rel_deadwood_24m_LGB.png">fig3b_signed_rel_deadwood_24m_LGB.png</a></li><li><a href="fig3b_signed_rel_deadwood_24m_LGB_landscape.png">fig3b_signed_rel_deadwood_24m_LGB_landscape.png</a></li><li><a href="fig3b_signed_rel_deadwood_24m_XGB.png">fig3b_signed_rel_deadwood_24m_XGB.png</a></li><li><a href="fig3b_signed_rel_deadwood_24m_XGB_landscape.png">fig3b_signed_rel_deadwood_24m_XGB_landscape.png</a></li><li><a href="fig3b_signed_total_mort_12m_LGB.png">fig3b_signed_total_mort_12m_LGB.png</a></li><li><a href="fig3b_signed_total_mort_12m_LGB_landscape.png">fig3b_signed_total_mort_12m_LGB_landscape.png</a></li><li><a href="fig3b_signed_total_mort_12m_XGB.png">fig3b_signed_total_mort_12m_XGB.png</a></li><li><a href="fig3b_signed_total_mort_12m_XGB_landscape.png">fig3b_signed_total_mort_12m_XGB_landscape.png</a></li><li><a href="fig3b_signed_total_mort_24m_LGB.png">fig3b_signed_total_mort_24m_LGB.png</a></li><li><a href="fig3b_signed_total_mort_24m_LGB_landscape.png">fig3b_signed_total_mort_24m_LGB_landscape.png</a></li><li><a href="fig3b_signed_total_mort_24m_XGB.png">fig3b_signed_total_mort_24m_XGB.png</a></li><li><a href="fig3b_signed_total_mort_24m_XGB_landscape.png">fig3b_signed_total_mort_24m_XGB_landscape.png</a></li><li><a href="fig4_signed_shap_rel_deadwood.png">fig4_signed_shap_rel_deadwood.png</a></li><li><a href="fig4_signed_shap_total_mort.png">fig4_signed_shap_total_mort.png</a></li><li><a href="fig5_igbp_board_12m_LGB.png">fig5_igbp_board_12m_LGB.png</a></li><li><a href="fig5_igbp_board_12m_XGB.png">fig5_igbp_board_12m_XGB.png</a></li><li><a href="fig5_igbp_board_24m_LGB.png">fig5_igbp_board_24m_LGB.png</a></li><li><a href="fig5_igbp_board_24m_XGB.png">fig5_igbp_board_24m_XGB.png</a></li><li><a href="fig_site_dRMSE_rel_deadwood.png">fig_site_dRMSE_rel_deadwood.png</a></li><li><a href="fig_site_dRMSE_total_mort.png">fig_site_dRMSE_total_mort.png</a></li></ul></section>
+</main></body></html>

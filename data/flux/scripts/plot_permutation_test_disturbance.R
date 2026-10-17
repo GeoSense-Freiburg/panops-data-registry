@@ -1,0 +1,88 @@
+#!/usr/bin/env Rscript
+# ============================================================================
+# Figure for the block-permutation test (scripts/permutation_test_disturbance.R),
+# addressing Rene's meeting question: is the M3->M4 RMSE improvement real
+# disturbance information, or just an artifact of M4 having ~100 more columns?
+#
+# For each EFP: the null distribution is built by block-permuting the D
+# block's rows (breaking its link to y/climate/traits, keeping its own
+# internal structure) and retraining M4 under identical LOSO folds/
+# hyperparameters, N_PERM=10 times. Real M4 is plotted against that null,
+# with the M3 (no disturbance) baseline as a reference line.
+# ============================================================================
+suppressMessages({library(data.table); library(ggplot2)})
+setwd("/mnt/gsdata/projects/panops/panops-data-registry/data/flux")
+OUT <- "plots/V10/disturbance_split"
+
+args <- commandArgs(trailingOnly = TRUE)
+N_PERM  <- if (length(args) >= 1) as.integer(args[1]) else 10
+LEARNER <- if (length(args) >= 2) args[2] else "XGB"
+CV_MODE <- if (length(args) >= 3) args[3] else "loso"
+OUT_SUFFIX <- sprintf("_%s_%s_n%d", LEARNER, CV_MODE, N_PERM)
+LOG_FILE <- if (length(args) >= 4) args[4] else sprintf("logs/permutation_test_disturbance_%s_%s_n%d.log", LEARNER, CV_MODE, N_PERM)
+
+# per-EFP null RMSEs are only in the run log, not the summary CSV - reparse
+log_lines <- readLines(LOG_FILE)
+resp_hdr <- grep("^=== (GPPsat|NEPmax|ETmax|WUE) \\(", log_lines)
+if (length(resp_hdr) == 0) resp_hdr <- grep("^=== (GPPsat|NEPmax|ETmax|WUE) ===$", log_lines)  # old-format logs (XGB/loso, no learner/cv_mode in header)
+resp_names <- gsub("^=== ([A-Za-z]+).*$", "\\1", log_lines[resp_hdr])
+perm_rows <- list()
+for (i in seq_along(resp_hdr)) {
+  seg_end <- if (i < length(resp_hdr)) resp_hdr[i+1] - 1 else length(log_lines)
+  seg <- log_lines[resp_hdr[i]:seg_end]
+  vals <- as.numeric(gsub(".*RMSE = ", "", grep("perm ", seg, value = TRUE)))
+  perm_rows[[resp_names[i]]] <- data.table(response = resp_names[i], rmse_perm = vals)
+}
+perm_dt <- rbindlist(perm_rows)
+
+summary_dt <- fread(file.path(OUT, sprintf("permutation_test_disturbance_12m%s.csv", OUT_SUFFIX)))
+EFP_ORDER <- c("GPPsat","NEPmax","ETmax","WUE")
+EFP_LAB <- c(GPPsat="GPPsat", NEPmax="NEPmax", ETmax="ETmax", WUE="WUE")
+perm_dt[, response := factor(response, EFP_ORDER)]
+summary_dt[, response := factor(response, EFP_ORDER)]
+summary_dt[, sig_lab := sprintf("p=%.4f%s", p_perm, ifelse(p_perm <= 1/(n_perm+1)+1e-9,
+                                 sprintf("  (best possible at n=%d)", N_PERM), ""))]
+perm_x_lab <- sprintf("Permuted D\n(null, n=%d)", N_PERM)
+
+BG <- "white"; GRID <- "#D9D9D9"; TXT <- "#111111"; AX <- "#444444"
+th <- theme_bw(base_size = 11) + theme(
+  plot.background = element_rect(fill = BG, colour = NA),
+  panel.background = element_rect(fill = BG, colour = NA),
+  panel.border = element_rect(colour = GRID, fill = NA, linewidth = 0.4),
+  panel.grid.major.x = element_blank(),
+  panel.grid.minor = element_blank(),
+  strip.background = element_rect(fill = "#EFEFEF", colour = GRID),
+  strip.text = element_text(colour = TXT, size = 10, face = "bold"),
+  axis.text = element_text(colour = AX, size = 9),
+  axis.title = element_text(colour = AX, size = 10, face = "bold"),
+  plot.title = element_text(colour = TXT, size = 14, face = "bold"),
+  plot.subtitle = element_text(colour = AX, size = 9),
+  plot.caption = element_text(colour = AX, size = 8, hjust = 0),
+  legend.position = "bottom")
+
+p <- ggplot() +
+  geom_jitter(data = perm_dt, aes(x = perm_x_lab, y = rmse_perm, colour = "Permuted D (null)"),
+              width = 0.08, size = 1.8, alpha = 0.7) +
+  geom_boxplot(data = perm_dt, aes(x = perm_x_lab, y = rmse_perm),
+               width = 0.35, outlier.shape = NA, fill = NA, colour = "#555555", linewidth = 0.4) +
+  geom_point(data = summary_dt, aes(x = "M3\n(no disturbance)", y = rmse_M3, colour = "M3 baseline"),
+             size = 3, shape = 18) +
+  geom_point(data = summary_dt, aes(x = "M4 real D\n(actual data)", y = rmse_M4_real, colour = "M4 real disturbance"),
+             size = 3.2, shape = 18) +
+  geom_text(data = summary_dt, aes(x = "M4 real D\n(actual data)", y = rmse_M4_real, label = sig_lab),
+            vjust = -1.3, size = 2.9, colour = TXT, fontface = "bold") +
+  scale_colour_manual(values = c("Permuted D (null)" = "#8C8C8C", "M3 baseline" = "#B0413E",
+                                  "M4 real disturbance" = "#2E6F40"), name = NULL) +
+  facet_wrap(~response, scales = "free_y", nrow = 1, labeller = labeller(response = EFP_LAB)) +
+  labs(title = "Permutation test: is the disturbance-block RMSE gain real information, or added flexibility?",
+       subtitle = sprintf("%s-Optuna, tc>=30 (93 sites / 395 site-years), 12-month window, %s CV | Null = M4 retrained with the disturbance block's rows block-permuted (%d reps)",
+                           c(XGB="XGBoost", LGB="LightGBM")[LEARNER],
+                           c(loso="LOSO", repeated="repeated LOSO (3x80% site subsample)")[CV_MODE], N_PERM),
+       x = NULL, y = sprintf("%sRMSE", if (CV_MODE == "repeated") "Mean-of-3-reps " else ""),
+       caption = sprintf("p = (# permuted reps with RMSE <= real M4 RMSE + 1) / (n_perm + 1), one-sided. Floor at n_perm=%d is p=%.4f (real M4 beating all %d/%d permutations).\nETmax's real M4 falling inside the null cloud is expected: disturbance did not improve ETmax in the main results either - an internal negative control.",
+                          N_PERM, 1/(N_PERM+1), N_PERM, N_PERM)) +
+  th
+
+ggsave(file.path(OUT, sprintf("permutation_test_disturbance_12m%s.png", OUT_SUFFIX)), p, width = 13, height = 5.5, dpi = 300, bg = BG)
+ggsave(file.path(OUT, sprintf("permutation_test_disturbance_12m%s.pdf", OUT_SUFFIX)), p, width = 13, height = 5.5, bg = BG)
+cat("Saved:", file.path(OUT, sprintf("permutation_test_disturbance_12m%s.png", OUT_SUFFIX)), "\n")

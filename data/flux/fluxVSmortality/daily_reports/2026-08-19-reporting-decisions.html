@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>V10 — Model selection and reporting decisions</title><style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0D0D0D;color:#E0E0E0;font-family:Arial,Helvetica,sans-serif;line-height:1.6;padding:28px 18px 60px}
+a{color:#22D4EB;text-decoration:none} a:hover{text-decoration:underline}
+.wrap{max-width:900px;margin:0 auto}
+.nav{font-size:.85em;color:#6B7280;margin-bottom:22px} .nav a{margin-right:14px}
+h1{font-size:1.65em;color:#fff;line-height:1.25;margin-bottom:6px;letter-spacing:-.01em}
+.article h1{display:none}
+.article h2{font-size:1.3em;color:#22D4EB;margin:34px 0 12px;padding-bottom:6px;border-bottom:1px solid #22D4EB55}
+.article h3{font-size:1.1em;color:#E5E7EB;margin:24px 0 8px}
+.article h4{font-size:1em;color:#9CA3AF;margin:18px 0 6px}
+.article p{margin:10px 0} .article ul,.article ol{margin:8px 0 8px 24px} .article li{margin:4px 0}
+.article hr{border:0;border-top:1px solid #2A2A3A;margin:26px 0}
+.article blockquote{border-left:3px solid #22D4EB;padding:2px 14px;color:#9CA3AF;margin:12px 0}
+.article code{background:#1F2937;border-radius:4px;padding:1px 5px;font-size:.88em;color:#A7F3D0;font-family:Consolas,Menlo,monospace}
+.article pre{background:#111827;border:1px solid #2A2A3A;border-radius:8px;padding:12px 14px;overflow-x:auto;margin:12px 0}
+.article pre code{background:none;padding:0;color:#E5E7EB}
+.tw{overflow-x:auto;margin:14px 0}
+.article table{border-collapse:collapse;font-size:.88em;min-width:60%}
+.article th{background:#1F2937;color:#22D4EB;text-align:left}
+.article th,.article td{border:1px solid #2A2A3A;padding:6px 10px;vertical-align:top}
+.article tr:nth-child(even) td{background:#111827}
+.article img{max-width:100%;height:auto;background:#fff;border-radius:6px;margin:12px 0 4px;display:block}
+.article em{color:#9CA3AF}
+.badge{display:inline-block;font-size:.75em;background:#1F2937;border:1px solid #374151;border-radius:4px;padding:2px 8px;color:#9CA3AF;margin-right:6px}
+.meta{margin:6px 0 22px}
+.footer{margin-top:50px;font-size:.75em;color:#4B5563;text-align:center}
+
+.month{font-size:1.05em;color:#22D4EB;margin:34px 0 12px;padding-bottom:6px;border-bottom:1px solid #22D4EB55}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.card{display:flex;flex-direction:column;gap:8px;background:#111827;border:1px solid #2A2A3A;border-radius:12px;padding:20px 20px;color:#E0E0E0;transition:border-color .2s,transform .15s}
+.card:hover{border-color:#22D4EB;transform:translateY(-2px);text-decoration:none}
+.card-title{font-size:1.02em;font-weight:bold;color:#22D4EB;line-height:1.3}
+.card-desc{font-size:.83em;color:#9CA3AF;line-height:1.5}
+.card-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto;padding-top:4px}
+.tag{font-size:.72em;background:#1F2937;border:1px solid #374151;border-radius:4px;padding:2px 8px;color:#6B7280}
+#q{width:100%;background:#111827;border:1px solid #2A2A3A;border-radius:8px;color:#E0E0E0;padding:10px 14px;font-size:.95em;margin:14px 0 4px}
+#q:focus{outline:none;border-color:#22D4EB}
+.sub{color:#9CA3AF;font-size:.9em}
+</style></head>
+<body><div class="wrap">
+<div class="nav"><a href="index.html">&larr; Daily reports</a><a href="../index.html">Hub</a></div>
+<h1>V10 — Model selection and reporting decisions</h1><div class="meta"><span class="badge">2026-08-19</span><span class="badge">11 tables</span></div>
+<div class="article"><h1 id="v10--model-selection-and-reporting-decisions">V10 — Model selection and reporting decisions</h1>
+<p><strong>Date:</strong> 2026-08-19 <strong>Question addressed:</strong> which dataset, cross-validation structure, learner and model subset to report in the manuscript, and what the results actually support.</p>
+<hr />
+<h2 id="decisions">Decisions</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>choice</th>
+<th>selected</th>
+<th>role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Dataset</strong></td>
+<td>tree cover ≥30% — 93 sites, 395 site-years</td>
+<td>main text</td>
+</tr>
+<tr>
+<td><strong>Cross-validation</strong></td>
+<td>leave-one-site-out (LOSO)</td>
+<td>main text</td>
+</tr>
+<tr>
+<td></td>
+<td>repeated LOSO-CV (3 × 80% of sites)</td>
+<td>sanity check</td>
+</tr>
+<tr>
+<td><strong>Learner</strong></td>
+<td>XGBoost + Optuna (<code>XGB_optuna</code>)</td>
+<td>main text</td>
+</tr>
+<tr>
+<td><strong>Models</strong></td>
+<td>M3/M4 (no memory) and M7/M8 raw (with memory)</td>
+<td>main text</td>
+</tr>
+<tr>
+<td>Everything else</td>
+<td>3 datasets × 9 learners × 2 CV structures</td>
+<td>appendix</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="1-does-disturbance-help-more-in-one-dataset">1. Does disturbance help more in one dataset?</h2>
+<p>Across <strong>1,620 paired comparisons</strong> (9 learners × 12 model pairs × 5 EFPs × 3 datasets), where each pair differs <em>only</em> by the disturbance block (M1→M2, M3→M4, M5→M6, M7→M8; both windows, both memory types):</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>dataset</th>
+<th style="text-align: right;">median ΔRMSE</th>
+<th style="text-align: right;">comparisons improved</th>
+<th style="text-align: right;">EFPs helped</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>tc≥30 (93)</strong></td>
+<td style="text-align: right;"><strong>−4.74%</strong></td>
+<td style="text-align: right;"><strong>83.1%</strong></td>
+<td style="text-align: right;"><strong>4/5</strong></td>
+</tr>
+<tr>
+<td>all_sites (112)</td>
+<td style="text-align: right;">−2.11%</td>
+<td style="text-align: right;">79.4%</td>
+<td style="text-align: right;">4/5</td>
+</tr>
+<tr>
+<td>tc≥50 (65)</td>
+<td style="text-align: right;">−0.75%</td>
+<td style="text-align: right;">65.0%</td>
+<td style="text-align: right;">3/5</td>
+</tr>
+</tbody>
+</table></div>
+<p>The ranking is <strong>not monotonic in tree cover</strong> — the most forested dataset is the weakest.</p>
+<h3 id="which-efps-by-dataset-median-δrmse--improved">Which EFPs, by dataset (median ΔRMSE, % improved)</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>EFP</th>
+<th style="text-align: right;">all_sites</th>
+<th style="text-align: right;">tc≥30</th>
+<th style="text-align: right;">tc≥50</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NEPmax</td>
+<td style="text-align: right;">−13.6% (96%)</td>
+<td style="text-align: right;">−11.9% (98%)</td>
+<td style="text-align: right;">−4.9% (98%)</td>
+</tr>
+<tr>
+<td>GPPsat</td>
+<td style="text-align: right;">−11.2% (96%)</td>
+<td style="text-align: right;">−8.3% (97%)</td>
+<td style="text-align: right;">−3.1% (93%)</td>
+</tr>
+<tr>
+<td>ETmax</td>
+<td style="text-align: right;">−2.4% (91%)</td>
+<td style="text-align: right;">+0.3% (39%)</td>
+<td style="text-align: right;">+0.7% (26%)</td>
+</tr>
+<tr>
+<td>uWUE</td>
+<td style="text-align: right;">−1.3% (67%)</td>
+<td style="text-align: right;">−4.0% (82%)</td>
+<td style="text-align: right;">+0.1% (47%)</td>
+</tr>
+<tr>
+<td>WUE</td>
+<td style="text-align: right;">+0.1% (47%)</td>
+<td style="text-align: right;">−6.2% (99%)</td>
+<td style="text-align: right;">−0.4% (61%)</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>The robust finding:</strong> disturbance reliably improves the <strong>carbon</strong> fluxes — NEPmax and GPPsat improve in 93–98% of comparisons in <em>every</em> dataset. The water-use properties are inconsistent and change sign between datasets.</p>
+<hr />
+<h2 id="2-does-disturbance-matter-more-for-forests--no-evidence">2. Does disturbance matter more for forests? — <strong>No evidence</strong></h2>
+<p>Tested at <strong>site level</strong> (one value per site = median over all 9 learners × 12 pairs × 5 EFPs, so no pseudo-replication), on the all_sites dataset which spans the full tree-cover gradient:</p>
+<ul>
+<li><strong>Tree cover vs disturbance benefit: Spearman ρ = 0.044, p = 0.65</strong> — no relationship</li>
+<li><strong>Forest (83 sites) −3.09% vs non-forest (29 sites) −7.09%, p = 0.163</strong> — not significant, and pointing <em>opposite</em> to the hypothesis</li>
+</ul>
+<h3 id="methodological-warning">Methodological warning</h3>
+<p>A first pass pooling all site × pair × EFP rows gave "non-forest benefits more, p = 1e-08". That was <strong>pseudo-replication</strong> — 60 non-independent rows per site. After aggregating to one value per site the effect disappears (p = 0.163). <strong>Do not quote the pooled version.</strong></p>
+<h3 id="why-tc50-looked-weakest--a-confound-not-an-answer">Why tc≥50 looked weakest — a confound, not an answer</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>dataset</th>
+<th style="text-align: right;">mortality rate mean</th>
+<th style="text-align: right;">sd</th>
+<th style="text-align: right;">CV</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>all_sites</td>
+<td style="text-align: right;">3.90</td>
+<td style="text-align: right;">5.46</td>
+<td style="text-align: right;">1.40</td>
+</tr>
+<tr>
+<td>tc≥30</td>
+<td style="text-align: right;">3.58</td>
+<td style="text-align: right;">5.14</td>
+<td style="text-align: right;">1.44</td>
+</tr>
+<tr>
+<td><strong>tc≥50</strong></td>
+<td style="text-align: right;"><strong>2.80</strong></td>
+<td style="text-align: right;"><strong>3.18</strong></td>
+<td style="text-align: right;"><strong>1.13</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>tc≥50 has <strong>42% less spread</strong> in mortality rate, plus fewer sites (65) and site-years (287). The weak result there reflects <strong>less disturbance variance to detect</strong>, not proof that mortality matters less in dense forest. These are different claims and should not be conflated.</p>
+<p><strong>Conclusion:</strong> the disturbance effect is <strong>EFP-specific, not ecosystem-specific</strong>. It depends on which function is predicted (carbon yes, water no), not on ecosystem type.</p>
+<hr />
+<h2 id="3-cross-validation-loso-vs-repeated-cv">3. Cross-validation: LOSO vs repeated CV</h2>
+<p>Across <strong>3,240 matched</strong> model × EFP × learner × dataset rows:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>dataset</th>
+<th style="text-align: right;">ΔR² (rep − LOSO)</th>
+<th style="text-align: right;">ΔRMSE</th>
+<th style="text-align: right;">model-rank agreement (ρ)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>all_sites</td>
+<td style="text-align: right;">+0.004</td>
+<td style="text-align: right;">−0.31%</td>
+<td style="text-align: right;">0.958</td>
+</tr>
+<tr>
+<td>tc≥30</td>
+<td style="text-align: right;">+0.005</td>
+<td style="text-align: right;">−0.37%</td>
+<td style="text-align: right;">0.948</td>
+</tr>
+<tr>
+<td>tc≥50</td>
+<td style="text-align: right;">+0.019</td>
+<td style="text-align: right;">−1.14%</td>
+<td style="text-align: right;">0.853</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>Repeated CV is very slightly <strong>more optimistic</strong>, not more conservative (it averages 3 predictions).</li>
+<li><strong>Best learner: <code>RF_exp02</code> under both structures in all three datasets</strong> (6/6 agreement).</li>
+<li>Best model per EFP: same winner in 4/5, 4/5, 5/5.</li>
+<li>Disturbance effect correlates at <strong>r = 0.966</strong> across all 1,620 comparisons.</li>
+<li>Per-EFP sign agreement in <strong>13/15</strong> cases; both exceptions are effectively-zero effects flipping sign around zero.</li>
+</ul>
+<h3 id="but-repeated-cv-costs-statistical-power">But repeated CV costs statistical power</h3>
+<p>For the reporting cell (tc≥30, XGB_optuna), site-level paired Wilcoxon with BH-FDR over 20 tests:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th></th>
+<th style="text-align: right;">significant</th>
+<th style="text-align: right;">no-memory (M3→M4)</th>
+<th style="text-align: right;">raw-memory (M7→M8)</th>
+<th style="text-align: right;">median effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>LOSO</strong></td>
+<td style="text-align: right;"><strong>9/20</strong></td>
+<td style="text-align: right;">7/10</td>
+<td style="text-align: right;">2/10</td>
+<td style="text-align: right;">−4.53%</td>
+</tr>
+<tr>
+<td>repeated CV</td>
+<td style="text-align: right;">4/20</td>
+<td style="text-align: right;">4/10</td>
+<td style="text-align: right;">0/10</td>
+<td style="text-align: right;">−4.00%</td>
+</tr>
+</tbody>
+</table></div>
+<p>Effect sizes are nearly identical; repeated CV averages 3 predictions per site, smoothing both models and shrinking the paired differences. <strong>Decision: LOSO primary, repeated CV as the sanity check.</strong></p>
+<hr />
+<h2 id="4-learner-comparison">4. Learner comparison</h2>
+<p>Mean R² across all three datasets (LOSO):</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>learner</th>
+<th style="text-align: right;">all_sites</th>
+<th style="text-align: right;">tc≥30</th>
+<th style="text-align: right;">tc≥50</th>
+<th style="text-align: right;">overall</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RF_exp02</td>
+<td style="text-align: right;">0.430</td>
+<td style="text-align: right;">0.410</td>
+<td style="text-align: right;">0.276</td>
+<td style="text-align: right;"><strong>0.372</strong></td>
+</tr>
+<tr>
+<td><strong>XGB_optuna</strong></td>
+<td style="text-align: right;">0.413</td>
+<td style="text-align: right;">0.402</td>
+<td style="text-align: right;">0.258</td>
+<td style="text-align: right;"><strong>0.358</strong></td>
+</tr>
+<tr>
+<td>RF_optuna</td>
+<td style="text-align: right;">0.410</td>
+<td style="text-align: right;">0.393</td>
+<td style="text-align: right;">0.252</td>
+<td style="text-align: right;">0.352</td>
+</tr>
+<tr>
+<td>LGB_optuna</td>
+<td style="text-align: right;">0.408</td>
+<td style="text-align: right;">0.401</td>
+<td style="text-align: right;">0.247</td>
+<td style="text-align: right;">0.352</td>
+</tr>
+<tr>
+<td>XGB_tuned</td>
+<td style="text-align: right;">0.381</td>
+<td style="text-align: right;">0.389</td>
+<td style="text-align: right;">0.211</td>
+<td style="text-align: right;">0.327</td>
+</tr>
+<tr>
+<td>LGB_tuned</td>
+<td style="text-align: right;">0.388</td>
+<td style="text-align: right;">0.383</td>
+<td style="text-align: right;">0.206</td>
+<td style="text-align: right;">0.326</td>
+</tr>
+<tr>
+<td>XGB_base</td>
+<td style="text-align: right;">0.387</td>
+<td style="text-align: right;">0.377</td>
+<td style="text-align: right;">0.203</td>
+<td style="text-align: right;">0.322</td>
+</tr>
+<tr>
+<td>LGB_base</td>
+<td style="text-align: right;">0.369</td>
+<td style="text-align: right;">0.355</td>
+<td style="text-align: right;">0.189</td>
+<td style="text-align: right;">0.304</td>
+</tr>
+<tr>
+<td>RF_base</td>
+<td style="text-align: right;">0.357</td>
+<td style="text-align: right;">0.325</td>
+<td style="text-align: right;">0.191</td>
+<td style="text-align: right;">0.291</td>
+</tr>
+</tbody>
+</table></div>
+<p>Total spread 0.081 R², concentrated almost entirely in the <strong>raw-memory</strong> models:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th></th>
+<th style="text-align: right;">no memory</th>
+<th style="text-align: right;">anomaly</th>
+<th style="text-align: right;">raw memory</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RF_exp02</td>
+<td style="text-align: right;">0.234</td>
+<td style="text-align: right;">0.234</td>
+<td style="text-align: right;"><strong>0.648</strong></td>
+</tr>
+<tr>
+<td>RF_base</td>
+<td style="text-align: right;">0.234</td>
+<td style="text-align: right;">0.234</td>
+<td style="text-align: right;"><strong>0.404</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>RF_exp02 and RF_base are <em>identical</em> without raw memory. exp02's only change — forcing raw EFP memory into every split — is worth <strong>+0.244 R²</strong> there and nothing elsewhere.</p>
+<h3 id="why-rf_exp02-was-rejected-despite-the-best-r²">Why <code>RF_exp02</code> was rejected despite the best R²</h3>
+<p><code>always.split.variables = raw memory</code> hard-codes a structural privilege for one predictor block. The defence that exists: memory is the <strong>control</strong> (an autoregressive nuisance term), disturbance is the <strong>treatment</strong>; forcing the control is conservative, and measurably so — RF_exp02 shows the <em>weakest</em> disturbance effect of the RF family (−1.51% median, 70% improved, vs RF_base's −2.40%/67%). Forcing disturbance instead would be circular.</p>
+<p><strong>But the forcing is unnecessary.</strong> <code>RF_optuna</code> reaches essentially the same raw-memory performance (<strong>0.644 vs 0.648</strong>) with no forcing at all — purely by tuning <code>mtry</code> to <strong>0.72–0.91</strong> of predictors instead of ranger's <code>sqrt(p)</code> default (~0.05 when p ≈ 449). With ~21 of 449 predictors sampled per split, RF picked the memory variable by chance ~5% of the time, so it was diluted despite being the strongest single predictor. <strong>The forcing was a workaround for a hyperparameter pathology, not a scientific statement.</strong></p>
+<h3 id="the-accuracy--effect-size-tension">The accuracy / effect-size tension</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>learner</th>
+<th style="text-align: right;">median ΔRMSE from D</th>
+<th style="text-align: right;">improved</th>
+<th style="text-align: right;">disturbance SHAP share</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LGB_base</td>
+<td style="text-align: right;">−3.61%</td>
+<td style="text-align: right;">82.2%</td>
+<td style="text-align: right;">25.4%</td>
+</tr>
+<tr>
+<td>LGB_tuned</td>
+<td style="text-align: right;">−3.34%</td>
+<td style="text-align: right;">83.9%</td>
+<td style="text-align: right;">25.5%</td>
+</tr>
+<tr>
+<td>XGB_tuned</td>
+<td style="text-align: right;">−3.25%</td>
+<td style="text-align: right;">81.7%</td>
+<td style="text-align: right;">25.9%</td>
+</tr>
+<tr>
+<td><strong>XGB_optuna</strong></td>
+<td style="text-align: right;"><strong>−2.15%</strong></td>
+<td style="text-align: right;"><strong>78.3%</strong></td>
+<td style="text-align: right;"><strong>26.7%</strong></td>
+</tr>
+<tr>
+<td>RF_base</td>
+<td style="text-align: right;">−2.40%</td>
+<td style="text-align: right;">67.2%</td>
+<td style="text-align: right;">35.6%</td>
+</tr>
+<tr>
+<td>RF_exp02</td>
+<td style="text-align: right;">−1.51%</td>
+<td style="text-align: right;">70.0%</td>
+<td style="text-align: right;">25.9%</td>
+</tr>
+<tr>
+<td>RF_optuna</td>
+<td style="text-align: right;">−1.28%</td>
+<td style="text-align: right;">63.9%</td>
+<td style="text-align: right;">23.1%</td>
+</tr>
+</tbody>
+</table></div>
+<p>The best predictor shows the weakest disturbance effect: forcing raw memory into every split lets memory absorb variance disturbance would otherwise explain. Visible in the SHAP split — RF_base's disturbance share falls 38.2% → 31.6% when memory is added; RF_exp02's falls 28.8% → 21.4%.</p>
+<p><strong><code>XGB_optuna</code> selected:</strong> highest R² of any non-forcing learner, hyperparameters from a defined TPE search space (no hand-placed structure), disturbance effect mid-pack so not cherry-picked, and SHAP share (26.7%) slightly above RF_exp02's.</p>
+<p><em>Caveat:</em> RF_base has the highest disturbance SHAP share (35.6%) partly <strong>because it is the worst model</strong> — its raw-memory models underperform (0.404), so proportionally more attribution falls to disturbance. Do not cite it as evidence that disturbance matters more.</p>
+<hr />
+<h2 id="5-paper-table--tc30--loso--xgb_optuna">5. Paper table — tc≥30 | LOSO | XGB_optuna</h2>
+<p>Site-level paired Wilcoxon (one-sided), BH-FDR across the 20 tests. Full table: <code>derived_tables/paper_table_tc30_XGBoptuna_LOSO.csv</code></p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>comparison</th>
+<th>EFP</th>
+<th style="text-align: right;">R² without D</th>
+<th style="text-align: right;">R² with D</th>
+<th style="text-align: right;">median ΔRMSE</th>
+<th style="text-align: right;">sites improved</th>
+<th style="text-align: left;">sig</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>M3→M4 12m</td>
+<td>GPPsat</td>
+<td style="text-align: right;">0.191</td>
+<td style="text-align: right;">0.359</td>
+<td style="text-align: right;">−10.15%</td>
+<td style="text-align: right;">66%</td>
+<td style="text-align: left;">***</td>
+</tr>
+<tr>
+<td>M3→M4 12m</td>
+<td>NEPmax</td>
+<td style="text-align: right;">0.192</td>
+<td style="text-align: right;">0.405</td>
+<td style="text-align: right;">−8.86%</td>
+<td style="text-align: right;">66%</td>
+<td style="text-align: left;">***</td>
+</tr>
+<tr>
+<td>M3→M4 12m</td>
+<td>ETmax</td>
+<td style="text-align: right;">0.420</td>
+<td style="text-align: right;">0.419</td>
+<td style="text-align: right;">−0.08%</td>
+<td style="text-align: right;">51%</td>
+<td style="text-align: left;">ns</td>
+</tr>
+<tr>
+<td>M3→M4 12m</td>
+<td>uWUE</td>
+<td style="text-align: right;">0.041</td>
+<td style="text-align: right;">0.134</td>
+<td style="text-align: right;">−2.25%</td>
+<td style="text-align: right;">52%</td>
+<td style="text-align: left;">ns</td>
+</tr>
+<tr>
+<td>M3→M4 12m</td>
+<td>WUE</td>
+<td style="text-align: right;">0.113</td>
+<td style="text-align: right;">0.282</td>
+<td style="text-align: right;">−3.09%</td>
+<td style="text-align: right;">59%</td>
+<td style="text-align: left;">*</td>
+</tr>
+<tr>
+<td>M3→M4 24m</td>
+<td>GPPsat</td>
+<td style="text-align: right;">0.205</td>
+<td style="text-align: right;">0.347</td>
+<td style="text-align: right;">−7.17%</td>
+<td style="text-align: right;">65%</td>
+<td style="text-align: left;">**</td>
+</tr>
+<tr>
+<td>M3→M4 24m</td>
+<td>NEPmax</td>
+<td style="text-align: right;">0.215</td>
+<td style="text-align: right;">0.400</td>
+<td style="text-align: right;">−11.79%</td>
+<td style="text-align: right;">66%</td>
+<td style="text-align: left;">***</td>
+</tr>
+<tr>
+<td>M3→M4 24m</td>
+<td>ETmax</td>
+<td style="text-align: right;">0.401</td>
+<td style="text-align: right;">0.382</td>
+<td style="text-align: right;">+1.62%</td>
+<td style="text-align: right;">41%</td>
+<td style="text-align: left;">ns</td>
+</tr>
+<tr>
+<td>M3→M4 24m</td>
+<td>uWUE</td>
+<td style="text-align: right;">0.024</td>
+<td style="text-align: right;">0.141</td>
+<td style="text-align: right;">−5.29%</td>
+<td style="text-align: right;">59%</td>
+<td style="text-align: left;">*</td>
+</tr>
+<tr>
+<td>M3→M4 24m</td>
+<td>WUE</td>
+<td style="text-align: right;">0.117</td>
+<td style="text-align: right;">0.273</td>
+<td style="text-align: right;">−3.76%</td>
+<td style="text-align: right;">54%</td>
+<td style="text-align: left;">*</td>
+</tr>
+<tr>
+<td>M7→M8 raw 12m</td>
+<td>GPPsat</td>
+<td style="text-align: right;">0.677</td>
+<td style="text-align: right;">0.693</td>
+<td style="text-align: right;">−2.22%</td>
+<td style="text-align: right;">57%</td>
+<td style="text-align: left;">*</td>
+</tr>
+<tr>
+<td>M7→M8 raw 12m</td>
+<td>NEPmax</td>
+<td style="text-align: right;">0.731</td>
+<td style="text-align: right;">0.747</td>
+<td style="text-align: right;">+0.50%</td>
+<td style="text-align: right;">49%</td>
+<td style="text-align: left;">ns</td>
+</tr>
+<tr>
+<td>M7→M8 raw 12m</td>
+<td>ETmax</td>
+<td style="text-align: right;">0.670</td>
+<td style="text-align: right;">0.673</td>
+<td style="text-align: right;">+0.69%</td>
+<td style="text-align: right;">47%</td>
+<td style="text-align: left;">ns</td>
+</tr>
+<tr>
+<td>M7→M8 raw 12m</td>
+<td>uWUE</td>
+<td style="text-align: right;">0.632</td>
+<td style="text-align: right;">0.625</td>
+<td style="text-align: right;">−0.55%</td>
+<td style="text-align: right;">52%</td>
+<td style="text-align: left;">ns</td>
+</tr>
+<tr>
+<td>M7→M8 raw 12m</td>
+<td>WUE</td>
+<td style="text-align: right;">0.643</td>
+<td style="text-align: right;">0.662</td>
+<td style="text-align: right;">−1.84%</td>
+<td style="text-align: right;">57%</td>
+<td style="text-align: left;">ns</td>
+</tr>
+<tr>
+<td>M7→M8 raw 24m</td>
+<td>GPPsat</td>
+<td style="text-align: right;">0.686</td>
+<td style="text-align: right;">0.692</td>
+<td style="text-align: right;">−0.44%</td>
+<td style="text-align: right;">52%</td>
+<td style="text-align: left;">ns</td>
+</tr>
+<tr>
+<td>M7→M8 raw 24m</td>
+<td>NEPmax</td>
+<td style="text-align: right;">0.733</td>
+<td style="text-align: right;">0.746</td>
+<td style="text-align: right;">−2.91%</td>
+<td style="text-align: right;">55%</td>
+<td style="text-align: left;">ns</td>
+</tr>
+<tr>
+<td>M7→M8 raw 24m</td>
+<td>ETmax</td>
+<td style="text-align: right;">0.651</td>
+<td style="text-align: right;">0.653</td>
+<td style="text-align: right;">−0.25%</td>
+<td style="text-align: right;">54%</td>
+<td style="text-align: left;">ns</td>
+</tr>
+<tr>
+<td>M7→M8 raw 24m</td>
+<td>uWUE</td>
+<td style="text-align: right;">0.629</td>
+<td style="text-align: right;">0.630</td>
+<td style="text-align: right;">−1.89%</td>
+<td style="text-align: right;">55%</td>
+<td style="text-align: left;">ns</td>
+</tr>
+<tr>
+<td>M7→M8 raw 24m</td>
+<td>WUE</td>
+<td style="text-align: right;">0.641</td>
+<td style="text-align: right;">0.665</td>
+<td style="text-align: right;">−2.41%</td>
+<td style="text-align: right;">62%</td>
+<td style="text-align: left;">*</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>9/20 significant — 7/10 without memory, 2/10 with raw memory.</strong></p>
+<h3 id="the-finding-in-four-numbers">The finding in four numbers</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th></th>
+<th>GPPsat</th>
+<th>NEPmax</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>no memory</strong> (M3→M4)</td>
+<td>R² 0.191 → <strong>0.359</strong>, −10.2% ***</td>
+<td>R² 0.192 → <strong>0.405</strong>, −8.9% ***</td>
+</tr>
+<tr>
+<td><strong>raw memory</strong> (M7→M8)</td>
+<td>R² 0.677 → 0.693, −2.2% *</td>
+<td>R² 0.731 → 0.747, ns</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Disturbance roughly doubles explained variance for both carbon fluxes when EFP memory is absent, and adds almost nothing once raw memory is included.</strong> Raw EFP memory already contains most of the information disturbance carries.</p>
+<hr />
+<h2 id="6-things-to-state-explicitly-in-the-manuscript">6. Things to state explicitly in the manuscript</h2>
+<ol type="1">
+<li><strong>Justify tc≥30 a priori</strong> — "sites with ≥30% tree cover, the forest-relevant subset" — not because it showed the strongest effect. all_sites and tc≥50 are in the appendix showing the same direction.</li>
+<li><strong>The 2 raw-memory significant results are fragile.</strong> GPPsat 12m and WUE 24m (<code>*</code> under LOSO) drop to <strong>0/10 under repeated CV</strong>. Describe them as marginal and not robust to resampling structure. The defensible line is: <em>once raw EFP memory is included, disturbance adds no consistent improvement.</em></li>
+<li><strong>ETmax is a consistent null</strong> — ns in every configuration and slightly positive in places. An honest null across 3 datasets × 9 learners × 2 CV structures is a result; report it rather than leaving it unremarked.</li>
+<li><strong>uWUE/WUE are borderline</strong> — significant at 24m, not 12m. Describe as weak and window-dependent.</li>
+<li><strong>Do not compare R² across datasets.</strong> tc≥50's R² is depressed ~41% by range restriction (GPPsat sd 8.72 → 6.97) while its RMSE <em>improves</em> ~6.7%. Use RMSE for cross-dataset comparison; R² is valid for ranking models <em>within</em> a dataset.</li>
+<li><strong>Robustness sentence available:</strong> <em>"The disturbance effect is invariant across nine learner configurations (RF, XGBoost, LightGBM, each with tuned and Optuna variants) and two resampling structures; the adopted configuration yields a mid-range estimate."</em></li>
+</ol>
+<hr />
+<h2 id="provenance">Provenance</h2>
+<ul>
+<li>Interactive report: <a href="https://negin-katal.github.io/fluxVSmortality/v10/index.html">https://negin-katal.github.io/fluxVSmortality/v10/index.html</a></li>
+<li>Datasets: <code>derived_tables/outputs_afterEGU_results/{v10, v10_all_sites, v10_tc50}/</code></li>
+<li>Model outputs: <code>derived_tables/outputs_afterEGU_results/{RF,XGB,LGB}_v10*</code></li>
+<li>Repeated CV: <code>*_repCV{,_all_sites,_tc50}/</code></li>
+<li>Paper table: <code>derived_tables/paper_table_tc30_XGBoptuna_LOSO.csv</code></li>
+</ul>
+</div>
+<div class="footer">FluxNet &times; Mortality &middot; generated from daily_reports/*.md</div>
+</div></body></html>

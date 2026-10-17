@@ -1,0 +1,615 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=2.2cm]{geometry}
+\usepackage{graphicx}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage[colorlinks=true,linkcolor=blue!50!black,urlcolor=blue!50!black]{hyperref}
+\usepackage{parskip}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{rotating}
+\usepackage[numbers,super,sort&compress]{natbib}
+\setlist[itemize]{leftmargin=1.4em,itemsep=2pt,topsep=3pt}
+\newcommand{\decide}[1]{\textcolor{red!75!black}{\textbf{[DECISION: #1]}}}
+
+\title{\vspace{-1.5cm}Tree mortality and ecosystem functional properties\\[2pt]}
+\author{}
+\date{\today}
+
+\begin{document}
+\maketitle
+\vspace{-1cm}
+
+{\small\textit{Coauthor notes (not part of the manuscript). Section order follows Nature Ecology \& Evolution:
+Abstract, Main, Results, Discussion, Methods, Data availability, Code availability, References, Acknowledgements,
+Funding, Author information, Extended Data / Supplementary Information.}}
+
+\noindent\fbox{\parbox{\dimexpr\linewidth-2\fboxsep-2\fboxrule}{
+\textbf{Main findings} (AutoGluon, deadtrees v5, 101 sites, 361 site-years)
+\begin{enumerate}[leftmargin=1.6em,itemsep=3pt,topsep=3pt]
+  \item \textbf{Knowing about tree mortality makes carbon uptake more predictable, especially in the years when trees died.}
+        Adding mortality lowers the error (MAE) of NEP$_{max}$ by 11--12\,\% over all site-years and by 29--32\,\% in
+        high-mortality years; WUE improves mainly where mortality happened ($-17$ to $-22$\,\% in high-mortality years);
+        GPP$_{sat}$ improves less ($-4$ to $-12$\,\%) and ET$_{max}$ not at all (Table~\ref{tab:main}).
+  \item \textbf{Without mortality, models over-estimate carbon uptake in ecosystems with high mortality; mortality corrects
+        this bias.} At $>$30\,\% relative mortality the model without mortality over-predicts NEP$_{max}$ by about 4 and
+        GPP$_{sat}$ by about 4.3\,$\mu$mol\,m$^{-2}$\,s$^{-1}$ and WUE by about 0.8\,g\,C\,mm$^{-1}$. The bias grows with
+        mortality; adding mortality reduces it by about two-thirds, and the correction is significant --- for all three
+        learners and robust to resampling whole sites, leaving out any single site and removing the most extreme sites (Fig.~2).
+  \item \textbf{The effect follows the amount of mortality, not the ecosystem type.} Mortality pushes predicted GPP$_{sat}$,
+        NEP$_{max}$ and WUE down at high-mortality sites (86--91\,\% of them) and slightly up at low-mortality sites
+        (2--10\,\%); the direction tracks relative mortality closely ($\rho = -0.78$ to $-0.83$) and does not depend on tree
+        cover or vegetation class. Relative mortality alone carries most of the information (Figs.~3--5).
+\end{enumerate}
+\textit{In one sentence:} tree mortality mapped from remote sensing makes ecosystem carbon uptake more predictable ---
+without it, models over-estimate the productivity of woody ecosystems with high mortality, and the correction scales with the amount
+of mortality regardless of ecosystem type.
+}}
+
+\medskip
+\textbf{What changed in this version}
+\begin{itemize}
+  \item \textbf{Dataset:} deadtrees v5 mortality maps (delivered 2026-10-06).
+  \item \textbf{Main learner: AutoGluon} (AutoML ensemble). XGBoost and LightGBM (Optuna-tuned) are in the Appendix as a check.
+  \item \textbf{Main test:} paired bootstrap of the MAE at the \textbf{site-year level} (every year is an observation, whole
+        sites resampled; Table~\ref{tab:main}). Site-level tests and the per-site figures are in the Appendix.
+  \item Only \textbf{relative mortality} is shown in the main text; the other mortality metrics are in the Appendix.
+\end{itemize}
+
+\clearpage
+\section*{Abstract}
+{\small\textit{Draft for Nature Ecology \& Evolution: unreferenced, $\leq$200 words.}}
+
+Tree mortality is increasing in forests worldwide, yet how it changes ecosystem functioning across sites remains
+poorly quantified. Here we combine eddy-covariance measurements from 101 sites with at least 30\,\% tree cover (361 site-years;
+forests, woody savannas, shrublands and wetlands) with
+remote-sensing maps of tree mortality and machine learning, and show that knowing about mortality makes their carbon
+uptake markedly more predictable. Adding mortality to climate and plant traits reduced the prediction error of maximum
+net ecosystem productivity by 11--12\,\% overall and by about 30\,\% in years with high mortality, and improved
+water-use efficiency mainly where mortality occurred; maximum evapotranspiration did not improve. Without mortality,
+models over-estimated carbon uptake and water-use efficiency in high-mortality years, a bias that grew with the amount of
+mortality and that mortality information reduced by about two-thirds. The direction of the effect followed the amount of
+mortality rather than vegetation type or tree cover, and the results held across three learning algorithms and
+when the climate variables used to calculate each property were left out. Mortality maps can thus correct a systematic over-estimate of
+carbon uptake in woody ecosystems with high mortality.
+
+\section*{Main}
+    \begin{itemize}
+    \item Terrestrial ecosystems regulate global \textbf{carbon, water, and energy balances}; forest functioning is closely linked to vegetation structure and functional traits.
+
+    \item Increasing \textbf{drought, heat, and biotic disturbances} are causing widespread tree mortality, with potentially large consequences for ecosystem functioning.
+
+    \item Mortality alters \textbf{canopy structure and leaf area}, affecting carbon uptake, evapotranspiration, and energy partitioning, with cascading effects on soils, nutrients, and vegetation recovery.
+
+    \item The magnitude and trajectory of these impacts likely depend on \textbf{vegetation type and functional trait composition}.
+
+    \item However, quantitative understanding of mortality impacts across ecosystems remains limited due to \textbf{spatial and temporal constraints of field observations} and limited integration of mortality and trait data.
+
+    \item Advances in \textbf{remote sensing, machine learning, citizen science, and trait databases} now enable large-scale assessments of mortality and ecosystem responses.
+
+    \item This creates an opportunity to quantify how mortality affects ecosystem functioning and identify \textbf{vegetation types that are more sensitive or resilient}.
+\end{itemize}
+
+\section*{Results}
+
+\subsection*{Mortality across 101 woody ecosystems}
+We combined four ecosystem functional properties --- light-saturated gross primary productivity (GPP$_\mathrm{sat}$), maximum net
+ecosystem productivity (NEP$_\mathrm{max}$), maximum evapotranspiration (ET$_\mathrm{max}$) and water-use efficiency (WUE) --- from 101
+eddy-covariance sites with at least 30\,\% tree cover (361 site-years) with annual remote-sensing maps of standing
+deadwood and tree cover (Fig.~1). Most sites are temperate and boreal forests (49 evergreen needleleaf, 30 deciduous
+broadleaf and 7 mixed forests); the others are wetlands (6), evergreen broadleaf forests (3), shrublands (5) and a woody
+savanna. We grouped the sites by their maximum relative mortality, the share of the tree cover that died or was lost in a
+year: Low ($<$\,10.6\,\%, 41 sites), Mid (38 sites) and High ($>$\,24.0\,\%, 22 sites). For each property we trained
+machine-learning models on climate and plant traits (C+T) and on climate, traits and mortality (C+T+M) and evaluated
+them with leave-one-site-out cross-validation, so that every prediction is made for a site the model has not seen
+(AutoGluon; XGBoost and LightGBM as checks).
+
+\begin{center}\includegraphics[width=\linewidth]{figures/fig1_site_map.png}\\[2pt]
+\parbox{\linewidth}{{\small \textbf{Fig.\ 1} $|$ \textbf{The 101 eddy-covariance sites and their ecosystem functional properties.} \textbf{a}, Sites with at least 30\,\% tree cover, coloured by IGBP vegetation class (ENF, evergreen needleleaf forest; DBF, deciduous broadleaf forest; MF, mixed forest; EBF, evergreen broadleaf forest; WET, wetland; CSH, closed shrubland; OSH, open shrubland; WSA, woody savanna); Robinson projection. \textbf{b--e}, GPP$_\mathrm{sat}$ (\textbf{b}), NEP$_\mathrm{max}$ (\textbf{c}), ET$_\mathrm{max}$ (\textbf{d}) and WUE (\textbf{e}) per vegetation class; points are site-years ($n$ = 361), boxes show the median and interquartile range, whiskers extend to 1.5 times the interquartile range.}}\end{center}
+
+\subsection*{Mortality improves predictions}
+To test whether knowing about mortality makes ecosystem function more predictable, we compared the errors of the two
+models. Adding mortality raised the mean cross-validated $R^2$ from 0.35 to 0.40 with the 12-month predictor window and
+from 0.35 to 0.41 with the 24-month window (Table~\ref{tab:r2}). The gain was largest for NEP$_\mathrm{max}$ ($+0.11$), followed by WUE
+($+0.06$) and GPP$_\mathrm{sat}$ ($+0.04$ to $+0.05$); ET$_\mathrm{max}$ did not improve. With every site-year as an observation and whole
+sites resampled, mortality reduced the mean absolute error (MAE) of NEP$_\mathrm{max}$ by 11.8\,\% (95\,\% bootstrap interval
+6.3--17.0\,\%) and 10.8\,\% (5.1--16.0\,\%) for the 12- and 24-month windows (Table~\ref{tab:main}). The reduction was
+largest in the years in which trees died: in site-years with more than 24\,\% relative mortality the NEP$_\mathrm{max}$ error fell by
+31.6\,\% (16.0--43.2\,\%) and 29.2\,\% (8.6--42.9\,\%), and the WUE error by 16.9\,\% (5.1--25.2\,\%) and
+21.8\,\% (8.2--34.5\,\%), although WUE did not improve significantly across all site-years ($-4.3$ and $-4.7$\,\%).
+GPP$_\mathrm{sat}$ improved less ($-4$ to $-12$\,\%; significant across all site-years at 24 months and in the years with more than
+10.6\,\% mortality), and ET$_\mathrm{max}$ improved only in the years with more than 10.6\,\% mortality at 24 months ($-5.4$\,\%).
+Mortality information therefore matters most for the carbon fluxes and WUE, and most in the years in which trees died.
+
+\begin{table}[htbp]
+\centering
+\caption{\textbf{Adding mortality improves the model skill for three of the four properties.} Coefficient of determination ($R^2$) of repeated leave-one-site-out predictions with climate and traits (C+T) and with mortality added (C+T+M); AutoGluon; $\Delta$, change in $R^2$; 12- and 24-month predictor windows. ET$_\mathrm{max}$ does not improve.}
+\label{tab:r2}
+\footnotesize
+\begin{tabular}{lcccccc}
+\toprule
+ & \multicolumn{3}{c}{12 months} & \multicolumn{3}{c}{24 months} \\
+\cmidrule(lr){2-4}\cmidrule(lr){5-7}
+EFP & C+T & C+T+M & $\Delta$ & C+T & C+T+M & $\Delta$ \\
+\midrule
+GPP$_\mathrm{sat}$ & 0.330 & 0.367 & +0.037 & 0.317 & 0.370 & +0.053 \\
+NEP$_\mathrm{max}$ & 0.391 & 0.503 & +0.112 & 0.394 & 0.502 & +0.108 \\
+ET$_\mathrm{max}$  & 0.423 & 0.425 & +0.002 & 0.429 & 0.433 & +0.004 \\
+WUE                & 0.252 & 0.312 & +0.060 & 0.264 & 0.326 & +0.062 \\
+\midrule
+Mean               & 0.349 & 0.402 & +0.053 & 0.351 & 0.408 & +0.057 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\input{tables/table1_bootstrap_siteyear_dMAE_AG}
+
+\subsection*{Without mortality, models over-predict}
+To find where these errors come from, we grouped the residuals (observed $-$ predicted) by the relative mortality of
+each site-year (Fig.~2). Without mortality, the model predicted too high in high-mortality years. In site-years with more
+than 30\,\% relative mortality (21 site-years at 10 sites) it over-predicted NEP$_\mathrm{max}$ by 4.0\,$\mu$mol\,m$^{-2}$\,s$^{-1}$ (95\,\% interval
+2.4--5.5), GPP$_\mathrm{sat}$ by 4.3\,$\mu$mol\,m$^{-2}$\,s$^{-1}$ (1.3--7.5) and WUE by 0.77\,g\,C\,mm$^{-1}$ (0.29--1.10), whereas the residuals were close to zero in years
+with little mortality. Adding mortality reduced these over-predictions by about two-thirds, to 1.3, 1.1 and 0.43, with
+intervals that included zero. This correction --- the amount by which adding mortality lowered the prediction --- was
+significant in the $>$\,30\,\% class (GPP$_\mathrm{sat}$ $+3.2$, NEP$_\mathrm{max}$ $+2.7$\,$\mu$mol\,m$^{-2}$\,s$^{-1}$, WUE $+0.34$\,g\,C\,mm$^{-1}$; all $q<0.01$, paired permutation test
+with whole sites swapped) and grew with relative mortality (mixed model with a random intercept per site, per
+$+10$\,\% relative mortality: $+0.96$, $+0.75$ and $+0.10$; all $q<0.01$, site-block bootstrap; Fig.~A23). In years with less than 10\,\% mortality the
+mortality predictors instead raised the predictions slightly. ET$_\mathrm{max}$ showed no over-prediction without mortality; with mortality its residual rose slightly with relative mortality ($+0.006$\,mm\,d$^{-1}$ per $+10$\,\%, $q<0.05$; Fig.~A23), a small over-correction that did not increase its error (Table~\ref{tab:main}). Across all 361 site-years, the
+residual of the model without mortality declined with relative mortality (per $+10$\,\%: NEP$_\mathrm{max}$ $-0.77$\,$\mu$mol\,m$^{-2}$\,s$^{-1}$, WUE
+$-0.18$\,g\,C\,mm$^{-1}$); for NEP$_\mathrm{max}$ and WUE this decline held when whole sites were resampled, when any single site was left out and
+when the three sites with more than 50\,\% mortality were removed (Fig.~A22), whereas with mortality no trend remained.
+A model that ignores mortality thus systematically over-estimates carbon uptake and water-use efficiency where trees
+died.
+
+\begin{center}
+\includegraphics[width=\linewidth]{figures/fig2_residual_by_mortality_AG_24m.png}\\[2pt]
+\parbox{\linewidth}{{\small \textbf{Fig.\ 2} $|$ \textbf{Without mortality, the model over-predicts the ecosystem functional properties in years with high mortality.} Mean residual (observed $-$ predicted) of the leave-one-site-out predictions of GPP$_\mathrm{sat}$ (\textbf{a}), NEP$_\mathrm{max}$ (\textbf{b}), ET$_\mathrm{max}$ (\textbf{c}) and WUE (\textbf{d}), grouped by the relative mortality of the site-year, for the model with climate and traits (C+T, blue) and with mortality added (C+T+M, vermillion); AutoGluon, 24-month window. Negative values mean that the model predicts too high. Points, mean; bars, 95\,\% bootstrap interval with whole sites resampled; numbers, site-years (sites) per class. Stars: adding mortality lowers the prediction in that class (one-sided paired permutation test with the two models swapped per site, Benjamini--Hochberg corrected; $^{*}$\,$q<0.05$, $^{**}$\,$q<0.01$, $^{***}$\,$q<0.001$).}}
+\end{center}
+
+\subsection*{Predictions drop where trees died}
+To see how the models use mortality, we summed the SHAP values of the mortality predictors for each site (Fig.~3). These
+contributions describe the fitted model, not a measured physiological response. At High sites the mortality predictors
+lowered the predicted GPP$_\mathrm{sat}$ at 86\,\%, NEP$_\mathrm{max}$ at 91\,\% and WUE at 86\,\% of the sites (medians $-2.1$ and $-1.5$\,$\mu$mol\,m$^{-2}$\,s$^{-1}$ for
+GPP$_\mathrm{sat}$ and NEP$_\mathrm{max}$), whereas at Low sites they raised the predictions slightly at 90--98\,\% of the sites (medians $+1.4$ and
+$+1.2$\,$\mu$mol\,m$^{-2}$\,s$^{-1}$); Mid sites were mixed (58--68\,\% negative). The contributions of High and Low+Mid sites differed for all four
+properties and both windows (Fig.~4; Mann--Whitney $U$ test, all $q<0.001$): at 24 months, GPP$_\mathrm{sat}$ $-2.15$ versus $+0.66$\,$\mu$mol\,m$^{-2}$\,s$^{-1}$,
+NEP$_\mathrm{max}$ $-1.51$ versus $+0.51$\,$\mu$mol\,m$^{-2}$\,s$^{-1}$ and WUE $-0.24$ versus $+0.07$\,g\,C\,mm$^{-1}$ (medians). Because the sites are grouped by the
+variable whose contribution is measured, this comparison shows that the learned relationship is consistent rather than
+providing independent evidence; its sign and size are the informative part. Together with Fig.~2, it shows that the
+models improve by lowering their predictions where trees died. Mortality accounted for 24\,\% (GPP$_\mathrm{sat}$), 28\,\% (NEP$_\mathrm{max}$),
+16\,\% (ET$_\mathrm{max}$) and 23\,\% (WUE) of the mean absolute SHAP, compared with 52--66\,\% for climate and 11--20\,\% for traits.
+
+\begin{center}
+\includegraphics[width=\linewidth]{figures/fig3_signed_relmort_24m_AG_piyg_names.png}\\[2pt]
+\parbox{\linewidth}{{\small \textbf{Fig.\ 3} $|$ \textbf{Mortality lowers the predicted carbon uptake and water-use efficiency at sites with high mortality and raises them slightly where mortality is low.} Net contribution of the mortality predictors (sum of their SHAP values, mean over the years of each site) to the predicted GPP$_\mathrm{sat}$ (\textbf{a}), NEP$_\mathrm{max}$ (\textbf{b}), ET$_\mathrm{max}$ (\textbf{c}) and WUE (\textbf{d}), in the units of each property; model with climate, traits and mortality (C+T+M), AutoGluon, 24-month window. Negative values: mortality lowers the prediction at that site. The 101 sites are ordered by their maximum relative mortality (mean of five buffers of 100--500\,m radius), highest on the left, and coloured from green (low) to pink (high), with the colour change anchored at the class breaks (dashed lines, 10.6\,\% and 24.0\,\%; number of sites per class in brackets). FLUXNET site codes below the panels.}}
+\end{center}
+
+\begin{center}
+\includegraphics[width=\linewidth]{figures/fig4_relmort_high_vs_lowmid_AG.png}\\[2pt]
+\parbox{\linewidth}{{\small \textbf{Fig.\ 4} $|$ \textbf{The direction of the mortality effect differs between high- and low-mortality sites.} Net mortality SHAP per site (as in Fig.~3) at sites with high relative mortality (High, site maximum $>$ 24.0\,\%, $n$ = 22, pink) and at the other sites (Low+Mid, $n$ = 79, green) for GPP$_\mathrm{sat}$ (\textbf{a}), NEP$_\mathrm{max}$ (\textbf{b}), ET$_\mathrm{max}$ (\textbf{c}) and WUE (\textbf{d}), 12- and 24-month windows; AutoGluon, C+T+M. Points are sites in their Fig.~3 colour; box colour, the Fig.~3 colour at the group's median relative mortality; boxes show the median and interquartile range, whiskers extend to 1.5 times the interquartile range. Stars: two-sided Mann--Whitney $U$ test, Benjamini--Hochberg corrected across the eight tests ($^{*}$\,$q<0.05$, $^{**}$\,$q<0.01$, $^{***}$\,$q<0.001$).}}
+\end{center}
+
+\subsection*{The effect scales with mortality}
+The contribution of mortality followed the amount of mortality closely (Fig.~5). Across sites, it declined with the site
+maximum of relative mortality for GPP$_\mathrm{sat}$ (Spearman $\rho=-0.81$), NEP$_\mathrm{max}$ ($\rho=-0.83$) and WUE ($\rho=-0.78$), and less for
+ET$_\mathrm{max}$ ($\rho=-0.47$; all $q<0.001$); its sign changed at about 10--20\,\% relative mortality. The error reduction did not
+depend on tree cover ($\rho=0.10$ to $0.18$, not significant). The direction of the contribution was also related to tree
+cover ($\rho=0.66$ to $0.75$), but less closely than to relative mortality, and it was mostly negative in shrublands and
+wetlands and mostly positive in deciduous broadleaf, evergreen broadleaf and mixed forests, classes that contain few
+sites (Fig.~A12). The effect of mortality on the predictions is therefore graded: the more trees died, the more the models
+lowered the predicted carbon uptake and WUE.
+
+\begin{center}
+\includegraphics[width=\linewidth]{figures/fig5_relmort_direction_24m_AG.png}\\[2pt]
+\parbox{\linewidth}{{\small \textbf{Fig.\ 5} $|$ \textbf{The direction of the mortality effect follows the amount of mortality.} Net mortality SHAP per site (as in Fig.~3) against the site's maximum relative mortality for GPP$_\mathrm{sat}$ (\textbf{a}), NEP$_\mathrm{max}$ (\textbf{b}), ET$_\mathrm{max}$ (\textbf{c}) and WUE (\textbf{d}); AutoGluon, C+T+M, 24-month window; $n$ = 101 sites coloured by IGBP class (abbreviations as in Fig.~1). Black line, linear fit with 95\,\% confidence band; dashed line, zero; $\rho$, Spearman rank correlation, Benjamini--Hochberg corrected across the four panels ($^{*}$\,$q<0.05$, $^{**}$\,$q<0.01$, $^{***}$\,$q<0.001$).}}
+\end{center}
+
+\subsection*{The results are robust}
+XGBoost and LightGBM reached similar skill to AutoGluon (Table~\ref{tab:a_r2}) and showed the same over-prediction without
+mortality in the $>$\,30\,\% class (NEP$_\mathrm{max}$ $-3.6$ to $-4.0$\,$\mu$mol\,m$^{-2}$\,s$^{-1}$), with significant but about half as large corrections
+(Figs.~A20 and A21). The results were the same with the 12-month window (Figs.~A6 and A19), with site-level tests and with
+the root-mean-square error (Tables~\ref{tab:a_site} and \ref{tab:a_boot_rmse}). Because some climate variables enter the
+calculation of the properties, we refitted each property without them (radiation for GPP$_\mathrm{sat}$, air temperature for ET$_\mathrm{max}$ and
+WUE); $R^2$ changed by about 0.03 or less, and the error reductions, the over-prediction without mortality and its correction
+remained (Table~\ref{tab:efpclim} and Fig.~A24). Finally, the five mortality metrics were strongly correlated: removing
+any single metric changed the error by at most about 1\,\%, and relative mortality alone gave most of the improvement
+(6.7--7.1\,\% of the 7.6--8.9\,\% NEP$_\mathrm{max}$ RMSE reduction of the full block with XGBoost and LightGBM; Figs.~A15 and A16).
+
+\section*{Discussion}
+{\small\textit{Draft (about 1,000 words). Numbered citations; references in references.bib, each checked against the
+paper's abstract.}}
+
+Satellite- and aerial-based maps of tree mortality made the functional properties of woody ecosystems more predictable, and
+the gain was concentrated where mortality occurred. Without mortality information, models over-predicted maximum net
+ecosystem productivity, light-saturated photosynthesis and water-use efficiency in years with high mortality, and this
+bias grew with the amount of mortality. Adding mortality reduced it by one- to two-thirds, depending on the learner,
+and the direction of the mortality effect followed the amount of mortality rather than vegetation type or tree cover.
+Mortality therefore carries information on carbon uptake that climate and plant traits do not.
+
+The direction of the effect is consistent with what single-site studies have measured during mortality events. At a
+subalpine forest hit by spruce beetles, net ecosystem exchange diminished by about half once the attacked trees died,
+after an earlier phase in which hydraulic failure restricted gas exchange\cite{frank2014ecosystem}. Across North
+American forests, net ecosystem production became a carbon loss after stand-replacing disturbances and returned to a
+sink within 10 to 20 years\cite{amiro2010ecosystem}. Our results generalize these site observations across 101 sites
+and several ecosystem types, and they suggest why mortality acts on productivity: the first and most important axis of
+ecosystem function, maximum productivity, is mostly explained by vegetation structure\cite{migliavacca2021three}, and
+mortality changes that structure directly. Relative mortality, which combines standing dead trees with tree-cover loss,
+carried most of the information, and the direction of its effect was negative at most sites with high mortality and
+slightly positive at sites with little.
+
+The effect was not uniform, and the literature shows why. At a lodgepole pine forest where beetles killed 30 to 78\,\%
+of the basal area, maximum CO$_2$ uptake did not change, because the remaining vegetation used light more efficiently
+and the changes in photosynthesis and respiration cancelled out\cite{reed2014impact}. In British Columbia, beetle-killed
+stands remained growing-season carbon sinks thanks to surviving trees and understory\cite{brown2009impact}, and a
+synthesis of remote-sensing and flux data suggested that net ecosystem production may recover within about four years
+after climate-driven mortality\cite{anderegg2016when}. Such compensation fits the shape of our results: errors changed
+little at low and moderate mortality and fell sharply only in the site-years with more than 30\,\% relative mortality, and
+the reduction over all site-years (11--12\,\% for maximum net ecosystem productivity) was much smaller than in
+high-mortality years (29--32\,\%). Our predictors included mortality of the current and the one or two preceding years,
+which allows models to capture the multi-year legacies that follow drought and mortality\cite{anderegg2015pervasive};
+how quickly the functional properties recover after mortality remains to be tested with longer records.
+
+Mortality improved water-use efficiency where it occurred but not maximum evapotranspiration. Measured responses of
+evapotranspiration to tree death differ between sites: evapotranspiration fell by 28--36\,\% during a spruce beetle
+outbreak\cite{frank2014ecosystem}, and evapotranspiration relative to precipitation fell by 30\,\% at a beetle-affected
+site\cite{knowles2023bark}, whereas reviews of die-off ecohydrology expect the loss of transpiration and interception to
+be partly offset by more evaporation from the soil and by surviving and understory vegetation\cite{adams2011ecohydrological}.
+After drought-induced die-off in semi-arid basins, streamflow even decreased\cite{guardiolaclaramonte2011decreased}.
+Maximum evapotranspiration, the 95th percentile of half-hourly evapotranspiration, is dominated by atmospheric demand
+and is therefore less sensitive to the loss of individual trees than carbon uptake. Mortality thus appears to act more
+on the carbon side of ecosystem function than on its water side.
+
+These results matter for estimates of the forest carbon sink. Disturbances, many of them involving tree mortality,
+already shape the carbon balance at large scales: a mountain pine beetle outbreak turned the forests of British Columbia
+from a small carbon sink into a large source\cite{kurz2008mountain}, increasing disturbances could reduce the carbon
+storage of European forests by about 500\,Tg\,C in 2021--2030\cite{seidl2014increasing}, drought and fire brought the
+Siberian forest carbon sink close to neutral\cite{fan2022siberian}, and stand-replacing disturbances account for a large
+part of global biomass turnover\cite{pugh2019important}. Data-driven upscaling of eddy-covariance fluxes does not include
+time since disturbance or site history among its predictors, which likely contributes to biased net ecosystem exchange
+patterns\cite{jung2020scaling}, and the representation of disturbance in vegetation models is a key reason why their
+estimates of the northern carbon sink disagree with atmospheric inversions\cite{osullivan2024role}. Our models reproduce
+this blind spot: without mortality they over-estimated carbon uptake exactly where mortality was high. With tree
+mortality increasing worldwide\cite{allen2009global,hammond2022global,hartmann2022climate} and forest disturbance
+regimes shifting towards younger and shorter stands\cite{mcdowell2020pervasive,seidl2017forest}, this bias is likely to
+grow unless mortality is represented explicitly.
+
+Our study has limitations. The models are predictive, so they quantify how much mortality information improves
+predictions rather than the physiological mechanisms behind the change. Only 21 site-years at 10 sites had more than
+30\,\% relative mortality; the strongest effects rest on these sites, although the over-prediction without mortality held
+when any single site or the three most extreme sites were left out. Mortality was derived from maps around each tower
+(100--500\,m buffers), which do not match the varying flux footprint exactly, and errors in the maps add noise that
+probably weakens rather than strengthens the effects we report. Finally, the climate predictors cover only the period
+before the growing season, and leaving out the climate variables that enter the calculation of each property did not
+change the main results (Appendix~A8), so the mortality effect does not arise from circularity with the climate data.
+
+Knowing where and when trees die makes the carbon uptake of woody ecosystems more predictable. Without that knowledge, models
+systematically over-estimated carbon uptake in ecosystems with high mortality; with it, this bias shrank, and the correction
+scaled with the amount of mortality regardless of vegetation type or tree cover. Mortality maps now cover large areas
+at high resolution\cite{mosig2025deadtrees}, and flux networks keep growing. Adding mortality to data-driven upscaling
+products and to the evaluation of land-surface models is a direct way to avoid over-estimating the carbon uptake of
+woody ecosystems with high mortality.
+
+\section*{Methods}
+
+
+\textbf{Eddy-covariance data.} We used half-hourly FLUXNET data products processed with ONEFlux v1.3\cite{pastorello2020fluxnet2015},
+downloaded for all available sites with the FLUXNET Shuttle on 12 May 2026. Net ecosystem exchange (NEE\_VUT\_REF) and gross
+primary productivity from night-time partitioning (GPP\_NT\_VUT\_REF\cite{reichstein2005separation}) were used together with the
+tower meteorology (air temperature, vapour pressure deficit, incoming shortwave radiation, precipitation) and latent heat flux.
+Only measured or high-quality gap-filled half-hours (quality flags 0 and 1) entered the calculation of the ecosystem functional
+properties. The 101 sites of the final dataset come from AmeriFlux (44 sites), ICOS (29), the European Fluxes Database (18),
+JapanFlux\cite{ueyama2025japanflux} (3), KoFlux (2), ChinaFlux\cite{yu2006chinaflux} (2), TERN-OzFlux\cite{beringer2016ozflux,isaac2017ozflux}
+(2) and FLUXNET (1); the data of each site are cited individually (Data availability).
+
+\textbf{Ecosystem functional properties.} For each site-year we calculated four ecosystem functional properties following
+Migliavacca et al.\cite{migliavacca2021three}, within the growing season, defined as the days on which daily gross primary
+productivity exceeded 30\,\% of its 95th percentile (bigleaf R package\cite{knauer2018bigleaf}). Light-saturated gross
+primary productivity (GPP$_\mathrm{sat}$) was obtained by fitting a light-response curve of NEE against photosynthetic photon
+flux density (shortwave radiation $\times$ 2.11) in five-day windows of daytime data (shortwave radiation $>$ 50\,W\,m$^{-2}$)
+and taking the 95th percentile of the fitted saturation values per year\cite{lasslop2010separation,migliavacca2021three}. Maximum
+net ecosystem productivity (NEP$_\mathrm{max}$) is the 90th percentile of all half-hourly net ecosystem productivity
+($-$NEE, day and night) in the growing season\cite{migliavacca2021three}. Maximum evapotranspiration (ET$_\mathrm{max}$) is the
+95th percentile of half-hourly evapotranspiration (mm\,d$^{-1}$), and water-use efficiency (WUE) the median ratio of gross
+primary productivity to evapotranspiration (g\,C\,mm$^{-1}$)\cite{knauer2018bigleaf}; both used daytime half-hours with shortwave radiation $>$ 200\,W\,m$^{-2}$ and
+friction velocity $>$ 0.2\,m\,s$^{-1}$ and excluded half-hours within 24\,h after precipitation of more than
+0.1\,mm, so that evaporation of intercepted water does not inflate evapotranspiration. Evapotranspiration was converted from latent
+heat flux with the air-temperature-dependent latent heat of vaporization\cite{knauer2018bigleaf}.
+
+\textbf{Tree mortality.} Tree mortality was derived from annual maps of standing deadwood cover and tree cover produced by
+deadtrees.earth from Sentinel-2 imagery, trained on centimetre-resolution aerial imagery with manually annotated dead
+trees\cite{mosig2025deadtrees} (map version 5; year 2016 excluded as unreliable). Within five nested circular buffers around each
+tower (radius 100, 200, 300, 400 and 500\,m; pixels without a valid prediction masked) we calculated, per year: absolute
+deadwood (deadwood cover as a percentage of buffer area), relative deadwood (deadwood cover relative to tree cover, where tree
+cover $\geq$ 10\,\%, capped at 100\,\%), deadwood gain (year-on-year increase of deadwood cover, percentage points), relative
+tree-cover loss (percentage of the previous year's tree cover lost) and relative mortality, (deadwood + tree-cover loss) / (tree
+cover + tree-cover loss) $\times$ 100. Each metric entered the models for every buffer, for the year of the ecosystem functional
+property and for the one (12-month window) or two (24-month window) preceding years. For figures, sites were classified by
+their maximum relative mortality across years, averaged over the five buffers (Low $<$ mean $-$ 0.5\,s.d., High $>$ mean + 0.5\,s.d.
+across sites).
+
+\textbf{Climate and plant traits.} Climate predictors were calculated from the tower meteorology and cover only the period
+before the growing season: the 12 months ending in the month before the growing-season start (lag 1) and, for the 24-month window,
+the 12 months before that (lag 2). For every month we used the mean, 5th and 95th percentile of air temperature, vapour pressure
+deficit and shortwave radiation, and the precipitation sum. Plant traits were 23 community-weighted mean traits at 1\,km
+resolution from global maps based on crowdsourced biodiversity observations and Earth observation\cite{lusk2026crowdsourced},
+averaged within 500\,m of each tower and weighted by area.
+
+\textbf{Site selection.} Site-years were retained when all four ecosystem functional properties were available (2017--2025),
+lay in runs of at least two consecutive years and had complete climate and mortality predictors including their lags, which
+restricts the years to 2020--2025. Two plantation sites with extreme water-use efficiency (CN-Sb1, CN-Sb2) and site-years with
+negative water-use efficiency were removed. We kept sites with a mean tree cover of at least 30\,\% within 500\,m. The final
+dataset has 101 sites and 361 site-years (median 4 years per site) of evergreen needleleaf (49 sites), deciduous broadleaf (30),
+mixed (7) and evergreen broadleaf (3) forests, wetlands (6), closed (3) and open shrublands (2) and woody savanna (1).
+
+\textbf{Models.} For each property and window, two models were compared that differ only in the mortality predictors:
+climate and traits (C+T; 143 predictors for 12 months, 263 for 24 months) and climate, traits and mortality (C+T+M; 193 and 338
+predictors). The main learner was AutoGluon-Tabular\cite{erickson2020autogluon} (v1.6.3; default model zoo of gradient-boosted
+trees, random forests, extra trees and neural networks, five-fold bagging on site-disjoint folds, weighted ensemble without
+stacking). XGBoost\cite{chen2016xgboost} and LightGBM\cite{ke2017lightgbm}, each tuned with Optuna\cite{akiba2019optuna}
+(tree-structured Parzen estimator, 50 trials per property and window, five-fold cross-validation on site-disjoint groups),
+served as checks.
+
+\textbf{Cross-validation.} Models were evaluated with repeated leave-one-site-out cross-validation: for every site, models were
+trained three times on a random 80\,\% of the remaining sites and the predictions for the held-out site were averaged. AutoGluon
+was refitted inside every fold, so that model selection never saw the held-out site.
+
+\textbf{Model interpretation.} Contributions of predictors were quantified with SHAP values\cite{lundberg2017unified}: exact
+TreeSHAP\cite{lundberg2020local} for XGBoost and LightGBM and permutation-based SHAP for the AutoGluon ensemble. The net
+contribution of the mortality block is the sum of the signed SHAP values of all mortality predictors per site-year, averaged per
+site; negative values mean that mortality lowers the predicted property.
+
+\textbf{Statistics.} The main test compares the mean absolute error (MAE) of C+T+M and C+T at the site-year level: every
+site-year is an observation, and the statistic is the difference of the pooled MAE (percentage change = ratio of the pooled
+errors). Because the years of one site are not independent, whole sites were resampled with replacement (10\,000 bootstrap draws,
+95\,\% percentile intervals) and, for a paired permutation test, the C+T and C+T+M predictions were swapped per site
+(10\,000 draws, one-sided). The same tests were run for subsets of sites (High relative mortality) and of site-years (relative mortality
+of the year above the Mid or High break). At the site level, per-site errors were compared with a one-sided sign-flip permutation
+test on the log error ratios (100\,000 flips). The relationship between the residuals (observed $-$ predicted) and the total
+mortality of the site-year was tested with linear mixed models with a random intercept per site (nlme\cite{pinheiro2000mixed}),
+checked with a site-block bootstrap of the slope (1,000 draws), leave-one-site-out refits and without the three sites with more
+than 50\,\% relative mortality; the correction of the residual by mortality (residual of C+T+M minus residual of C+T) was tested per
+mortality class with the paired site-level permutation (100\,000 draws). Differences in net mortality SHAP between High and
+Low+Mid sites were tested with Mann--Whitney U tests and associations with Spearman correlations. $P$ values were corrected for
+multiple testing with the Benjamini--Hochberg procedure\cite{benjamini1995controlling} within each table or figure. To test for
+circularity, each property was refitted without the climate variables that enter its own formula (shortwave radiation for
+GPP$_\mathrm{sat}$, air temperature for ET$_\mathrm{max}$ and WUE).
+
+\textbf{Software.} Analyses used R\cite{rcore2024} (v4.3.3; xgboost, lightgbm, nlme, bigleaf) and Python (AutoGluon, Optuna, shap).
+
+\textbf{Use of large language models.} \decide{wording to be agreed by the authors; the journal requires any use of LLMs (e.g.
+for code or text assistance) to be documented here}
+
+\section*{Data availability}
+The FLUXNET data products used in this work were downloaded from the ICOS Carbon Portal and AmeriFlux via the FLUXNET Shuttle on
+12 May 2026 and are cited per site\cite{flxATMmg,flxATZoe,flxAUAPL,flxAUHow,flxBEBra,flxBEMaa,flxBEVie,flxCALU2,flxCATP1,flxCATP3,flxCATPD,flxCHDav,flxCHLae,flxCLACF,flxCLSDP,flxCNBeO,flxCNDzo,flxCZBK1,flxCZLnz,flxCZRAJ,flxCZStn,flxDEAkm,flxDEHai,flxDEHar,flxDEHoH,flxDEHzd,flxDEMsr,flxDEObe,flxDERuC,flxDETha,flxDKGds,flxDKSor,flxEEStg,flxESCrg,flxESHen,flxFIHyy,flxFIKen,flxFILet,flxFIRk2,flxFRBil,flxFRFBn,flxFRFon,flxFRPue,flxILYat,flxITBFt,flxITBsB,flxITCp2,flxITLav,flxITNoe,flxITRen,flxITSR2,flxJPApi,flxJPYms,flxJPYnf,flxKRKw1,flxKRKw2,flxNLLoo,flxRUFy2,flxRUFyo,flxSEHtm,flxSENor,flxSERos,flxSESvb,flxUSBZo,flxUSBar,flxUSCMW,flxUSCRK,flxUSCS2,flxUSGLE,flxUSHB2,flxUSHB3,flxUSHBK,flxUSMBP,flxUSMOz,flxUSMtB,flxUSNC2,flxUSNC3,flxUSRRC,flxUSRpf,flxUSSHC,flxUSSSH,flxUSUMd,flxUSVcp,flxUSxAB,flxUSxBL,flxUSxBN,flxUSxBR,flxUSxDJ,flxUSxDL,flxUSxGR,flxUSxJE,flxUSxML,flxUSxRM,flxUSxRN,flxUSxSC,flxUSxSE,flxUSxST,flxUSxTR,flxUSxUK,flxUSxUN,flxUSxWR}. Tree mortality maps are available from deadtrees.earth\cite{mosig2025deadtrees}
+and plant trait maps from Zenodo\cite{lusk2026crowdsourced}. The derived site-year dataset and all model predictions are deposited
+at [repository, DOI].
+
+\section*{Code availability}
+All code for dataset construction, model training (AutoGluon, XGBoost, LightGBM), statistics and figures is available at
+[repository, DOI].
+
+\renewcommand{\refname}{References}
+{\small\textit{Discussion references so far; Main and Methods still to be added (about 50 for an Article).}}
+\bibliographystyle{unsrtnat}
+\bibliography{references}
+
+\section*{Acknowledgements}
+FLUXNET data products were produced and harmonized by eddy covariance regional networks and data processing centers,
+including AmeriFlux, ChinaFlux, European Fluxes Database, ICOS, JapanFlux, KoFlux, OzFlux, SAEON, and TERN. These products also
+include a modified version of ERA5 hourly data provided by the Copernicus Climate Change Service. Funding for the AmeriFlux data
+service was provided by the U.S. Department of Energy Office of Science. ChinaFlux data are from the National ecosystem science
+data center https://www.nesdc.org.cn. TERN data are from the TERN Data Discovery Portal https://portal.tern.org.au/browse/theme.
+We thank all site PIs and teams. [deadtrees.earth, colleagues, computing resources.]
+
+\section*{Funding}
+[Initials] disclose(s) support for the research of this work from [Funder] [grant number]. [Initials] declare(s) no
+relevant funding.
+
+\section*{Author information}
+\textbf{Contributions:} [CRediT roles per author.] \quad \textbf{Competing interests:} The authors declare no competing
+interests. \quad \textbf{Corresponding author:} [name, e-mail].
+
+\clearpage
+\section*{Extended Data and Supplementary Information}
+{\small\textit{The journal allows at most 10 Extended Data items (each cited in the main text); everything else goes
+to Supplementary Information. The A-sections below still need to be split into Extended Data and Supplementary.}}
+
+
+\subsection*{A1. Learner comparison}
+\begin{itemize}
+  \item Same data, predictors, windows and cross-validation for all three learners.
+  \item AutoGluon best in 7 of 16 tasks; mean $R^2$ (C+T+M) 0.402 / 0.408 (12 / 24\,m) vs XGBoost 0.385 / 0.406
+        and LightGBM 0.388 / 0.400.
+  \item The effect of mortality is very similar: NEP$_{max}$ improves for every learner; overall RMSE change for
+        GPP$_{sat}$ $-2.8$ to $-4.0$\,\% for all learners; AutoGluon gives a somewhat larger WUE effect
+        ($-4$\,\% vs $-1$ to $-4$\,\%).
+\end{itemize}
+
+\begin{table}[htbp]
+\centering
+\caption{\textbf{The three learners reach similar skill.} $R^2$ of repeated leave-one-site-out predictions of the C+T+M model for AutoGluon, XGBoost and LightGBM (Optuna-tuned); bold, best learner per property and window; bottom rows, mean over the four properties with (C+T+M) and without mortality (C+T).}
+\label{tab:a_r2}
+\footnotesize
+\begin{tabular}{lcccccc}
+\toprule
+ & \multicolumn{3}{c}{12 months} & \multicolumn{3}{c}{24 months} \\
+\cmidrule(lr){2-4}\cmidrule(lr){5-7}
+EFP & AutoGluon & XGBoost & LightGBM & AutoGluon & XGBoost & LightGBM \\
+\midrule
+GPP$_\mathrm{sat}$ & \textbf{0.367} & 0.334 & 0.346 & 0.370 & \textbf{0.387} & 0.347 \\
+NEP$_\mathrm{max}$ & \textbf{0.503} & 0.473 & 0.492 & 0.502 & 0.514 & \textbf{0.540} \\
+ET$_\mathrm{max}$  & 0.425 & 0.439 & \textbf{0.443} & 0.433 & 0.447 & \textbf{0.453} \\
+WUE                & \textbf{0.312} & 0.292 & 0.270 & \textbf{0.326} & 0.277 & 0.261 \\
+\midrule
+Mean, C+T+M & \textbf{0.402} & 0.385 & 0.388 & \textbf{0.408} & 0.406 & 0.400 \\
+Mean, C+T   & \textbf{0.349} & 0.337 & 0.347 & 0.351 & \textbf{0.365} & 0.356 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection*{A2. Per-site error: figures and site-level tests}
+\begin{itemize}
+  \item Per-site MAE without and with mortality; \% = geometric-mean change of the per-site MAE, stars = one-sided
+        paired sign-flip permutation test on the per-site log MAE ratios (100\,000 flips, BH-FDR across the figure).
+        The log ratio stops sites with an almost perfect C+T prediction from dominating (one-year sites, e.g.\ KR-Kw1).
+  \item NEP$_{max}$ MAE $-12$ / $-8$\,\% across all sites and $-30$ / $-17$\,\% at High sites (12 / 24\,months); WUE
+        $-11$ / $-15$\,\% at High sites.
+\end{itemize}
+\begin{center}\includegraphics[width=0.62\linewidth]{figures/A_fig_MAE_AG.png}\\[2pt]
+\parbox{\linewidth}{{\small \textbf{Fig.\ A1} $|$ \textbf{Per-site error without and with mortality (AutoGluon).} MAE of every site for C+T (blue) and C+T+M (vermillion), all 101 sites, 12- and 24-month windows, in the units of each property. Boxes show the median and interquartile range, whiskers 1.5 times the interquartile range; points are sites; y axes cut at the 95th percentile (no data removed). Labels: geometric-mean change of the per-site MAE and share of sites whose MAE decreased; stars, one-sided paired sign-flip permutation test on the per-site log MAE ratios, Benjamini--Hochberg corrected ($^{*}$\,$q<0.05$).}}\end{center}
+\begin{center}\includegraphics[width=0.62\linewidth]{figures/A_fig_MAE_high_AG.png}\\[2pt]
+\parbox{\linewidth}{{\small \textbf{Fig.\ A2} $|$ \textbf{As Fig.~A1 for the 22 sites with high relative mortality} (models trained on all sites).}}\end{center}
+\begin{center}\includegraphics[width=\linewidth]{figures/A_fig_MAE_all_learners.png}\\[2pt]
+\parbox{\linewidth}{{\small \textbf{Fig.\ A3} $|$ \textbf{As Fig.~A1 for the three learners} (AutoGluon, XGBoost, LightGBM).}}\end{center}
+\begin{center}\includegraphics[width=\linewidth]{figures/A_fig_site_dRMSE_AG.png}\\[2pt]
+\parbox{\linewidth}{{\small \textbf{Fig.\ A4} $|$ \textbf{Per-site change in RMSE when mortality is added (AutoGluon).} One bar per site, sorted by the change; negative values, smaller error; bars coloured by the site's maximum relative mortality (colour bar; scale as in Fig.~3, anchored at the class breaks 10.6 and 24.0\,\%); labels, share of sites with a smaller error.}}\end{center}
+\begin{center}\includegraphics[width=\linewidth]{figures/A_fig_siteyear_dabs_AG.png}\\[2pt]
+\parbox{\linewidth}{{\small \textbf{Fig.\ A5} $|$ \textbf{The same per site-year: the largest improvements are in years with high mortality (AutoGluon).} Change in absolute error when mortality is added, $|$observed $-$ C+T+M$|$ $-$ $|$observed $-$ C+T$|$, for each of the 361 site-years, sorted by the change; negative values, smaller error; bars coloured by the relative mortality of that site-year (colour bar; scale as in Fig.~3); labels, share of site-years with a smaller error.}}\end{center}
+
+\input{tables/tableA_site_logratio_dMAE_AG}
+\input{tables/tableA_bootstrap_full_dMAE_AG}
+\input{tables/tableA_bootstrap_full_dRMSE_AG}
+\input{tables/tableA_bootstrap_full_dMAE_XGBLGB}
+\input{tables/tableA_site_logratio_dMAE_XGBLGB}
+
+\clearpage
+\subsection*{A3. Direction per site: 12 months and XGBoost / LightGBM}
+\begin{center}
+\includegraphics[width=\linewidth]{figures/A_fig_signed_12m_AG_sites.png}\\[2pt]
+\parbox{\linewidth}{{\small \textbf{Fig.\ A6} $|$ \textbf{As Fig.~3 for the 12-month window} (AutoGluon).}}
+\end{center}
+\begin{center}
+\includegraphics[width=\linewidth]{figures/A_fig_signed_24m_XGB.png}\\[2pt]
+\parbox{\linewidth}{{\small \textbf{Fig.\ A7} $|$ \textbf{As Fig.~3 for XGBoost} (Optuna-tuned, 24 months).}}
+\end{center}
+\begin{center}
+\includegraphics[width=\linewidth]{figures/A_fig_signed_24m_LGB.png}\\[2pt]
+\parbox{\linewidth}{{\small \textbf{Fig.\ A8} $|$ \textbf{As Fig.~3 for LightGBM} (Optuna-tuned, 24 months).}}
+\end{center}
+
+\clearpage
+\subsection*{A4. High vs Low+Mid: all learners and relative deadwood}
+\begin{center}
+\includegraphics[width=\linewidth]{figures/A_fig_direction_all_learners.png}\\[2pt]
+\parbox{\linewidth}{{\small \textbf{Fig.\ A9} $|$ \textbf{As Fig.~4 for XGBoost} (Optuna-tuned).}}
+\end{center}
+\begin{center}
+\includegraphics[width=\linewidth]{figures/A_fig_direction_LGB.png}\\[2pt]
+\parbox{\linewidth}{{\small \textbf{Fig.\ A10} $|$ \textbf{As Fig.~4 for LightGBM} (Optuna-tuned).}}
+\end{center}
+\begin{center}
+\includegraphics[width=\linewidth]{figures/A_fig_direction_rel_deadwood_AG.png}\\[2pt]
+\parbox{\linewidth}{{\small \textbf{Fig.\ A11} $|$ \textbf{As Fig.~4 with the sites grouped by relative deadwood instead of relative mortality (AutoGluon).} The High versus Low+Mid difference is the same for GPP$_\mathrm{sat}$, NEP$_\mathrm{max}$ and WUE and not significant for ET$_\mathrm{max}$.}}
+\end{center}
+
+\subsection*{A5. Ecosystem type and tree cover}
+\begin{itemize}
+  \item \textbf{A} $\Delta$RMSE by IGBP, \textbf{B} net signed mortality SHAP by IGBP, \textbf{C} tree cover vs benefit,
+        \textbf{D} tree cover vs direction, \textbf{E} relative mortality vs direction (= Fig.~5).
+  \item C: no relationship ($\rho$ = 0.10--0.18, n.s.). D: positive, $\rho$ = +0.66 to +0.75 (all $p<0.001$) --- at low
+        tree cover mortality pulls predicted carbon uptake down, at high tree cover it pushes it up.
+  \item B: DBF, EBF and MF mostly positive, CSH, OSH and WET negative, ENF slightly negative.
+        OSH has 2 sites, WSA 1, CSH and EBF 3 each, WET 6.
+\end{itemize}
+\begin{center}
+\includegraphics[width=0.82\linewidth]{figures/A_fig_igbp_24m_AG.png}\\[2pt]
+\parbox{\linewidth}{{\small \textbf{Fig.\ A12} $|$ \textbf{The mortality effect by vegetation class and tree cover (AutoGluon, C+T+M, 24 months).} \textbf{a}, Change in RMSE when mortality is added, per IGBP class; \textbf{b}, net mortality SHAP per class; \textbf{c}, tree cover against the change in RMSE; \textbf{d}, tree cover against net mortality SHAP; \textbf{e}, site maximum relative mortality against net mortality SHAP (as Fig.~5). Each point is a site, coloured by IGBP class (abbreviations as in Fig.~1); boxes, median and interquartile range; lines, linear fits with 95\,\% confidence bands; $\rho$, Spearman rank correlation, Benjamini--Hochberg corrected within the figure.}}
+\end{center}
+\begin{center}
+\includegraphics[width=0.82\linewidth]{figures/A_fig_igbp_12m_AG.png}\\[2pt]
+\parbox{\linewidth}{{\small \textbf{Fig.\ A13} $|$ \textbf{As Fig.~A12 for the 12-month window} (AutoGluon).}}
+\end{center}
+\begin{center}
+\includegraphics[width=0.82\linewidth]{figures/A_fig_igbp_24m_XGB.png}\\[2pt]
+\parbox{\linewidth}{{\small \textbf{Fig.\ A14} $|$ \textbf{As Fig.~A12 for XGBoost} (Optuna-tuned, 24 months).}}
+\end{center}
+
+\subsection*{A6. Mortality metrics}
+\begin{itemize}
+  \item Share of the mortality block's mean $|$SHAP$|$ per metric, AutoGluon: relative mortality 26\,\%, relative deadwood
+        24\,\%, relative tree-cover loss 22\,\%, absolute deadwood 16\,\%, deadwood gain 12\,\%; for ET$_{max}$ tree-cover
+        loss leads (32\,\%).
+  \item Drop-column test (XGBoost and LightGBM retrained without each metric, or with only one metric added to C+T):
+        removing any single metric changes the error by at most about 1\,\%, because the correlated metrics take over
+        (relative mortality vs relative deadwood $\rho$ = 0.91). Absolute deadwood gets 14--16\,\% of the SHAP but adds
+        nothing when removed.
+\end{itemize}
+\begin{center}
+\includegraphics[width=0.8\linewidth]{figures/A_fig_mortality_block_AG.png}\\[2pt]
+\parbox{\linewidth}{{\small \textbf{Fig.\ A15} $|$ \textbf{Contribution of each mortality metric to the mortality block (AutoGluon).} Share of the block's mean $|$SHAP$|$ per metric in the C+T+M model, 12-month (left) and 24-month window (right); bars, mean over the 101 sites $\pm$ s.e.}}
+\end{center}
+\begin{center}
+\includegraphics[width=\linewidth]{figures/A_fig_dropcol.png}\\[2pt]
+\parbox{\linewidth}{{\small \textbf{Fig.\ A16} $|$ \textbf{Removing or adding a single mortality metric changes the error little.} Rows, the four properties; left column, share of each metric in the mortality block's $|$SHAP$|$ (all learners); middle, increase in RMSE when the metric is removed from C+T+M; right, decrease in RMSE when only this metric is added to C+T (middle and right: XGBoost and LightGBM retrained with the same tuned settings and folds). Bars, mean of the 12- and 24-month windows; lines, range of the two.}}
+\end{center}
+\begin{center}
+\includegraphics[width=0.8\linewidth]{figures/A_fig_mortality_block_XGB.png}\\[2pt]
+\parbox{\linewidth}{{\small \textbf{Fig.\ A17} $|$ \textbf{As Fig.~A15 for XGBoost.}}}
+\end{center}
+\begin{center}
+\includegraphics[width=0.8\linewidth]{figures/A_fig_mortality_block_LGB.png}\\[2pt]
+\parbox{\linewidth}{{\small \textbf{Fig.\ A18} $|$ \textbf{As Fig.~A15 for LightGBM.}}}
+\end{center}
+
+\subsection*{A7. Fig.~2: other learners, 12 months, mixed models and robustness}
+\begin{itemize}
+  \item XGBoost and LightGBM over-predict in the $>$30\,\% class as much as AutoGluon without mortality (NEP$_{max}$ $-3.6$ to
+        $-4.0$\,$\mu$mol\,m$^{-2}$\,s$^{-1}$); with mortality the over-prediction is smaller but stays below 0 ($-1.8$ to $-2.4$).
+        Their correction in the $>$30\,\% class is significant for GPP$_{sat}$ (+1.4 to +1.8), NEP$_{max}$ (+1.2 to +2.2)
+        and WUE (+0.12 to +0.19), all $q<0.05$.
+  \item Robustness of the mixed-model slopes (Fig.~A22): mixed model, site-block bootstrap (1000 draws), leave one site out
+        (range over 101 refits) and without the three most extreme sites (FI-Hyy, US-GLE, US-NC2). The over-prediction
+        without mortality (middle row) holds in every check for NEP$_{max}$ and WUE; with mortality (bottom row) no check is
+        significant for GPP$_{sat}$, NEP$_{max}$ or WUE. Whether the error reduction itself grows with mortality (top row)
+        goes the same way but is not robust in the bootstrap.
+\end{itemize}
+\begin{center}
+\includegraphics[width=\linewidth]{figures/A_fig_residual_by_mortality_AG_12m.png}\\[2pt]
+\parbox{\linewidth}{{\small \textbf{Fig.\ A19} $|$ \textbf{As Fig.~2 for the 12-month window} (AutoGluon).}}
+\end{center}
+\begin{center}
+\includegraphics[width=\linewidth]{figures/A_fig_residual_by_mortality_XGB_24m.png}\\[2pt]
+\parbox{\linewidth}{{\small \textbf{Fig.\ A20} $|$ \textbf{As Fig.~2 for XGBoost} (Optuna-tuned, 24 months).}}
+\end{center}
+\begin{center}
+\includegraphics[width=\linewidth]{figures/A_fig_residual_by_mortality_LGB_24m.png}\\[2pt]
+\parbox{\linewidth}{{\small \textbf{Fig.\ A21} $|$ \textbf{As Fig.~2 for LightGBM} (Optuna-tuned, 24 months).}}
+\end{center}
+\begin{center}
+\includegraphics[width=\linewidth]{figures/A_fig_dose_robustness_AG.png}\\[2pt]
+\parbox{\linewidth}{{\small \textbf{Fig.\ A22} $|$ \textbf{The over-prediction without mortality is robust (AutoGluon).} Slope of the residual or error change per +10\,\% relative mortality of the site-year under each check: mixed model with a random intercept per site, site-block bootstrap (1,000 draws), leave one site out (range over 101 refits) and without the three sites with more than 50\,\% relative mortality. Rows: change in absolute error, residual without (C+T) and with mortality (C+T+M); points, slope; lines, 95\,\% interval (bootstrap: percentile interval; leave one site out: range of the refits); filled symbols, significant (Benjamini--Hochberg $q<0.05$; leave one site out: $p<0.05$ in at least 95\,\% of the refits).}}
+\end{center}
+\begin{center}
+\includegraphics[width=\linewidth]{figures/A_fig_dose_siteyear_AG.png}\\[2pt]
+\parbox{\linewidth}{{\small \textbf{Fig.\ A23} $|$ \textbf{All site-years with the mixed-model slopes (AutoGluon).} \textbf{a--h}, Change in absolute error when mortality is added (grey points, site-years; black line, mixed-model slope) for the 12- and 24-month windows; \textbf{i--p}, residuals without (blue) and with mortality (vermillion) with their slopes, against the relative mortality of the site-year. Labels, slope per +10\,\% relative mortality with Benjamini--Hochberg corrected significance (mixed model with a random intercept per site); $\Delta$, difference between the two slopes, estimated as the trend of the correction (residual with minus residual without mortality per site-year) with a mixed model and tested with a site-block bootstrap (500 draws; $^{**}$\,$q<0.01$, the smallest value 500 draws can resolve); y axes cut at the 1st and 99th percentiles (no data removed).}}
+\end{center}
+
+\subsection*{A8. Circularity check: EFP-specific climate block}
+\begin{itemize}
+  \item Concern (Miguel): a climate variable that is part of an EFP's formula could make the prediction partly circular.
+        The climate predictors are already strictly pre-season, but to be safe each EFP was refitted (AutoGluon, same design)
+        \textbf{without the climate variables in its formula}: GPP$_{sat}$ without radiation (light-response curve on
+        PPFD = SW$_{IN}$ $\times$ 2.11), ET$_{max}$ and WUE without air temperature (ET = LE / $\lambda$(T$_a$));
+        NEP$_{max}$ has no climate variable in its formula and is unchanged. Filters (SW$_{IN}$ thresholds, rain) are not
+        part of the formulas and were kept. 36 (12\,m) and 72 (24\,m) climate predictors removed.
+  \item \textbf{Skill hardly changes:} $R^2$ of C+T+M (12 / 24\,m) GPP$_{sat}$ 0.385 / 0.365 (before 0.367 / 0.370),
+        ET$_{max}$ 0.409 / 0.420 (0.425 / 0.433), WUE 0.281 / 0.302 (0.312 / 0.326).
+  \item \textbf{The mortality effect is unchanged} (Table~\ref{tab:efpclim}): WUE still improves significantly at High sites
+        ($-11$ / $-15$\,\%) and in high-mortality years ($-17$ / $-20$\,\%); GPP$_{sat}$ $-4$ to $-16$\,\%, significant at
+        12\,m (all site-years $-6.1$\,\%, Mid+High years $-8.3$\,\%) but not at 24\,m; ET$_{max}$ not significant.
+  \item \textbf{The over-prediction without mortality and its correction remain} (Fig.~A24): in the $>$30\,\% class
+        GPP$_{sat}$ is over-predicted by 4.6 and corrected by +3.6\,$\mu$mol\,m$^{-2}$\,s$^{-1}$ ($q=0.04$; 12\,m: +3.7,
+        $q=0.009$), WUE by 0.71 and corrected by +0.25\,g\,C\,mm$^{-1}$ ($q=0.04$; 12\,m $q=0.002$); NEP$_{max}$ as before.
+  \item \textbf{So:} the mortality results do not depend on climate variables that enter the EFP formulas --- no
+        circularity from the climate block.
+\end{itemize}
+
+\input{tables/table_efpclim_bootstrap_dMAE}
+
+\begin{center}
+\includegraphics[width=\linewidth]{figures/fig6_residual_by_mortality_AG_efpclim_24m.png}\\[2pt]
+\parbox{\linewidth}{{\small \textbf{Fig.\ A24} $|$ \textbf{The over-prediction and its correction remain when the climate variables used to compute each property are left out.} As Fig.~2 (AutoGluon, 24 months) with the EFP-specific climate block: radiation removed for GPP$_\mathrm{sat}$, air temperature for ET$_\mathrm{max}$ and WUE.}}
+\end{center}
+
+\end{document}

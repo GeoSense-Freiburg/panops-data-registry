@@ -1,0 +1,72 @@
+\begin{table}[htbp]
+\centering
+\caption{Leave-one-site-out random forest performance for five ecosystem
+functional properties (EFPs), evaluated on a unified benchmark --- the set of
+site-years with complete 24-month predictor data (v2: fixed data quality).
+Each cell shows $R^2$ (RMSE in native units). \textbf{Bold} = best $R^2$
+per EFP within each panel. Panels A--B: anomaly z-score EFP memory;
+Panels C--D: raw-lag EFP memory.}
+\label{tab:RF_LOSO_v2}
+\footnotesize
+\begin{tabular}{llcccccc}
+\toprule
+Model & Predictors & $n$ & GPP$_\mathrm{sat}$ & NEP$_\mathrm{max}$ & ET$_\mathrm{max}$ & uWUE & WUE \\
+  &  &  & ($\mu$mol m$^{-2}$ s$^{-1}$) & ($\mu$mol m$^{-2}$ s$^{-1}$) & (mm d$^{-1}$) & (g C mm$^{-1}$) & (g C mm$^{-1}$) \\
+\midrule
+\multicolumn{8}{l}{\textit{Panel A: 12m window --- Anomaly z-score EFP memory --- ? site-years, ? sites}} \\
+\midrule
+M01 & C & \multirow{8}{*}{?} & --- & --- & --- & 0.162 (1.22) & --- \\
+M02 & C + D &  & --- & --- & --- & \textbf{0.212 (1.17)} & --- \\
+M03 & C + T &  & --- & --- & --- & 0.178 (1.20) & --- \\
+M04 & C + T + D &  & --- & --- & --- & 0.197 (1.18) & --- \\
+M05 & C + M &  & --- & --- & --- & 0.161 (1.22) & --- \\
+M06 & C + D + M &  & --- & --- & --- & 0.205 (1.18) & --- \\
+M07 & C + T + M &  & --- & --- & --- & 0.177 (1.20) & --- \\
+M08 & C + T + D + M &  & --- & --- & --- & 0.187 (1.19) & --- \\
+\midrule
+\multicolumn{8}{l}{\textit{Panel B: 24m window --- Anomaly z-score EFP memory --- ? site-years, ? sites}} \\
+\midrule
+M01 & C & \multirow{8}{*}{?} & --- & --- & --- & 0.169 (1.21) & --- \\
+M02 & C + D &  & --- & --- & --- & \textbf{0.199 (1.18)} & --- \\
+M03 & C + T &  & --- & --- & --- & 0.181 (1.20) & --- \\
+M04 & C + T + D &  & --- & --- & --- & 0.198 (1.18) & --- \\
+M05 & C + M &  & --- & --- & --- & 0.166 (1.21) & --- \\
+M06 & C + D + M &  & --- & --- & --- & 0.198 (1.18) & --- \\
+M07 & C + T + M &  & --- & --- & --- & 0.172 (1.20) & --- \\
+M08 & C + T + D + M &  & --- & --- & --- & 0.186 (1.19) & --- \\
+\midrule
+\multicolumn{8}{l}{\textit{Panel C: 12m window --- Raw-lag EFP memory --- ? site-years, ? sites}} \\
+\midrule
+M01 & C & \multirow{8}{*}{?} & --- & --- & --- & 0.162 (1.22) & --- \\
+M02 & C + D &  & --- & --- & --- & 0.207 (1.18) & --- \\
+M03 & C + T &  & --- & --- & --- & 0.168 (1.21) & --- \\
+M04 & C + T + D &  & --- & --- & --- & 0.182 (1.19) & --- \\
+M05 & C + M &  & --- & --- & --- & \textbf{0.604 (0.837)} & --- \\
+M06 & C + D + M &  & --- & --- & --- & 0.510 (0.939) & --- \\
+M07 & C + T + M &  & --- & --- & --- & 0.561 (0.894) & --- \\
+M08 & C + T + D + M &  & --- & --- & --- & 0.477 (0.970) & --- \\
+\midrule
+\multicolumn{8}{l}{\textit{Panel D: 24m window --- Raw-lag EFP memory --- ? site-years, ? sites}} \\
+\midrule
+M01 & C & \multirow{8}{*}{?} & --- & --- & --- & 0.164 (1.22) & --- \\
+M02 & C + D &  & --- & --- & --- & 0.194 (1.19) & --- \\
+M03 & C + T &  & --- & --- & --- & 0.164 (1.21) & --- \\
+M04 & C + T + D &  & --- & --- & --- & 0.189 (1.19) & --- \\
+M05 & C + M &  & --- & --- & --- & \textbf{0.604 (0.835)} & --- \\
+M06 & C + D + M &  & --- & --- & --- & 0.517 (0.930) & --- \\
+M07 & C + T + M &  & --- & --- & --- & 0.571 (0.875) & --- \\
+M08 & C + T + D + M &  & --- & --- & --- & 0.507 (0.941) & --- \\
+\midrule
+\bottomrule
+\end{tabular}
+\vspace{2pt}
+\begin{minipage}{\linewidth}
+\footnotesize
+\textit{Note:} C = Climate (monthly TA, VPD, SW$_\mathrm{IN}$ mean/p05/p95;
+P mean, sum, $P_\mathrm{p05}$, $P_\mathrm{p95}$); T = Plant traits (hydraulic, leaf, root);
+D = Disturbance (mortality intensity, deadwood, forest loss at 100--500\,m);
+M = EFP memory (anomaly z-score in Panels A--B; raw lag-1/lag-2 values in Panels C--D).
+RMSE in native units in parentheses. Data quality v2: negative uWUE/WUE set to NA;
+CN-Sb1/CN-Sb2 extreme outliers removed; US-HB4 anomalous precipitation months set to NA.
+\end{minipage}
+\end{table}

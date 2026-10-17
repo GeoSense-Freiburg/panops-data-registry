@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>Daily Report — 2026-07-03 (RF v3 Harmonized Benchmark)</title><style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0D0D0D;color:#E0E0E0;font-family:Arial,Helvetica,sans-serif;line-height:1.6;padding:28px 18px 60px}
+a{color:#22D4EB;text-decoration:none} a:hover{text-decoration:underline}
+.wrap{max-width:900px;margin:0 auto}
+.nav{font-size:.85em;color:#6B7280;margin-bottom:22px} .nav a{margin-right:14px}
+h1{font-size:1.65em;color:#fff;line-height:1.25;margin-bottom:6px;letter-spacing:-.01em}
+.article h1{display:none}
+.article h2{font-size:1.3em;color:#22D4EB;margin:34px 0 12px;padding-bottom:6px;border-bottom:1px solid #22D4EB55}
+.article h3{font-size:1.1em;color:#E5E7EB;margin:24px 0 8px}
+.article h4{font-size:1em;color:#9CA3AF;margin:18px 0 6px}
+.article p{margin:10px 0} .article ul,.article ol{margin:8px 0 8px 24px} .article li{margin:4px 0}
+.article hr{border:0;border-top:1px solid #2A2A3A;margin:26px 0}
+.article blockquote{border-left:3px solid #22D4EB;padding:2px 14px;color:#9CA3AF;margin:12px 0}
+.article code{background:#1F2937;border-radius:4px;padding:1px 5px;font-size:.88em;color:#A7F3D0;font-family:Consolas,Menlo,monospace}
+.article pre{background:#111827;border:1px solid #2A2A3A;border-radius:8px;padding:12px 14px;overflow-x:auto;margin:12px 0}
+.article pre code{background:none;padding:0;color:#E5E7EB}
+.tw{overflow-x:auto;margin:14px 0}
+.article table{border-collapse:collapse;font-size:.88em;min-width:60%}
+.article th{background:#1F2937;color:#22D4EB;text-align:left}
+.article th,.article td{border:1px solid #2A2A3A;padding:6px 10px;vertical-align:top}
+.article tr:nth-child(even) td{background:#111827}
+.article img{max-width:100%;height:auto;background:#fff;border-radius:6px;margin:12px 0 4px;display:block}
+.article em{color:#9CA3AF}
+.badge{display:inline-block;font-size:.75em;background:#1F2937;border:1px solid #374151;border-radius:4px;padding:2px 8px;color:#9CA3AF;margin-right:6px}
+.meta{margin:6px 0 22px}
+.footer{margin-top:50px;font-size:.75em;color:#4B5563;text-align:center}
+
+.month{font-size:1.05em;color:#22D4EB;margin:34px 0 12px;padding-bottom:6px;border-bottom:1px solid #22D4EB55}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.card{display:flex;flex-direction:column;gap:8px;background:#111827;border:1px solid #2A2A3A;border-radius:12px;padding:20px 20px;color:#E0E0E0;transition:border-color .2s,transform .15s}
+.card:hover{border-color:#22D4EB;transform:translateY(-2px);text-decoration:none}
+.card-title{font-size:1.02em;font-weight:bold;color:#22D4EB;line-height:1.3}
+.card-desc{font-size:.83em;color:#9CA3AF;line-height:1.5}
+.card-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto;padding-top:4px}
+.tag{font-size:.72em;background:#1F2937;border:1px solid #374151;border-radius:4px;padding:2px 8px;color:#6B7280}
+#q{width:100%;background:#111827;border:1px solid #2A2A3A;border-radius:8px;color:#E0E0E0;padding:10px 14px;font-size:.95em;margin:14px 0 4px}
+#q:focus{outline:none;border-color:#22D4EB}
+.sub{color:#9CA3AF;font-size:.9em}
+</style></head>
+<body><div class="wrap">
+<div class="nav"><a href="index.html">&larr; Daily reports</a><a href="../index.html">Hub</a></div>
+<h1>Daily Report — 2026-07-03 (RF v3 Harmonized Benchmark)</h1><div class="meta"><span class="badge">2026-07-03</span><span class="badge">1 table</span></div>
+<div class="article"><h1 id="daily-report--2026-07-03-rf-v3-harmonized-benchmark">Daily Report — 2026-07-03 (RF v3 Harmonized Benchmark)</h1>
+<hr />
+<h2 id="background">Background</h2>
+<p>Previous RF versions had <strong>unequal sample sizes across EFPs</strong>:</p>
+<ul>
+<li>GPPsat, NEPmax, ETmax: 644 site-years × 166 sites</li>
+<li>WUE, uWUE: 635 site-years × 164 sites (missing CN-Sb1, CN-Sb2)</li>
+</ul>
+<p>This was unfair for model comparison. Today we fixed this.</p>
+<hr />
+<h2 id="changes-made">Changes Made</h2>
+<h3 id="1-remove-flagged-sites-cn-sb1-cn-sb2">1. Remove Flagged Sites (CN-Sb1, CN-Sb2)</h3>
+<p><strong>Reason</strong>: Both sites have no usable WUE/uWUE data after quality control:</p>
+<ul>
+<li>CN-Sb1: 5 site-years removed</li>
+<li>CN-Sb2: 5 site-years removed</li>
+<li><strong>Total removed</strong>: 10 rows</li>
+</ul>
+<p><strong>Why now</strong>: During v2 data quality checks, we found extreme uWUE/WUE values (&gt;8) at CN-Sb1 and CN-Sb2 — likely rice paddy/agricultural contamination despite DNF labeling. We set those values to NA. Now to ensure identical samples across EFPs, we remove these sites entirely.</p>
+<h3 id="2-add-relative-disturbance-metric">2. Add Relative Disturbance Metric</h3>
+<p>Added 15 new columns (5 buffers × 3 lags):</p>
+<pre><code>relative_disturbance_pct_{100,200,300,400,500}m{,_lag1,_lag2}</code></pre>
+<p><strong>Formula</strong>: <code>(deadwood_mean_pct + loss_area_frac×100) / (forest_mean_pct + loss_area_frac×100) × 100</code></p>
+<p><strong>Interpretation</strong>: Fraction of original forest extent showing disturbance signal (standing deadwood + forest loss). Bounded 0–100%.</p>
+<p><strong>Values</strong>:</p>
+<ul>
+<li>Current year (100m–500m): 1068–1081 non-NA site-years</li>
+<li>Lag1: 884–892 site-years</li>
+<li>Lag2: 712–717 site-years</li>
+</ul>
+<p><strong>Note</strong>: <code>forest_mean_pct</code> only exists at current year (no lags in source data), so relative disturbance at lags uses current-year forest as denominator.</p>
+<h3 id="3-harmonized-benchmark">3. Harmonized Benchmark</h3>
+<p><strong>Input</strong>: <code>EFP_mortality_trait_hydro_combined_with_meteo_dist_lags.csv</code> (1180 rows)<br />
+<strong>Output</strong>: <code>EFP_mortality_trait_hydro_combined_with_meteo_dist_lags_v3_harmonized.csv</code> (1170 rows)</p>
+<p><strong>Final benchmark</strong>:</p>
+<ul>
+<li>All EFPs: 1164 site-years (identical across 5 EFPs)</li>
+<li>Sites: 182 (after removing CN-Sb1, CN-Sb2)</li>
+<li>Years: 9 (2016–2024)</li>
+<li>Columns: 668 (added 15 relative_disturbance metrics)</li>
+</ul>
+<hr />
+<h2 id="rf-v3-runs-in-progress">RF v3 Runs (In Progress)</h2>
+<p><strong>Scripts created</strong>:</p>
+<ul>
+<li><code>run_39_RF_LOSO_anomaly_24mbench_v3.R</code> — Anomaly memory, M01–M08, LOSO</li>
+<li><code>run_40_RF_LOSO_rawmem_24mbench_v3.R</code> — Raw-lag memory, M01–M08, LOSO</li>
+<li><code>run_41_RF_shap_anomaly_24mbench_v3.R</code> — Anomaly SHAP (M04/M08)</li>
+<li><code>run_42_RF_shap_rawmem_24mbench_v3.R</code> — Rawmem SHAP (M04/M08)</li>
+</ul>
+<p><strong>Launch status</strong> (2026-07-03 10:34 UTC):</p>
+<ul>
+<li><code>rf39_anomaly</code> tmux: <strong>running</strong> (LOSO training)</li>
+<li><code>rf40_rawmem</code> tmux: <strong>running</strong> (LOSO training)</li>
+</ul>
+<p><strong>Expected completion</strong>: ~4–6 hours per LOSO run; SHAP runs will follow after.</p>
+<p><strong>Monitor</strong>:</p>
+<pre class="bash"><code>tmux capture-pane -t rf39_anomaly -p | tail -20
+tmux capture-pane -t rf40_rawmem -p | tail -20</code></pre>
+<p><strong>Output locations</strong>:</p>
+<ul>
+<li><code>derived_tables/outputs_afterEGU_results/RF_outputs_anomaly_24mbench_v3/</code></li>
+<li><code>derived_tables/outputs_afterEGU_results/RF_outputs_rawmem_24mbench_v3/</code></li>
+</ul>
+<hr />
+<h2 id="summary-table">Summary Table</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>v2</th>
+<th>v3</th>
+<th>Change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sites</td>
+<td>166/164 (unequal)</td>
+<td>182 (equal)</td>
+<td>-2 (removed CN-Sb1/2)</td>
+</tr>
+<tr>
+<td>Site-years</td>
+<td>644/635 (unequal)</td>
+<td>1164 (equal)</td>
+<td>harmonized</td>
+</tr>
+<tr>
+<td>EFPs</td>
+<td>GPPsat, NEPmax, ETmax, uWUE, WUE</td>
+<td>same</td>
+<td>N/A</td>
+</tr>
+<tr>
+<td>Disturbance vars</td>
+<td>mortality_intensity_pct×5 buffers</td>
+<td>+ relative_disturbance_pct×5 buffers</td>
+<td>15 new columns</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="next-steps">Next Steps</h2>
+<ol type="1">
+<li>✓ Data harmonization done</li>
+<li>✓ RF runs launched</li>
+<li>⏳ Wait for v3 LOSO completion (~4–6h)</li>
+<li>⏳ Launch v3 SHAP runs</li>
+<li><label><input type="checkbox" />Replot figures 15–20 with v3 outputs</label></li>
+<li><label><input type="checkbox" />Commit and push results</label></li>
+<li><label><input type="checkbox" />Update manuscript tables with v3 numbers</label></li>
+</ol>
+</div>
+<div class="footer">FluxNet &times; Mortality &middot; generated from daily_reports/*.md</div>
+</div></body></html>

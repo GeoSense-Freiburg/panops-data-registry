@@ -1,0 +1,15 @@
+{
+  "learner": "LGB",
+  "response": "WUE",
+  "best_value": 0.8061873,
+  "n_trials": 50,
+  "params": {
+    "learning_rate": 0.023708765088478877,
+    "nrounds": 500,
+    "num_leaves": 34,
+    "min_data_in_leaf": 11,
+    "feature_fraction": 0.22343887786375083,
+    "bagging_fraction": 0.6050667328409073,
+    "lambda_l2": 0.17255969963349718
+  }
+}

@@ -1,0 +1,24 @@
+== Stage counts ==
+EFPs: all four available (2017-2025)                            274 sites |  1356 site-years
++ QC: without CN-Sb1 / CN-Sb2 and negative-WUE site-years       272 sites |  1340 site-years
+EFPs: in a run of >= 2 continuous years                         239 sites |  1295 site-years
++ v5 mortality exists for the site-year (current year)          239 sites |  1293 site-years
++ growing-season start known                                    239 sites |  1293 site-years
++ lag-1 climate window complete                                 239 sites |  1191 site-years
+EFP + mortality + climate on the same site-years, >= 2 continuous  224 sites |  1174 site-years
+
+== After lag 1/2 and NA cleaning ==
+A) all mortality metrics with lag 1 and lag 2                   122 sites |   437 site-years
+     years present: 2020, 2021, 2022, 2023, 2024, 2025
+   ... of which in a run of >= 2 continuous years                99 sites |   412 site-years
+B) lag 2 only for stock metrics (abs./rel. mortality), as V10   129 sites |   520 site-years
+     years present: 2019, 2020, 2021, 2022, 2023, 2024, 2025
+   ... of which in a run of >= 2 continuous years               115 sites |   506 site-years
+
+== Tree cover >= 30 % (500 m buffer, site mean of v5 tree cover) ==
+clean_full, tree cover >= 30 %                                  101 sites |   361 site-years
+clean_stock, tree cover >= 30 %                                 105 sites |   428 site-years
+
+== Traits (Lusk 1 km, area-weighted 500 m) ==
+full lags, tc >= 30, all 23 traits non-NA                       101 sites |   361 site-years
+stock lags, tc >= 30, all 23 traits non-NA                      105 sites |   428 site-years

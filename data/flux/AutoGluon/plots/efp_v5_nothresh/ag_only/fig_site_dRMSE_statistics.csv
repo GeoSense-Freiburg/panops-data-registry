@@ -1,0 +1,17 @@
+response,learner,window,n_sites,pct_improved,median_dRMSE,rho,p_rho,metric
+ETmax,AG,12m,101,57.4,-0.000334,-0.159,0.112,Relative mortality
+ETmax,AG,24m,101,59.4,-0.00114,-0.207,0.0379,Relative mortality
+GPPsat,AG,12m,101,58.4,-0.114,-0.088,0.384,Relative mortality
+GPPsat,AG,24m,101,60.4,-0.251,-0.191,0.0561,Relative mortality
+NEPmax,AG,12m,101,61.4,-0.258,-0.091,0.366,Relative mortality
+NEPmax,AG,24m,101,63.4,-0.208,-0.048,0.637,Relative mortality
+WUE,AG,12m,101,50.5,-0.00111,-0.236,0.0174,Relative mortality
+WUE,AG,24m,101,56.4,-0.0136,-0.191,0.0552,Relative mortality
+ETmax,AG,12m,101,57.4,-0.000334,-0.179,0.0729,Relative deadwood
+ETmax,AG,24m,101,59.4,-0.00114,-0.176,0.0785,Relative deadwood
+GPPsat,AG,12m,101,58.4,-0.114,-0.102,0.312,Relative deadwood
+GPPsat,AG,24m,101,60.4,-0.251,-0.21,0.0355,Relative deadwood
+NEPmax,AG,12m,101,61.4,-0.258,-0.111,0.268,Relative deadwood
+NEPmax,AG,24m,101,63.4,-0.208,-0.104,0.299,Relative deadwood
+WUE,AG,12m,101,50.5,-0.00111,-0.138,0.168,Relative deadwood
+WUE,AG,24m,101,56.4,-0.0136,-0.165,0.1,Relative deadwood

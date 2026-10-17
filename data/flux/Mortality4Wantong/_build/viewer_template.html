@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tower Mortality Viewer</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.27.0/plotly.min.js"></script>
+<style>
+:root {
+  color-scheme: light;
+  --page: #f9f9f7; --surface: #fcfcfb; --ink: #0b0b0b; --ink-2: #52514e; --muted: #898781;
+  --grid: #e1e0d9; --axis: #c3c2b7; --border: rgba(11,11,11,0.10); --accent: #2a78d6;
+  --b100: #86b6ef; --b200: #5598e7; --b300: #2a78d6; --b400: #1c5cab; --b500: #104281;
+  --tc-low: #86b6ef; --tc-mid: #2a78d6; --tc-high: #104281; --nodata: #898781;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page: #0d0d0d; --surface: #1a1a19; --ink: #f0efec; --ink-2: #c3c2b7; --muted: #898781;
+    --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,0.10); --accent: #3987e5;
+    --b100: #184f95; --b200: #256abf; --b300: #3987e5; --b400: #6da7ec; --b500: #b7d3f6;
+    --tc-low: #184f95; --tc-mid: #3987e5; --tc-high: #b7d3f6;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0d0d0d; --surface: #1a1a19; --ink: #f0efec; --ink-2: #c3c2b7; --muted: #898781;
+  --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,0.10); --accent: #3987e5;
+  --b100: #184f95; --b200: #256abf; --b300: #3987e5; --b400: #6da7ec; --b500: #b7d3f6;
+  --tc-low: #184f95; --tc-mid: #3987e5; --tc-high: #b7d3f6;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--page); color: var(--ink);
+  font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+main { max-width: 1180px; margin: 0 auto; padding: 24px 16px 48px; }
+h1 { font-size: 24px; line-height: 1.25; margin: 0 0 6px; }
+h2 { font-size: 17px; margin: 0 0 8px; }
+p { margin: 0 0 10px; }
+.lede { color: var(--ink-2); max-width: 75ch; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-top: 16px; }
+.top { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 16px; }
+@media (max-width: 820px) { .top { grid-template-columns: 1fr; } }
+#map { height: 420px; border-radius: 8px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--ink-2); margin-top: 8px; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.dot { width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--surface); box-shadow: 0 0 0 1px var(--axis); }
+.dot.hollow { background: transparent !important; border: 2px solid var(--nodata); box-shadow: none; }
+.swatch { width: 18px; height: 3px; border-radius: 2px; }
+label { font-size: 13px; color: var(--ink-2); display: block; margin-bottom: 4px; }
+select { font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--axis);
+  border-radius: 6px; padding: 6px 8px; width: 100%; }
+dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 12px; margin: 12px 0 0; font-size: 14px; }
+dt { color: var(--muted); }
+dd { margin: 0; }
+.warn { margin-top: 12px; font-size: 13px; color: var(--ink-2); border-left: 3px solid var(--axis); padding-left: 10px; }
+.grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 980px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 620px) { .grid { grid-template-columns: 1fr; } }
+.panel { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 10px 4px; min-width: 0; }
+.panel h3 { font-size: 14px; margin: 0; }
+.panel .sub { font-size: 12px; color: var(--muted); margin: 0; min-height: 18px; }
+.chart { height: 230px; }
+.chart-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; flex-wrap: wrap; }
+details { margin-top: 14px; }
+summary { cursor: pointer; color: var(--accent); font-size: 14px; }
+.tablewrap { overflow-x: auto; margin-top: 8px; }
+table { border-collapse: collapse; font-size: 12px; font-variant-numeric: tabular-nums; }
+th, td { padding: 3px 8px; text-align: right; border-bottom: 1px solid var(--grid); white-space: nowrap; }
+th { color: var(--ink-2); font-weight: 600; }
+td:first-child, th:first-child, td:nth-child(2), th:nth-child(2) { text-align: left; }
+.defs { font-size: 13px; color: var(--ink-2); }
+.defs b, .defs h2 { color: var(--ink); }
+.leaflet-container { background: var(--grid); font: inherit; }
+.leaflet-popup-content { font-size: 13px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Tree mortality around flux towers</h1>
+  <p class="lede">Annual tree mortality metrics from deadtrees.earth maps (version 5.1, 10 m) for the ICOS/GEDI and NEON
+  site lists, in circular buffers of 100-500 m around each tower, 2017-2025. 77 of the 84 requested sites (68 towers)
+  have data. Click a tower on the map or pick it from the list.</p>
+
+  <section class="top">
+    <div class="card">
+      <div id="map" role="img" aria-label="Map of tower locations"></div>
+      <div class="legend" aria-label="Map legend: median tree cover in the 500 m buffer">
+        <span><i class="dot" style="background:var(--tc-high)"></i>tree cover &ge; 30 %</span>
+        <span><i class="dot" style="background:var(--tc-mid)"></i>10-30 %</span>
+        <span><i class="dot" style="background:var(--tc-low)"></i>&lt; 10 %</span>
+        <span><i class="dot hollow"></i>requested, no data</span>
+      </div>
+    </div>
+    <div class="card">
+      <label for="site">Tower</label>
+      <select id="site"></select>
+      <dl id="info"></dl>
+      <p class="warn" id="warn" hidden></p>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="chart-head">
+      <div>
+        <h2 id="charts-title">Metrics by year and buffer</h2>
+        <p class="lede" style="margin:0">One line per buffer radius. Hover a year to read all buffers.</p>
+      </div>
+      <div class="legend" id="buf-legend" aria-label="Buffer legend"></div>
+    </div>
+    <div class="grid" id="panels" style="margin-top:12px"></div>
+    <details>
+      <summary>Show values as a table</summary>
+      <div class="tablewrap" id="table"></div>
+    </details>
+  </section>
+
+  <section class="card defs">
+    <h2>What the metrics mean</h2>
+    <p><b>Relative mortality</b>: share of the tree canopy that is dead or was lost since last year,
+      (deadwood + tree cover loss) / (tree cover + tree cover loss) &times; 100.</p>
+    <p><b>Relative deadwood</b>: standing deadwood relative to the living canopy, deadwood / tree cover &times; 100;
+      empty when tree cover &lt; 10 %.</p>
+    <p><b>Absolute deadwood</b>: standing deadwood cover as a share of the buffer area.</p>
+    <p><b>Deadwood gain</b>: new standing deadwood since the previous year, in percentage points.</p>
+    <p><b>Relative tree cover loss</b>: canopy lost since the previous year relative to last year's tree cover;
+      empty when that tree cover &lt; 10 %.</p>
+    <p>The three change metrics compare a year with the previous one, so they start in 2018. At sites with little
+      tree cover, deadwood values of a few percent are mostly map noise. Full definitions and caveats are in README.md.</p>
+  </section>
+</main>
+
+<script>
+const DATA = /*__DATA__*/null;
+const METRICS = [
+  ["relative_mortality_pct", "Relative mortality", "%"],
+  ["relative_deadwood_pct", "Relative deadwood", "% of tree cover"],
+  ["absolute_deadwood_pct", "Absolute deadwood", "% of area"],
+  ["deadwood_gain_pp", "Deadwood gain", "percentage points"],
+  ["relative_tree_cover_loss_pct", "Relative tree cover loss", "% of last year's tree cover"],
+  ["tree_cover_pct", "Tree cover", "% of area"],
+];
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const tcClass = t => t == null ? "--nodata" : t >= 30 ? "--tc-high" : t >= 10 ? "--tc-mid" : "--tc-low";
+const label = t => {
+  const alt = [...t.icos.filter(x => x !== t.id), ...t.neon.map(x => "NEON " + x)];
+  return alt.length ? `${t.id} (${alt.join(", ")})` : t.id;
+};
+const fmt = v => v == null ? "–" : v.toFixed(v >= 10 ? 1 : 2);
+
+// site list
+const sel = document.getElementById("site");
+DATA.towers.forEach((t, i) => sel.add(new Option(label(t), i)));
+
+// map
+const map = L.map("map", { worldCopyJump: true, scrollWheelZoom: false });
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  maxZoom: 18, attribution: "&copy; OpenStreetMap contributors" }).addTo(map);
+const markers = DATA.towers.map((t, i) => {
+  const m = L.circleMarker([t.lat, t.lon], { radius: 7, weight: 2, color: "#fcfcfb", fillOpacity: 1 })
+    .bindTooltip(label(t)).on("click", () => select(i));
+  m.addTo(map); return m;
+});
+DATA.missing.forEach(s => L.circleMarker([s.lat, s.lon], { radius: 6, weight: 2, fillOpacity: 0, dashArray: "3 2" })
+  .bindTooltip(`${s.id} (${s.list}): no data`).bindPopup(`<b>${s.id}</b> (${s.list} list)<br>${s.note}`)
+  .addTo(map).setStyle({ color: "#898781" }));
+map.fitBounds(L.latLngBounds([...DATA.towers, ...DATA.missing].map(t => [t.lat, t.lon])).pad(0.05));
+
+function paintMarkers(cur) {
+  markers.forEach((m, i) => {
+    const t = DATA.towers[i];
+    m.setStyle({ fillColor: css(tcClass(t.tc500)), color: i === cur ? css("--ink") : "#fcfcfb",
+                 weight: i === cur ? 3 : 2, radius: i === cur ? 10 : 7 });
+    if (i === cur) m.bringToFront();
+  });
+}
+
+// buffer legend
+const bufColor = b => css("--b" + b);
+function paintLegend() {
+  document.getElementById("buf-legend").innerHTML = DATA.buffers.map(b =>
+    `<span><i class="swatch" style="background:${bufColor(b)}"></i>${b} m</span>`).join("");
+}
+
+// panels
+const panels = document.getElementById("panels");
+METRICS.forEach(([k, name, unit]) => {
+  panels.insertAdjacentHTML("beforeend",
+    `<div class="panel"><h3>${name}</h3><p class="sub">${unit}<span id="note-${k}"></span></p>
+     <div class="chart" id="c-${k}" role="img" aria-label="${name} by year and buffer"></div></div>`);
+});
+
+let current = 0;
+function draw() {
+  const t = DATA.towers[current];
+  const ink2 = css("--ink-2"), muted = css("--muted"), grid = css("--grid"), axis = css("--axis"), surf = css("--surface");
+  METRICS.forEach(([k, name, unit]) => {
+    const traces = DATA.buffers.map(b => ({
+      x: DATA.years, y: t.series[k][b], name: b + " m", mode: "lines+markers", connectgaps: false,
+      line: { color: bufColor(b), width: 2 }, marker: { size: 6, color: bufColor(b) },
+      hovertemplate: `${b} m: %{y:.2f}<extra></extra>`,
+    }));
+    const empty = traces.every(tr => tr.y.every(v => v == null));
+    document.getElementById("note-" + k).textContent = empty ? " · no values (tree cover < 10 %)" : "";
+    Plotly.react("c-" + k, traces, {
+      margin: { l: 40, r: 8, t: 8, b: 28 }, showlegend: false, hovermode: "x unified",
+      paper_bgcolor: surf, plot_bgcolor: surf, font: { family: "system-ui, sans-serif", size: 11, color: ink2 },
+      hoverlabel: { bgcolor: surf, bordercolor: axis, font: { color: css("--ink") } },
+      xaxis: { range: [2016.6, 2025.4], dtick: document.getElementById("c-" + k).clientWidth < 420 ? 2 : 1, tickangle: 0, tickformat: "d", gridcolor: grid, linecolor: axis, tickcolor: axis,
+               tickfont: { color: muted }, zeroline: false, fixedrange: true },
+      yaxis: { rangemode: "tozero", gridcolor: grid, linecolor: axis, tickfont: { color: muted }, zeroline: false,
+               fixedrange: true },
+    }, { displayModeBar: false, responsive: true });
+  });
+}
+
+function drawTable() {
+  const t = DATA.towers[current];
+  let h = "<table><thead><tr><th>Year</th><th>Buffer</th>" +
+    METRICS.map(m => `<th>${m[1]}</th>`).join("") + "</tr></thead><tbody>";
+  DATA.years.forEach((y, yi) => DATA.buffers.forEach(b => {
+    h += `<tr><td>${y}</td><td>${b} m</td>` + METRICS.map(m => `<td>${fmt(t.series[m[0]][b][yi])}</td>`).join("") + "</tr>";
+  }));
+  document.getElementById("table").innerHTML = h + "</tbody></table>";
+}
+
+function select(i, pan = true) {
+  current = +i; sel.value = i;
+  const t = DATA.towers[i];
+  const rows = [["Map site ID", t.id], ["IGBP", t.igbp]];
+  if (t.icos.length) rows.push(["ICOS list", t.icos.join(", ")]);
+  if (t.neon.length) rows.push(["NEON list", t.neon.join(", ")]);
+  rows.push(["Lat, lon", `${t.lat.toFixed(4)}, ${t.lon.toFixed(4)}`],
+            ["Tree cover (500 m, median)", t.tc500 == null ? "–" : t.tc500.toFixed(1) + " %"]);
+  document.getElementById("info").innerHTML = rows.map(([a, b]) => `<dt>${a}</dt><dd>${b}</dd>`).join("");
+  const w = document.getElementById("warn");
+  w.hidden = !(t.tc500 != null && t.tc500 < 30);
+  w.textContent = "Tree cover is below 30 % here. Deadwood values of a few percent are mostly map noise; " +
+    "ratio metrics are empty where tree cover is below 10 %.";
+  document.getElementById("charts-title").textContent = "Metrics by year and buffer: " + label(t);
+  paintMarkers(i);
+  if (pan) map.panTo([t.lat, t.lon]);
+  draw(); drawTable();
+}
+sel.addEventListener("change", e => select(e.target.value));
+
+function repaint() { paintLegend(); paintMarkers(current); draw(); }
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", repaint);
+new MutationObserver(repaint).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+
+paintLegend();
+select(Math.max(0, DATA.towers.findIndex(t => t.id === "DE-Hai")), false);
+</script>
+</body>
+</html>

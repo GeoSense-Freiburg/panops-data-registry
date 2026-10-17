@@ -1,0 +1,27 @@
+learner,,,LightGBM (Optuna),LightGBM (Optuna),XGBoost (Optuna),XGBoost (Optuna)
+maps,,,v4.1,v5,v4.1,v5
+metric,response,window,,,,
+relative deadwood,ETmax,12m,-0.004 vs 0.001 ns,-0.002 vs 0.0 ns,-0.003 vs 0.001 ns,-0.002 vs 0.001 ns
+relative deadwood,ETmax,24m,-0.005 vs 0.002 ns,-0.003 vs 0.001 ns,-0.006 vs 0.002*,-0.003 vs 0.002 ns
+relative deadwood,GPPsat,12m,-1.56 vs 0.282**,-1.506 vs 0.297***,-1.771 vs 0.595***,-1.683 vs 0.654***
+relative deadwood,GPPsat,24m,-1.382 vs 0.464**,-1.792 vs 0.059***,-1.437 vs 0.522**,-1.582 vs 0.037***
+relative deadwood,NEPmax,12m,-0.722 vs 0.14**,-1.331 vs 0.183***,-0.924 vs 0.182**,-1.393 vs 0.204***
+relative deadwood,NEPmax,24m,-0.819 vs 0.215**,-1.503 vs 0.291***,-0.905 vs 0.443**,-1.532 vs 0.193***
+relative deadwood,WUE,12m,-0.2 vs 0.101**,-0.326 vs 0.113***,-0.249 vs 0.099***,-0.298 vs 0.115***
+relative deadwood,WUE,24m,-0.264 vs 0.111**,-0.333 vs 0.084***,-0.297 vs 0.098**,-0.326 vs 0.08***
+relative mortality,ETmax,12m,,-0.003 vs 0.001*,,-0.002 vs 0.001 ns
+relative mortality,ETmax,24m,,-0.004 vs 0.002*,,-0.005 vs 0.002**
+relative mortality,GPPsat,12m,,-1.592 vs 0.268***,,-1.751 vs 0.497***
+relative mortality,GPPsat,24m,,-1.896 vs -0.026***,,-1.736 vs 0.037***
+relative mortality,NEPmax,12m,,-1.755 vs 0.127***,,-1.565 vs 0.204***
+relative mortality,NEPmax,24m,,-1.852 vs 0.267***,,-1.871 vs 0.183***
+relative mortality,WUE,12m,,-0.239 vs 0.113***,,-0.224 vs 0.115***
+relative mortality,WUE,24m,,-0.203 vs 0.084***,,-0.214 vs 0.08***
+total mortality,ETmax,12m,-0.006 vs 0.002*,,-0.003 vs 0.001*,
+total mortality,ETmax,24m,-0.006 vs 0.002**,,-0.006 vs 0.002**,
+total mortality,GPPsat,12m,-1.955 vs 0.282***,,-2.051 vs 0.595***,
+total mortality,GPPsat,24m,-1.761 vs 0.464***,,-2.321 vs 0.522***,
+total mortality,NEPmax,12m,-1.353 vs 0.148***,,-1.549 vs 0.243***,
+total mortality,NEPmax,24m,-1.474 vs 0.215***,,-1.59 vs 0.443***,
+total mortality,WUE,12m,-0.2 vs 0.108***,,-0.238 vs 0.115***,
+total mortality,WUE,24m,-0.214 vs 0.111***,,-0.313 vs 0.111***,
