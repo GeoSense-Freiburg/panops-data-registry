@@ -84,11 +84,15 @@ cell_d <- function(x) sprintf("$%s%.1f$%s", ifelse(x[[SHOW]] < 0, "-", "+"), abs
                               ifelse(x$sig == "", "", sprintf("$^{%s}$", x$sig)))
 cell_i <- function(x) sprintf("%.0f", x$improved_pct)
 L_ok <- intersect(names(LEARNERS), unique(st$learner))
-# env TABLE1_SHOW (e.g. "AG" or "XGB,LGB"; 2026-10-09, coauthor draft): show only these learners. The tests and the
-# BH correction still cover all learners, so tables split between main text and appendix are one family of tests.
+# env TABLE1_SHOW (e.g. "AG"; 2026-10-09, coauthor draft): show only these learners. Since 2026-10-20 (draft reports
+# AutoGluon only) the BH correction is redone over the tests of the shown learners; the statistics CSV keeps all learners.
 SHOWL <- strsplit(Sys.getenv("TABLE1_SHOW", ""), ",")[[1]]
-if (length(SHOWL)) { L_ok <- intersect(L_ok, SHOWL); TSFX <- paste0(TSFX, "_", paste(L_ok, collapse = "")) }
-BH_TXT <- if (length(SHOWL)) sprintf("all %d tests of the three learners", nrow(st)) else sprintf("all %d tests in the table", nrow(st))
+if (length(SHOWL)) {
+  L_ok <- intersect(L_ok, SHOWL); TSFX <- paste0(TSFX, "_", paste(L_ok, collapse = ""))
+  st <- st[learner %in% L_ok][, q := p.adjust(p, method = "BH")]
+  st[, sig := fifelse(q < 0.001, "***", fifelse(q < 0.01, "**", fifelse(q < 0.05, "*", "")))]
+}
+BH_TXT <- sprintf("all %d tests in the table", nrow(st))
 tex <- c(
   "\\begin{table}[p]",
   "\\centering",
