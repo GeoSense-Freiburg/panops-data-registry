@@ -18,6 +18,7 @@ Years 2017-2025 (2016 is left out because the data producer considers it unrelia
 | `mortality_v5.1_long.csv` | one row per site x year x buffer (20,445 rows) |
 | `mortality_v5.1_wide.csv` | one row per site x year, buffers as columns (`..._100m` ... `..._500m`) |
 | `make_mortality_metrics.py` | the script |
+| [`mortality_sites_viewer.html`](mortality_sites_viewer.html) | interactive overview: map of all 457 towers with a land-cover filter, and for the selected tower each metric over time with one line per buffer. Open in a web browser (needs internet for the map and chart libraries); rebuild with `python _build/make_html.py` |
 
 ## Metrics (all in %, or percentage points)
 
