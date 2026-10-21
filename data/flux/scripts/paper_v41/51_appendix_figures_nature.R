@@ -3,12 +3,11 @@
 # Appendix (Extended Data / Supplementary) figures in the Nature style and colours of the main figures (fig_style.R),
 # 2026-10-15. Redraws the figures that 21, 23, 24, 26/38, 29, 41, 42 and 43 drew in the old style; reuses their model
 # outputs and statistics (nothing is refitted). V5 maps, mortality block without thresholded metrics.
-#   site_mae_<AG|all>[_high]     per-site MAE without / with mortality (old 21 MAE_perm)
+#   site_mae_AG[_high]           per-site MAE without / with mortality (old 21 MAE_perm)
 #   site_drmse_AG                per-site change in RMSE, sites sorted (old 29)
 #   direction_rel_deadwood_AG    Fig. 4 with the sites grouped by relative deadwood (old 23)
-#   igbp_<L>_<win>               mortality effect by IGBP class and tree cover (old 24 board)
-#   mortality_block_<L>          share of each mortality metric in the block's |SHAP| (old 26)
-#   dropcol                      SHAP share, unique and alone contribution per metric (old 38)
+#   igbp_AG_<win>                mortality effect by IGBP class and tree cover (old 24 board)
+#   mortality_block_AG           share of each mortality metric in the block's |SHAP| (old 26)
 #   dose_robustness_AG           slopes per +10 % relative mortality under each robustness check (old 42)
 #   dose_siteyear_AG             every site-year with the mixed-model slopes (old 41)
 #   residual_efpclim_AG_<win>    Fig. 2 with the EFP-specific climate block (old 43 efpclim)
@@ -22,7 +21,10 @@ source("scripts/paper_v41/fig_style.R")
 OUT <- "plots/paper_v5_nothresh/nature/appendix"; dir.create(OUT, showWarnings = FALSE, recursive = TRUE)
 EFP <- EFP_ORDER_FIG; WINS <- c("12m", "24m"); WLAB <- c("12m" = "12 months", "24m" = "24 months")
 LAB <- c(AG = "AutoGluon", XGB = "XGBoost", LGB = "LightGBM")
-FI <- "AutoGluon/outputs/efp_v5_nothresh/fig_inputs"                     # predictions and SHAP of all three learners
+FI <- "AutoGluon/outputs/efp_v5_nothresh"                                # AutoGluon predictions and SHAP
+# 2026-10-21: AutoGluon only (the paper no longer shows XGBoost / LightGBM); the A3 three-learner MAE figure, the XGBoost
+# IGBP board, the XGBoost / LightGBM metric blocks and the drop-column figure were removed from this script.
+LRN <- c(AG = "AutoGluon")
 BOX <- function(...) geom_boxplot(outlier.shape = NA, linewidth = 0.25, ...)
 efp_title <- function(e) parse(text = EFP_EXPR[[e]])
 win_lab <- function(x) factor(WLAB[x], WLAB)
@@ -42,7 +44,7 @@ pred <- function(L) {
   p <- fread(file.path(FI, sprintf("%s_predictions_repCV.csv", L)))[response %in% EFP & grepl("^M[34]_(12m|24m)$", model)]
   p[, c("mod", "window") := tstrsplit(model, "_")][is.finite(observed) & is.finite(predicted)][, learner := LAB[[L]]][]
 }
-P <- rbindlist(lapply(names(LAB), pred))
+P <- rbindlist(lapply(names(LRN), pred))
 
 # ---- 1. per-site MAE without / with mortality ------------------------------------------------------------------
 mae <- P[, .(mae = mean(abs(observed - predicted))), by = .(learner, response, window, mod, SITE_ID)]
@@ -78,7 +80,6 @@ mae_fig <- function(learners, high = FALSE, stem) {
 }
 mae_fig("AutoGluon", FALSE, "site_mae_AG")
 mae_fig("AutoGluon", TRUE, "site_mae_AG_high")
-mae_fig(c("AutoGluon", "XGBoost", "LightGBM"), FALSE, "site_mae_all")
 
 # ---- 2. per-site change in RMSE, sites sorted -------------------------------------------------------------------
 rm <- P[learner == "AutoGluon", .(rmse = sqrt(mean((observed - predicted)^2))), by = .(response, window, mod, SITE_ID)]
@@ -125,7 +126,7 @@ save_pub(wrap_plots(py, ncol = 4, guides = "collect") + plot_annotation(tag_leve
 # ---- 3. Fig. 4 with the sites grouped by relative deadwood ------------------------------------------------------
 sh <- function(L) fread(file.path(FI, sprintf("%s_site_signed_shap_M4.csv", L)))[group == "Disturbance" & response %in% EFP][
   , .(SITE_ID = test_site, response, window = sub("M4_", "", model), shap = mean_signed_shap, learner = LAB[[L]])]
-SH <- rbindlist(lapply(names(LAB), sh))
+SH <- rbindlist(lapply(names(LRN), sh))
 Brd <- brk(site$rd_max)
 s3 <- merge(SH[learner == "AutoGluon"], site[, .(SITE_ID, rd_max)], by = "SITE_ID")
 s3[, grp := factor(fifelse(rd_max > Brd[2], "High", "Low+Mid"), c("Low+Mid", "High"))][, win := win_lab(window)]
@@ -180,7 +181,7 @@ igbp_fig <- function(Lk, w) {
     theme(legend.position = "bottom") & guides(fill = guide_legend(nrow = 1, override.aes = list(size = 1.8)))
   save_pub(f, file.path(OUT, sprintf("igbp_%s_%s", Lk, w)), W2, 170)
 }
-igbp_fig("AG", "24m"); igbp_fig("AG", "12m"); igbp_fig("XGB", "24m")
+igbp_fig("AG", "24m"); igbp_fig("AG", "12m")
 
 # ---- 5. share of each mortality metric in the block, and the drop-column test ------------------------------------
 FAM <- c(relative_disturbance = "Relative mortality", relative_mortality = "Relative deadwood",
@@ -196,8 +197,8 @@ share <- function(L) {
   s[, .(m = mean(share), se = sd(share) / sqrt(.N)), by = .(model, response, family)][
     , `:=`(learner = LAB[[L]], window = sub("M4_", "", model), metric = factor(FAM[family], rev(FAM)))][]
 }
-SHR <- rbindlist(lapply(names(LAB), share))
-for (Lk in names(LAB)) {
+SHR <- rbindlist(lapply(names(LRN), share))
+for (Lk in names(LRN)) {
   p5 <- unlist(lapply(EFP, function(e) lapply(WINS, function(w) ggplot(SHR[learner == LAB[[Lk]] & response == e & window == w],
       aes(m, metric, fill = metric)) + geom_col(width = 0.7, show.legend = FALSE) +
       geom_errorbarh(aes(xmin = m - se, xmax = m + se), height = 0, linewidth = 0.3) +
@@ -207,27 +208,6 @@ for (Lk in names(LAB)) {
       theme_pub() + theme(axis.text.y = if (w == "12m") element_text() else element_blank()))), recursive = FALSE)
   save_pub(wrap_plots(p5, ncol = 2) + plot_annotation(tag_levels = "a"), file.path(OUT, sprintf("mortality_block_%s", Lk)), W15, 150)
 }
-D <- rbindlist(lapply(c("XGB", "LGB"), function(L) fread(sprintf("derived_tables/paper_v5_nothresh/dropcol/%s_dropcol_rmse.csv", L))))
-w <- dcast(D, learner + window + response ~ config, value.var = "overall_rmse")
-U <- rbindlist(lapply(names(FAM), function(f) w[, .(learner = LAB[learner], window, response, metric = FAM[[f]],
-       unique = 100 * (get(paste0("minus:", f)) / `C+T+M` - 1), alone = 100 * (1 - get(paste0("only:", f)) / `C+T`))]))
-agg <- function(d, v) d[, .(m = mean(get(v)), lo = min(get(v)), hi = max(get(v))), by = .(learner, response, metric)]
-A <- SHR[, .(m = mean(m), lo = min(m), hi = max(m)), by = .(learner, response, metric = as.character(metric))]
-DC <- rbind(A[, panel := "SHAP share in the block (%)"], agg(U, "unique")[, panel := "RMSE increase when removed (%)"],
-            agg(U, "alone")[, panel := "RMSE decrease when added alone to C+T (%)"])
-DC[, `:=`(metric = factor(metric, rev(FAM)), learner = factor(learner, c("AutoGluon", "XGBoost", "LightGBM")))]
-PN3 <- unique(DC$panel)
-pd <- position_dodge(0.75)
-p6 <- unlist(lapply(EFP, function(e) lapply(PN3, function(pn) ggplot(DC[response == e & panel == pn], aes(m, metric, fill = learner)) +
-    geom_vline(xintercept = 0, colour = PAL$zero, linewidth = 0.25) +
-    geom_col(width = 0.7, position = pd, show.legend = pn == PN3[1] && e == EFP[1]) +
-    geom_errorbarh(aes(xmin = lo, xmax = hi), height = 0, linewidth = 0.25, position = pd, show.legend = FALSE) +
-    scale_fill_manual(values = PAL$learner, name = NULL, drop = FALSE) +
-    labs(x = if (e == EFP[4]) pn else NULL, y = if (pn == PN3[1]) efp_title(e) else NULL) + theme_pub() +
-    theme(axis.text.y = if (pn == PN3[1]) element_text() else element_blank()))), recursive = FALSE)
-save_pub(wrap_plots(p6, ncol = 3, guides = "collect") + plot_annotation(tag_levels = "a") & theme(legend.position = "bottom"),
-         file.path(OUT, "dropcol"), W2, 150)
-
 # ---- 6. robustness of the slopes per +10 % relative mortality ---------------------------------------------------
 R <- fread("plots/paper_v5_nothresh/dose_response/dose_response_robustness_AG.csv")
 ML <- c("Mixed model", "Site-block bootstrap", "Leave one site out (range)", "Without the 3 most extreme sites")

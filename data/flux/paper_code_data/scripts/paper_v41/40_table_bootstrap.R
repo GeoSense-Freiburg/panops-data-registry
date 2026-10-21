@@ -17,6 +17,9 @@ VTAG <- c(efp = "v41", efp_v5 = "v5", v10efp = "v22")[[PAPER_RESP_SET]]
 if (PAPER_NO_THRESH) VTAG <- paste0(VTAG, "_nothresh")
 AG_EXTRA <- Sys.getenv("AG_EXTRA", ""); ISFX <- if (AG_EXTRA != "") paste0("_", AG_EXTRA) else ""
 st <- fread(file.path(PAPER_FIG, sprintf("paired_bootstrap_statistics%s.csv", ISFX)))[metric == MET]
+# BH correction over the tests of the shown learners only (2026-10-20: the draft reports AutoGluon only), per level
+st <- st[learner %in% SHOW][, q := p.adjust(p_perm, "BH"), by = .(level)]
+st[, sig := fifelse(q < 0.001, "***", fifelse(q < 0.01, "**", fifelse(q < 0.05, "*", "")))]
 LAB <- c(XGB = "XGBoost", LGB = "LightGBM", AG = "AutoGluon", AGx = "AutoGluon, EFP-specific climate")
 EFP_TEX <- c(GPPsat = "GPP$_\\mathrm{sat}$", NEPmax = "NEP$_\\mathrm{max}$", ETmax = "ET$_\\mathrm{max}$", WUE = "WUE")
 COLS <- list(c("site", "all"), c("siteyear", "all"), c("siteyear", "midhigh"), c("siteyear", "high"), c("siteyear", "yr_midhigh"),
@@ -36,7 +39,7 @@ tex <- c("\\begin{table}[htbp]", "\\centering",
     "leave-one-site-out predictions: 100\\,(%s$_\\mathrm{C+T+M}$ / %s$_\\mathrm{C+T}$ $-$ 1)\\,\\%%; negative = smaller error. ",
     "Brackets: 95\\,\\%% interval of a bootstrap that resamples whole sites (10\\,000 draws). ",
     "Stars: one-sided paired permutation test with the two models swapped per site (10\\,000 draws), ",
-    if (AG_EXTRA != "") "Benjamini--Hochberg corrected across both runs: " else "Benjamini--Hochberg corrected across all learners: ",
+    if (AG_EXTRA != "") "Benjamini--Hochberg corrected across both runs: " else "Benjamini--Hochberg corrected across all tests of the same level: ",
     "$^{*}$\\,$q<0.05$, $^{**}$\\,$q<0.01$, $^{***}$\\,$q<0.001$. ",
     if (SY_ONLY) "" else "\\emph{Site level}: one error per site (mean over its years). ",
     "\\emph{Site-year level}: every site-year is one observation. ",

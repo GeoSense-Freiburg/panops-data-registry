@@ -35,6 +35,9 @@ CODE = [  # paths relative to the project root = paths inside the package
     "scripts/paper_v41/24_fig5_igbp_board.R", "scripts/paper_v41/25_fig3b_site_signed_shap.R",
     "scripts/paper_v41/26_D_block_composition.R", "scripts/paper_v41/29_site_delta_rmse.R",
     "scripts/paper_v41/32_fig3_landscape.R",
+    # Nature-style figures of the current draft (2026-10-21) and the respiration check
+    "scripts/paper_v41/fig_style.R", "scripts/paper_v41/50_figures_nature.R", "scripts/paper_v41/51_appendix_figures_nature.R",
+    "scripts/paper_v41/52_skill_bars.R", "scripts/paper_v41/53_reco_mortality_check.R",
 ]
 
 DATA = [  # analysis-ready inputs and results, at the paths the scripts use
@@ -57,6 +60,21 @@ DATA = [  # analysis-ready inputs and results, at the paths the scripts use
     "plots/paper_v5_nothresh/dose_response/residual_correction_trend_AG_24m.csv",
     "plots/paper_v5_nothresh/dose_response/dose_response_robustness_AG.csv",
     "plots/paper_v5_nothresh/mortality_split/mortality_block_dropcol.csv",
+    # inputs of 50-53 (2026-10-21)
+    "fluxnet_2017_2025_V02/fluxnet_shuttle_snapshot_20260512T115423.csv",
+    "plots/paper_v5_nothresh/dose_response/dose_response_AG.csv",
+    "plots/paper_v5_nothresh/dose_response/residual_by_mortality_AG_12m.csv",
+    "plots/paper_v5_nothresh/dose_response/residual_correction_by_mortality_AG_12m.csv",
+    "plots/paper_v5_nothresh/dose_response/residual_correction_trend_AG_12m.csv",
+    "plots/paper_v5_nothresh/dose_response/residual_by_mortality_AG_efpclim_12m.csv",
+    "plots/paper_v5_nothresh/dose_response/residual_by_mortality_AG_efpclim_24m.csv",
+    "plots/paper_v5_nothresh/dose_response/residual_correction_by_mortality_AG_efpclim_12m.csv",
+    "plots/paper_v5_nothresh/dose_response/residual_correction_by_mortality_AG_efpclim_24m.csv",
+    "AutoGluon/plots/efp_v5_nothresh/ag_only/fig2_MAE_perm_statistics.csv",
+    "AutoGluon/plots/efp_v5_nothresh/ag_only/fig2_high_total_mort_MAE_perm_statistics.csv",
+    "plots/paper_v5_nothresh/nature/AG_24m/skill_r2_bootstrap_AG.csv",
+    "plots/paper_v5_nothresh/reco_check/reco_gpp_nep_gs_by_site_year.csv",
+    "plots/paper_v5_nothresh/reco_check/reco_mortality_check.csv",
 ]
 
 R_ROOT = 'Sys.getenv("PAPER_ROOT", ".")'

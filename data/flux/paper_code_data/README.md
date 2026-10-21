@@ -27,17 +27,21 @@ paper_code_data/
 ├── source_data/               one Excel file per main display item
 ├── notebooks/                 12_FLUXNET_shuttle.ipynb (download), 14_calc_EFPs.ipynb (ecosystem functional properties)
 ├── scripts/
-│   ├── optuna_tune.py         Optuna driver for XGBoost / LightGBM
+│   ├── optuna_tune.py         Optuna driver for XGBoost / LightGBM (earlier check, not shown in the paper)
 │   └── paper_v41/             paper_common.R (shared settings) and all R/Python steps, numbered:
 │                              01-04 data (mortality metrics, NEPmax/growing season/climate, dataset, traits)
-│                              10-13 XGBoost / LightGBM (tuning, repeated leave-one-site-out, TreeSHAP)
-│                              20-32 figures; 31, 37-43 statistics
+│                              10-13 XGBoost / LightGBM (earlier check, not shown in the paper)
+│                              31, 37-43 statistics; 53 respiration check
+│                              50-52 + fig_style.R: figures of the current draft (Nature style)
+│                              20-32 older figure layouts (kept for reference)
 ├── AutoGluon/                 ag_common.py, 01-03 (fits, repeated leave-one-site-out, SHAP), run_*.sh, 05*_figures.sh
 │   └── outputs/               efp_v5_nothresh (main run), efp_v5_nothresh_efpclim (circularity check)
 ├── derived_tables/
 │   ├── paper_v5/              analysis-ready dataset: 101 sites, 361 site-years, all predictors
-│   └── paper_v5_nothresh/models/   XGBoost / LightGBM predictions, metrics, SHAP
-└── plots/paper_v5_nothresh/   tuned hyperparameters (Optuna/*/best_configs.csv) and statistics tables
+│   └── paper_v5_nothresh/models/   XGBoost / LightGBM predictions, metrics, SHAP (earlier check, not shown)
+├── fluxnet_2017_2025_V02/     FLUXNET Shuttle snapshot (site coordinates and IGBP for the map)
+└── plots/paper_v5_nothresh/   statistics tables (bootstrap, dose-response, R² bootstrap, respiration check) and
+                               tuned hyperparameters (Optuna/*/best_configs.csv)
 ```
 
 Server-specific inputs are read from environment variables when needed: `PAPER_ROOT` (package root, default `.`),
@@ -45,29 +49,35 @@ Server-specific inputs are read from environment variables when needed: `PAPER_R
 `raw/trait_maps`). Raw FLUXNET and mortality-map files are expected under the same relative paths as in the project
 (`fluxnet_2017_2025_V02/`, `deadtree/deadtrees_maps_v5/`) if the pipeline is run from the raw data.
 
+Checked on 2026-10-21: in a copy of the package, `50_figures_nature.R`, `51_appendix_figures_nature.R` and
+`52_skill_bars.R` run from the package files alone (the R² bootstrap is reproduced byte-for-byte).
 Checked on 2026-10-13: a copy of the package in another folder reproduces the bootstrap statistics and residual
 corrections byte-for-byte (`scripts/paper_v41/39_paired_bootstrap.R`, `43_residual_by_mortality_bin.R`) and rebuilds all
 source data.
 
 ## Figures and tables
 
-Main display items (numbering of the current draft):
+Main display items (numbering of the coauthor draft, 21 October 2026; AutoGluon only). Script `50_figures_nature.R`
+keeps its own internal figure names, given in brackets.
 
 | Item | Content | Script(s) | Source data |
 |---|---|---|---|
-| Fig. 1 | Sites and EFP distributions | `scripts/paper_v41/20_fig1_site_map.R` | `Fig1_sites_and_EFPs.xlsx` |
-| Table 1 | Skill (R²) with and without mortality, AutoGluon | `AutoGluon/02_loso_repcv.py` | `Table1_skill.xlsx` |
-| Table 2 | Site-year MAE change, paired bootstrap and permutation | `scripts/paper_v41/39_paired_bootstrap.R`, `40_table_bootstrap.R` | `Table2_siteyear_MAE_bootstrap.xlsx` |
-| Fig. 2 | Net mortality SHAP per site (compact) | `scripts/paper_v41/32_fig3_landscape.R` (via `AutoGluon/05_figures.sh`) | `Fig2_net_mortality_shap_per_site.xlsx` |
-| Fig. 3 | High vs Low+Mid sites | `scripts/paper_v41/23_fig4_signed_shap.R` (wide layout via `AutoGluon/05b_figures_ag_only.sh`) | `Fig3_high_vs_lowmid.xlsx` |
-| Fig. 4 | Relative mortality vs direction (panel E of the board) | `scripts/paper_v41/24_fig5_igbp_board.R` | `Fig4_mortality_vs_direction.xlsx` |
-| Fig. 5 | Residual by mortality class, with correction test | `scripts/paper_v41/43_residual_by_mortality_bin.R` | `Fig5_residual_by_mortality_class.xlsx` |
+| Fig. 1 | Sites and EFP distributions (to be replaced by a workflow schematic) | `scripts/paper_v41/50_figures_nature.R AG 24m` [fig1] | `Fig1_sites_and_EFPs.xlsx` |
+| Table 1 | Skill (R²) with and without mortality | `AutoGluon/02_loso_repcv.py` | `Table1_skill.xlsx` |
+| Table 2 | Site-year MAE change, paired bootstrap and permutation | `scripts/paper_v41/39_paired_bootstrap.R`, `40_table_bootstrap.R` (`TABLE_COLS=siteyear`) | `Table2_siteyear_MAE_bootstrap.xlsx` |
+| Fig. 2 | R² and relative MAE decrease (bar plots of Tables 1 and 2) | `scripts/paper_v41/52_skill_bars.R` | `Fig2_skill_R2_and_MAE_decrease.xlsx` |
+| Fig. 3 | Residual by mortality class, with correction test | `43_residual_by_mortality_bin.R AG 24m`, then `50_figures_nature.R AG 24m` [fig5] | `Fig3_residual_by_mortality_class.xlsx` |
+| Fig. 4 | Net mortality SHAP per site, site codes | `FIG2_PALETTE=piyg FIG2_NAMES=1 Rscript scripts/paper_v41/50_figures_nature.R AG 24m` [fig2] | `Fig4_net_mortality_shap_per_site.xlsx` |
+| Fig. 5 | High vs Low+Mid sites | `50_figures_nature.R AG 24m` [fig3] | `Fig5_high_vs_lowmid.xlsx` |
+| Fig. 6 | Site maximum relative mortality vs net mortality SHAP | `50_figures_nature.R AG 24m` [fig4] | `Fig6_mortality_vs_direction.xlsx` |
 
-Extended Data / Supplementary items (all in `scripts/paper_v41/`): per-site MAE and log-ratio permutation (`21_fig2_M3M4.R`
-with `FIG2_STAT=mae_perm`, `31_table_fig2_summary.R`), per-site ΔRMSE (`29_site_delta_rmse.R`), per-site SHAP with site
-names (`25_…`, `32_…`), IGBP board (`24_…`), mortality metrics and drop-column test (`26_…`, `37_…`, `38_…`), mixed
-models and robustness (`41_…`, `42_…`), circularity check (`AutoGluon/run_efpclim.sh`, `39_…` with
-`AG_EXTRA=efp_v5_nothresh_efpclim`).
+Appendix figures A1–A13 (all AutoGluon): `scripts/paper_v41/51_appendix_figures_nature.R` draws per-site MAE (A1, A2),
+per-site and per-site-year error change (A3, A4), High vs Low+Mid by relative deadwood (A6), IGBP and tree-cover boards
+(A7, A8), metric shares in the mortality block (A9), mixed-model robustness and site-year slopes (A11, A12) and the
+circularity check (A13); A5 and A10 (12-month window) come from `50_figures_nature.R AG 12m` [fig2, fig5]. Appendix
+tables: `31_table_fig2_summary.R` (`TABLE1_TEST=permlog`, site-level log-ratio test), `40_table_bootstrap.R` (full table,
+RMSE, circularity check with `AG_EXTRA=efp_v5_nothresh_efpclim`). Benjamini–Hochberg corrections run over the AutoGluon
+tests shown. Respiration check (Discussion): `53_reco_mortality_check.R`.
 
 ## Input data (not redistributed here)
 
@@ -86,11 +96,15 @@ Run from the package root. From the analysis-ready dataset (hours, CPU):
 
 1. AutoGluon: `bash AutoGluon/run_efp.sh efp_v5_nothresh` (repeated leave-one-site-out and SHAP; about 5 h on ~100 cores,
    < 250 GB RAM); circularity check `bash AutoGluon/run_efpclim.sh` (about 3 h).
-2. XGBoost / LightGBM: `PAPER_NO_THRESH=1 bash scripts/paper_v41/run_variant.sh efp_v5` (Optuna tuning, repeated
-   leave-one-site-out, TreeSHAP).
-3. Statistics: `Rscript scripts/paper_v41/39_paired_bootstrap.R`, `40_…`, `41_…`, `42_…`, `43_… AG 24m` (minutes).
-4. Figures: `scripts/paper_v41/2*_…`, `32_…`, `bash AutoGluon/05_figures.sh efp_v5_nothresh`, `bash AutoGluon/05b_figures_ag_only.sh`.
+2. Optional, not shown in the paper: XGBoost / LightGBM, `PAPER_NO_THRESH=1 bash scripts/paper_v41/run_variant.sh efp_v5`.
+3. Statistics: `Rscript scripts/paper_v41/39_paired_bootstrap.R`, `40_…`, `31_…`, `41_… AG`, `42_… AG`,
+   `43_… AG 24m` and `43_… AG 12m` (minutes).
+4. Figures: `Rscript scripts/paper_v41/50_figures_nature.R AG 24m` (and `AG 12m`; Fig. 4 with
+   `FIG2_PALETTE=piyg FIG2_NAMES=1`), `51_appendix_figures_nature.R`, `52_skill_bars.R`; output in
+   `plots/paper_v5_nothresh/nature/`.
 5. Source data: `Rscript make_source_data.R`.
+6. Respiration check: `Rscript scripts/paper_v41/53_reco_mortality_check.R` needs the raw FLUXNET daily files
+   (`fluxnet_2017_2025_V02/*.zip`); its results are included (`plots/paper_v5_nothresh/reco_check/`).
 
 From the raw data (days): `notebooks/12_FLUXNET_shuttle.ipynb` (download) → `notebooks/14_calc_EFPs.ipynb` →
 `scripts/paper_v41/02_…` (NEPmax, growing season, monthly climate) → `01_…` (mortality metrics, `DEADTREE_VERSION=v5`) →

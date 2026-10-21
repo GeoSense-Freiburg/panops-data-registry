@@ -70,8 +70,8 @@ Avoid: "disturbance" in paper labels (use mortality); "forests" for the whole si
   draft; tree-cover threshold test, deadwood edge/patch density).
 - **HTML report:** `fluxVSmortality/v10/index.html`, built by `scripts/paper_v41/35_build_report_paper.py`, published only
   via `scripts/push_fluxVSmortality.sh` (never commit inside `fluxVSmortality/`).
-- **Code-and-data package:** `paper_code_data/` (`build_package.py`); its figure scripts and README still describe the
-  older figure set.
+- **Code-and-data package:** `paper_code_data/` (`build_package.py`, README, `make_source_data.R` with one Excel file per
+  main display item); matches the draft of 21 Oct 2026 (Figs 1–6, Tables 1–2, appendix A1–A13, AutoGluon only).
 
 ## Canonical files
 
