@@ -52,11 +52,12 @@ arrow_ <- function(x, y, xend, yend, col = LINE)
   annotate("segment", x = x, y = y, xend = xend, yend = yend, colour = col, linewidth = 0.35,
            arrow = arrow(length = unit(1.2, "mm"), type = "closed"))
 
-# column 1: data (flux on top; climate and traits feed both models; mortality at the bottom feeds only C+T+M) ----------
+# column 1: data (FLUXNET: fluxes -> targets, meteorology -> climate predictors; traits feed both models; mortality only C+T+M)
 X0 <- 1; X1 <- 35
 p <- p + lab(18, 49, "Data", fontface = "bold", size = 7 / .pt)
 # (i) flux towers + mini site map
-p <- p + box(X0, X1, 37, 47)
+p <- p + box(X0, X1, 25, 47) +
+  annotate("segment", x = X0 + 1, xend = X1 - 1, y = 36, yend = 36, colour = "#D9D9D9", linewidth = 0.25, linetype = "22")
 tw <- tower(4.6, 38.3, 7.6)
 p <- p + geom_path(data = tw$lines, aes(x, y, group = g), colour = LINE, linewidth = 0.3) +
   geom_point(data = tw$sonic, aes(x, y), shape = 21, size = 0.9, fill = "white", colour = LINE, stroke = 0.3)
@@ -68,15 +69,14 @@ sp <- cbind(meta, robinson(meta$lon, meta$lat))
 sx <- function(x) 9.3 + (x + 2.7) / 5.4 * 11; sy <- function(y) 37.9 + (y + 1.4) / 2.9 * 5.7   # map into the panel
 p <- p + geom_polygon(data = world, aes(sx(x), sy(y), group = group), fill = "#E3E3E3", colour = NA) +
   geom_point(data = sp, aes(sx(x), sy(y)), size = 0.22, colour = "black")
-p <- p + lab(27.5, 45.2, "FLUXNET eddy covariance") + lab(27.5, 41.2, "101 sites\n361 site-years", size = TXS, colour = GREY)
-# (ii) climate
-p <- p + box(X0, X1, 25, 35)
+p <- p + lab(27.5, 45.2, "FLUXNET eddy covariance") + lab(27.5, 41.2, "fluxes, 101 sites\n361 site-years", size = TXS, colour = GREY)
+# (ii) climate from the tower meteorology (same FLUXNET files)
 sun <- circle(4.6, 31.4, 1.0); rays <- rbindlist(lapply(seq(0, 7, 1) * pi / 4, function(a) data.table(x = 4.6 + c(1.4, 2.0) * cos(a), y = 31.4 + c(1.4, 2.0) * sin(a), g = a)))
 cloud <- rbindlist(list(circle(6.8, 28.6, 0.95)[, g := 1], circle(8.2, 29.0, 1.2)[, g := 2], circle(9.6, 28.6, 0.9)[, g := 3]))
 p <- p + geom_polygon(data = sun, aes(x, y), fill = SUN, colour = NA) + geom_path(data = rays, aes(x, y, group = g), colour = SUN, linewidth = 0.3) +
   geom_polygon(data = cloud, aes(x, y, group = g), fill = "#D9D9D9", colour = NA) +
   annotate("segment", x = c(7.2, 8.4, 9.6), xend = c(6.9, 8.1, 9.3), y = 27.3, yend = 26.5, colour = SKY, linewidth = 0.35)
-p <- p + lab(13, 31.3, "Climate", hjust = 0) + lab(13, 28.7, "pre-season, 12 or 24 months", size = TXS, colour = GREY, hjust = 0)
+p <- p + lab(13, 31.3, "Climate (tower meteorology)", hjust = 0) + lab(13, 28.7, "pre-season, 12 or 24 months", size = TXS, colour = GREY, hjust = 0)
 # (iii) plant traits
 p <- p + box(X0, X1, 13, 23)
 lf <- leaf(6.3, 18, 0.85)
