@@ -1,0 +1,74 @@
+[BE-Bra] Janssens, I., Bresseleers, S., De Meulder, T., Lefevre, L., Naseer, M., Roland, M., Segers, J., Van Look, J., Vande Sompele, A. (2026). Fluxnet Archive Product from Brasschaat, 1999–2024, FLUXNET, https://hdl.handle.net/11676/LFEir6YGDlkpjoTnCuB1qWeS
+
+[BE-Vie] Vincke, C., Bogaerts, G., Chebbi, W., Chebbi, W., Chopin, H., De Ligne, A., Demoulin, L., Douxfils, B., Engelmann, T., Faurès, A., Heinesch, B., Manise, T., Orgun, A., Piret, A., Thyrion, T. (2026). Fluxnet Archive Product from Vielsalm, 1996–2024, FLUXNET, https://hdl.handle.net/11676/h7WL05ckcTEzgXiZaFsQDL4r
+
+[CD-Ygb] Boeckx, P., Verbeeck, H., Bauters, M., Boon, G., Bulonza, E., Daelman, R., Ekili, D., Kimbesa, F., Lefevre, L., Mbifo, J., Sibret, T., Van Damme, F. (2026). Fluxnet Archive Product from Yangambi, 2020–2024, FLUXNET, https://hdl.handle.net/11676/Y_4oHTr_yfOSLhV2_swVropx
+
+[CH-Dav] Feigenwinter, I., Etzold, S., Gharun, M., Hortnagl, L., Meier, P., Liechti, K., Stutz, T., Burri, S., Zweifel, R., Buchmann, N., Baur, T., Eugster, W., Gessler, A., Hug, C., Häni, M., Hüglin, C., Kumar, S., Köchli, R., Marty, M., Schmitt Oehler, M., Staudinger, M., Sutter, F., Thimonier Rickenmann, A., Trotsiuk, V., Waldner, P., Walser, M., Wilhelm, M., Zhu, J., Zimmermann, S. (2026). Fluxnet Archive Product from Davos, 1997–2024, FLUXNET, https://hdl.handle.net/11676/eHcoHNvdn-kHLqQoJbyUs0Yq
+
+[CZ-BK1] Šigut, L., Bellan, M., Czerný, R., Darenová, E., Fischer, M., Fischer, M., Foltýnová, L., Jocher, G., Klimo, P., Konrádová, P., Kowalska, N., Krejza, J., Marek, M., Nezval, O., Pavelka, M., Staník, K., Taufarová, K., Trusina, J., Vágner, L., Šlížek, J. (2025). Fluxnet Archive Product from Bily Kriz forest, 2004–2024, FLUXNET, https://hdl.handle.net/11676/KiFUcCsC30gKhoS-4oJf5__f
+
+[CZ-Lnz] Kowalska, N., Bellan, M., Czerný, R., Darenová, E., Fischer, M., Fischer, M., Foltýnová, L., Jocher, G., Krejza, J., Mensah, C., Nezval, O., Pavelka, M., Staník, K., Trusina, J., Šigut, L., Šlížek, J. (2026). Fluxnet Archive Product from Lanzhot, 2015–2024, FLUXNET, https://hdl.handle.net/11676/B2BjRQCUXetA0_vGI3x7WFUJ
+
+[DE-Hai] Knohl, A., Tiedemann, F., Klosterhalfen, A., Markwitz, C., Fellert, D., Herbst, M., Kolle, O., Kreilein, H., Kutsch, W., Kutsch, W., Rebmann, C., Rebmann, C., Siebicke, L. (2026). Fluxnet Archive Product from Hainich, 2000–2024, FLUXNET, https://hdl.handle.net/11676/M1ET1IeG31p-6n4BFjDb3ZO7
+
+[DE-Har] Christen, A., Baab, F., Kolbe, S., Plapp, T., Redepenning, D., Schindler, D. (2026). Fluxnet Archive Product from Hartheim, 2020–2024, FLUXNET, https://hdl.handle.net/11676/RMAJ-gFOgcGACadN_gZG_GqU
+
+[DE-HoH] Rebmann, C., Rebmann, C., Dienstbach, L., Schmidt, P., Wiesen, R., Meis, J., Feldmann, I., Bastos Campos, F., Dejosez, S., Garcia Quiros, I., Gimper, S., Hautmann, D., Hildebrandt, A., Kempka, P., Paasch, S. (2025). Fluxnet Archive Product from Hohes Holz, 2015–2024, FLUXNET, https://hdl.handle.net/11676/-aRYvkkX6D6wd2ijWclesXaK
+
+[DE-Hzd] Bernhofer, C., Gruenwald, T., Hehn, M., Mauder, M., Moderow, U., Prasse, H. (2025). Fluxnet Archive Product from Hetzdorf, 2022–2024, FLUXNET, https://hdl.handle.net/11676/uq6kULT1EqxHKftJz-CqeaJa
+
+[DE-Msr] Drösler, M., Eberl, J., Klatt, J., Meyer, H., Schlaipfer, M. (2025). Fluxnet Archive Product from Mooseurach, 2020–2024, FLUXNET, https://hdl.handle.net/11676/FYr5igpqgstIKkMu0YL-eKyI
+
+[DE-RuW] Schmidt, M., Bagheri, S., Baltes, U., Becker, N., Dolfus, D., Drüe, C., Graf, A., Kettler, M., Kummer, S., Mattes, J. (2025). Fluxnet Archive Product from Wustebach, 2011–2024, FLUXNET, https://hdl.handle.net/11676/BytRjI_RJ0pRtLQCYfnb2Sd1
+
+[DE-Tha] Bernhofer, C., Eichelmann, U., Gruenwald, T., Hehn, M., Mauder, M., Moderow, U., Prasse, H. (2026). Fluxnet Archive Product from Tharandt, 1996–2024, FLUXNET, https://hdl.handle.net/11676/ffjFRTBfditjn_0A4exzi5K8
+
+[DK-Gds] Friborg, T., Jensen, R. (2024). Fluxnet Archive Product from Gludsted Plantage, 2020–2022, FLUXNET, https://hdl.handle.net/11676/vDQDn0hIxnz9gRAIc3duWbUE
+
+[DK-RCW] Ibrom, A., Pilegaard, K., Lange Rønn, E., Møller, F., Schaarup Sørensen, J. (2026). Fluxnet Archive Product from Riso Campus Willow, 2023–2024, FLUXNET, https://hdl.handle.net/11676/m0GlLgv0gcrx3ujxm3uDVWpq
+
+[DK-Sor] Ibrom, A., Lange Rønn, E., Lodsgaard Justesen, M., Møller, F., Pilegaard, K., Schaarup Sørensen, J. (2026). Fluxnet Archive Product from Soroe, 1996–2024, FLUXNET, https://hdl.handle.net/11676/lwXfRUVQCnuq5OcIe-F6tpib
+
+[FI-Hyy] Mammarella, I., Aalto, J., Back, J., Kolari, P., Laakso, H., Levula, J., Matilainen, T., Pihlatie, M., Pumpanen, J., Ryhti, K., Taipale, R., Vesala, T. (2026). Fluxnet Archive Product from Hyytiala, 1997–2024, FLUXNET, https://hdl.handle.net/11676/pIDsMGxYyXTg31dHecNO55Nq
+
+[FI-Ken] Laurila, T., Aaltonen, H., Aurela, M., Hatakka, J., Rainne, J., Suopajärvi, S., Varjonen, S. (2026). Fluxnet Archive Product from Kenttarova, 2018–2024, FLUXNET, https://hdl.handle.net/11676/BhlqiN95ECtoSXoxmf0Q4V35
+
+[FI-Let] Korkiakoski, M., Aaltonen, H., Aurela, M., Hatakka, J., Laurila, T., Lohila, A., Rainne, J., Tuovinen, J. (2025). Fluxnet Archive Product from Lettosuo, 2009–2024, FLUXNET, https://hdl.handle.net/11676/DklI-LaynvPoGMvnIbInqLrw
+
+[FI-Sod] Aurela, M., Aaltonen, H., Hatakka, J., Laurila, T., Lohila, A., Mäkelä, T., Männikkö, M., Rainne, J., Suopajärvi, S., Tuovinen, J., Varjonen, S. (2025). Fluxnet Archive Product from Sodankyla, 2023–2024, FLUXNET, https://hdl.handle.net/11676/TNkSnk2tWf7rkMpSQ2Dtf8FI
+
+[FI-Var] Kolari, P., Aalto, P., Keronen, P., Kulmala, L., Kulmala, L., Sahoo, G. (2025). Fluxnet Archive Product from Varrio, 2016–2024, FLUXNET, https://hdl.handle.net/11676/Ve8588DeHh2Y-t-dtZGWggl6
+
+[FR-Bil] Domec, J., Loustau, D., Aluome, C., Chipeaux, C., Denou, J., Depuydt, J., Garrigou, C., Kruszewski, A., Lafont, S. (2026). Fluxnet Archive Product from Bilos, 2014–2024, FLUXNET, https://hdl.handle.net/11676/Qa701KsgkCkpYT4vev--kpOk
+
+[FR-FBn] Simioni, G., Marloie, O., Martin - Saint Paul, N. (2026). Fluxnet Archive Product from Font-Blanche, 2008–2024, FLUXNET, https://hdl.handle.net/11676/dw5JqZoWiNVw0JQS-QXykPY6
+
+[FR-Fon] Berveiller, D., Dufrêne, E., Delpierre, N., Morfin, A., Vincent, G., Bazot, S., Soudani, K., Girardin, C., Guillot, T., Perot-Guillaume, C. (2025). Fluxnet Archive Product from Fontainebleau-Barbeau, 2019–2024, FLUXNET, https://hdl.handle.net/11676/vgMluaOupOEt-hzl3RWXI99X
+
+[FR-Hes] Cuntz, M., Joetzjer, E., Aiguier, T., Courtois, P., Lily, J., Naiken, A. (2026). Fluxnet Archive Product from Hesse, 1997–2024, FLUXNET, https://hdl.handle.net/11676/762ZAgt8A5AGDMT1ry74n13K
+
+[FR-Pue] Joffre, R., Limousin, J., Kempf, J., Ourcival, J., Piquemal, K. (2026). Fluxnet Archive Product from Puechabon, 2000–2024, FLUXNET, https://hdl.handle.net/11676/5vx0Ks1CqWMCVA8BrWv_IDrV
+
+[GF-Guy] Bonal, D., Brechet, L., Burban, B. (2026). Fluxnet Archive Product from Guyaflux, 2017–2024, FLUXNET, https://hdl.handle.net/11676/3jDZZoDeBw29TRwEqPKQozcn
+
+[IT-BFt] Gerosa, G., Bignotti, L., Finco, A., Marzuoli, R., Plebani, D. (2025). Fluxnet Archive Product from Bosco Fontana, 2019–2024, FLUXNET, https://hdl.handle.net/11676/IUOlBlndAhz4kdSgYJUDyq-D
+
+[IT-Cp2] Fares, S., Alivernini, A., Chianucci, F., Conte, A., Corsanici, R., Ilardi, F., Moretti, V., Sorgi, T. (2025). Fluxnet Archive Product from Castelporziano2, 2012–2024, FLUXNET, https://hdl.handle.net/11676/B6lVx5OEcdr4ZS-3ix2K7iPP
+
+[IT-Ren] Montagnani, L., Tomelleri, E., Bortoli, M., Cobbe, I., Folino, G., Minerbi, S., Stecher, M., Tenca, F., Ventura, M. (2025). Fluxnet Archive Product from Renon, 1999–2024, FLUXNET, https://hdl.handle.net/11676/MneKjijlv5X9lwsAh_VHcJt6
+
+[IT-SR2] Arriga, N., Goded, I., Grüning, C., Dell'Acqua, A., Matteucci, M. (2026). Fluxnet Archive Product from San Rossore 2, 2013–2024, FLUXNET, https://hdl.handle.net/11676/Frhkznd6pBhhJKKaYoAShaV2
+
+[IT-TrF] Galvagno, M., Ferraris, D., Filippa, G. (2024). Fluxnet Archive Product from Torgnon-LD, 2012–2024, FLUXNET, https://hdl.handle.net/11676/YwbRGa_5X4xiWtFOUz2_TvxL
+
+[NL-Loo] van der Molen, M., Barten, J., Kruijt, B., Lootens, R., Ronda, R., Snellen, H., Zhao, H. (2026). Fluxnet Archive Product from Loobos, 1997–2024, FLUXNET, https://hdl.handle.net/11676/WewhyVCaeifJzeZN8L6CdbW3
+
+[NO-Hur] Lange, H., Zhao, J., Meissner, H., Guzman, R. (2026). Fluxnet Archive Product from Hurdal, 2023–2024, FLUXNET, https://hdl.handle.net/11676/CDVyAitBD2Nv07IGEndbf0mk
+
+[SE-Htm] Heliasz, M., Kljun, N., Biermann, T., Holst, J., Holst, T., Kornacher, P., Linderson, M., Mölder, M., Rinne, J. (2025). Fluxnet Archive Product from Hyltemossa, 2018–2024, FLUXNET, https://hdl.handle.net/11676/8hMY0lY7kERIfokXkEpev-03
+
+[SE-Nor] Kljun, N., Mölder, M., Lehner, I., Bergström, G., Båth, A., Holst, J., Linderson, M. (2026). Fluxnet Archive Product from Norunda, 2018–2024, FLUXNET, https://hdl.handle.net/11676/TQJ13O19n72qJ3MoGHnXCdRB
+
+[SE-Svb] Peichl, M., Nilsson, M., Larmanou, E., Smith, P., Marklund, P., De Simon, G., Lofvenius, P., Dignam, R., Holst, J., Mölder, M., Andersson, T., Boschetti, F., Kozii, N., Linderson, M., Lindgren, K., Ottosson-Löfvenius, M. (2025). Fluxnet Archive Product from Svartberget, 2014–2024, FLUXNET, https://hdl.handle.net/11676/SxJ5MBCJuCmHLPK4C1fgwGCc
+

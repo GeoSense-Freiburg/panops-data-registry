@@ -1,0 +1,41 @@
+VARIABLE,UNITS,DESCRIPTION
+SITE_ID,-,FLUXNET site code (CC-XXX)
+TIMESTAMP_START,YYYYMMDDHHMM,Start of the half-hour averaging period; local standard time (no daylight saving)
+TIMESTAMP_END,YYYYMMDDHHMM,End of the half-hour averaging period; local standard time (no daylight saving)
+NIGHT,-,Night-time flag (1 = night; 0 = day) from incoming radiation
+NEE_VUT_REF,umolCO2 m-2 s-1,Net ecosystem exchange; variable u* threshold (per year); reference realisation (model efficiency based); gap-filled (MDS). Negative = uptake by the ecosystem
+NEE_VUT_REF_QC,-,QC for NEE_VUT_REF: 0 = measured; 1 = good-quality gap-fill; 2 = medium; 3 = poor
+NEE_VUT_REF_RANDUNC,umolCO2 m-2 s-1,Random uncertainty of NEE_VUT_REF
+NEE_VUT_REF_JOINTUNC,umolCO2 m-2 s-1,Joint uncertainty (random + u* filtering) of NEE_VUT_REF
+NEE_VUT_05,umolCO2 m-2 s-1,5th percentile of the NEE ensemble across u* thresholds (VUT)
+NEE_VUT_95,umolCO2 m-2 s-1,95th percentile of the NEE ensemble across u* thresholds (VUT)
+NEE_CUT_REF,umolCO2 m-2 s-1,As NEE_VUT_REF but with a constant u* threshold across all years (CUT)
+NEE_CUT_REF_QC,-,QC for NEE_CUT_REF (same coding as above)
+NEE_CUT_REF_RANDUNC,umolCO2 m-2 s-1,Random uncertainty of NEE_CUT_REF
+NEE_CUT_REF_JOINTUNC,umolCO2 m-2 s-1,Joint uncertainty of NEE_CUT_REF
+NEE_CUT_05,umolCO2 m-2 s-1,5th percentile of the NEE ensemble (CUT)
+NEE_CUT_95,umolCO2 m-2 s-1,95th percentile of the NEE ensemble (CUT)
+GPP_NT_VUT_REF,umolCO2 m-2 s-1,Gross primary production; night-time partitioning (Reichstein et al. 2005); from NEE_VUT_REF
+GPP_NT_VUT_05,umolCO2 m-2 s-1,5th percentile of GPP_NT_VUT ensemble
+GPP_NT_VUT_95,umolCO2 m-2 s-1,95th percentile of GPP_NT_VUT ensemble
+GPP_DT_VUT_REF,umolCO2 m-2 s-1,Gross primary production; daytime partitioning (Lasslop et al. 2010); from NEE_VUT_REF
+GPP_DT_VUT_05,umolCO2 m-2 s-1,5th percentile of GPP_DT_VUT ensemble
+GPP_DT_VUT_95,umolCO2 m-2 s-1,95th percentile of GPP_DT_VUT ensemble
+GPP_NT_CUT_REF,umolCO2 m-2 s-1,GPP night-time partitioning; from NEE_CUT_REF
+GPP_NT_CUT_05,umolCO2 m-2 s-1,5th percentile of GPP_NT_CUT ensemble
+GPP_NT_CUT_95,umolCO2 m-2 s-1,95th percentile of GPP_NT_CUT ensemble
+GPP_DT_CUT_REF,umolCO2 m-2 s-1,GPP daytime partitioning; from NEE_CUT_REF
+GPP_DT_CUT_05,umolCO2 m-2 s-1,5th percentile of GPP_DT_CUT ensemble
+GPP_DT_CUT_95,umolCO2 m-2 s-1,95th percentile of GPP_DT_CUT ensemble
+RECO_NT_VUT_REF,umolCO2 m-2 s-1,Ecosystem respiration; night-time partitioning; VUT
+RECO_DT_VUT_REF,umolCO2 m-2 s-1,Ecosystem respiration; daytime partitioning; VUT
+RECO_NT_CUT_REF,umolCO2 m-2 s-1,Ecosystem respiration; night-time partitioning; CUT
+RECO_DT_CUT_REF,umolCO2 m-2 s-1,Ecosystem respiration; daytime partitioning; CUT
+TA_F,deg C,Air temperature; consolidated from measured (MDS gap-filled) and downscaled ERA5
+TA_F_QC,-,QC for TA_F: 0 = measured; 1 = good gap-fill; 2 = medium; 3 = poor/ERA5
+SW_IN_F,W m-2,Incoming shortwave radiation; consolidated (measured + ERA5)
+SW_IN_F_QC,-,QC for SW_IN_F
+VPD_F,hPa,Vapour pressure deficit; consolidated (measured + ERA5)
+VPD_F_QC,-,QC for VPD_F
+P_F,mm per half hour,Precipitation; consolidated (measured + ERA5)
+USTAR,m s-1,Friction velocity (not gap-filled)
