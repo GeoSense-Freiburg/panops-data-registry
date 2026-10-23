@@ -18,6 +18,7 @@ Sys.setenv(PAPER_RESP_SET = "efp_v5", PAPER_NO_THRESH = "1")
 ROOT <- Sys.getenv("PAPER_ROOT", Sys.getenv("PAPER_ROOT", ".")); setwd(ROOT)
 source("scripts/paper_v41/paper_common.R")
 source("scripts/paper_v41/fig_style.R")
+set.seed(20261023)                                                       # jittered points reproducible
 OUT <- "plots/paper_v5_nothresh/nature/appendix"; dir.create(OUT, showWarnings = FALSE, recursive = TRUE)
 EFP <- EFP_ORDER_FIG; WINS <- c("12m", "24m"); WLAB <- c("12m" = "12 months", "24m" = "24 months")
 LAB <- c(AG = "AutoGluon", XGB = "XGBoost", LGB = "LightGBM")

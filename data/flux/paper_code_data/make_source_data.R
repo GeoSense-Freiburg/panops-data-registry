@@ -42,10 +42,10 @@ write_xlsx(list(README = readme("Table 1: AutoGluon skill under repeated leave-o
 # ---- Table 2 ------------------------------------------------------------------------------------------
 pb <- fread(file.path(here, "plots/paper_v5_nothresh/paired_bootstrap_statistics.csv"))[learner == "AG" & metric == "MAE"]
 pb[, q := p.adjust(p_perm, "BH"), by = level]                           # BH over the AutoGluon tests of each level (as in the draft)
-b <- pb[level == "siteyear" & subset %in% c("all", "midhigh", "high", "yr_midhigh", "yr_high")]
+b <- pb[level == "siteyear" & subset %in% c("all", "yr_midhigh", "yr_high")]       # the three columns of Table 2 (2026-10-23)
 write_xlsx(list(README = readme(c("Table 2: change of the pooled site-year MAE when mortality is added (AutoGluon).",
                                   "pct = % change; pct_lo/pct_hi = 95 % site-block bootstrap interval; p_perm/q = paired permutation (sites swapped), BH-corrected across the AutoGluon site-year tests.",
-                                  "subset: all = all site-years; midhigh / high = all years of the Mid+High / High sites; yr_midhigh / yr_high = site-years whose own relative mortality exceeds the Mid / High break.")),
+                                  "subset: all = all site-years; yr_midhigh / yr_high = site-years whose own relative mortality exceeds the Mid (10.6 %) / High (24.0 %) break; q corrected over all AutoGluon site-year tests, as in the draft.")),
                 statistics = b[, .(response, window, subset, n_sites = n_units, n_site_years = n_obs, diff, pct, pct_lo, pct_hi, p_perm, q)]),
            file.path(O, "Table2_siteyear_MAE_bootstrap.xlsx"))
 

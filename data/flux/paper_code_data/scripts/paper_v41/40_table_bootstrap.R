@@ -27,6 +27,10 @@ COLS <- list(c("site", "all"), c("siteyear", "all"), c("siteyear", "midhigh"), c
 # env TABLE_COLS = all (default) | siteyear (2026-10-09, draft main text: site-year columns only); suffix _siteyear
 SY_ONLY <- Sys.getenv("TABLE_COLS", "all") == "siteyear"
 if (SY_ONLY) COLS <- COLS[-1]
+# main-text Table 2 (2026-10-23): only all site-years and the two "years with mortality" columns (same as Fig. 2b); the
+# circularity table (AG_EXTRA) keeps all site-year columns. Stars keep the BH correction over all site-year tests.
+SY3 <- SY_ONLY && AG_EXTRA == ""
+if (SY3) COLS <- list(c("siteyear", "all"), c("siteyear", "yr_midhigh"), c("siteyear", "yr_high"))
 num <- function(x) sprintf("$%s%.1f$", ifelse(x < 0, "-", "+"), abs(x))
 cell <- function(x) if (!nrow(x)) "--" else
   sprintf("%s {\\tiny[%s, %s]}%s", num(x$pct), num(x$pct_lo), num(x$pct_hi), ifelse(x$sig == "", "", sprintf("$^{%s}$", x$sig)))
@@ -43,14 +47,19 @@ tex <- c("\\begin{table}[htbp]", "\\centering",
     "$^{*}$\\,$q<0.05$, $^{**}$\\,$q<0.01$, $^{***}$\\,$q<0.001$. ",
     if (SY_ONLY) "" else "\\emph{Site level}: one error per site (mean over its years). ",
     "\\emph{Site-year level}: every site-year is one observation. ",
-    "\\emph{All years of the sites}: all sites, or only the sites whose maximum relative mortality exceeds %.1f\\,\\%% (Mid + High) ",
-    "or %.1f\\,\\%% (High), with all their years. \\emph{Only the years with mortality}: site-years whose own relative mortality ",
-    "exceeds %.1f\\,\\%% or %.1f\\,\\%%. Numbers under the column heads: sites / site-years. ",
+    gsub("%", "%%", fixed = TRUE, if (SY3) sprintf(paste0("Columns: all site-years, and only the site-years whose own relative mortality exceeds %.1f\\,\\%% or ",
+      "%.1f\\,\\%% (high mortality). Numbers under the column heads: sites / site-years. "), b$b_lo, b$b_hi) else
+    sprintf(paste0("\\emph{All years of the sites}: all sites, or only the sites whose maximum relative mortality exceeds %.1f\\,\\%% (Mid + High) ",
+      "or %.1f\\,\\%% (High), with all their years. \\emph{Only the years with mortality}: site-years whose own relative mortality ",
+      "exceeds %.1f\\,\\%% or %.1f\\,\\%%. Numbers under the column heads: sites / site-years. "), b$b_lo, b$b_hi, b$b_lo, b$b_hi)),
     "%d sites, %d site-years, deadtrees v5 maps.}"),
-    MET, MET, paste(LAB[SHOW], collapse = " and "), MET, MET, b$b_lo, b$b_hi, b$b_lo, b$b_hi, max(st$n_units), max(st$n_obs)),
+    MET, MET, paste(LAB[SHOW], collapse = " and "), MET, MET, max(st$n_units), max(st$n_obs)),
   sprintf("\\label{tab:bootstrap_d%s_%s}", MET, paste(SHOW, collapse = "")),
   "\\scriptsize", "\\setlength{\\tabcolsep}{3pt}",
   "\\resizebox{\\linewidth}{!}{%",
+  if (SY3) c("\\begin{tabular}{llccc}", "\\toprule",
+    " & & All site-years & \\multicolumn{2}{c}{Only the years with mortality} \\\\", "\\cmidrule(lr){4-5}",
+    sprintf(" & & & $>$ %.1f\\,\\%% & $>$ %.1f\\,\\%% (high mortality) \\\\", b$b_lo, b$b_hi)) else
   if (SY_ONLY) c("\\begin{tabular}{llccccc}", "\\toprule",
     " & & \\multicolumn{3}{c}{All years of the sites} & \\multicolumn{2}{c}{Only the years with mortality} \\\\",
     "\\cmidrule(lr){3-5}\\cmidrule(lr){6-7}",
