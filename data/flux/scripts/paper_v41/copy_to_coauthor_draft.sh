@@ -25,6 +25,8 @@ c $N/AG_12m/fig5_residual_by_mortality_class.png A_fig_residual_by_mortality_AG_
 c $A/dose_robustness_AG.png A_fig_dose_robustness_AG.png
 c $A/dose_siteyear_AG.png A_fig_dose_siteyear_AG.png
 c $A/residual_efpclim_AG_24m.png fig6_residual_by_mortality_AG_efpclim_24m.png
+c $A/shap_composition_AG_24m.png A_fig_shap_composition_AG_24m.png
+c $A/shap_composition_AG_12m.png A_fig_shap_composition_AG_12m.png
 # tables: label and float placement as used in the draft
 cpt() { sed -e "s/\\\\label{[^}]*}/\\\\label{$3}/" -e "s/\\\\begin{table}\\[[a-z]*\\]/\\\\begin{table}[$4]/" $T/$1 > $D/tables/$2.tex; }
 cpt table_bootstrap_dMAE_v5_nothresh_AG_siteyear.tex table1_bootstrap_siteyear_dMAE_AG tab:main htbp

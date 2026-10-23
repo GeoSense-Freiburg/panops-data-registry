@@ -537,4 +537,26 @@ to Supplementary Information. The A-sections below still need to be split into E
 \parbox{\linewidth}{{\small \textbf{Fig.\ A13} $|$ \textbf{The over-prediction and its correction remain when the climate variables used to compute each property are left out.} As Fig.~3 (AutoGluon, 24 months) with the EFP-specific climate block: radiation removed for GPP$_\mathrm{sat}$, air temperature for ET$_\mathrm{max}$ and WUE.}}
 \end{center}
 
+\clearpage
+\subsection*{A8. Driver composition of the predictions per site}
+\begin{itemize}
+  \item Share of climate, traits and mortality in the mean $|$SHAP$|$ of each site (C+T+M, AutoGluon). Averaged over the
+        sites, mortality accounts for 22--27\,\% of the attribution for GPP$_\mathrm{sat}$, NEP$_\mathrm{max}$ and WUE
+        (24 months; 23--30\,\% at 12 months) and for 15--16\,\% for ET$_\mathrm{max}$; climate carries most of the rest.
+  \item High-mortality sites are over-represented among the sites with the largest mortality share (12 of the top 20,
+        against 22 of all 101 sites), but over all sites the share is only weakly related to relative mortality
+        (Spearman $\rho$ = 0.19 at 24 months, $p$ = 0.06; 0.20 at 12 months, $p$ = 0.05): $|$SHAP$|$ measures how much
+        the predictions depend on mortality, not in which direction (for the direction see Fig.~4).
+\end{itemize}
+
+\begin{center}
+\includegraphics[width=\linewidth]{figures/A_fig_shap_composition_AG_24m.png}\\[2pt]
+\parbox{\linewidth}{{\small \textbf{Fig.\ A14} $|$ \textbf{Climate dominates the predictions at every site; mortality accounts for about a fifth to a quarter.} Relative mean $|$SHAP$|$ of the climate (blue), trait (green) and mortality predictors (orange) per site for GPP$_\mathrm{sat}$ (\textbf{a}), NEP$_\mathrm{max}$ (\textbf{b}), ET$_\mathrm{max}$ (\textbf{c}) and WUE (\textbf{d}); model with climate, traits and mortality (C+T+M), AutoGluon, 24-month window; shares sum to 1 per site and property. The 101 sites are ordered by their mean mortality share over the four properties, highest on the left; the strip below the bars shows each site's maximum relative mortality (mean of five buffers of 100--500\,m radius) in the colours of Fig.~4 (class breaks 10.6\,\% and 24.0\,\%). FLUXNET site codes below the strip.}}
+\end{center}
+
+\begin{center}
+\includegraphics[width=\linewidth]{figures/A_fig_shap_composition_AG_12m.png}\\[2pt]
+\parbox{\linewidth}{{\small \textbf{Fig.\ A15} $|$ \textbf{As Fig.~A14 for the 12-month window} (AutoGluon).}}
+\end{center}
+
 \end{document}
