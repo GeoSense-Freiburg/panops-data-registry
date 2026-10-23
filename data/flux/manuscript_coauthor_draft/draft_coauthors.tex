@@ -70,8 +70,8 @@ net ecosystem productivity by 11--12\,\% overall and by about 30\,\% in years wi
 water-use efficiency mainly where mortality occurred; maximum evapotranspiration did not improve. Without mortality,
 models over-estimated carbon uptake and water-use efficiency in high-mortality years, a bias that grew with the amount of
 mortality and that mortality information reduced by about two-thirds. The direction of the effect followed the amount of
-mortality rather than vegetation type or tree cover, and the results held when whole sites were resampled and
-when the climate variables used to calculate each property were left out. Mortality maps can thus correct a systematic over-estimate of
+mortality rather than vegetation type or tree cover, and the results held when whole sites were resampled.
+Mortality maps can thus correct a systematic over-estimate of
 carbon uptake in woody ecosystems with high mortality.
 
 \section*{Main}
@@ -213,10 +213,7 @@ lowered the predicted carbon uptake and WUE.
 
 \subsection*{The results are robust}
 The results were the same with the 12-month window (Figs.~A5 and A10), with site-level tests and with
-the root-mean-square error (Tables~\ref{tab:a_site} and \ref{tab:a_boot_rmse}). Because some climate variables enter the
-calculation of the properties, we refitted each property without them (radiation for GPP$_\mathrm{sat}$, air temperature for ET$_\mathrm{max}$ and
-WUE); $R^2$ changed by about 0.03 or less, and the error reductions, the over-prediction without mortality and its correction
-remained (Table~\ref{tab:efpclim} and Fig.~A13). Finally, the five mortality metrics were strongly correlated (relative mortality
+the root-mean-square error (Tables~\ref{tab:a_site} and \ref{tab:a_boot_rmse}). Finally, the five mortality metrics were strongly correlated (relative mortality
 and relative deadwood, $\rho=0.91$), and relative mortality and relative deadwood carried the largest shares of the mortality
 block's SHAP (26 and 24\,\%; Fig.~A9).
 
@@ -294,8 +291,7 @@ predictions rather than the physiological mechanisms behind the change. Only 21 
 when any single site or the three most extreme sites were left out. Mortality was derived from maps around each tower
 (100--500\,m buffers), which do not match the varying flux footprint exactly, and errors in the maps add noise that
 probably weakens rather than strengthens the effects we report. Finally, the climate predictors cover only the period
-before the growing season, and leaving out the climate variables that enter the calculation of each property did not
-change the main results (Appendix~A7), so the mortality effect does not arise from circularity with the climate data.
+before the growing season.
 
 Knowing where and when trees die makes the carbon uptake of woody ecosystems more predictable. Without that knowledge, models
 systematically over-estimated carbon uptake in ecosystems with high mortality; with it, this bias shrank, and the correction
@@ -387,9 +383,7 @@ mortality class with the paired site-level permutation (100\,000 draws). Differe
 Low+Mid sites were tested with Mann--Whitney U tests and associations with Spearman correlations. $P$ values were corrected for
 multiple testing with the Benjamini--Hochberg procedure\cite{benjamini1995controlling} within each table or figure. Growing-season means of ecosystem respiration and gross and net productivity (FLUXNET daily
 data, night-time partitioning) were related to the relative mortality of the site-year with the same mixed model and a
-site-block bootstrap (1,000 draws). To test for
-circularity, each property was refitted without the climate variables that enter its own formula (shortwave radiation for
-GPP$_\mathrm{sat}$, air temperature for ET$_\mathrm{max}$ and WUE).
+site-block bootstrap (1,000 draws).
 
 \textbf{Software.} Analyses used R\cite{rcore2024} (v4.3.3; nlme, bigleaf) and Python (AutoGluon, shap).
 
