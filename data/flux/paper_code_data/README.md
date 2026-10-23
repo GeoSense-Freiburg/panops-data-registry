@@ -32,7 +32,7 @@ paper_code_data/
 │                              01-04 data (mortality metrics, NEPmax/growing season/climate, dataset, traits)
 │                              10-13 XGBoost / LightGBM (earlier check, not shown in the paper)
 │                              31, 37-43 statistics; 53 respiration check
-│                              50-52 + fig_style.R: figures of the current draft (Nature style)
+│                              50-52, 55 + fig_style.R: figures of the current draft (Nature style)
 │                              20-32 older figure layouts (kept for reference)
 ├── AutoGluon/                 ag_common.py, 01-03 (fits, repeated leave-one-site-out, SHAP), run_*.sh, 05*_figures.sh
 │   └── outputs/               efp_v5_nothresh (main run), efp_v5_nothresh_efpclim (circularity check)

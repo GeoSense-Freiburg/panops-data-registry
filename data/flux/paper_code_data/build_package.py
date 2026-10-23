@@ -38,6 +38,7 @@ CODE = [  # paths relative to the project root = paths inside the package
     # Nature-style figures of the current draft (2026-10-21) and the respiration check
     "scripts/paper_v41/fig_style.R", "scripts/paper_v41/50_figures_nature.R", "scripts/paper_v41/51_appendix_figures_nature.R",
     "scripts/paper_v41/52_skill_bars.R", "scripts/paper_v41/53_reco_mortality_check.R",
+    "scripts/paper_v41/55_appendix_shap_composition.R",
 ]
 
 DATA = [  # analysis-ready inputs and results, at the paths the scripts use
