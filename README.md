@@ -169,6 +169,17 @@ python src/soilgrids/get_soilgrids_data.py -v -d
 python src/worldclim/get_worldclim_data.py
 ```
 
+#### ESA CCI Soil Moisture
+- **Script**: `src/soil_moisture_cci/get_soil_moisture_cci_data.py`
+- **Configure in `params.yaml` under `soil_moisture_cci`**: `base_url`, `products`, `version`, `year_start`, `year_end`, `n_workers`, `out_dir`.
+- **Flags**: `--dry-run` (list files and total size only), `-t/--test` (first 3 files of the first year).
+- **Output**: daily 0.25° NetCDF files in `data/soil_moisture_cci/<PRODUCT>/<version>/<year>/`, plus `manifest.csv`. Re-running skips files already downloaded.
+- **Run** (from the project root; `-m` is needed unless the project is installed with `pip install -e .`):
+```bash
+python -m src.soil_moisture_cci.get_soil_moisture_cci_data --dry-run
+python -m src.soil_moisture_cci.get_soil_moisture_cci_data
+```
+
 #### Canopy height (ETH 2020)
 - **Script**: `src/canopy_height/get_canopy_height_data.py`
 - **Configure in `params.yaml` under `canopy_height`**: `height_collection`, `sd_collection`, `nodata`, `crs`, `scale`, `target`, `bucket`, `out_dir`.

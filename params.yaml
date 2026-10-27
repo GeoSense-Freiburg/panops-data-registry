@@ -59,6 +59,16 @@ worldclim:
   url: https://biogeo.ucdavis.edu/data/worldclim/v2.1/base/wc2.1_30s_bio.zip
   out_dir: data/worldclim
 
+soil_moisture_cci:
+  base_url: https://dap.ceda.ac.uk/neodc/esacci/soil_moisture/data/daily_files
+  products:
+    - "COMBINED" # also available: "ACTIVE", "PASSIVE"
+  version: "latest" # or a fixed version, e.g. "v09.1"
+  year_start: null # null = first year on the server
+  year_end: null # null = last year on the server
+  n_workers: 4
+  out_dir: data/soil_moisture_cci
+
 vodca:
   collection_base: "projects/sat-io/open-datasets/VODCA"
   bands:
