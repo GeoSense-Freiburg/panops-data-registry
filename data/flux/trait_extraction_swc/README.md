@@ -12,7 +12,29 @@ Source: `data/trait_maps/lusk_et-al_2025/cwms/Shrub_Tree_Grass/1km/`
 python3 -I scripts/01_site_coordinates.py           # data/site_coordinates.csv
 $RSCRIPT scripts/02_extract_traits_per_cell.R       # per-cell + site summary
 $RSCRIPT scripts/03_trait_diagnostics.R             # per-trait diagnostics + wide tables
+$RSCRIPT scripts/04_extract_esacci_sm.R             # daily ESA CCI soil moisture (~7 min, 32 cores)
 ```
+
+## ESA CCI Soil Moisture (step 04)
+
+Daily COMBINED v09.2 (0.25°, surface ~2–5 cm, m³ m⁻³), 1978-11-01 to 2024-12-31
+(no 2025), from `data/soil_moisture_cci/` in the registry. Values at the tower
+cell plus the mean of the 3 × 3 cell block (~75 km) as fallback.
+
+| File | Contents |
+|---|---|
+| `esacci_sm_daily.csv.gz` | site × day: `sm`, `sm_uncertainty`, `flag`, `freqbandID`, `sensor` (tower cell), `sm_3x3_mean`, `n_valid_3x3` |
+| `esacci_sm_site_year.csv` | site × year: valid days, frozen / dense-vegetation flag fractions, mean sm |
+| `esacci_sm_site_summary.csv` | site: grid cell, first/last valid day, valid fractions 2017–2024 |
+
+`flag` is a bit mask: 1 snow/frozen, 2 dense vegetation, 4 no convergence,
+8 outside physical bounds, 16 low weight, 32 all inputs unreliable, 64 barren.
+
+Coverage 2017–2024: median 60 % of days valid at the tower cell, 83 % for the
+3 × 3 mean. 76 sites have no tower-cell value at all: the cell is masked over the
+whole record (no value and no flag), e.g. FI-Hyy, FI-Sii, GF-Guy, CA-TP1, IT-Ro1;
+21 of them stay empty in the 3 × 3 block too. Forests and wetlands are worst
+(ENF median 47 %, WET 39 %), savannas best (> 90 %).
 
 ## Sites
 
