@@ -5,7 +5,7 @@ cd /mnt/gsdata/projects/panops/panops-data-registry/data/flux
 D=manuscript_coauthor_draft; P=plots/paper_v5_nothresh; N=$P/nature; A=$N/appendix; T=manuscript/tables
 c() { if [ -f "$1" ]; then cp "$1" "$D/figures/$2"; else echo "MISSING $1"; fi; }
 # main text
-c $N/AG_24m/fig1_sites_efps.png fig1_site_map.png
+c $N/AG_24m/fig1_sites_efps.png A_fig_sites_efps.png
 c $N/AG_24m/fig_skill_bars.png fig_skill_bars_AG.png
 c $N/AG_24m/fig5_residual_by_mortality_class.png fig2_residual_by_mortality_AG_24m.png
 c $N/AG_24m/fig2_net_mortality_shap_per_site_piyg_names.png fig3_signed_relmort_24m_AG_piyg_names.png
