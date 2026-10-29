@@ -1,6 +1,11 @@
 outs:
-- md5: 85fb88337543d010867ce942cc758043.dir
-  size: 307941318
+- md5: 5117aaf02c79d4bee2b8e58db93de46e.dir
+  size: 307289014
   nfiles: 1
   hash: md5
   path: TRY_6_gapfilled_for_distribution
+  desc: >-
+    TRY 6.0 gap-filled, filtered (TRY6_gapfilled_filtered_2.csv). 2026-10-27: column
+    X.X47. (LDMC) replaced with Jens Kattge's corrected values (gapfilled_filtered_2_new_47.csv),
+    matched on ObservationID; all other columns unchanged. Previous version:
+    85fb88337543d010867ce942cc758043.dir.
