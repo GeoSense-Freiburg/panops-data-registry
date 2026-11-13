@@ -17,13 +17,17 @@ functional type cover.
 
 | Folder | Files | Bands |
 | --- | --- | --- |
-| `SLA/`, `LNC/`, `LPC/` | 18 GeoTIFF tiles each (`<trait>_1.tif` … `<trait>_18.tif`) | 1 Mean (original units), 2 Std log, 3 Skewness, 4 Excess Kurtosis |
+| `SLA/`, `LNC/`, `LPC/` | 18 GeoTIFF tiles each (`<trait>_1.tif` … `<trait>_18.tif`) | 1 Mean, 2 Std log, 3 Skewness, 4 Excess Kurtosis (band names as delivered; see the scale notes below) |
 | `QA_SLA/`, `QA_LNC/`, `QA_LPC/` | 18 GeoTIFF tiles each | 1 Grid cell size (selected quadrat), 2 Missing Species (abundance share without trait data) |
 
 - Traits: specific leaf area (mm² mg⁻¹), leaf nitrogen per mass (mg g⁻¹), leaf
   phosphorus per mass (mg g⁻¹).
-- SD, skewness and kurtosis are on the natural-log scale. The mean is
-  back-transformed, so it is a geometric mean.
+- All four moments are on the natural-log scale. Band 1 holds the ln-scale mean
+  (SLA median 2.65 = ln 14 mm² mg⁻¹), although the paper describes back-transformed
+  means; exp(band 1) gives the geometric mean in original units.
+- Band 4 is named "Excess Kurtosis", but its values never fall below about 1.5 and
+  center on 3 (5th–95th percentile 1.5–23 for SLA), which is raw kurtosis.
+  Subtract 3 for excess kurtosis. Checked 2026-11-13 on tile 5 of each trait.
 - Grid: EPSG:4326, 0.008983° (about 1 km), float32, NaN where there is no value.
 - The paper validates only the means (against sPlotOpen); the higher moments are
   described as proof-of-concept products.
