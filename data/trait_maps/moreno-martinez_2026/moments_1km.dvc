@@ -1,0 +1,6 @@
+outs:
+- md5: 4b94422a7134a0a26073eb2e0edf1b33.dir
+  size: 9683299573
+  nfiles: 108
+  hash: md5
+  path: moments_1km
